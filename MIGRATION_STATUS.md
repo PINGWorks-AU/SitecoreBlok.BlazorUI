@@ -107,12 +107,12 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 
 | Status | Count |
 |---|---|
-| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 52 |
+| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 53 |
 | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | 6 |
 | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | 5 |
-| ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 4 |
+| ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 2 |
 | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | 5 |
-| **Total ported** | **63** of **72** Blok primitives |
+| **Total ported** | **59** of **66** Blok primitives |
 
 ## Notes on classification
 
