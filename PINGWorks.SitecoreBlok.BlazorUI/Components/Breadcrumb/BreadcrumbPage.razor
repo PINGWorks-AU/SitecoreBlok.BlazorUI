@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<span data-slot="breadcrumb-page" role="link" tabindex="0" aria-disabled="true" aria-current="page" class="@CssClass">
+	@ChildContent
+</span>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start("text-foreground font-normal")
+										.With(ClassName)
+										.Build();
+}

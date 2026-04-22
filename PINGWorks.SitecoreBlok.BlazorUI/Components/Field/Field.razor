@@ -1,0 +1,19 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="field" role="group" data-invalid="@(DataInvalid ? "true" : null)" class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public FieldOrientation Orientation { get; set; } = FieldOrientation.Vertical;
+	[Parameter] public bool DataInvalid { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "flex gap-2" )
+										.With( "flex-col gap-2.5", Orientation is FieldOrientation.Vertical )
+										.With( "flex-row items-center gap-4", Orientation is FieldOrientation.Horizontal )
+										.With( "data-[invalid=true]:[&_input]:border-destructive data-[invalid=true]:[&_select]:border-destructive data-[invalid=true]:[&_textarea]:border-destructive", DataInvalid )
+										.With( ClassName )
+										.Build();
+}

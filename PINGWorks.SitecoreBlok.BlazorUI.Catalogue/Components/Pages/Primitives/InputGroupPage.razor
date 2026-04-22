@@ -1,0 +1,97 @@
+@page "/primitives/inputgroup"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="InputGroup" Description="Groups input elements with addons" Interactivity="ComponentInteractivity.Ssr" ApiElements="@InputGroupElements">
+
+	<DivergenceNote>
+		<p><strong>Missing <code>InputGroupButton</code> and <code>InputGroupTextarea</code> sub-components.</strong> Blok exports these in addition to the standard <code>InputGroupAddon</code>, <code>InputGroupInput</code>, and <code>InputGroupText</code>. If you need a button affordance inside an input group, nest a plain <code>&lt;Button&gt;</code> inside <code>&lt;InputGroupAddon&gt;</code>; for a multi-line textarea use <code>&lt;Textarea&gt;</code> standalone. Classes and slot names match Blok exactly for every sub-component we do ship.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With prefix icon" Code="@("<InputGroup>\n    <InputGroupAddon>\n        <Icon Svg=\"@IconSvg.Magnify\" />\n    </InputGroupAddon>\n    <InputGroupInput Placeholder=\"Search...\" />\n</InputGroup>")">
+			<InputGroup>
+				<InputGroupAddon>
+					<Icon Svg="@IconSvg.Magnify" />
+				</InputGroupAddon>
+				<InputGroupInput Placeholder="Search..." />
+			</InputGroup>
+		</ComponentExample>
+
+		<ComponentExample Title="With suffix text" Code="@("<InputGroup>\n    <InputGroupInput Placeholder=\"0.00\" />\n    <InputGroupAddon Align=\"InputGroupAlign.InlineEnd\">\n        <span>USD</span>\n    </InputGroupAddon>\n</InputGroup>")">
+			<InputGroup>
+				<InputGroupInput Placeholder="0.00" />
+				<InputGroupAddon Align="InputGroupAlign.InlineEnd">
+					<span>USD</span>
+				</InputGroupAddon>
+			</InputGroup>
+		</ComponentExample>
+
+		<ComponentExample Title="With addon on both sides" Code="@("<InputGroup>\n    <InputGroupAddon>\n        <Icon Svg=\"@IconSvg.Mail\" />\n    </InputGroupAddon>\n    <InputGroupInput Placeholder=\"you@example.com\" />\n    <InputGroupAddon Align=\"InputGroupAlign.InlineEnd\">\n        <Icon Svg=\"@IconSvg.Check\" />\n    </InputGroupAddon>\n</InputGroup>")">
+			<InputGroup>
+				<InputGroupAddon>
+					<Icon Svg="@IconSvg.Mail" />
+				</InputGroupAddon>
+				<InputGroupInput Placeholder="you@example.com" />
+				<InputGroupAddon Align="InputGroupAlign.InlineEnd">
+					<Icon Svg="@IconSvg.Check" />
+				</InputGroupAddon>
+			</InputGroup>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] InputGroupElements =
+	[
+		new ApiElement(
+			Name: "InputGroup",
+			Description: "Container that composes an `InputGroupInput` with one or more `InputGroupAddon`s into a single rounded control. Provides focus-within and aria-invalid styling for the whole group.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the group container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain one `InputGroupInput` and one or more `InputGroupAddon`s." ),
+			]
+		),
+		new ApiElement(
+			Name: "InputGroupAddon",
+			Description: "Prefix or suffix slot within an `InputGroup`. Position is controlled by `Align`; typical contents are icons, short text, or a small `Button`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Align",        "InputGroupAlign", false, "Position within the group. Default: `InputGroupAlign.InlineStart`. Other values: `InlineEnd`, `BlockStart`, `BlockEnd`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the addon container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Addon contents — icon, text, or small button." ),
+			]
+		),
+		new ApiElement(
+			Name: "InputGroupInput",
+			Description: "The editable control inside an `InputGroup`. Renders an unstyled `<input>` whose border and focus ring come from the parent group.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Type",                 "string",                        false, "Native `<input>` type. Default: `\"text\"`." ),
+				new ApiProperty( "Value",                "string?",                       false, "Two-way bindable current value." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Invoked on input. Pair with `Value` via `@bind-Value`." ),
+				new ApiProperty( "Placeholder",          "string?",                       false, "Placeholder text shown when the value is empty." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, disables the input. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<input>`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<input>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "InputGroupText",
+			Description: "Muted inline text for use inside an `InputGroupAddon` when you need Blok's addon typography without the addon wrapper itself.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the text `<span>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Text content — typically a currency code, unit, or short hint." ),
+			]
+		),
+	];
+}

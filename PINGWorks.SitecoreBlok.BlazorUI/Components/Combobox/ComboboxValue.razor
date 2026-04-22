@@ -1,0 +1,22 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<span data-slot="combobox-value" style="pointer-events:none">
+	@if ( ChildContent is not null )
+	{
+		@ChildContent
+	}
+	else if ( Parent.Value is not null )
+	{
+		@Parent.GetDisplayLabel()
+	}
+	else if ( Placeholder is not null )
+	{
+		<span class="text-muted-foreground">@Placeholder</span>
+	}
+</span>
+
+@code {
+	[CascadingParameter] public required Combobox Parent { get; set; }
+	[Parameter] public string? Placeholder { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

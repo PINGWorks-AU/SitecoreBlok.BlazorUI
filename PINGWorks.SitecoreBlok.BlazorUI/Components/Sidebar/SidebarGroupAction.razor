@@ -1,0 +1,21 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button data-slot="sidebar-group-action" data-sidebar="group-action" class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+	@ChildContent
+</button>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public EventCallback OnClicked { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground ring-sidebar-ring outline-hidden transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+		"after:absolute after:-inset-2 md:after:hidden",
+		"group-data-[collapsible=icon]:hidden" )
+		.With( ClassName )
+		.Build();
+
+	private Task OnClick() => OnClicked.InvokeAsync();
+}

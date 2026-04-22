@@ -1,0 +1,99 @@
+@page "/primitives/searchinput"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="SearchInput" Description="A search input with icon and clear button" Interactivity="ComponentInteractivity.Interactive" ApiElements="@SearchInputElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<SearchInput>\n    <SearchInputLeftElement>\n        <Icon Svg=\"@IconSvg.Magnify\" />\n    </SearchInputLeftElement>\n    <SearchInputField Placeholder=\"Search...\" @bind-Value=\"query\" />\n    <SearchInputRightElement>\n        <SearchInputClearButton OnClear=\"Clear\" />\n    </SearchInputRightElement>\n</SearchInput>")">
+			<div class="max-w-sm">
+				<SearchInput>
+					<SearchInputLeftElement>
+						<Icon Svg="@IconSvg.Magnify" />
+					</SearchInputLeftElement>
+					<SearchInputField Placeholder="Search..." @bind-Value="Query" />
+					<SearchInputRightElement>
+						<SearchInputClearButton OnClear="Clear" />
+					</SearchInputRightElement>
+				</SearchInput>
+				@if (!string.IsNullOrEmpty(Query))
+				{
+					<p class="text-sm text-muted-foreground mt-2">Searching: @Query</p>
+				}
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Query;
+
+	private void Clear()
+	{
+		Query = null;
+	}
+
+	private static readonly ApiElement[] SearchInputElements =
+	[
+		new ApiElement(
+			Name: "SearchInput",
+			Description: "Outer container that lays out an optional left element, the `SearchInputField`, and an optional right element in a single row with a focus-visible border.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the outer `div`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Composed children — typically `SearchInputLeftElement`, `SearchInputField`, and `SearchInputRightElement`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SearchInputLeftElement",
+			Description: "Leading slot, usually holding a magnifier `Icon`. Sized to match the input and marked `pointer-events:none` so clicks pass through to the field.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the left element wrapper." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Icon or small leading markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "SearchInputField",
+			Description: "The actual `<input>` element. Exposes standard `Value`/`ValueChanged` for two-way binding plus an optional `DebounceMs` to throttle change notifications while typing.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                       false, "The current input value. Use `@bind-Value` for two-way binding." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Fires when the value changes (after the `DebounceMs` delay, if set). Part of the `@bind-Value` pair." ),
+				new ApiProperty( "Placeholder",          "string?",                       false, "Placeholder text shown when the field is empty." ),
+				new ApiProperty( "Type",                 "string",                        false, "Native `<input>` `type` attribute. Default: `\"text\"`." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, the field cannot be edited. Default: `false`." ),
+				new ApiProperty( "DebounceMs",           "int",                           false, "Milliseconds to wait after the last keystroke before firing `ValueChanged`. Default: `0` (no debounce)." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<input>` element." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<input>` element." ),
+			]
+		),
+		new ApiElement(
+			Name: "SearchInputRightElement",
+			Description: "Trailing slot, typically containing `SearchInputClearButton` or another inline action.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the right element wrapper." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Trailing content — usually `SearchInputClearButton`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SearchInputClearButton",
+			Description: "Pre-styled close-icon button that clears the search field. Wire `OnClear` to reset your bound value.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "OnClear",      "EventCallback",    false, "Invoked when the button is clicked. Reset the bound `SearchInputField` value here." ),
+				new ApiProperty( "AriaLabel",    "string",           false, "Accessible label for the button. Default: `\"Clear search\"`." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the button." ),
+			]
+		),
+	];
+}

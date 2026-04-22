@@ -1,0 +1,50 @@
+@page "/primitives/timepicker"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="TimePicker" Description="A time selection input" Interactivity="ComponentInteractivity.Interactive" ApiElements="@TimePickerElements">
+
+	<DivergenceNote>
+		<p><strong>Value type is <code>TimeSpan?</code> (24-hour), not Blok's <code>TimeValue &#123; hour, minute, period: AM/PM &#125;</code>.</strong> Blok models time as a structured object with an AM/PM period flag so the 12-hour display and the 24-hour internal representation can diverge. Blazor's <code>TimeSpan</code> is naturally 24-hour; we display in 24-hour by default and format via a <code>Format</code> string for 12-hour presentation. Consumers migrating from Blok need to convert their <code>TimeValue</code> to <code>TimeSpan</code> on binding (and ignore the period field, which our component infers from the hour).</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<TimePicker @bind-Value=\"selectedTime\" />")">
+			<div class="space-y-4">
+				<TimePicker @bind-Value="SelectedTime" />
+				@if ( SelectedTime is not null )
+				{
+					<p class="text-sm text-muted-foreground">Selected: @SelectedTime.Value.ToString(@"hh\:mm")</p>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<TimePicker Disabled=\"true\" />")">
+			<TimePicker Disabled="true" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private TimeSpan? SelectedTime;
+
+	private static readonly ApiElement[] TimePickerElements =
+	[
+		new ApiElement(
+			Name: "TimePicker",
+			Description: "Wraps a native `<input type=\"time\">` styled to match Blok. Two-way bindable via `@bind-Value` to a `TimeSpan?`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",                "TimeSpan?",                     false, "Selected time as a 24-hour `TimeSpan`. Null when unset or the underlying input is cleared." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<TimeSpan?>",      false, "Invoked when the user edits the time." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, the input is read-only and visually muted. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the outer wrapper." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the underlying `<input>`." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,92 @@
+@page "/primitives/errorstate"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="ErrorState" Description="Displays an error state with predefined variants for common HTTP status codes" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ErrorStateElements">
+
+	<DivergenceNote>
+		<p><strong>Variant-driven HTTP error copy is a Blazor-side addition.</strong> Blok's <code>EmptyStates</code> covers a generic <code>error</code> variant only. We extend the pattern with HTTP-status-code variants (<code>Http400</code>, <code>Http401</code>, <code>Http403</code>, <code>Http404</code>, <code>Http500</code>, <code>Http503</code>) that auto-populate title, description, error code, and matching <code>IllustrationSvg</code> — common needs in martech apps. Override any of <code>Title</code>, <code>Description</code>, <code>ErrorCode</code>, or <code>Illustration</code> as strings to customise per call site. Pass <code>ChildContent</code> for custom action buttons (default is a single "Go to homepage" link).</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Generic" Code="@("<ErrorState />")">
+			<div class="border border-border rounded-lg">
+				<ErrorState />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="404 - Page Not Found" Code="@("<ErrorState Variant=\"ErrorStateVariant.Http404\" />")">
+			<div class="border border-border rounded-lg">
+				<ErrorState Variant="ErrorStateVariant.Http404" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="401 - Unauthorized" Code="@("<ErrorState Variant=\"ErrorStateVariant.Http401\" />")">
+			<div class="border border-border rounded-lg">
+				<ErrorState Variant="ErrorStateVariant.Http401" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="403 - Forbidden" Code="@("<ErrorState Variant=\"ErrorStateVariant.Http403\" />")">
+			<div class="border border-border rounded-lg">
+				<ErrorState Variant="ErrorStateVariant.Http403" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="500 - Internal Server Error" Code="@("<ErrorState Variant=\"ErrorStateVariant.Http500\" />")">
+			<div class="border border-border rounded-lg">
+				<ErrorState Variant="ErrorStateVariant.Http500" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="503 - Service Unavailable" Code="@("<ErrorState Variant=\"ErrorStateVariant.Http503\" />")">
+			<div class="border border-border rounded-lg">
+				<ErrorState Variant="ErrorStateVariant.Http503" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="400 - Bad Request" Code="@("<ErrorState Variant=\"ErrorStateVariant.Http400\" />")">
+			<div class="border border-border rounded-lg">
+				<ErrorState Variant="ErrorStateVariant.Http400" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Custom Override" Code="@("<ErrorState Variant=\"ErrorStateVariant.Http404\"\n           Title=\"We couldn't find that\"\n           Description=\"The resource has been moved or deleted.\">\n    <div class=\"flex gap-2\">\n        <Button Variant=\"ButtonVariant.Link\">Go back</Button>\n        <Button Variant=\"ButtonVariant.Link\">Contact support</Button>\n    </div>\n</ErrorState>")">
+			<div class="border border-border rounded-lg">
+				<ErrorState Variant="ErrorStateVariant.Http404"
+							Title="We couldn't find that"
+							Description="The resource you requested has been moved or deleted.">
+					<div class="flex gap-2">
+						<Button Variant="ButtonVariant.Link">Go back</Button>
+						<Button Variant="ButtonVariant.Link">Contact support</Button>
+					</div>
+				</ErrorState>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ErrorStateElements =
+	[
+		new ApiElement(
+			Name: "ErrorState",
+			Description: "Full-height centred error panel with variant-driven defaults for title, description, error code, and illustration. Each string parameter overrides its variant-derived value independently.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Variant",      "ErrorStateVariant",   false, "Preset providing default title, description, error code, and illustration. Default: `ErrorStateVariant.Generic`. Other values: `Http400`, `Http401`, `Http403`, `Http404`, `Http500`, `Http503`." ),
+				new ApiProperty( "Title",        "string?",             false, "Overrides the variant's default title. When null, the variant's preset is used." ),
+				new ApiProperty( "Description",  "string?",             false, "Overrides the variant's default description. When null, the variant's preset is used." ),
+				new ApiProperty( "ErrorCode",    "string?",             false, "Overrides the variant's default error code. When null, the variant's preset is used (Generic has no code)." ),
+				new ApiProperty( "Illustration", "string?",             false, "Raw SVG markup rendered above the title. Overrides the variant's default `IllustrationSvg`." ),
+				new ApiProperty( "OnRetry",      "EventCallback",       false, "Fires when the default \"Go to homepage\" button is clicked. Only active when `ChildContent` is not supplied." ),
+				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes appended to the outer container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",     false, "Custom action content rendered below the description. When supplied, replaces the default \"Go to homepage\" link." ),
+			]
+		),
+	];
+}

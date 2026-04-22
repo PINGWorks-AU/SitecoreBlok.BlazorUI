@@ -1,0 +1,25 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="this">
+	<div data-slot="tooltip" class="relative inline-flex group/tooltip">
+		@ChildContent
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	internal bool IsSuppressed { get; private set; }
+
+	internal async Task Suppress()
+	{
+		IsSuppressed = true;
+		await InvokeAsync( StateHasChanged );
+	}
+
+	internal async Task Resume()
+	{
+		IsSuppressed = false;
+		await InvokeAsync( StateHasChanged );
+	}
+}

@@ -1,0 +1,28 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="this">
+	<div data-slot="accordion" class="@ClassName">
+		@ChildContent
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter, EditorRequired] public required RenderFragment ChildContent { get; set; }
+	[Parameter] public AccordionType Type { get; set; } = AccordionType.Single;
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private List<AccordionItem> Items { get; set; } = [];
+
+	internal void RegisterItem( AccordionItem item )
+		=> Items.Add( item );
+
+	internal async Task NotifyItemOpened( AccordionItem openedItem )
+	{
+		if ( Type == AccordionType.Single )
+		{
+			foreach ( var item in Items.Where( i => i != openedItem ) )
+				await item.SetState( isOpen: false );
+		}
+	}
+}

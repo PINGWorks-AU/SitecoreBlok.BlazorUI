@@ -1,0 +1,84 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="combobox-list" class="@CssClass">
+	<CascadingValue Value="this">
+		@ChildContent
+	</CascadingValue>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	// Direct children of the list, registered in render order. Used by ComboboxSeparator to
+	// decide whether it should render based on visible neighbours (skip if first/last/stacked).
+	// Groups register, separators register, top-level items can register.
+	private readonly List<ComponentBase> Children = [];
+	private bool ChildrenDirty;
+
+	internal void Register( ComponentBase child )
+	{
+		if ( !Children.Contains( child ) )
+		{
+			Children.Add( child );
+			ChildrenDirty = true;
+		}
+	}
+
+	internal void Unregister( ComponentBase child )
+	{
+		if ( Children.Remove( child ) ) ChildrenDirty = true;
+	}
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		// Separators render order-before the groups they divide — on first render, a separator's
+		// `ShouldRenderSeparator` can't see groups that haven't registered yet. Re-render once
+		// the full child list is known so separators settle into their correct visibility.
+		if ( ChildrenDirty )
+		{
+			ChildrenDirty = false;
+			await InvokeAsync( StateHasChanged );
+		}
+	}
+
+	// True if the separator has at least one visible group (or top-level item) on each side
+	// AND is not stacked immediately on top of another visible separator.
+	internal bool ShouldRenderSeparator( ComboboxSeparator sep )
+	{
+		var idx = Children.IndexOf( sep );
+		if ( idx < 0 ) return false;
+
+		// Walk backward: find the nearest visible content. If we hit another separator that
+		// IS itself rendering, this separator would stack — hide it. Otherwise keep walking
+		// until we find content (render) or run out (first visible — hide).
+		var contentBefore = false;
+		for ( var i = idx - 1; i >= 0; i-- )
+		{
+			var child = Children[ i ];
+			if ( IsVisibleContent( child ) ) { contentBefore = true; break; }
+			if ( child is ComboboxSeparator prevSep && ShouldRenderSeparator( prevSep ) ) return false;
+		}
+		if ( !contentBefore ) return false;
+
+		// Walk forward: need at least one visible content element after us.
+		for ( var i = idx + 1; i < Children.Count; i++ )
+		{
+			if ( IsVisibleContent( Children[ i ] ) ) return true;
+		}
+		return false;
+	}
+
+	private static bool IsVisibleContent( ComponentBase child )
+	{
+		if ( child is ComboboxGroup g ) return g.HasVisibleItems();
+		if ( child is ComboboxItem item ) return !item.Hidden;
+		return false;
+	}
+
+	private string CssClass => CssClassBuilder.Start(
+		"max-h-[min(calc(--spacing(96)---spacing(9)),calc(var(--radix-popper-available-height)---spacing(9)))]",
+		"scroll-py-1 overflow-y-auto p-1 data-empty:p-0" )
+										.With( ClassName )
+										.Build();
+}

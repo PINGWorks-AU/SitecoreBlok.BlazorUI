@@ -1,0 +1,34 @@
+@page "/primitives/label"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Label" Description="Renders an accessible label associated with controls" Interactivity="ComponentInteractivity.Ssr" ApiElements="@LabelElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Label ForId=\"email\">Email address</Label>")">
+			<Label ForId="email">Email address</Label>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] LabelElements =
+	[
+		new ApiElement(
+			Name: "Label",
+			Description: "Accessible `<label>` with Blok's label typography. Associate with a control via `ForId` (string id) or `For` (`ElementReference`).",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ForId",                "string?",                       false, "Id of the control this label describes. Emitted as the `for` attribute." ),
+				new ApiProperty( "For",                  "ElementReference?",             false, "Blazor element reference whose generated id is used for `for`. Takes precedence over `ForId` when both are set." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<label>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Label text or inline markup." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<label>`." ),
+			]
+		),
+	];
+}

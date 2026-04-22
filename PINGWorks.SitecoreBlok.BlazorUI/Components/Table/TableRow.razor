@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<tr data-slot="table-row" class="@CssClass">
+	@ChildContent
+</tr>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted" )
+										.With( ClassName )
+										.Build();
+}

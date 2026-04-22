@@ -1,0 +1,44 @@
+@page "/primitives/textarea"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Textarea" Description="Displays a multi-line text input" Interactivity="ComponentInteractivity.Interactive" ApiElements="@TextareaElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Textarea Placeholder=\"Type your message here...\" />")">
+			<Textarea Placeholder="Type your message here..." />
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Textarea Disabled Placeholder=\"Disabled textarea\" />")">
+			<Textarea Disabled Placeholder="Disabled textarea" />
+		</ComponentExample>
+
+		<ComponentExample Title="Custom rows" Code="@("<Textarea Rows=\"6\" Placeholder=\"This textarea has 6 rows\" />")">
+			<Textarea Rows="6" Placeholder="This textarea has 6 rows" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] TextareaElements =
+	[
+		new ApiElement(
+			Name: "Textarea",
+			Description: "Renders a native `<textarea>` styled to match Blok's input system. Two-way bindable via `@bind-Value`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                       false, "Current text content. Supports two-way binding via `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Invoked on every input event with the new value." ),
+				new ApiProperty( "Placeholder",          "string?",                       false, "Hint text shown when the textarea is empty." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, the textarea is read-only and visually muted. Default: `false`." ),
+				new ApiProperty( "Rows",                 "int",                           false, "Number of visible text rows. Default: `3`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the textarea's class attribute." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the underlying `<textarea>`." ),
+			]
+		),
+	];
+}

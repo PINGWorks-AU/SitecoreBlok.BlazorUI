@@ -1,0 +1,104 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@inject PopoverService Pops
+
+<CascadingValue Value="this">
+	@ChildContent
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	internal string SelectId { get; } = Guid.NewGuid().ToString();
+	internal bool IsOpen { get; private set; }
+	internal ElementReference? TriggerRef { get; private set; }
+
+	// Cached display label for the current Value. Populated by SetValue (when the
+	// user clicks an item — the item passes both value+label) and also seeded by
+	// Register (when the popover first opens and items register, we capture the
+	// label of any item matching the current Value). Persists after items are
+	// disposed so the trigger keeps displaying the correct label even after the
+	// popover closes.
+	internal string? SelectedLabel { get; private set; }
+
+	private readonly List<ComponentBase> Items = [];
+
+	internal void Register( ComponentBase item )
+	{
+		if ( !Items.Contains( item ) && item is SelectItem or SelectGroup )
+			Items.Add( item );
+
+		// Capture label for the current Value if this is the matching item.
+		if ( item is SelectItem si && si.Value == Value && si.Label is not null )
+			SelectedLabel = si.Label;
+	}
+
+	internal void Unregister( ComponentBase item )
+	{
+		Items.Remove( item );
+	}
+
+	// Display label for the currently-selected value.
+	// Prefers the cached SelectedLabel (set by SetValue or Register), falls back
+	// to a live lookup if items are currently registered, finally falls back to
+	// the raw Value when nothing else is available.
+	internal string? GetDisplayLabel()
+	{
+		if ( Value is null ) return null;
+		if ( SelectedLabel is not null ) return SelectedLabel;
+
+		var item = Items.OfType<SelectItem>().FirstOrDefault( i => i.Value == Value );
+		return item?.Label ?? Value;
+	}
+
+	internal void RegisterTriggerRef( ElementReference triggerRef )
+	{
+		TriggerRef = triggerRef;
+	}
+
+	internal async Task SetValue( string? value, string? label = null )
+	{
+		if ( Value != value )
+		{
+			Value = value;
+			SelectedLabel = label;   // may be null when caller has no label
+			await ValueChanged.InvokeAsync( Value );
+		}
+		else if ( label is not null )
+		{
+			SelectedLabel = label;
+		}
+
+		await Pops.Hide( SelectId );
+		await Close();
+	}
+
+	internal async Task Toggle()
+	{
+		if ( Disabled )
+			return;
+
+		if ( IsOpen )
+			await Close();
+		else
+			await Open();
+	}
+
+	internal async Task Close()
+	{
+		IsOpen = false;
+		await InvokeAsync( StateHasChanged );
+	}
+
+	internal async Task Open()
+	{
+		if ( TriggerRef is null ) return;
+
+		IsOpen = true;
+		await Pops.Show( SelectId, TriggerRef );
+		await InvokeAsync( StateHasChanged );
+	}
+}

@@ -1,0 +1,20 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="combobox-empty" class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	// Anti-revert: default is `flex` (visible). CSS `:has()` hides the message when the
+	// parent `.group/combobox-content` has any non-hidden `[data-slot=combobox-item]`.
+	// Data-attribute-driven visibility fails because `data-empty` is evaluated before items
+	// register on initial open — `:has()` evaluates at paint time, after items are in DOM.
+	private string CssClass => CssClassBuilder.Start(
+		"text-muted-foreground flex w-full justify-center py-2 text-center text-sm",
+		"group-has-[[data-slot=combobox-item]:not([hidden])]/combobox-content:hidden" )
+										.With( ClassName )
+										.Build();
+}

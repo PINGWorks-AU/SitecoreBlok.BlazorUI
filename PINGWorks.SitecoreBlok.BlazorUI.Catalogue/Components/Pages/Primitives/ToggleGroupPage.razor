@@ -1,0 +1,79 @@
+@page "/primitives/togglegroup"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="ToggleGroup" Description="A set of two-state buttons that can be toggled on or off" Interactivity="ComponentInteractivity.Interactive" ApiElements="@ToggleGroupElements">
+
+	<DivergenceNote>
+		<p><strong>Explicit <code>ToggleGroupType</code> enum and separate single/multi bindings, instead of Blok's union-type <code>type</code> discriminator.</strong> Blok uses Radix's <code>type="single"</code>/<code>type="multiple"</code> discriminated union where the <code>value</code> prop type shifts between <code>string</code> and <code>string[]</code>. Blazor doesn't handle discriminated unions cleanly, so we expose <code>ToggleGroupType.Single</code>/<code>ToggleGroupType.Multiple</code> and use <code>Value</code>/<code>ValueChanged</code> (single) or <code>Values</code>/<code>ValuesChanged</code> (multiple) depending on the chosen type. Behaviour, keyboard mechanics, and visuals match Blok — just the binding API differs.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Single selection" Code="@("<ToggleGroup @bind-Value=\"singleValue\">\n    <ToggleGroupItem Value=\"bold\"><Icon Svg=\"@IconSvg.FormatBold\" /></ToggleGroupItem>\n    <ToggleGroupItem Value=\"italic\"><Icon Svg=\"@IconSvg.FormatItalic\" /></ToggleGroupItem>\n    <ToggleGroupItem Value=\"underline\"><Icon Svg=\"@IconSvg.FormatUnderline\" /></ToggleGroupItem>\n</ToggleGroup>")">
+			<ToggleGroup @bind-Value="SingleValue" ClassName="p-0.5 gap-0.5 border border-border bg-transparent">
+				<ToggleGroupItem Value="bold"><Icon Svg="@IconSvg.FormatBold" /></ToggleGroupItem>
+				<ToggleGroupItem Value="italic"><Icon Svg="@IconSvg.FormatItalic" /></ToggleGroupItem>
+				<ToggleGroupItem Value="underline"><Icon Svg="@IconSvg.FormatUnderline" /></ToggleGroupItem>
+			</ToggleGroup>
+			@if (SingleValue is not null)
+			{
+				<p class="text-sm text-muted-foreground mt-3">Active: @SingleValue</p>
+			}
+		</ComponentExample>
+
+		<ComponentExample Title="Multiple selection" Code="@("<ToggleGroup Type=\"ToggleGroupType.Multiple\" @bind-Values=\"multiValues\">\n    <ToggleGroupItem Value=\"left\"><Icon Svg=\"@IconSvg.FormatAlignLeft\" /></ToggleGroupItem>\n    <ToggleGroupItem Value=\"center\"><Icon Svg=\"@IconSvg.FormatAlignCenter\" /></ToggleGroupItem>\n    <ToggleGroupItem Value=\"right\"><Icon Svg=\"@IconSvg.FormatAlignRight\" /></ToggleGroupItem>\n</ToggleGroup>")">
+			<ToggleGroup Type="ToggleGroupType.Multiple" @bind-Values="MultiValues" ClassName="p-0.5 gap-0.5 border border-border bg-transparent">
+				<ToggleGroupItem Value="left"><Icon Svg="@IconSvg.FormatAlignLeft" /></ToggleGroupItem>
+				<ToggleGroupItem Value="center"><Icon Svg="@IconSvg.FormatAlignCenter" /></ToggleGroupItem>
+				<ToggleGroupItem Value="right"><Icon Svg="@IconSvg.FormatAlignRight" /></ToggleGroupItem>
+			</ToggleGroup>
+			@if (MultiValues.Count > 0)
+			{
+				<p class="text-sm text-muted-foreground mt-3">Active: @string.Join(", ", MultiValues)</p>
+			}
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? SingleValue = "bold";
+	private List<string> MultiValues = [];
+
+	private static readonly ApiElement[] ToggleGroupElements =
+	[
+		new ApiElement(
+			Name: "ToggleGroup",
+			Description: "Container for a set of `ToggleGroupItem` buttons. Coordinates selection through a cascading value; bind via `Value`/`ValueChanged` for single mode or `Values`/`ValuesChanged` for multiple.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Type",                 "ToggleGroupType",               false, "Selection mode. Default: `ToggleGroupType.Single` (one item active at a time). Other value: `Multiple` (independent on/off per item)." ),
+				new ApiProperty( "Variant",              "ToggleVariant",                 false, "Visual style shared by child `ToggleGroupItem`s. Default: `ToggleVariant.Default`. Other value: `Outline`." ),
+				new ApiProperty( "Size",                 "ToggleSize",                    false, "Size token shared by child `ToggleGroupItem`s. Default: `ToggleSize.Default`. Other values: `Sm`, `Lg`." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "Disables every item. Item-level `Disabled` is unioned with this. Default: `false`." ),
+				new ApiProperty( "Value",                "string?",                       false, "Active item's `Value` in single mode. Use with `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Fires when the active item changes in single mode." ),
+				new ApiProperty( "Values",               "List<string>",                  false, "Active item `Value`s in multiple mode. Use with `@bind-Values`. Default: empty list." ),
+				new ApiProperty( "ValuesChanged",        "EventCallback<List<string>>",   false, "Fires when the active set changes in multiple mode." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the group container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "The group's items. Must be one or more `ToggleGroupItem`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the group container." ),
+			]
+		),
+		new ApiElement(
+			Name: "ToggleGroupItem",
+			Description: "A single button within a `ToggleGroup`. Its `Value` uniquely identifies it within the parent and drives the shared selection state.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string",           true,  "Unique identifier for this item. Matched against `ToggleGroup.Value` / `Values` to decide pressed state." ),
+				new ApiProperty( "Disabled",     "bool",             false, "When true, this item cannot be toggled. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the item button." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Item label — typically an icon or short text." ),
+			]
+		),
+	];
+}

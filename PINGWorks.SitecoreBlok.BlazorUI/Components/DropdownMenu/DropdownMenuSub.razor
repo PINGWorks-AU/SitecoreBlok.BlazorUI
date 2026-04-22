@@ -1,0 +1,73 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<CascadingValue Value="this">
+	@ChildContent
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	internal bool IsOpen { get; private set; }
+	internal bool IsPositioned { get; private set; }
+	internal double Left { get; private set; }
+	internal double Top { get; private set; }
+	internal double TriggerLeft { get; private set; }
+	internal double TriggerTop { get; private set; }
+	internal double TriggerRight { get; private set; }
+	internal double TriggerBottom { get; private set; }
+
+	private ElementReference TriggerRef;
+	private bool HasTriggerRef;
+	private IJSObjectReference? Module;
+
+	internal void RegisterTriggerRef( ElementReference triggerRef )
+	{
+		TriggerRef = triggerRef;
+		HasTriggerRef = true;
+	}
+
+	internal async Task Open()
+	{
+		if ( IsOpen || !HasTriggerRef ) return;
+
+		Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
+		var rect = await Module.InvokeAsync<ElementRect>( "SitecoreUI.getElementBounds", TriggerRef );
+
+		TriggerLeft = rect.Left;
+		TriggerTop = rect.Top;
+		TriggerRight = rect.Left + rect.Width;
+		TriggerBottom = rect.Top + rect.Height;
+		Left = TriggerRight;
+		Top = TriggerTop;
+		IsPositioned = false;
+		IsOpen = true;
+
+		await InvokeAsync( StateHasChanged );
+	}
+
+	internal async Task UpdatePosition( double x, double y )
+	{
+		Left = x;
+		Top = y;
+		IsPositioned = true;
+		await InvokeAsync( StateHasChanged );
+	}
+
+	internal async Task Close()
+	{
+		IsOpen = false;
+		IsPositioned = false;
+		await InvokeAsync( StateHasChanged );
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+}

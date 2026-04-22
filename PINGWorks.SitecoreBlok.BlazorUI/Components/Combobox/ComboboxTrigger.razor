@@ -1,0 +1,25 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button type="button" data-slot="combobox-trigger" class="@CssClass"
+		disabled="@Disabled"
+		data-state="@( Parent.IsOpen ? "open" : "closed" )"
+		@onclick="OnClick" @attributes="AdditionalAttributes">
+	@ChildContent
+	<Icon Svg="@IconSvg.ChevronDown" Scale="0.9"
+		ClassName="text-muted-foreground pointer-events-none"
+		data-slot="combobox-trigger-icon" />
+</button>
+
+@code {
+	[CascadingParameter] public required Combobox Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "[&_svg:not([class*='size-'])]:size-4" )
+											.With( ClassName )
+											.Build();
+
+	private async Task OnClick() => await Parent.Toggle();
+}

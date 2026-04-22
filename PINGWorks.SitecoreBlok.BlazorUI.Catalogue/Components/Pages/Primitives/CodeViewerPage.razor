@@ -1,0 +1,138 @@
+@page "/primitives/codeviewer"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="CodeViewer" Description="Displays syntax-highlighted code blocks with language support"
+			   Interactivity="ComponentInteractivity.Interactive" RequiresScripts="true" ApiElements="@CodeViewerElements">
+
+	<InstallationNote>
+		<p>CodeViewer delegates syntax highlighting to <a href="https://prismjs.com" target="_blank" rel="noopener" class="text-primary underline">Prism.js</a>, which ships as a static web asset inside the BlazorUI package. Wire the stylesheet and script into your host page (typically <code class="text-xs bg-muted px-1 py-0.5 rounded">App.razor</code>):</p>
+		<CodeViewer Code="@("<head>\n    ...\n    <link rel=\"stylesheet\" href=\"@Assets[\"_content/PINGWorks.SitecoreBlok.BlazorUI/vendor/prism/prism.css\"]\" />\n</head>\n<body>\n    ...\n    <script src=\"@Assets[\"_content/PINGWorks.SitecoreBlok.BlazorUI/vendor/prism/prism.js\"]\"></script>\n    <script src=\"@Assets[\"_framework/blazor.web.js\"]\"></script>\n</body>")" Language="CodeLanguage.Razor" />
+		<p>Without these, the component still renders but code will appear unhighlighted.</p>
+	</InstallationNote>
+
+	<DivergenceNote>
+		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> CodeViewer wraps Prism.js with the <code>prism-tomorrow</code> theme to render syntax-highlighted code uniformly in light and dark mode (matching the editor-style code block convention Blok uses in its docs site, but as a reusable component).</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Razor / Markup" Code="@("<CodeViewer Code=\"@razorSample\" />")">
+			<CodeViewer Code="@razorSample" Language="CodeLanguage.Razor" />
+		</ComponentExample>
+
+		<ComponentExample Title="C#" Code="@("<CodeViewer Code=\"@csharpSample\" Language=\"CodeLanguage.CSharp\" />")">
+			<CodeViewer Code="@csharpSample" Language="CodeLanguage.CSharp" />
+		</ComponentExample>
+
+		<ComponentExample Title="JavaScript" Code="@("<CodeViewer Code=\"@jsSample\" Language=\"CodeLanguage.JavaScript\" />")">
+			<CodeViewer Code="@jsSample" Language="CodeLanguage.JavaScript" />
+		</ComponentExample>
+
+		<ComponentExample Title="JSON" Code="@("<CodeViewer Code=\"@jsonSample\" Language=\"CodeLanguage.Json\" />")">
+			<CodeViewer Code="@jsonSample" Language="CodeLanguage.Json" />
+		</ComponentExample>
+
+		<ComponentExample Title="CSS" Code="@("<CodeViewer Code=\"@cssSample\" Language=\"CodeLanguage.Css\" />")">
+			<CodeViewer Code="@cssSample" Language="CodeLanguage.CSS" />
+		</ComponentExample>
+
+		<ComponentExample Title="Bash" Code="@("<CodeViewer Code=\"@bashSample\" Language=\"CodeLanguage.Bash\" />")">
+			<CodeViewer Code="@bashSample" Language="CodeLanguage.Bash" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string razorSample = """
+		<Card Style="CardStyle.Outline" Elevation="CardElevation.Xs">
+			<CardHeader>
+				<CardTitle>Hello World</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<Button Click="OnClick">Click me</Button>
+			</CardContent>
+		</Card>
+		""";
+
+	private string csharpSample = """
+		public class WeatherService
+		{
+			private readonly HttpClient _http;
+
+			public WeatherService(HttpClient http)
+				=> _http = http;
+
+			public async Task<Forecast[]> GetForecastAsync()
+				=> await _http.GetFromJsonAsync<Forecast[]>("/api/weather")
+				   ?? Array.Empty<Forecast>();
+		}
+		""";
+
+	private string jsSample = """
+		export function initComponent(element) {
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('visible');
+					}
+				});
+			});
+			observer.observe(element);
+		}
+		""";
+
+	private string jsonSample = """
+		{
+			"name": "PINGWorks.SitecoreBlok.BlazorUI",
+			"version": "0.6.0",
+			"dependencies": {
+				"Microsoft.AspNetCore.Components.Web": "10.0.0"
+			},
+			"license": "Apache-2.0"
+		}
+		""";
+
+	private string cssSample = """
+		:root {
+			--primary: #6e3fff;
+			--background: #ffffff;
+			--foreground: #1a1a1a;
+			--border: rgba(0, 0, 0, 0.11);
+		}
+
+		.dark {
+			--background: #282828;
+			--foreground: #ffffff;
+		}
+		""";
+
+	private string bashSample = """
+		# Install the package
+		dotnet add package PINGWorks.SitecoreBlok.BlazorUI
+
+		# Build the solution
+		dotnet build
+
+		# Run the catalogue
+		cd PINGWorks.SitecoreBlok.BlazorUI.Catalogue
+		dotnet run
+		""";
+
+	private static readonly ApiElement[] CodeViewerElements =
+	[
+		new ApiElement(
+			Name: "CodeViewer",
+			Description: "Renders a syntax-highlighted `<pre><code>` block. Runs Prism.js once per first render to colour the supplied `Code` according to `Language`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Code",      "string",       true,  "Source text to render inside the `<code>` element. Whitespace is preserved verbatim." ),
+				new ApiProperty( "Language",  "CodeLanguage", false, "Prism grammar to apply. Default: `CodeLanguage.Markup`. Other values include `Razor`, `CSharp`, `JavaScript`, `Json`, `CSS`, `Bash`, `TypeScript`, `YAML`, and more." ),
+				new ApiProperty( "ClassName", "string?",      false, "Extra CSS classes appended to the `<pre>` element." ),
+			]
+		),
+	];
+}

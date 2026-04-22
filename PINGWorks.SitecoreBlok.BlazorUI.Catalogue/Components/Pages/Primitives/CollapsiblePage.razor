@@ -1,0 +1,89 @@
+@page "/primitives/collapsible"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Collapsible" Description="An interactive component which expands/collapses a panel" Interactivity="ComponentInteractivity.Interactive" ApiElements="@CollapsibleElements">
+
+	<DivergenceNote>
+		<p><strong>Composable: previous <code>Label</code>/<code>Icon</code> strings replaced by <code>CollapsibleTrigger</code> children.</strong> The trigger is whatever you put inside <code>&lt;CollapsibleTrigger&gt;</code> — typically a <code>Button</code> with an icon, or any clickable element. Add <code>[&amp;[data-state=open]_svg]:rotate-180</code> to the trigger's <code>ClassName</code> to rotate a chevron on open. The previous <code>BeforeCollapsibleContent</code> / <code>AfterCollapsibleContent</code> slots are no longer needed — siblings of <code>CollapsibleTrigger</code>/<code>CollapsibleContent</code> render in source order.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Collapsible Open=\"@isOpen\" OpenChanged=\"@(v => isOpen = v)\">\n    <CollapsibleTrigger ClassName=\"flex items-center justify-between w-full gap-4 px-4 py-2 text-sm font-semibold text-foreground hover:bg-neutral-bg rounded-md cursor-pointer [&[data-state=open]_svg]:rotate-180\">\n        <span>Toggle content</span>\n        <Icon Svg=\"@IconSvg.ChevronDown\" ClassName=\"size-4 transition-transform\" />\n    </CollapsibleTrigger>\n    <CollapsibleContent>\n        <div class=\"rounded-md border px-4 py-3 text-sm mt-2 text-foreground\">\n            This content can be toggled open and closed.\n        </div>\n    </CollapsibleContent>\n</Collapsible>")">
+			@* `text-foreground` on the trigger is required: a native <button> doesn't inherit
+			   color from its parent, so without an explicit class the label stays the
+			   browser default (dark) and is invisible in dark mode. *@
+			<Collapsible Open="@IsOpen" OpenChanged="@(v => IsOpen = v)">
+				<CollapsibleTrigger ClassName="flex items-center justify-between w-full gap-4 px-4 py-2 text-sm font-semibold text-foreground hover:bg-neutral-bg rounded-md cursor-pointer [&[data-state=open]_svg]:rotate-180">
+					<span>Toggle content</span>
+					<Icon Svg="@IconSvg.ChevronDown" ClassName="size-4 transition-transform" />
+				</CollapsibleTrigger>
+				<CollapsibleContent>
+					<div class="rounded-md border border-border px-4 py-3 text-sm mt-2 text-foreground">
+						This content can be toggled open and closed. Click the trigger above to try it out.
+					</div>
+				</CollapsibleContent>
+			</Collapsible>
+		</ComponentExample>
+
+		<ComponentExample Title="Custom trigger (Button)" Code="@("<Collapsible Open=\"@isOpen2\" OpenChanged=\"@(v => isOpen2 = v)\">\n    <CollapsibleTrigger ClassName=\"[&[data-state=open]_svg]:rotate-180\">\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\">\n            Show more\n            <Icon Svg=\"@IconSvg.ChevronDown\" ClassName=\"size-4 ml-2 transition-transform\" />\n        </Button>\n    </CollapsibleTrigger>\n    <CollapsibleContent>\n        <p class=\"mt-2 text-sm\">Hidden body content.</p>\n    </CollapsibleContent>\n</Collapsible>")">
+			<Collapsible Open="@IsOpen2" OpenChanged="@(v => IsOpen2 = v)">
+				<CollapsibleTrigger ClassName="[&[data-state=open]_svg]:rotate-180">
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">
+						Show more
+						<Icon Svg="@IconSvg.ChevronDown" ClassName="size-4 ml-2 transition-transform" />
+					</Button>
+				</CollapsibleTrigger>
+				<CollapsibleContent>
+					<p class="mt-2 text-sm text-muted-foreground">Hidden body content sits below the button when open.</p>
+				</CollapsibleContent>
+			</Collapsible>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool IsOpen;
+	private bool IsOpen2;
+
+	private static readonly ApiElement[] CollapsibleElements =
+	[
+		new ApiElement(
+			Name: "Collapsible",
+			Description: "Root container. Tracks `Open` state and cascades itself so `CollapsibleTrigger` and `CollapsibleContent` can react to toggles.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Open",         "bool",             false, "Whether the panel is expanded. Supports two-way binding via `@bind-Open`. Default: `false`." ),
+				new ApiProperty( "OpenChanged",  "EventCallback<bool>", false, "Fires whenever `Open` toggles. Pair with `Open` for two-way binding." ),
+				new ApiProperty( "Disabled",     "bool",             false, "When true, `CollapsibleTrigger` clicks are ignored and the trigger renders disabled. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the outer container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Should contain one `CollapsibleTrigger` and one `CollapsibleContent`, plus any sibling markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "CollapsibleTrigger",
+			Description: "The native `<button>` that toggles the parent `Collapsible`. Mirrors the parent's `data-state` so CSS can react (e.g. rotate a chevron when open).",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the trigger button. Defaults include `text-foreground` so the label is visible in dark mode." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Trigger label and any affordance markup (icon, chevron, etc.)." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes, forwarded to the underlying `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "CollapsibleContent",
+			Description: "The revealed body. Uses a `grid-template-rows` 0fr→1fr transition so open/close animates smoothly without JS measurement.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the outer grid wrapper." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Body content revealed when `Open` is true." ),
+			]
+		),
+	];
+}

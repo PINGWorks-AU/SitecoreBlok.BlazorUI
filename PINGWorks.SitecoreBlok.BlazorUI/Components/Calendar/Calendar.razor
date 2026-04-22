@@ -1,0 +1,268 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="calendar" class="@CssClass">
+	<div class="flex gap-4">
+		@for ( var mi = 0; mi < NumberOfMonths; mi++ )
+		{
+			var monthDate = DisplayDate.AddMonths( mi );
+			var isFirst = mi == 0;
+			var isLast = mi == NumberOfMonths - 1;
+
+			<div class="flex flex-col w-full gap-4">
+				<div class="flex items-center justify-between w-full relative px-1">
+					@if ( isFirst )
+					{
+						<button type="button" class="inline-flex items-center justify-center size-8 rounded-md bg-transparent opacity-50 hover:opacity-100 cursor-pointer" @onclick="PreviousMonth">
+							<Icon Svg="@IconSvg.ChevronLeft" Scale="0.9" ResetClassName />
+						</button>
+					}
+					else
+					{
+						<div class="size-8"></div>
+					}
+
+					@{
+						var offset = mi;
+					}
+					<div class="flex items-center gap-1.5">
+						<div class="relative border border-input rounded-md h-8 flex items-center px-2">
+							<span class="text-sm font-medium select-none flex items-center gap-1">
+								@( monthDate.ToString( "MMM" ) )
+								<Icon Svg="@IconSvg.ChevronDown" ClassName="size-3.5 text-muted-foreground" />
+							</span>
+							@* Native <select> popup styling in dark mode is unreliable across browsers
+							   when the element is `opacity-0` — Edge and some Chrome versions ignore
+							   `color-scheme` on transparent form controls. Style `<option>` elements
+							   directly: Chromium browsers honour bg-color/color set on options for the
+							   open popup. (Firefox is less consistent but still readable.) *@
+							<select value="@monthDate.Month" name="calendar-month" @onchange="e => OnMonthChangeForPanel( e, offset )"
+									class="absolute inset-0 opacity-0 cursor-pointer w-full dark:[color-scheme:dark] dark:[&_option]:bg-background dark:[&_option]:text-foreground">
+								@for ( var m = 1; m <= 12; m++ )
+								{
+									<option value="@m" selected="@( m == monthDate.Month )">@( new DateTime( 2000, m, 1 ).ToString( "MMM" ) )</option>
+								}
+							</select>
+						</div>
+						<div class="relative border border-input rounded-md h-8 flex items-center px-2">
+							<span class="text-sm font-medium select-none flex items-center gap-1">
+								@monthDate.Year
+								<Icon Svg="@IconSvg.ChevronDown" ClassName="size-3.5 text-muted-foreground" />
+							</span>
+							<select value="@monthDate.Year" name="calendar-year" @onchange="e => OnYearChangeForPanel( e, offset )"
+									class="absolute inset-0 opacity-0 cursor-pointer w-full dark:[color-scheme:dark] dark:[&_option]:bg-background dark:[&_option]:text-foreground">
+								@for ( var y = YearStart; y <= YearEnd; y++ )
+								{
+									<option value="@y" selected="@( y == monthDate.Year )">@y</option>
+								}
+							</select>
+						</div>
+					</div>
+
+					@if ( isLast )
+					{
+						<button type="button" class="inline-flex items-center justify-center size-8 rounded-md bg-transparent opacity-50 hover:opacity-100 cursor-pointer" @onclick="NextMonth">
+							<Icon Svg="@IconSvg.ChevronRight" Scale="0.9" ResetClassName />
+						</button>
+					}
+					else
+					{
+						<div class="size-8"></div>
+					}
+				</div>
+
+				<div>
+					<div class="flex">
+						@foreach ( var day in DayNames )
+						{
+							<div class="text-muted-foreground text-xs font-normal select-none flex-1 text-center rounded-md h-8 flex items-center justify-center">@day</div>
+						}
+					</div>
+
+					@foreach ( var week in GetWeeksForMonth( monthDate ) )
+					{
+						<div class="flex w-full mt-0.5">
+							@foreach ( var date in week )
+							{
+								var isCurrent = date.Month == monthDate.Month;
+								var isDisabled = IsDateDisabled( date );
+								var isToday = date.Date == DateTime.Today;
+								var isSelected = !IsRange && Value?.Date == date.Date;
+								var isRangeStart = IsRange && RangeStart?.Date == date.Date;
+								var isRangeEnd = IsRange && RangeEnd?.Date == date.Date;
+								var isRangeMiddle = IsRange && RangeStart.HasValue && RangeEnd.HasValue
+									&& date.Date > RangeStart.Value.Date && date.Date < RangeEnd.Value.Date;
+
+								<button type="button" @onclick="() => SelectDate( date )"
+										disabled="@( isDisabled )"
+										aria-selected="@( isSelected || isRangeStart || isRangeEnd || isRangeMiddle ? "true" : "false" )"
+										class="@DayCssClass( isCurrent, isSelected, isToday, isDisabled, isRangeStart, isRangeEnd, isRangeMiddle )">
+									@date.Day
+								</button>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public DateTime? Value { get; set; }
+	[Parameter] public EventCallback<DateTime?> ValueChanged { get; set; }
+	[Parameter] public DateTime? RangeStart { get; set; }
+	[Parameter] public EventCallback<DateTime?> RangeStartChanged { get; set; }
+	[Parameter] public DateTime? RangeEnd { get; set; }
+	[Parameter] public EventCallback<DateTime?> RangeEndChanged { get; set; }
+	[Parameter] public DateTime? MinDate { get; set; }
+	[Parameter] public DateTime? MaxDate { get; set; }
+	[Parameter] public int YearRangeStart { get; set; } = DateTime.Today.Year - 10;
+	[Parameter] public int YearRangeEnd { get; set; } = DateTime.Today.Year + 10;
+	[Parameter] public int NumberOfMonths { get; set; } = 1;
+
+	private bool IsRange => RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate;
+
+	private DateTime DisplayDate;
+
+	private static readonly string[] DayNames = [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" ];
+	private int YearStart => MinDate?.Year ?? YearRangeStart;
+	private int YearEnd => MaxDate?.Year ?? YearRangeEnd;
+
+	protected override void OnInitialized()
+	{
+		DisplayDate = Value ?? RangeStart ?? DateTime.Today;
+		DisplayDate = new DateTime( DisplayDate.Year, DisplayDate.Month, 1 );
+	}
+
+	private string CssClass => CssClassBuilder.Start( "p-3 bg-card text-card-foreground rounded-lg border border-border shadow-sm w-fit" )
+										.With( ClassName )
+										.Build();
+
+	// `text-white` (literal) — NOT `text-inverse-text` — on the selected/range day
+	// cells. The surface is a fixed `bg-primary-500` (medium blue, doesn't flip in
+	// dark mode), so `text-inverse-text` would resolve to dark in dark mode and
+	// produce dark-on-medium-blue (low contrast / unreadable). Selected days
+	// always need white text against the primary-500 surface in both modes.
+	// Caught by harness Check 5; do not revert.
+	private static string DayCssClass( bool isCurrentMonth, bool isSelected, bool isToday, bool isDisabled,
+									   bool isRangeStart, bool isRangeEnd, bool isRangeMiddle )
+	{
+		return CssClassBuilder.Start( "inline-flex items-center justify-center size-8 text-sm font-normal flex-1 border border-transparent cursor-pointer" )
+										.With( "bg-primary-500 text-white hover:bg-primary-600 rounded-md", isSelected )
+										.With( "bg-primary-500 text-white hover:bg-primary-600 rounded-l-md rounded-r-none", isRangeStart && !isRangeEnd )
+										.With( "bg-primary-500 text-white hover:bg-primary-600 rounded-md", isRangeStart && isRangeEnd )
+										.With( "bg-primary-500 text-white hover:bg-primary-600 rounded-r-md rounded-l-none", isRangeEnd && !isRangeStart )
+										.With( "bg-primary-bg text-foreground rounded-none", isRangeMiddle )
+										.With( "hover:bg-primary hover:text-inverse-text rounded-md", !isSelected && !isRangeStart && !isRangeEnd && !isRangeMiddle && isCurrentMonth && !isDisabled )
+										.With( "bg-accent text-accent-foreground rounded-md", isToday && !isSelected && !isRangeStart && !isRangeEnd && !isRangeMiddle && isCurrentMonth )
+										.With( "text-muted-foreground", !isCurrentMonth )
+										.With( "text-muted-foreground opacity-50 cursor-not-allowed pointer-events-none", isDisabled )
+										.Build();
+	}
+
+	private bool IsDateDisabled( DateTime date )
+		=> ( MinDate.HasValue && date.Date < MinDate.Value.Date ) || ( MaxDate.HasValue && date.Date > MaxDate.Value.Date );
+
+	private async Task SelectDate( DateTime date )
+	{
+		if ( IsDateDisabled( date ) ) return;
+
+		if ( IsRange )
+		{
+			if ( !RangeStart.HasValue || ( RangeStart.HasValue && RangeEnd.HasValue ) )
+			{
+				RangeStart = date;
+				RangeEnd = null;
+
+				if ( RangeStartChanged.HasDelegate )
+					await RangeStartChanged.InvokeAsync( RangeStart );
+
+				if ( RangeEndChanged.HasDelegate )
+					await RangeEndChanged.InvokeAsync( null );
+			}
+			else
+			{
+				if ( date < RangeStart )
+				{
+					RangeEnd = RangeStart;
+					RangeStart = date;
+				}
+				else
+				{
+					RangeEnd = date;
+				}
+
+				if ( RangeStartChanged.HasDelegate )
+					await RangeStartChanged.InvokeAsync( RangeStart );
+
+				if ( RangeEndChanged.HasDelegate )
+					await RangeEndChanged.InvokeAsync( RangeEnd );
+
+				EnsureRangeEndVisible();
+			}
+		}
+		else
+		{
+			Value = date;
+			DisplayDate = new DateTime( date.Year, date.Month, 1 );
+
+			if ( ValueChanged.HasDelegate )
+				await ValueChanged.InvokeAsync( Value );
+		}
+	}
+
+	private void EnsureRangeEndVisible()
+	{
+		if ( !RangeEnd.HasValue ) return;
+
+		var lastVisibleMonth = DisplayDate.AddMonths( NumberOfMonths - 1 );
+
+		if ( RangeEnd.Value.Year > lastVisibleMonth.Year ||
+			 ( RangeEnd.Value.Year == lastVisibleMonth.Year && RangeEnd.Value.Month > lastVisibleMonth.Month ) )
+		{
+			var endMonth = new DateTime( RangeEnd.Value.Year, RangeEnd.Value.Month, 1 );
+			DisplayDate = endMonth.AddMonths( -( NumberOfMonths - 1 ) );
+		}
+	}
+
+	private void OnMonthChangeForPanel( ChangeEventArgs e, int panelOffset )
+	{
+		if ( !int.TryParse( e.Value?.ToString(), out var month ) ) return;
+
+		var panelDate = DisplayDate.AddMonths( panelOffset );
+		var targetDate = new DateTime( panelDate.Year, month, 1 );
+		DisplayDate = targetDate.AddMonths( -panelOffset );
+	}
+
+	private void OnYearChangeForPanel( ChangeEventArgs e, int panelOffset )
+	{
+		if ( !int.TryParse( e.Value?.ToString(), out var year ) ) return;
+
+		var panelDate = DisplayDate.AddMonths( panelOffset );
+		var targetDate = new DateTime( year, panelDate.Month, 1 );
+		DisplayDate = targetDate.AddMonths( -panelOffset );
+	}
+
+	private void PreviousMonth() => DisplayDate = DisplayDate.AddMonths( -1 );
+	private void NextMonth() => DisplayDate = DisplayDate.AddMonths( 1 );
+
+	private static List<DateTime[]> GetWeeksForMonth( DateTime monthDate )
+	{
+		var weeks = new List<DateTime[]>();
+		var firstOfMonth = new DateTime( monthDate.Year, monthDate.Month, 1 );
+		var start = firstOfMonth.AddDays( -(int)firstOfMonth.DayOfWeek );
+
+		for ( var w = 0; w < 6; w++ )
+		{
+			var week = new DateTime[7];
+
+			for ( var d = 0; d < 7; d++ )
+				week[d] = start.AddDays( w * 7 + d );
+
+			weeks.Add( week );
+		}
+
+		return weeks;
+	}
+}

@@ -1,0 +1,40 @@
+@page "/graphics/theming/spacing"
+@rendermode InteractiveServer
+
+<ComponentPage Title="Spacing" Description="Width-based spacing utilities used throughout the design system.">
+
+	<div class="pt-2 pb-4">
+		<a href="/graphics/theming" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">&larr; Theming</a>
+	</div>
+
+	<Table Size="TableSize.Sm">
+		<TableHeader>
+			<TableRow>
+				<TableHead>Class</TableHead>
+				<TableHead>Preview</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody>
+			@foreach (var sp in Spacings)
+			{
+				<TableRow>
+					<TableCell>
+						<code class="font-medium text-sm">@sp</code>
+					</TableCell>
+					<TableCell>
+						<div class="h-3 rounded bg-primary @sp" style="min-width:4px;"></div>
+					</TableCell>
+				</TableRow>
+			}
+		</TableBody>
+	</Table>
+
+</ComponentPage>
+
+@code {
+	private static readonly string[] Spacings =
+	[
+		"w-1", "w-2", "w-3", "w-4", "w-5", "w-6",
+		"w-7", "w-8", "w-9", "w-10", "w-11", "w-12",
+	];
+}

@@ -1,0 +1,44 @@
+@page "/primitives/input"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Input" Description="Displays a form input field" Interactivity="ComponentInteractivity.Interactive" ApiElements="@InputElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Input Placeholder=\"Enter text...\" />")">
+			<Input Placeholder="Enter text..." />
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Input Disabled Placeholder=\"Disabled input\" />")">
+			<Input Disabled Placeholder="Disabled input" />
+		</ComponentExample>
+
+		<ComponentExample Title="With placeholder" Code="@("<Input Placeholder=\"Email address\" Type=\"email\" />")">
+			<Input Placeholder="Email address" Type="email" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] InputElements =
+	[
+		new ApiElement(
+			Name: "Input",
+			Description: "Single-line text input with Blok's border, focus ring, and aria-invalid destructive styling. Supports two-way binding via `@bind-Value`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Type",                 "string",                        false, "Native `<input>` type attribute. Default: `\"text\"`. Pass e.g. `\"email\"`, `\"password\"`, `\"number\"`." ),
+				new ApiProperty( "Value",                "string?",                       false, "Two-way bindable current value." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Invoked on input. Pair with `Value` via `@bind-Value`." ),
+				new ApiProperty( "Placeholder",          "string?",                       false, "Placeholder text shown when the value is empty." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, disables the input. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<input>`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes (e.g. `id`, `name`, `aria-invalid`), forwarded to the `<input>`." ),
+			]
+		),
+	];
+}

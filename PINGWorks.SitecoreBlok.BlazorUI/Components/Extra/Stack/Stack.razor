@@ -1,0 +1,68 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public int Gap { get; set; } = 4;
+	[Parameter] public int Padding { get; set; } = 2;
+	[Parameter] public Size Size { get; set; } = Size.Lg;
+	[Parameter] public string? ClassName { get; set; }
+
+	[Parameter] public bool Flex { get; set; }
+	[Parameter] public bool Row { get; set; }
+	[Parameter] public bool Border { get; set; }
+
+	public string CssClass => CssClassBuilder.Start( "items-start" )
+
+											// layout
+											.With( "flex flex-wrap", Flex )
+												.With( "flex-row", Flex && Row )
+												.With( "flex-col", Flex && !Row )
+											.With( "grid", !Flex )
+
+											// border
+											.With( "border rounded-lg", Border )
+
+											// this seems dumb but Tailwind uses a scanner to detect classes and it won't pick up an interpolated value
+											.With( $"gap-1", Gap is 1 )
+											.With( $"gap-2", Gap is 2 )
+											.With( $"gap-3", Gap is 3 )
+											.With( $"gap-4", Gap is 4 )
+											.With( $"gap-5", Gap is 5 )
+											.With( $"gap-6", Gap is 6 )
+
+											.With( $"p-1", Padding is 1 )
+											.With( $"p-2", Padding is 2 )
+											.With( $"p-3", Padding is 3 )
+											.With( $"p-4", Padding is 4 )
+											.With( $"p-5", Padding is 5 )
+											.With( $"p-6", Padding is 6 )
+
+											.With( MaxWidth )
+											.With( ClassName )
+											.Build();
+
+	// this seems dumb but Tailwind uses a scanner to detect classes and it won't pick up an interpolated value
+	private string MaxWidth => Size switch
+	{
+		Size.Xs3 => "max-w-3xs",
+		Size.Xs2 => "max-w-2xs",
+		Size.Xs => "max-w-xs",
+		Size.Sm => "max-w-sm",
+		Size.Md => "max-w-md",
+		Size.Lg => "max-w-lg",
+		Size.Xl => "max-w-xl",
+		Size.Xl2 => "max-w-2xl",
+		Size.Xl3 => "max-w-3xl",
+		Size.Xl4 => "max-w-4xl",
+		Size.Xl5 => "max-w-5xl",
+		Size.Xl6 => "max-w-6xl",
+		Size.Xl7 => "max-w-7xl",
+		Size.Xl8 => "max-w-8xl",
+		Size.Full => "max-w-full",
+		_ => "max-w-lg"
+	};
+}

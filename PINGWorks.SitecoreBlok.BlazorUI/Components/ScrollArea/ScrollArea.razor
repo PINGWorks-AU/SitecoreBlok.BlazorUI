@@ -1,0 +1,18 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="scroll-area" class="@CssClass">
+	<div data-slot="scroll-area-viewport" tabindex="0"
+		 class="size-full rounded-[inherit] overflow-auto focus-visible:ring-ring/50 transition-[color,box-shadow] outline-none focus-visible:ring-[3px] [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-button]:!h-0 [&::-webkit-scrollbar-button]:!w-0"
+		 style="scrollbar-width:thin;scrollbar-color:var(--border) transparent;">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "relative overflow-hidden" )
+										.With( ClassName )
+										.Build();
+}

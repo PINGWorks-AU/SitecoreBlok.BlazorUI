@@ -1,0 +1,52 @@
+@page "/primitives/switch"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Switch" Description="A control that allows the user to toggle between checked and not checked" Interactivity="ComponentInteractivity.Interactive" ApiElements="@SwitchElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Switch Checked=\"@checked1\" CheckedChanged=\"@(v => checked1 = v)\" />")">
+			<Switch Checked="@Checked1" CheckedChanged="@(v => Checked1 = v)" />
+		</ComponentExample>
+
+		<ComponentExample Title="Variants" Code="@("<Switch Variant=\"SwitchVariant.Primary\" Checked=\"@checked2\" CheckedChanged=\"@(v => checked2 = v)\" />\n<Switch Variant=\"SwitchVariant.Danger\" Checked=\"@checked3\" CheckedChanged=\"@(v => checked3 = v)\" />\n<Switch Variant=\"SwitchVariant.Success\" Checked=\"@checked4\" CheckedChanged=\"@(v => checked4 = v)\" />")">
+			<Switch Variant="SwitchVariant.Primary" Checked="@Checked2" CheckedChanged="@(v => Checked2 = v)" />
+			<Switch Variant="SwitchVariant.Danger" Checked="@Checked3" CheckedChanged="@(v => Checked3 = v)" />
+			<Switch Variant="SwitchVariant.Success" Checked="@Checked4" CheckedChanged="@(v => Checked4 = v)" />
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Switch Disabled Checked=\"true\" />\n<Switch Disabled />")">
+			<Switch Disabled Checked="true" />
+			<Switch Disabled />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool Checked1 = true;
+	private bool Checked2 = true;
+	private bool Checked3 = true;
+	private bool Checked4 = true;
+
+	private static readonly ApiElement[] SwitchElements =
+	[
+		new ApiElement(
+			Name: "Switch",
+			Description: "Two-state toggle rendered as a `<button role=\"switch\">`. Use with `@bind-Checked` for two-way binding; the `Variant` drives the checked-state colour.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Checked",              "bool",                          false, "Current checked state. Default: `false`." ),
+				new ApiProperty( "CheckedChanged",       "EventCallback<bool>",           false, "Invoked when toggled. Use with `@bind-Checked` for two-way binding." ),
+				new ApiProperty( "Variant",              "SwitchVariant",                 false, "Checked-state colour. Default: `SwitchVariant.Primary`. Other values: `Danger`, `Success`." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, the switch is non-interactive and visually muted. Default: `false`." ),
+				new ApiProperty( "AriaLabel",            "string?",                       false, "Accessible label. Default: `\"Toggle switch\"`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the button." ),
+			]
+		),
+	];
+}

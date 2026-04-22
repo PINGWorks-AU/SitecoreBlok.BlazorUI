@@ -1,0 +1,29 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="resizable-panel"
+	 data-panel-min-size="@MinSize"
+	 data-panel-max-size="@MaxSize"
+	 style="@PanelStyle"
+	 class="@PanelClass"
+	 @attributes="AdditionalAttributes">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public double? DefaultSize { get; set; }
+	[Parameter] public double MinSize { get; set; } = 0;
+	[Parameter] public double MaxSize { get; set; } = 100;
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	// overflow-hidden mirrors what react-resizable-panels sets on panels internally
+	// so content clips correctly when a panel is dragged smaller than its content.
+	private string PanelClass => CssClassBuilder.Start("overflow-hidden")
+												.With(ClassName)
+												.Build();
+
+	private string PanelStyle => DefaultSize.HasValue
+		? $"flex: 0 0 {DefaultSize}%"
+		: "flex: 1 1 0%";
+}

@@ -1,0 +1,16 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<tfoot data-slot="table-footer" class="@CssClass">
+	@ChildContent
+</tfoot>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	// `parity-no-text-pair`: tfoot has no own text; the <td> children
+	// (TableCell) set text-foreground.
+	private string CssClass => CssClassBuilder.Start("bg-muted/50 border-t font-medium [&>tr]:last:border-b-0 parity-no-text-pair")
+										.With(ClassName)
+										.Build();
+}

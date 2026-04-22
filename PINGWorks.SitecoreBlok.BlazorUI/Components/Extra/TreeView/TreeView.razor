@@ -1,0 +1,540 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@typeparam TItem
+
+<CascadingValue Value="this" IsFixed="true">
+	<div data-slot="tree-view" class="@RootCssClass">
+		@if ( ShowSearch )
+		{
+			<div class="mb-2">
+				<SearchInput>
+					<SearchInputField Value="@InternalSearchText" ValueChanged="HandleSearchInputAsync" Placeholder="@SearchPlaceholder" DebounceMs="@SearchDebounceMs" />
+					@if ( !string.IsNullOrEmpty( InternalSearchText ) )
+					{
+						<SearchInputRightElement>
+							<SearchInputClearButton OnClear="@(async () => await HandleSearchInputAsync( null ))" />
+						</SearchInputRightElement>
+					}
+				</SearchInput>
+			</div>
+		}
+
+		<ul role="tree" aria-label="@AriaLabel" class="space-y-0.5">
+			@if ( IsSearchActive && !HasAnyMatches )
+			{
+				<li role="presentation" class="list-none">
+					@if ( NoResultsContent is not null )
+					{
+						@NoResultsContent
+					}
+					else
+					{
+						<div class="text-muted-foreground text-sm py-4 text-center">No matches.</div>
+					}
+				</li>
+			}
+			else if ( !Items.Any() )
+			{
+				<li role="presentation" class="list-none">
+					@if ( EmptyContent is not null )
+					{
+						@EmptyContent
+					}
+					else
+					{
+						<div class="text-muted-foreground text-sm py-4 text-center">No items.</div>
+					}
+				</li>
+			}
+			else
+			{
+				@foreach ( var item in Items )
+				{
+					<TreeNode TItem="TItem" Item="item" Depth="0" />
+				}
+			}
+		</ul>
+	</div>
+</CascadingValue>
+
+@code {
+	// Data accessors
+	[Parameter, EditorRequired] public required IEnumerable<TItem> Items { get; set; }
+	[Parameter, EditorRequired] public required Func<TItem, string> GetItemValue { get; set; }
+	[Parameter] public Func<TItem, string>? GetItemText { get; set; }
+	[Parameter] public Func<TItem, IEnumerable<TItem>?>? GetItemChildren { get; set; }
+	[Parameter] public Func<TItem, bool>? GetItemHasChildren { get; set; }
+	[Parameter] public Func<TItem, bool>? GetItemDisabled { get; set; }
+	[Parameter] public Func<TItem, string?>? GetItemIcon { get; set; }
+	[Parameter] public Func<TItem, string?>? GetItemBadge { get; set; }
+
+	// Expansion
+	[Parameter] public ISet<string>? ExpandedValues { get; set; }
+	[Parameter] public EventCallback<ISet<string>> ExpandedValuesChanged { get; set; }
+	[Parameter] public bool DefaultExpandAll { get; set; }
+	[Parameter] public int? DefaultExpandedDepth { get; set; }
+
+	// Selection
+	[Parameter] public TreeSelectionMode SelectionMode { get; set; } = TreeSelectionMode.None;
+	[Parameter] public string? SelectedValue { get; set; }
+	[Parameter] public EventCallback<string?> SelectedValueChanged { get; set; }
+	[Parameter] public ISet<string>? SelectedValues { get; set; }
+	[Parameter] public EventCallback<ISet<string>> SelectedValuesChanged { get; set; }
+	[Parameter] public EventCallback<TItem> OnItemSelected { get; set; }
+
+	// Checkboxes
+	[Parameter] public bool Checkable { get; set; }
+	[Parameter] public bool CascadeChecks { get; set; } = true;
+	[Parameter] public ISet<string>? CheckedValues { get; set; }
+	[Parameter] public EventCallback<ISet<string>> CheckedValuesChanged { get; set; }
+
+	// Lazy loading
+	[Parameter] public Func<TItem, Task<IEnumerable<TItem>>>? OnLoadChildren { get; set; }
+
+	// Search
+	[Parameter] public bool ShowSearch { get; set; }
+	[Parameter] public string SearchPlaceholder { get; set; } = "Search...";
+	[Parameter] public string? SearchText { get; set; }
+	[Parameter] public EventCallback<string?> SearchTextChanged { get; set; }
+	[Parameter] public int SearchDebounceMs { get; set; } = 200;
+	[Parameter] public RenderFragment? NoResultsTemplate { get; set; }
+
+	// Visual
+	[Parameter] public bool ShowIcons { get; set; } = true;
+	[Parameter] public bool EnableRowHover { get; set; } = true;
+	[Parameter] public bool ShowConnectorLines { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? AriaLabel { get; set; }
+
+	// Templates
+	[Parameter] public RenderFragment<TItem>? LabelTemplate { get; set; }
+	[Parameter] public RenderFragment<TItem>? ActionsTemplate { get; set; }
+	[Parameter] public RenderFragment? EmptyTemplate { get; set; }
+
+	private HashSet<string> Expanded = new();
+	private HashSet<string> Selected = new();
+	private HashSet<string> Checked = new();
+	private HashSet<string> Loading = new();
+	private HashSet<string> Errored = new();
+	private Dictionary<string, IEnumerable<TItem>> LoadedChildren = new();
+	private string? InternalSearchText;
+	private HashSet<string> Matched = new();
+	private HashSet<string> SearchAncestors = new();
+	private bool SeededDefaults;
+
+	protected override void OnParametersSet()
+	{
+		if ( ExpandedValues is not null )
+			Expanded = new HashSet<string>( ExpandedValues );
+
+		if ( SelectedValues is not null )
+			Selected = new HashSet<string>( SelectedValues );
+
+		if ( CheckedValues is not null )
+			Checked = new HashSet<string>( CheckedValues );
+
+		if ( SearchText != InternalSearchText )
+		{
+			InternalSearchText = SearchText;
+			RebuildSearchIndex();
+		}
+
+		if ( !SeededDefaults )
+		{
+			SeedDefaultExpansion();
+			SeededDefaults = true;
+		}
+	}
+
+	private void SeedDefaultExpansion()
+	{
+		if ( !DefaultExpandAll && DefaultExpandedDepth is null )
+			return;
+
+		void Walk( TItem item, int depth )
+		{
+			if ( DefaultExpandAll || ( DefaultExpandedDepth is { } d && depth < d ) )
+			{
+				Expanded.Add( GetItemValue( item ) );
+				foreach ( var child in ResolveChildren( item ) )
+					Walk( child, depth + 1 );
+			}
+		}
+
+		foreach ( var item in Items )
+			Walk( item, 0 );
+	}
+
+	private string RootCssClass => CssClassBuilder.Start( "bg-background text-foreground text-sm" )
+	                                              .With( ClassName )
+	                                              .Build();
+
+	internal string ResolveValue( TItem item ) => GetItemValue( item );
+
+	internal string ResolveText( TItem item ) =>
+		GetItemText?.Invoke( item ) ?? item?.ToString() ?? string.Empty;
+
+	internal IEnumerable<TItem> ResolveChildren( TItem item )
+	{
+		var value = GetItemValue( item );
+		if ( LoadedChildren.TryGetValue( value, out var cached ) )
+			return cached;
+
+		return GetItemChildren?.Invoke( item ) ?? [];
+	}
+
+	internal bool HasChildren( TItem item )
+	{
+		if ( GetItemHasChildren is not null )
+			return GetItemHasChildren( item );
+
+		var children = GetItemChildren?.Invoke( item );
+		return children is not null && children.Any();
+	}
+
+	internal bool IsExpanded( TItem item ) => Expanded.Contains( GetItemValue( item ) );
+
+	internal async Task ToggleExpandedAsync( TItem item )
+	{
+		var value = GetItemValue( item );
+		var isOpening = !Expanded.Contains( value );
+
+		if ( !isOpening )
+		{
+			Expanded.Remove( value );
+			if ( ExpandedValuesChanged.HasDelegate )
+				await ExpandedValuesChanged.InvokeAsync( Expanded );
+			StateHasChanged();
+			return;
+		}
+
+		var needsLoad = OnLoadChildren is not null
+		                && !LoadedChildren.ContainsKey( value )
+		                && ( GetItemChildren?.Invoke( item )?.Any() ?? false ) == false
+		                && HasChildren( item );
+
+		if ( needsLoad )
+			await LoadChildrenAsync( item );
+
+		Expanded.Add( value );
+		if ( ExpandedValuesChanged.HasDelegate )
+			await ExpandedValuesChanged.InvokeAsync( Expanded );
+		StateHasChanged();
+	}
+
+	internal async Task LoadChildrenAsync( TItem item )
+	{
+		if ( OnLoadChildren is null )
+			return;
+
+		var value = GetItemValue( item );
+		Loading.Add( value );
+		Errored.Remove( value );
+		StateHasChanged();
+
+		try
+		{
+			var loaded = await OnLoadChildren( item );
+			LoadedChildren[value] = loaded.ToList();
+		}
+		catch
+		{
+			Errored.Add( value );
+		}
+		finally
+		{
+			Loading.Remove( value );
+			StateHasChanged();
+		}
+	}
+
+	internal bool IsLoading( TItem item ) => Loading.Contains( GetItemValue( item ) );
+	internal bool IsErrored( TItem item ) => Errored.Contains( GetItemValue( item ) );
+
+	internal bool IsDisabled( TItem item ) => GetItemDisabled?.Invoke( item ) ?? false;
+
+	internal string? ResolveIcon( TItem item ) =>
+		ShowIcons ? GetItemIcon?.Invoke( item ) : null;
+
+	internal string? ResolveBadge( TItem item ) => GetItemBadge?.Invoke( item );
+
+	internal static string GetRowClass( bool isSelected, bool isDisabled, bool hoverEnabled ) =>
+		( isSelected, isDisabled, hoverEnabled ) switch
+		{
+			( true,  _,     _     ) => "bg-primary-bg text-primary-fg",
+			( false, true,  _     ) => "opacity-50 pointer-events-none",
+			( false, false, true  ) => "hover:bg-blackAlpha-50 dark:hover:bg-whiteAlpha-100 transition-colors",
+			_                       => ""
+		};
+
+	internal bool IsSelected( TItem item )
+	{
+		if ( SelectionMode == TreeSelectionMode.None )
+			return false;
+
+		var value = GetItemValue( item );
+		return SelectionMode == TreeSelectionMode.Single
+			? value == SelectedValue
+			: Selected.Contains( value );
+	}
+
+	internal async Task HandleRowClickAsync( TItem item )
+	{
+		if ( IsDisabled( item ) )
+			return;
+
+		if ( OnItemSelected.HasDelegate )
+			await OnItemSelected.InvokeAsync( item );
+
+		if ( SelectionMode == TreeSelectionMode.None )
+			return;
+
+		var value = GetItemValue( item );
+
+		if ( SelectionMode == TreeSelectionMode.Single )
+		{
+			var newValue = SelectedValue == value ? null : value;
+			if ( SelectedValueChanged.HasDelegate )
+				await SelectedValueChanged.InvokeAsync( newValue );
+			else
+				SelectedValue = newValue;
+		}
+		else
+		{
+			if ( !Selected.Add( value ) )
+				Selected.Remove( value );
+
+			if ( SelectedValuesChanged.HasDelegate )
+				await SelectedValuesChanged.InvokeAsync( Selected );
+		}
+
+		StateHasChanged();
+	}
+
+	internal enum CheckState { Unchecked, Checked, Indeterminate }
+
+	internal CheckState GetCheckState( TItem item )
+	{
+		if ( !CascadeChecks )
+			return Checked.Contains( GetItemValue( item ) ) ? CheckState.Checked : CheckState.Unchecked;
+
+		var all = true;
+		var any = false;
+		var anyDescendant = false;
+
+		void Walk( TItem node )
+		{
+			var children = ResolveChildren( node ).ToList();
+			if ( children.Count == 0 )
+			{
+				anyDescendant = true;
+				var checkedNow = Checked.Contains( GetItemValue( node ) );
+				if ( checkedNow ) any = true;
+				else all = false;
+				return;
+			}
+
+			foreach ( var child in children )
+				Walk( child );
+		}
+
+		var directChildren = ResolveChildren( item ).ToList();
+		if ( directChildren.Count == 0 )
+			return Checked.Contains( GetItemValue( item ) ) ? CheckState.Checked : CheckState.Unchecked;
+
+		foreach ( var child in directChildren )
+			Walk( child );
+
+		if ( !anyDescendant )
+			return Checked.Contains( GetItemValue( item ) ) ? CheckState.Checked : CheckState.Unchecked;
+
+		return ( all, any ) switch
+		{
+			( true,  _     ) => CheckState.Checked,
+			( false, true  ) => CheckState.Indeterminate,
+			_                => CheckState.Unchecked
+		};
+	}
+
+	internal async Task ToggleCheckAsync( TItem item )
+	{
+		if ( IsDisabled( item ) )
+			return;
+
+		var currentState = GetCheckState( item );
+		var targetChecked = currentState != CheckState.Checked;
+
+		if ( CascadeChecks )
+		{
+			void Apply( TItem node )
+			{
+				var leafChildren = ResolveChildren( node ).ToList();
+				if ( leafChildren.Count == 0 )
+				{
+					var v = GetItemValue( node );
+					if ( targetChecked ) Checked.Add( v );
+					else Checked.Remove( v );
+					return;
+				}
+
+				foreach ( var c in leafChildren )
+					Apply( c );
+			}
+
+			Apply( item );
+
+			// Canonicalise: a branch is in Checked iff all leaves below it are checked.
+			var rootValue = GetItemValue( item );
+			if ( GetCheckState( item ) == CheckState.Checked )
+				Checked.Add( rootValue );
+			else
+				Checked.Remove( rootValue );
+		}
+		else
+		{
+			var value = GetItemValue( item );
+			if ( targetChecked ) Checked.Add( value );
+			else Checked.Remove( value );
+		}
+
+		if ( CheckedValuesChanged.HasDelegate )
+			await CheckedValuesChanged.InvokeAsync( Checked );
+
+		StateHasChanged();
+	}
+
+	private void RebuildSearchIndex()
+	{
+		Matched.Clear();
+		SearchAncestors.Clear();
+
+		if ( string.IsNullOrWhiteSpace( InternalSearchText ) )
+			return;
+
+		var needle = InternalSearchText.Trim();
+
+		bool Walk( TItem item, List<string> ancestorValues )
+		{
+			var value = GetItemValue( item );
+			var text = ResolveText( item );
+			var selfMatch = text.Contains( needle, StringComparison.OrdinalIgnoreCase );
+
+			var descendantMatch = false;
+			foreach ( var child in ResolveChildren( item ) )
+			{
+				ancestorValues.Add( value );
+				if ( Walk( child, ancestorValues ) )
+					descendantMatch = true;
+				ancestorValues.RemoveAt( ancestorValues.Count - 1 );
+			}
+
+			if ( selfMatch )
+			{
+				Matched.Add( value );
+				foreach ( var a in ancestorValues )
+					SearchAncestors.Add( a );
+			}
+
+			if ( descendantMatch )
+				SearchAncestors.Add( value );
+
+			return selfMatch || descendantMatch;
+		}
+
+		foreach ( var root in Items )
+			Walk( root, new List<string>() );
+	}
+
+	internal bool IsSearchActive => !string.IsNullOrWhiteSpace( InternalSearchText );
+
+	internal bool IsVisibleInSearch( TItem item )
+	{
+		if ( !IsSearchActive )
+			return true;
+		var value = GetItemValue( item );
+		return Matched.Contains( value ) || SearchAncestors.Contains( value );
+	}
+
+	internal bool IsAutoExpandedBySearch( TItem item ) =>
+		IsSearchActive && SearchAncestors.Contains( GetItemValue( item ) );
+
+	internal bool HasAnyMatches => Matched.Count > 0;
+
+	internal RenderFragment? NoResultsContent => NoResultsTemplate;
+	internal RenderFragment? EmptyContent => EmptyTemplate;
+	internal RenderFragment<TItem>? LabelTemplateInternal => LabelTemplate;
+	internal RenderFragment<TItem>? ActionsTemplateInternal => ActionsTemplate;
+	internal bool ShowConnectorLinesInternal => ShowConnectorLines;
+
+	internal async Task HandleSearchInputAsync( string? value )
+	{
+		InternalSearchText = value;
+		RebuildSearchIndex();
+
+		if ( SearchTextChanged.HasDelegate )
+			await SearchTextChanged.InvokeAsync( value );
+
+		StateHasChanged();
+	}
+
+	public async Task ExpandAllAsync()
+	{
+		void Walk( TItem item )
+		{
+			if ( !HasChildren( item ) )
+				return;
+			Expanded.Add( GetItemValue( item ) );
+			foreach ( var child in ResolveChildren( item ) )
+				Walk( child );
+		}
+
+		foreach ( var root in Items )
+			Walk( root );
+
+		if ( ExpandedValuesChanged.HasDelegate )
+			await ExpandedValuesChanged.InvokeAsync( Expanded );
+		StateHasChanged();
+	}
+
+	public async Task CollapseAllAsync()
+	{
+		Expanded.Clear();
+
+		if ( ExpandedValuesChanged.HasDelegate )
+			await ExpandedValuesChanged.InvokeAsync( Expanded );
+		StateHasChanged();
+	}
+
+	internal RenderFragment RenderHighlightedText( TItem item ) => builder =>
+	{
+		var text = ResolveText( item );
+		if ( !IsSearchActive || string.IsNullOrEmpty( InternalSearchText ) )
+		{
+			builder.AddContent( 0, text );
+			return;
+		}
+
+		var needle = InternalSearchText;
+		var seq = 0;
+		var idx = 0;
+		while ( idx < text.Length )
+		{
+			var match = text.IndexOf( needle, idx, StringComparison.OrdinalIgnoreCase );
+			if ( match < 0 )
+			{
+				builder.AddContent( seq++, text[idx..] );
+				break;
+			}
+
+			if ( match > idx )
+				builder.AddContent( seq++, text[idx..match] );
+
+			builder.OpenElement( seq++, "mark" );
+			builder.AddAttribute( seq++, "class", "bg-warning-bg text-warning-fg rounded px-0.5" );
+			builder.AddContent( seq++, text.Substring( match, needle.Length ) );
+			builder.CloseElement();
+
+			idx = match + needle.Length;
+		}
+	};
+}

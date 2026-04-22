@@ -1,0 +1,44 @@
+@page "/primitives/separator"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Separator" Description="Visually or semantically separates content" Interactivity="ComponentInteractivity.Ssr" ApiElements="@SeparatorElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Horizontal (default)" Code="@("<Separator />")">
+			<div class="space-y-2">
+				<p class="text-sm">Content above</p>
+				<Separator />
+				<p class="text-sm">Content below</p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Vertical" Code="@("<Separator Orientation=\"SeparatorDirection.Vertical\" />")">
+			<div class="flex items-center gap-4 h-6">
+				<span class="text-sm">Left</span>
+				<Separator Orientation="SeparatorDirection.Vertical" />
+				<span class="text-sm">Right</span>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] SeparatorElements =
+	[
+		new ApiElement(
+			Name: "Separator",
+			Description: "Thin decorative line that spans the full width (horizontal) or height (vertical) of its parent. Emits `role=\"none\"` and a `data-orientation` attribute consumed by the utility classes.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Orientation",          "SeparatorDirection",            false, "Axis of the line. Default: `SeparatorDirection.Horizontal`. Other value: `Vertical`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the separator element." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the separator element." ),
+			]
+		),
+	];
+}

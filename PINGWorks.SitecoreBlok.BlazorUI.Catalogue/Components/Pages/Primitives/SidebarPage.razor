@@ -1,0 +1,493 @@
+@page "/primitives/sidebar"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Sidebar" Description="App-level collapsible side navigation" Interactivity="ComponentInteractivity.Interactive" ApiElements="@SidebarElements">
+
+	<DivergenceNote>
+		<p><strong>Desktop rendering only.</strong> Blok's source swaps to a mobile <code>Sheet</code> when <code>useIsMobile()</code> returns true. BlazorUI keeps the desktop <code>position:absolute</code> container and hides on small viewports via <code>hidden md:block</code>. Consumers who need a mobile drawer should compose <code>&lt;Sheet&gt;</code> separately for the small-viewport layout.</p>
+		<p><strong>No keyboard shortcut.</strong> Blok wires a global <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>B</kbd> listener via <code>window.addEventListener('keydown', …)</code> to toggle the sidebar. BlazorUI leaves this to the consumer — add your own handler if you want the shortcut.</p>
+		<p><strong>No cookie persistence.</strong> Blok persists the open/collapsed state to a <code>sidebar_state</code> cookie so the layout survives page reloads. BlazorUI's state is in-memory for the current circuit. Consumers can wire their own persistence via <code>OpenChanged</code>.</p>
+		<p><strong>No tooltip on collapsed menu buttons.</strong> Blok's <code>SidebarMenuButton</code> accepts a <code>tooltip</code> prop that surfaces the button's label when the sidebar collapses to icon-only. BlazorUI's <code>Tooltip</code> is a pure-CSS hover primitive with no programmatic <code>hidden</code> prop or <code>TooltipProvider</code> context, so this integration is omitted. Consumers can wrap the button with a <code>Tooltip</code> manually.</p>
+		<p><strong><code>SidebarHeader</code> and <code>SidebarFooter</code> are not exposed.</strong> Blok's source does not export these; the upstream shadcn/ui primitive does, but BlazorUI tracks Blok. Place header/footer content directly inside <code>SidebarContent</code> or an outer <code>&lt;div&gt;</code> with layout classes.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+	<ComponentExample Title="Leading icons" Code="@("<SidebarProvider>\n    <Sidebar>\n        <SidebarContent>\n            <SidebarGroup>\n                <SidebarGroupLabel>Application</SidebarGroupLabel>\n                <SidebarGroupContent>\n                    <SidebarMenu>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton IsActive=\"true\">\n                                <Icon Svg=\"@IconSvg.ViewDashboard\" />\n                                <span>Dashboard</span>\n                            </SidebarMenuButton>\n                        </SidebarMenuItem>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>\n                                <Icon Svg=\"@IconSvg.FolderOutline\" />\n                                <span>Projects</span>\n                            </SidebarMenuButton>\n                        </SidebarMenuItem>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>\n                                <Icon Svg=\"@IconSvg.AccountGroupOutline\" />\n                                <span>Team</span>\n                            </SidebarMenuButton>\n                        </SidebarMenuItem>\n                    </SidebarMenu>\n                </SidebarGroupContent>\n            </SidebarGroup>\n        </SidebarContent>\n    </Sidebar>\n    <SidebarInset>\n        <div class=\"flex items-center gap-2 p-4 border-b\">\n            <SidebarTrigger />\n            <span class=\"font-semibold\">Main content</span>\n        </div>\n        <div class=\"p-4\">Content goes here.</div>\n    </SidebarInset>\n</SidebarProvider>")">
+		<div class="h-96 border rounded-lg overflow-hidden">
+			<SidebarProvider>
+				<Sidebar>
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupLabel>Application</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuItem>
+										<SidebarMenuButton IsActive="true">
+											<Icon Svg="@IconSvg.ViewDashboard" />
+											<span>Dashboard</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton>
+											<Icon Svg="@IconSvg.FolderOutline" />
+											<span>Projects</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton>
+											<Icon Svg="@IconSvg.AccountGroupOutline" />
+											<span>Team</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</SidebarContent>
+				</Sidebar>
+				<SidebarInset>
+					<div class="flex items-center gap-2 p-4 border-b">
+						<SidebarTrigger />
+						<span class="font-semibold">Main content</span>
+					</div>
+					<div class="p-4">Content goes here.</div>
+				</SidebarInset>
+			</SidebarProvider>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="Trailing actions and badges" Code="@("<SidebarProvider>\n    <Sidebar>\n        <SidebarContent>\n            <SidebarGroup>\n                <SidebarGroupLabel>Inbox</SidebarGroupLabel>\n                <SidebarGroupContent>\n                    <SidebarMenu>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>\n                                <Icon Svg=\"@IconSvg.InboxOutline\" />\n                                <span>Messages</span>\n                            </SidebarMenuButton>\n                            <SidebarMenuBadge>12</SidebarMenuBadge>\n                        </SidebarMenuItem>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>\n                                <Icon Svg=\"@IconSvg.BellOutline\" />\n                                <span>Notifications</span>\n                            </SidebarMenuButton>\n                            <SidebarMenuAction>\n                                <Icon Svg=\"@IconSvg.DotsHorizontal\" />\n                            </SidebarMenuAction>\n                        </SidebarMenuItem>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton IsActive=\"true\">\n                                <Icon Svg=\"@IconSvg.StarOutline\" />\n                                <span>Starred</span>\n                            </SidebarMenuButton>\n                            <SidebarMenuBadge>3</SidebarMenuBadge>\n                        </SidebarMenuItem>\n                    </SidebarMenu>\n                </SidebarGroupContent>\n            </SidebarGroup>\n        </SidebarContent>\n    </Sidebar>\n    <SidebarInset>\n        <div class=\"flex items-center gap-2 p-4\"><SidebarTrigger /><span>Main</span></div>\n    </SidebarInset>\n</SidebarProvider>")">
+		<div class="h-96 border rounded-lg overflow-hidden">
+			<SidebarProvider>
+				<Sidebar>
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupLabel>Inbox</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuItem>
+										<SidebarMenuButton>
+											<Icon Svg="@IconSvg.InboxOutline" />
+											<span>Messages</span>
+										</SidebarMenuButton>
+										<SidebarMenuBadge>12</SidebarMenuBadge>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton>
+											<Icon Svg="@IconSvg.BellOutline" />
+											<span>Notifications</span>
+										</SidebarMenuButton>
+										<SidebarMenuAction>
+											<Icon Svg="@IconSvg.DotsHorizontal" />
+										</SidebarMenuAction>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton IsActive="true">
+											<Icon Svg="@IconSvg.StarOutline" />
+											<span>Starred</span>
+										</SidebarMenuButton>
+										<SidebarMenuBadge>3</SidebarMenuBadge>
+									</SidebarMenuItem>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</SidebarContent>
+				</Sidebar>
+				<SidebarInset>
+					<div class="flex items-center gap-2 p-4">
+						<SidebarTrigger />
+						<span class="font-semibold">Main</span>
+					</div>
+				</SidebarInset>
+			</SidebarProvider>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="Groups with sub-menus" Code="@("<SidebarProvider>\n    <Sidebar>\n        <SidebarContent>\n            <SidebarGroup>\n                <SidebarGroupLabel>Platform</SidebarGroupLabel>\n                <SidebarGroupContent>\n                    <SidebarMenu>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>Documents</SidebarMenuButton>\n                            <SidebarMenuBadge>3</SidebarMenuBadge>\n                        </SidebarMenuItem>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>Settings</SidebarMenuButton>\n                            <SidebarMenuSub>\n                                <SidebarMenuSubItem>\n                                    <SidebarMenuSubButton Href=\"#\" IsActive=\"true\">General</SidebarMenuSubButton>\n                                </SidebarMenuSubItem>\n                                <SidebarMenuSubItem>\n                                    <SidebarMenuSubButton Href=\"#\">Security</SidebarMenuSubButton>\n                                </SidebarMenuSubItem>\n                            </SidebarMenuSub>\n                        </SidebarMenuItem>\n                    </SidebarMenu>\n                </SidebarGroupContent>\n            </SidebarGroup>\n        </SidebarContent>\n    </Sidebar>\n    <SidebarInset>\n        <div class=\"flex items-center gap-2 p-4\"><SidebarTrigger /><span>Main</span></div>\n    </SidebarInset>\n</SidebarProvider>")">
+		<div class="h-96 border rounded-lg overflow-hidden">
+			<SidebarProvider>
+				<Sidebar>
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupLabel>Platform</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuItem>
+										<SidebarMenuButton>Documents</SidebarMenuButton>
+										<SidebarMenuBadge>3</SidebarMenuBadge>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton>Settings</SidebarMenuButton>
+										<SidebarMenuSub>
+											<SidebarMenuSubItem>
+												<SidebarMenuSubButton Href="#" IsActive="true">General</SidebarMenuSubButton>
+											</SidebarMenuSubItem>
+											<SidebarMenuSubItem>
+												<SidebarMenuSubButton Href="#">Security</SidebarMenuSubButton>
+											</SidebarMenuSubItem>
+										</SidebarMenuSub>
+									</SidebarMenuItem>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</SidebarContent>
+				</Sidebar>
+				<SidebarInset>
+					<div class="flex items-center gap-2 p-4">
+						<SidebarTrigger />
+						<span class="font-semibold">Main</span>
+					</div>
+				</SidebarInset>
+			</SidebarProvider>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="Collapsible: icon" Code="@("<SidebarProvider DefaultOpen=\"false\">\n    <Sidebar Collapsible=\"SidebarCollapsible.Icon\">\n        <SidebarContent>\n            <SidebarGroup>\n                <SidebarGroupLabel>Navigation</SidebarGroupLabel>\n                <SidebarGroupContent>\n                    <SidebarMenu>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton IsActive=\"true\">\n                                <Icon Svg=\"@IconSvg.Home\" />\n                                <span>Home</span>\n                            </SidebarMenuButton>\n                        </SidebarMenuItem>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>\n                                <Icon Svg=\"@IconSvg.Account\" />\n                                <span>Account</span>\n                            </SidebarMenuButton>\n                        </SidebarMenuItem>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>\n                                <Icon Svg=\"@IconSvg.Cog\" />\n                                <span>Settings</span>\n                            </SidebarMenuButton>\n                        </SidebarMenuItem>\n                    </SidebarMenu>\n                </SidebarGroupContent>\n            </SidebarGroup>\n        </SidebarContent>\n    </Sidebar>\n    <SidebarInset>\n        <div class=\"flex items-center gap-2 p-4\"><SidebarTrigger /><span>Toggle to expand</span></div>\n    </SidebarInset>\n</SidebarProvider>")">
+		<div class="h-96 border rounded-lg overflow-hidden">
+			<SidebarProvider DefaultOpen="false">
+				<Sidebar Collapsible="SidebarCollapsible.Icon">
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupLabel>Navigation</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuItem>
+										<SidebarMenuButton IsActive="true">
+											<Icon Svg="@IconSvg.Home" />
+											<span>Home</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton>
+											<Icon Svg="@IconSvg.Account" />
+											<span>Account</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton>
+											<Icon Svg="@IconSvg.Cog" />
+											<span>Settings</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</SidebarContent>
+				</Sidebar>
+				<SidebarInset>
+					<div class="flex items-center gap-2 p-4">
+						<SidebarTrigger />
+						<span class="font-semibold">Toggle to expand</span>
+					</div>
+				</SidebarInset>
+			</SidebarProvider>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="Variant: floating" Code="@("<SidebarProvider>\n    <Sidebar Variant=\"SidebarVariant.Floating\">\n        <SidebarContent>\n            <SidebarGroup>\n                <SidebarGroupContent>\n                    <SidebarMenu>\n                        <SidebarMenuItem>\n                            <SidebarMenuButton>Floating sidebar item</SidebarMenuButton>\n                        </SidebarMenuItem>\n                    </SidebarMenu>\n                </SidebarGroupContent>\n            </SidebarGroup>\n        </SidebarContent>\n    </Sidebar>\n    <SidebarInset>\n        <div class=\"flex items-center gap-2 p-4\"><SidebarTrigger /><span>Main</span></div>\n    </SidebarInset>\n</SidebarProvider>")">
+		<div class="h-96 border rounded-lg overflow-hidden bg-muted">
+			<SidebarProvider>
+				<Sidebar Variant="SidebarVariant.Floating">
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuItem>
+										<SidebarMenuButton>Floating sidebar item</SidebarMenuButton>
+									</SidebarMenuItem>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</SidebarContent>
+				</Sidebar>
+				<SidebarInset>
+					<div class="flex items-center gap-2 p-4">
+						<SidebarTrigger />
+						<span class="font-semibold">Main</span>
+					</div>
+				</SidebarInset>
+			</SidebarProvider>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="Loading skeleton" Code="@("<SidebarProvider>\n    <Sidebar>\n        <SidebarContent>\n            <SidebarGroup>\n                <SidebarGroupContent>\n                    <SidebarMenu>\n                        <SidebarMenuSkeleton ShowIcon=\"true\" />\n                        <SidebarMenuSkeleton ShowIcon=\"true\" />\n                        <SidebarMenuSkeleton ShowIcon=\"true\" />\n                    </SidebarMenu>\n                </SidebarGroupContent>\n            </SidebarGroup>\n        </SidebarContent>\n    </Sidebar>\n    <SidebarInset>\n        <div class=\"flex items-center gap-2 p-4\"><SidebarTrigger /><span>Main</span></div>\n    </SidebarInset>\n</SidebarProvider>")">
+		<div class="h-96 border rounded-lg overflow-hidden">
+			<SidebarProvider>
+				<Sidebar>
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuSkeleton ShowIcon="true" />
+									<SidebarMenuSkeleton ShowIcon="true" />
+									<SidebarMenuSkeleton ShowIcon="true" />
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</SidebarContent>
+				</Sidebar>
+				<SidebarInset>
+					<div class="flex items-center gap-2 p-4">
+						<SidebarTrigger />
+						<span class="font-semibold">Main</span>
+					</div>
+				</SidebarInset>
+			</SidebarProvider>
+		</div>
+	</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] SidebarElements =
+	[
+		new ApiElement(
+			Name: "SidebarProvider",
+			Description: "Outermost wrapper. Cascades itself so child `Sidebar`, `SidebarTrigger`, and `SidebarRail` components can read and toggle the open state. Sets the `--sidebar-width` and `--sidebar-width-icon` CSS variables consumed by `Sidebar`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "DefaultOpen",          "bool",                          false, "Initial open state. Default: `true`." ),
+				new ApiProperty( "OpenChanged",          "EventCallback<bool>",           false, "Fires whenever the user toggles the sidebar. Use this to persist state yourself — Blok's cookie persistence is not ported." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the provider wrapper." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Should contain a `Sidebar` and a sibling `SidebarInset`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the wrapper `div`." ),
+			]
+		),
+		new ApiElement(
+			Name: "Sidebar",
+			Description: "The collapsible navigation rail. Reads its open state from the cascading `SidebarProvider` and swaps between full-width, icon-only, or off-canvas layouts via the `Collapsible` parameter.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Side",                 "SidebarSide",                   false, "Screen edge to dock against. Default: `SidebarSide.Left`. Other value: `Right`." ),
+				new ApiProperty( "Variant",              "SidebarVariant",                false, "Visual treatment. Default: `SidebarVariant.Sidebar`. Other values: `Floating` (rounded + shadow), `Inset` (inset main content)." ),
+				new ApiProperty( "Collapsible",          "SidebarCollapsible",            false, "Collapse behaviour. Default: `SidebarCollapsible.Offcanvas` (slides off-screen). Other values: `Icon` (collapses to icon-only rail), `None` (fixed width, no collapse)." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the sidebar container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Sidebar body — typically one or more `SidebarGroup`s inside a `SidebarContent`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the sidebar container." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarInset",
+			Description: "Main-content `<main>` region that sits alongside the `Sidebar`. When the `Sidebar` is `SidebarVariant.Inset`, this element gains the inset margin and rounded corner styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<main>` element." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Page content rendered next to the sidebar." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<main>` element." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarTrigger",
+			Description: "Pre-styled icon button that toggles the nearest `SidebarProvider`. Place it in your page header to let users collapse / expand the sidebar.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "OnClicked",            "EventCallback",                 false, "Fires on click, before the provider toggles. Use for analytics or extra side effects." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the underlying `Button`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarRail",
+			Description: "Thin vertical hit-area at the outer edge of the sidebar that also toggles the provider. Useful for drag-to-collapse style interactions.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the rail button." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the rail `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarInput",
+			Description: "Standard `Input` wired up with the sidebar input styling. Useful for inline filters at the top of a sidebar group.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                       false, "Current input value. Use `@bind-Value` for two-way binding." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Fires on input change. Part of the `@bind-Value` pair." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the inner `Input`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the inner `Input`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarSeparator",
+			Description: "Horizontal `Separator` with sidebar-specific spacing and background colour.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the separator." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the separator." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarContent",
+			Description: "Scrollable body area of the sidebar. Place `SidebarGroup`s here; overflow becomes scrollable.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the content container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Should contain one or more `SidebarGroup`s." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the content container." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarGroup",
+			Description: "Logical section inside `SidebarContent`. Usually holds a `SidebarGroupLabel`, an optional `SidebarGroupAction`, and a `SidebarGroupContent` with a `SidebarMenu`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the group wrapper." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Group content." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the group wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarGroupLabel",
+			Description: "Small uppercase heading at the top of a `SidebarGroup`. Fades out when the sidebar collapses to icon mode.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the label container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Label text or inline markup." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the label container." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarGroupAction",
+			Description: "Small icon button positioned at the top-right of a `SidebarGroup`. Hidden when the sidebar is collapsed to icon mode.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "OnClicked",            "EventCallback",                 false, "Fires when the action button is clicked." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Button content — typically an `Icon`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarGroupContent",
+			Description: "Body of a `SidebarGroup`. Host for `SidebarMenu`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the content wrapper." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Group body — usually a `SidebarMenu`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenu",
+			Description: "Vertical `<ul>` of navigation items inside a `SidebarGroupContent`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<ul>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "One or more `SidebarMenuItem`s." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<ul>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenuItem",
+			Description: "`<li>` row hosting one `SidebarMenuButton` plus optional `SidebarMenuBadge`, `SidebarMenuAction`, or `SidebarMenuSub`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<li>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Item content — the button plus any trailing badge / action / sub-menu." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<li>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenuButton",
+			Description: "The primary clickable row of a `SidebarMenuItem`. Place an `Icon` + `<span>` label inside; the icon stays visible when the sidebar collapses to icon mode.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "IsActive",             "bool",                          false, "When true, paints the button with the active (primary) colour. Default: `false`." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, the button is non-interactive and visually muted. Default: `false`." ),
+				new ApiProperty( "Size",                 "SidebarMenuButtonSize",         false, "Size token. Default: `SidebarMenuButtonSize.Default`. Other values: `Sm` (smaller text), `Lg` (larger hit area)." ),
+				new ApiProperty( "OnClicked",            "EventCallback",                 false, "Fires when the button is clicked." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<button>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Typically an `Icon` followed by a `<span>` label." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenuBadge",
+			Description: "Small inline badge pinned to the right of a `SidebarMenuItem` (e.g. unread counts). Hidden when the sidebar collapses to icon mode.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the badge container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Badge content — typically a short number or string." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the badge container." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenuAction",
+			Description: "Icon-only button pinned to the right of a `SidebarMenuItem`. Optionally shown only on hover via `ShowOnHover`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ShowOnHover",          "bool",                          false, "When true, the action is opacity-0 until the menu item is hovered or focused. Default: `false`." ),
+				new ApiProperty( "OnClicked",            "EventCallback",                 false, "Fires when the action button is clicked." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Button content — typically an `Icon`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenuSub",
+			Description: "Nested `<ul>` rendered beneath a `SidebarMenuItem` to hold second-level navigation. Hidden when the sidebar collapses to icon mode.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the sub-menu `<ul>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "One or more `SidebarMenuSubItem`s." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<ul>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenuSubItem",
+			Description: "`<li>` row inside a `SidebarMenuSub`, hosting a single `SidebarMenuSubButton`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<li>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "A single `SidebarMenuSubButton`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<li>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenuSubButton",
+			Description: "Clickable navigation link inside a `SidebarMenuSubItem`. Renders as an `<a>` so `Href` drives actual navigation.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Href",                 "string?",                       false, "The target URL for the link." ),
+				new ApiProperty( "IsActive",             "bool",                          false, "When true, paints the link with the active colour. Default: `false`." ),
+				new ApiProperty( "Size",                 "SidebarMenuSubButtonSize",      false, "Size token. Default: `SidebarMenuSubButtonSize.Md`. Other value: `Sm` (smaller text)." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<a>` element." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Link content — typically a label string, optionally with a leading `Icon`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<a>` element." ),
+			]
+		),
+		new ApiElement(
+			Name: "SidebarMenuSkeleton",
+			Description: "Loading placeholder styled to match a `SidebarMenuItem`. Each instance picks a random width between 50% and 90% for visual variety.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ShowIcon",             "bool",                          false, "When true, also renders a small square `Skeleton` in the icon slot. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the skeleton row." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the skeleton row." ),
+			]
+		),
+	];
+}

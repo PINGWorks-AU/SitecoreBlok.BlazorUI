@@ -1,0 +1,25 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if ( ChildContent is not null )
+{
+	<div data-slot="field-separator" class="@CssClassWithContent">
+		@ChildContent
+	</div>
+}
+else
+{
+	<div data-slot="field-separator" class="@CssClassSimple"></div>
+}
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClassWithContent => CssClassBuilder.Start( "relative flex items-center gap-2 py-4 before:flex-1 before:border-t before:border-border after:flex-1 after:border-t after:border-border" )
+										.With( ClassName )
+										.Build();
+
+	private string CssClassSimple => CssClassBuilder.Start( "border-t border-border" )
+										.With( ClassName )
+										.Build();
+}

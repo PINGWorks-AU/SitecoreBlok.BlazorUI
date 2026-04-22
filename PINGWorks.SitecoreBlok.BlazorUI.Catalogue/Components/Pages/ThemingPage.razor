@@ -1,0 +1,82 @@
+@page "/graphics/theming"
+
+<ComponentPage Title="Theming" Description="Theming contains basic tokens and variables to be used when creating UIs or components using Blok, to achieve a Blok style.">
+
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
+
+		@* ── Colors ── *@
+		<a href="/graphics/theming/colors" class="group block rounded-lg border border-border bg-card p-6 no-underline hover:border-primary/50 hover:shadow-md transition-all">
+			<div class="flex gap-1.5 mb-4">
+				<div class="w-6 h-6 rounded-full" style="background-color:var(--color-primary-500)"></div>
+				<div class="w-6 h-6 rounded-full" style="background-color:var(--color-danger-500)"></div>
+				<div class="w-6 h-6 rounded-full" style="background-color:var(--color-success-500)"></div>
+				<div class="w-6 h-6 rounded-full" style="background-color:var(--color-warning-500)"></div>
+				<div class="w-6 h-6 rounded-full" style="background-color:var(--color-blackAlpha-500)"></div>
+			</div>
+			<h3 class="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Colors</h3>
+			<p class="text-xs text-muted-foreground mt-1">Primary, danger, success, warning, and neutral color palettes.</p>
+		</a>
+
+		@* ── Semantic Tokens ── *@
+		<a href="/graphics/theming/semantic-tokens" class="group block rounded-lg border border-border bg-card p-6 no-underline hover:border-primary/50 hover:shadow-md transition-all">
+			<div class="flex gap-1.5 mb-4">
+				<div class="w-6 h-6 rounded border border-border" style="background-color:var(--background)"></div>
+				<div class="w-6 h-6 rounded border border-border" style="background-color:var(--card)"></div>
+				<div class="w-6 h-6 rounded border border-border" style="background-color:var(--muted)"></div>
+				<div class="w-6 h-6 rounded border border-border" style="background-color:var(--accent)"></div>
+				<div class="w-6 h-6 rounded border border-border" style="background-color:var(--destructive)"></div>
+			</div>
+			<h3 class="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Semantic tokens</h3>
+			<p class="text-xs text-muted-foreground mt-1">Background, foreground, card, muted, accent, and other role-based tokens.</p>
+		</a>
+
+		@* ── Typography ── *@
+		<a href="/graphics/theming/typography" class="group block rounded-lg border border-border bg-card p-6 no-underline hover:border-primary/50 hover:shadow-md transition-all">
+			<div class="mb-4 space-y-0.5">
+				<p class="text-2xl font-bold text-foreground leading-none">Aa</p>
+				<p class="text-base text-foreground/70 leading-none">Aa</p>
+				<p class="text-xs text-foreground/50 leading-none">Aa</p>
+			</div>
+			<h3 class="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Typography</h3>
+			<p class="text-xs text-muted-foreground mt-1">Font sizes from text-3xs to text-9xl.</p>
+		</a>
+
+		@* ── Spacing ── *@
+		<a href="/graphics/theming/spacing" class="group block rounded-lg border border-border bg-card p-6 no-underline hover:border-primary/50 hover:shadow-md transition-all">
+			<div class="space-y-1.5 mb-4">
+				<div class="h-2 w-4 rounded-sm bg-primary/70"></div>
+				<div class="h-2 w-8 rounded-sm bg-primary/60"></div>
+				<div class="h-2 w-14 rounded-sm bg-primary/50"></div>
+				<div class="h-2 w-20 rounded-sm bg-primary/40"></div>
+			</div>
+			<h3 class="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Spacing</h3>
+			<p class="text-xs text-muted-foreground mt-1">Width-based spacing utilities from w-1 to w-12.</p>
+		</a>
+
+		@* ── Border Radius ── *@
+		<a href="/graphics/theming/border-radius" class="group block rounded-lg border border-border bg-card p-6 no-underline hover:border-primary/50 hover:shadow-md transition-all">
+			<div class="flex gap-2 mb-4">
+				<div class="w-6 h-6 border-2 border-primary/60 bg-primary/10 rounded-none"></div>
+				<div class="w-6 h-6 border-2 border-primary/60 bg-primary/10 rounded"></div>
+				<div class="w-6 h-6 border-2 border-primary/60 bg-primary/10 rounded-lg"></div>
+				<div class="w-6 h-6 border-2 border-primary/60 bg-primary/10 rounded-full"></div>
+			</div>
+			<h3 class="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Border radius</h3>
+			<p class="text-xs text-muted-foreground mt-1">Radius variants from rounded-none to rounded-full.</p>
+		</a>
+
+		@* ── Shadows ── *@
+		<a href="/graphics/theming/shadows" class="group block rounded-lg border border-border bg-card p-6 no-underline hover:border-primary/50 hover:shadow-md transition-all">
+			<div class="flex gap-2 mb-4">
+				<div class="w-8 h-6 rounded bg-background border border-border shadow-sm"></div>
+				<div class="w-8 h-6 rounded bg-background border border-border shadow"></div>
+				<div class="w-8 h-6 rounded bg-background border border-border shadow-md"></div>
+				<div class="w-8 h-6 rounded bg-background border border-border shadow-lg"></div>
+			</div>
+			<h3 class="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Shadows</h3>
+			<p class="text-xs text-muted-foreground mt-1">Shadow levels from shadow-none to shadow-xl.</p>
+		</a>
+
+	</div>
+
+</ComponentPage>

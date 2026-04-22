@@ -1,0 +1,41 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button @ref="Ref" type="button" data-slot="menubar-trigger"
+		data-state="@( ParentMenu.IsOpen ? "open" : "closed" )"
+		class="@CssClass" @onclick="OnClick" @onmouseenter="OnMouseEnter"
+		@attributes="AdditionalAttributes">
+	@ChildContent
+</button>
+
+@code {
+	[CascadingParameter] public required Menubar ParentMenubar { get; set; }
+	[CascadingParameter] public required MenubarMenu ParentMenu { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private ElementReference Ref;
+
+	// relative z-50 keeps triggers above the MenubarContent backdrop (z-40), so clicking a
+	// different trigger while a menu is open is a single click — not two (backdrop close, then open).
+	private string CssClass => CssClassBuilder.Start(
+		"relative z-50 flex select-none items-center rounded-sm px-2 py-1 font-medium text-sm outline-hidden",
+		"hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+		"data-[state=open]:bg-accent data-[state=open]:text-accent-foreground" )
+											.With( ClassName )
+											.Build();
+
+	protected override void OnAfterRender( bool firstRender )
+	{
+		if ( firstRender )
+			ParentMenu.RegisterTriggerRef( Ref );
+	}
+
+	private async Task OnClick() => await ParentMenu.Toggle();
+
+	private async Task OnMouseEnter()
+	{
+		if ( ParentMenubar.HasAnyOpen && !ParentMenu.IsOpen )
+			await ParentMenu.Open();
+	}
+}

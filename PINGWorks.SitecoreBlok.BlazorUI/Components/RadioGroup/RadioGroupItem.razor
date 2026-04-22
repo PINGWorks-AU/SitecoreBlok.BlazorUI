@@ -1,0 +1,54 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div class="flex items-center gap-2">
+	<button type="button" data-slot="radio-group-item" role="radio"
+			aria-checked="@( IsSelected ? "true" : "false" )"
+			data-state="@( IsSelected ? "checked" : "unchecked" )"
+			disabled="@( Disabled || Parent.Disabled )"
+			class="@CssClass" @onclick="Select">
+		@if ( IsSelected )
+		{
+			@* NOTE — Icon sized via !size-[0.8rem] (12.8px), matching Blok's `<Icon size={0.8}>` which
+			   sets the SVG's actual width/height. Do NOT revert to `Scale="0.8"` — that only applies
+			   an SVG transform, leaving the layout box at the default `size-6` (24px) which overflows
+			   the 16px button and mis-aligns the centre dot. The `!` is required to beat the default
+			   size class that `ResetClassName` preserves. *@
+			<span data-slot="radio-group-indicator" class="relative flex items-center justify-center">
+				<Icon Svg="@IconSvg.Circle" ResetClassName ClassName="!size-[0.8rem]" />
+			</span>
+		}
+	</button>
+
+	@if ( Label is not null )
+	{
+		<span @onclick="Select" class="@( $"text-md font-medium select-none {( Disabled || Parent.Disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer" )}" )">@Label</span>
+	}
+</div>
+
+@code {
+	[CascadingParameter] public required RadioGroup Parent { get; set; }
+
+	[Parameter, EditorRequired] public required string Value { get; set; }
+	[Parameter] public string? Label { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	private bool IsSelected => Parent.Value == Value;
+
+	// NOTE — `inline-flex items-center justify-center` added beyond Blok's class string.
+	// Blok's React/Radix implementation gets indicator centering implicitly via Radix's
+	// Indicator component rendering; our raw <button> + <span> needs the button to be an
+	// explicit flex container so the 12.8px circular indicator sits dead-centre in the
+	// 16px button in BOTH axes. Without it the indicator is top-aligned (roughly 3px
+	// vertical offset). Do NOT remove to "match Blok's class string" — harness drift
+	// finding is expected and documented in docs/ui-parity-audit.md.
+	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border transition-[color] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50" )
+										.With( ClassName )
+										.Build();
+
+	private async Task Select()
+	{
+		if ( Disabled || Parent.Disabled ) return;
+		await Parent.SelectValue( Value );
+	}
+}

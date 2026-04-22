@@ -1,0 +1,16 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="aspect-ratio" style="@WrapperStyle" @attributes="AdditionalAttributes">
+	<div class="@( ClassName ?? string.Empty )" style="position:absolute;top:0;right:0;bottom:0;left:0">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public double Ratio { get; set; } = 1;
+
+	private string WrapperStyle => $"position:relative;width:100%;padding-bottom:{100f / Ratio}%";
+}

@@ -1,0 +1,268 @@
+@page "/primitives/field"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Field" Description="A set of composable form field components for building accessible forms" Interactivity="ComponentInteractivity.Ssr" ApiElements="@FieldElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Input" Code="@("<FieldSet>\n    <FieldLegend>Login</FieldLegend>\n    <FieldGroup>\n        <Field>\n            <FieldLabel>Username</FieldLabel>\n            <Input Placeholder=\"Enter username\" />\n            <FieldDescription>This is your public display name.</FieldDescription>\n        </Field>\n        <Field>\n            <FieldLabel>Password</FieldLabel>\n            <Input Type=\"password\" Placeholder=\"Enter password\" />\n        </Field>\n    </FieldGroup>\n</FieldSet>")">
+			<FieldSet>
+				<FieldLegend>Login</FieldLegend>
+				<FieldGroup>
+					<Field>
+						<FieldLabel>Username</FieldLabel>
+						<Input Placeholder="Enter username" @bind-Value="Username" />
+						<FieldDescription>This is your public display name.</FieldDescription>
+					</Field>
+					<Field>
+						<FieldLabel>Password</FieldLabel>
+						<Input Type="password" Placeholder="Enter password" @bind-Value="Password" />
+					</Field>
+				</FieldGroup>
+			</FieldSet>
+		</ComponentExample>
+
+		<ComponentExample Title="Textarea" Code="@("<FieldSet>\n    <FieldLegend>Feedback</FieldLegend>\n    <FieldGroup>\n        <Field>\n            <FieldLabel>Message</FieldLabel>\n            <Textarea Placeholder=\"Type your message here\" />\n            <FieldDescription>Your message will be sent to the team.</FieldDescription>\n        </Field>\n    </FieldGroup>\n</FieldSet>")">
+			<FieldSet>
+				<FieldLegend>Feedback</FieldLegend>
+				<FieldGroup>
+					<Field>
+						<FieldLabel>Message</FieldLabel>
+						<Textarea Placeholder="Type your message here" @bind-Value="Message" />
+						<FieldDescription>Your message will be sent to the team.</FieldDescription>
+					</Field>
+				</FieldGroup>
+			</FieldSet>
+		</ComponentExample>
+
+		<ComponentExample Title="Select" Code="@("<Field>\n    <FieldLabel>Country</FieldLabel>\n    <Select @bind-Value=\"country\">\n        <SelectTrigger>\n            <SelectValue Placeholder=\"Select a country\" />\n        </SelectTrigger>\n        <SelectContent>\n            <SelectItem Value=\"au\" Label=\"Australia\" />\n            <SelectItem Value=\"us\" Label=\"United States\" />\n            <SelectItem Value=\"uk\" Label=\"United Kingdom\" />\n        </SelectContent>\n    </Select>\n</Field>")">
+			<Field>
+				<FieldLabel>Country</FieldLabel>
+				<Select @bind-Value="Country">
+					<SelectTrigger>
+						<SelectValue Placeholder="Select a country" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem Value="au" Label="Australia" />
+						<SelectItem Value="us" Label="United States" />
+						<SelectItem Value="uk" Label="United Kingdom" />
+					</SelectContent>
+				</Select>
+			</Field>
+		</ComponentExample>
+
+		<ComponentExample Title="Checkbox" Code="@("<Field>\n    <FieldLabel>Notifications</FieldLabel>\n    <div class=\"flex gap-4\">\n        <Checkbox Label=\"Email\" />\n        <Checkbox Label=\"SMS\" />\n        <Checkbox Label=\"Push\" />\n    </div>\n</Field>")">
+			<Field>
+				<FieldLabel>Notifications</FieldLabel>
+				<div class="flex gap-4">
+					<Checkbox Label="Email" @bind-Checked="NotifEmail" />
+					<Checkbox Label="SMS" @bind-Checked="NotifSms" />
+					<Checkbox Label="Push" @bind-Checked="NotifPush" />
+				</div>
+			</Field>
+		</ComponentExample>
+
+		<ComponentExample Title="Radio Group" Code="@("<Field>\n    <FieldLabel>Payment method</FieldLabel>\n    <RadioGroup @bind-Value=\"payment\">\n        <RadioGroupItem Value=\"card\" Label=\"Credit card\" />\n        <RadioGroupItem Value=\"bank\" Label=\"Bank transfer\" />\n        <RadioGroupItem Value=\"paypal\" Label=\"PayPal\" />\n    </RadioGroup>\n</Field>")">
+			<Field>
+				<FieldLabel>Payment method</FieldLabel>
+				<RadioGroup @bind-Value="Payment">
+					<RadioGroupItem Value="card" Label="Credit card" />
+					<RadioGroupItem Value="bank" Label="Bank transfer" />
+					<RadioGroupItem Value="paypal" Label="PayPal" />
+				</RadioGroup>
+			</Field>
+		</ComponentExample>
+
+		<ComponentExample Title="Switch" Code="@("<FieldSet>\n    <FieldLegend Variant=\"FieldLegendVariant.Label\">Preferences</FieldLegend>\n    <FieldGroup>\n        <Field Orientation=\"FieldOrientation.Horizontal\">\n            <FieldLabel>Dark mode</FieldLabel>\n            <Switch @bind-Checked=\"darkMode\" />\n        </Field>\n        <Field Orientation=\"FieldOrientation.Horizontal\">\n            <FieldLabel>Notifications</FieldLabel>\n            <Switch @bind-Checked=\"notifications\" />\n        </Field>\n    </FieldGroup>\n</FieldSet>")">
+			<FieldSet>
+				<FieldLegend Variant="FieldLegendVariant.Label">Preferences</FieldLegend>
+				<FieldGroup>
+					<Field Orientation="FieldOrientation.Horizontal">
+						<FieldLabel>Dark mode</FieldLabel>
+						<Switch @bind-Checked="DarkMode" />
+					</Field>
+					<Field Orientation="FieldOrientation.Horizontal">
+						<FieldLabel>Notifications</FieldLabel>
+						<Switch @bind-Checked="Notifications" />
+					</Field>
+				</FieldGroup>
+			</FieldSet>
+		</ComponentExample>
+
+		<ComponentExample Title="With Separator" Code="@("<FieldSet>\n    <FieldLegend>Personal Info</FieldLegend>\n    <FieldGroup>\n        <Field>\n            <FieldLabel>Name</FieldLabel>\n            <Input Placeholder=\"Jane Doe\" />\n        </Field>\n    </FieldGroup>\n    <FieldSeparator />\n    <FieldLegend Variant=\"FieldLegendVariant.Label\">Contact</FieldLegend>\n    <FieldGroup>\n        <Field>\n            <FieldLabel>Email</FieldLabel>\n            <Input Placeholder=\"jane@example.com\" />\n        </Field>\n    </FieldGroup>\n</FieldSet>")">
+			<FieldSet>
+				<FieldLegend>Personal Info</FieldLegend>
+				<FieldGroup>
+					<Field>
+						<FieldLabel>Name</FieldLabel>
+						<Input Placeholder="Jane Doe" @bind-Value="Name" />
+					</Field>
+				</FieldGroup>
+				<FieldSeparator />
+				<FieldLegend Variant="FieldLegendVariant.Label">Contact</FieldLegend>
+				<FieldGroup>
+					<Field>
+						<FieldLabel>Email</FieldLabel>
+						<Input Placeholder="jane@example.com" @bind-Value="Email" />
+					</Field>
+				</FieldGroup>
+			</FieldSet>
+		</ComponentExample>
+
+		<ComponentExample Title="With Error" Code="@("<Field DataInvalid>\n    <FieldLabel>Password</FieldLabel>\n    <Input Type=\"password\" Placeholder=\"Enter password\" />\n    <FieldError Errors=\"@errors\" />\n</Field>")">
+			<Field DataInvalid>
+				<FieldLabel>Password</FieldLabel>
+				<Input Type="password" Placeholder="Enter password" @bind-Value="PasswordErr" />
+				<FieldError Errors="@Errors" />
+			</Field>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Field>\n    <FieldLabel>Username</FieldLabel>\n    <Input Placeholder=\"Cannot edit\" Disabled />\n    <FieldDescription>This field is disabled.</FieldDescription>\n</Field>")">
+			<Field>
+				<FieldLabel>Username</FieldLabel>
+				<Input Placeholder="Cannot edit" Disabled />
+				<FieldDescription>This field is disabled.</FieldDescription>
+			</Field>
+		</ComponentExample>
+
+		<ComponentExample Title="Input with Addon" Code="@("<Field>\n    <FieldLabel>Phone</FieldLabel>\n    <InputGroup>\n        <InputGroupAddon>+61</InputGroupAddon>\n        <InputGroupInput Placeholder=\"412 345 678\" />\n    </InputGroup>\n</Field>")">
+			<Field>
+				<FieldLabel>Phone</FieldLabel>
+				<InputGroup>
+					<InputGroupAddon>+61</InputGroupAddon>
+					<InputGroupInput Placeholder="412 345 678" />
+				</InputGroup>
+			</Field>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Username;
+	private string? Password;
+	private string? PasswordErr;
+	private string? Message;
+	private string? Country;
+	private string? Name;
+	private string? Email;
+	private string? Payment;
+	private bool? NotifEmail = true;
+	private bool? NotifSms;
+	private bool? NotifPush;
+	private bool DarkMode;
+	private bool Notifications = true;
+	private List<string> Errors = ["Password must be at least 8 characters", "Password must contain a number"];
+
+	private static readonly ApiElement[] FieldElements =
+	[
+		new ApiElement(
+			Name: "FieldSet",
+			Description: "Outer `<fieldset>` grouping a set of related form fields. Typically contains a `FieldLegend` followed by `FieldGroup`s.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<fieldset>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Legend, groups, and separators that make up the fieldset." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<fieldset>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "FieldLegend",
+			Description: "Heading for a `FieldSet`. Renders a `<legend>` element with a visual variant controlling typography weight.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Variant",     "FieldLegendVariant", false, "Typography style. Default: `FieldLegendVariant.Legend` (larger, semibold). Other value: `Label` (smaller, medium weight)." ),
+				new ApiProperty( "ClassName",   "string?",            false, "Extra CSS classes appended to the `<legend>`." ),
+				new ApiProperty( "ChildContent","RenderFragment?",    false, "Legend text or inline markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "FieldGroup",
+			Description: "Vertical stack of `Field`s with consistent spacing. Place one or more of these inside a `FieldSet`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",   "string?",         false, "Extra CSS classes appended to the group container." ),
+				new ApiProperty( "ChildContent","RenderFragment?", false, "One or more `Field` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "Field",
+			Description: "Wrapper for a single form control plus its label, description, and error. Controls orientation (vertical vs horizontal) and invalid-state styling for nested inputs.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Orientation", "FieldOrientation", false, "Label/control layout. Default: `FieldOrientation.Vertical`. Other value: `Horizontal` (label and control on the same row)." ),
+				new ApiProperty( "DataInvalid", "bool",             false, "When true, applies destructive border styling to nested inputs/selects/textareas. Default: `false`." ),
+				new ApiProperty( "ClassName",   "string?",          false, "Extra CSS classes appended to the field container." ),
+				new ApiProperty( "ChildContent","RenderFragment?",  false, "Typically one `FieldLabel`, one control, and optional `FieldDescription` / `FieldError`." ),
+			]
+		),
+		new ApiElement(
+			Name: "FieldLabel",
+			Description: "Label for the control inside a `Field`. Renders a `<label>` element with Blok's label typography.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<label>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Label text or inline markup." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes (e.g. `for`), forwarded to the `<label>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "FieldDescription",
+			Description: "Helper text placed beneath a control inside a `Field`. Muted foreground, smaller type.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",   "string?",         false, "Extra CSS classes appended to the description container." ),
+				new ApiProperty( "ChildContent","RenderFragment?", false, "Description text or inline markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "FieldError",
+			Description: "Destructive-coloured message shown below a control. Accepts explicit `ChildContent` or an `Errors` list; renders nothing when both are empty.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Errors",      "List<string>?",   false, "Error messages. A single entry renders as a `<span>`; multiple entries render as a bulleted list." ),
+				new ApiProperty( "ClassName",   "string?",         false, "Extra CSS classes appended to the error container." ),
+				new ApiProperty( "ChildContent","RenderFragment?", false, "Custom error content. When supplied, overrides the `Errors` list rendering." ),
+			]
+		),
+		new ApiElement(
+			Name: "FieldContent",
+			Description: "Vertical sub-stack within a `Field`, used to group a control with adjacent helper text or actions.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",   "string?",         false, "Extra CSS classes appended to the content container." ),
+				new ApiProperty( "ChildContent","RenderFragment?", false, "Contents of the sub-stack." ),
+			]
+		),
+		new ApiElement(
+			Name: "FieldTitle",
+			Description: "Bold heading placed inside a `Field` when the control needs a prominent title (e.g. multi-line toggles).",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",   "string?",         false, "Extra CSS classes appended to the title container." ),
+				new ApiProperty( "ChildContent","RenderFragment?", false, "Title text or inline markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "FieldSeparator",
+			Description: "Horizontal divider between sections of a `FieldSet`. Renders as a rule by default, or a labelled rule when `ChildContent` is supplied.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",   "string?",         false, "Extra CSS classes appended to the separator." ),
+				new ApiProperty( "ChildContent","RenderFragment?", false, "Optional label centred on the rule." ),
+			]
+		),
+	];
+}

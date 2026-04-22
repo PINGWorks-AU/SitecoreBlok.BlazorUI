@@ -1,0 +1,155 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<CascadingValue Value="this">
+	@ChildContent
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public int OpenDelay { get; set; } = 700;
+	[Parameter] public int CloseDelay { get; set; } = 300;
+	[Parameter] public EventCallback<bool> OpenChanged { get; set; }
+
+	internal bool IsOpen { get; private set; }
+	internal double X { get; private set; }
+	internal double Y { get; private set; }
+
+	internal HoverCardSide ContentSide { get; set; } = HoverCardSide.Bottom;
+	internal HoverCardAlign ContentAlign { get; set; } = HoverCardAlign.Center;
+	internal int ContentSideOffset { get; set; } = 4;
+
+	private ElementReference TriggerRef;
+	private bool HasTriggerRef;
+	private IJSObjectReference? Module;
+	private CancellationTokenSource? OpenCts;
+	private CancellationTokenSource? CloseCts;
+
+	internal void RegisterTriggerRef( ElementReference triggerRef )
+	{
+		TriggerRef = triggerRef;
+		HasTriggerRef = true;
+	}
+
+	internal void SetContentConfig( HoverCardSide side, HoverCardAlign align, int sideOffset )
+	{
+		ContentSide = side;
+		ContentAlign = align;
+		ContentSideOffset = sideOffset;
+	}
+
+	internal async Task RequestOpen()
+	{
+		CancelCloseTimer();
+		if ( IsOpen ) return;
+
+		OpenCts?.Cancel();
+		OpenCts = new CancellationTokenSource();
+		var token = OpenCts.Token;
+
+		try
+		{
+			if ( OpenDelay > 0 )
+				await Task.Delay( OpenDelay, token );
+		}
+		catch ( TaskCanceledException ) { return; }
+
+		if ( !HasTriggerRef || token.IsCancellationRequested ) return;
+
+		Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
+		var rect = await Module.InvokeAsync<ElementRect>( "SitecoreUI.getElementBounds", TriggerRef );
+
+		ComputePosition( rect );
+		IsOpen = true;
+		await OpenChanged.InvokeAsync( true );
+		await InvokeAsync( StateHasChanged );
+	}
+
+	internal void CancelCloseTimer()
+	{
+		CloseCts?.Cancel();
+		CloseCts = null;
+	}
+
+	internal async Task RequestClose()
+	{
+		OpenCts?.Cancel();
+		if ( !IsOpen ) return;
+
+		CloseCts?.Cancel();
+		CloseCts = new CancellationTokenSource();
+		var token = CloseCts.Token;
+
+		try
+		{
+			if ( CloseDelay > 0 )
+				await Task.Delay( CloseDelay, token );
+		}
+		catch ( TaskCanceledException ) { return; }
+
+		if ( token.IsCancellationRequested ) return;
+
+		IsOpen = false;
+		await OpenChanged.InvokeAsync( false );
+		await InvokeAsync( StateHasChanged );
+	}
+
+	// w-64 = 256px known width; height unknown pre-render so approximate with 100px.
+	// Accept a minor first-open positioning glitch for side=top/left; the enter animation
+	// (fade+zoom 200ms) masks the correction on subsequent renders.
+	private void ComputePosition( ElementRect rect )
+	{
+		const double ContentWidth = 256;
+		const double HeightGuess = 100;
+
+		switch ( ContentSide )
+		{
+			case HoverCardSide.Top:
+				Y = rect.Top - HeightGuess - ContentSideOffset;
+				X = ContentAlign switch
+				{
+					HoverCardAlign.Start => rect.Left,
+					HoverCardAlign.End => rect.Left + rect.Width - ContentWidth,
+					_ => rect.Left + ( rect.Width - ContentWidth ) / 2,
+				};
+				break;
+			case HoverCardSide.Right:
+				X = rect.Left + rect.Width + ContentSideOffset;
+				Y = ContentAlign switch
+				{
+					HoverCardAlign.Start => rect.Top,
+					HoverCardAlign.End => rect.Top + rect.Height - HeightGuess,
+					_ => rect.Top + ( rect.Height - HeightGuess ) / 2,
+				};
+				break;
+			case HoverCardSide.Left:
+				X = rect.Left - ContentWidth - ContentSideOffset;
+				Y = ContentAlign switch
+				{
+					HoverCardAlign.Start => rect.Top,
+					HoverCardAlign.End => rect.Top + rect.Height - HeightGuess,
+					_ => rect.Top + ( rect.Height - HeightGuess ) / 2,
+				};
+				break;
+			default:
+				Y = rect.Top + rect.Height + ContentSideOffset;
+				X = ContentAlign switch
+				{
+					HoverCardAlign.Start => rect.Left,
+					HoverCardAlign.End => rect.Left + rect.Width - ContentWidth,
+					_ => rect.Left + ( rect.Width - ContentWidth ) / 2,
+				};
+				break;
+		}
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+}

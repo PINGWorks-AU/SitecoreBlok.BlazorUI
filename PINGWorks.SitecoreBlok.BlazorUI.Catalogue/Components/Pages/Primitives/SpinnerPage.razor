@@ -1,0 +1,36 @@
+@page "/primitives/spinner"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Spinner" Description="An indicator that can be used to show a loading state" Interactivity="ComponentInteractivity.Ssr" ApiElements="@SpinnerElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default variant" Code="@("<Spinner />")">
+			<Spinner />
+		</ComponentExample>
+
+		<ComponentExample Title="Primary variant" Code="@("<Spinner Variant=\"SpinnerVariant.Primary\" />")">
+			<Spinner Variant="SpinnerVariant.Primary" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] SpinnerElements =
+	[
+		new ApiElement(
+			Name: "Spinner",
+			Description: "Inline SVG loader icon with an `animate-spin` class. Used in buttons and inline loading states; size is controlled via `ClassName` (e.g. `size-4`).",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Variant",              "SpinnerVariant",                false, "Colour tone. Default: `SpinnerVariant.Default` (neutral foreground). Other value: `Primary`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<svg>`. Default dimensions are `size-4`; override here to resize." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<svg>`." ),
+			]
+		),
+	];
+}

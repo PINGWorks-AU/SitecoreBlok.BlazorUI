@@ -1,0 +1,38 @@
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@inject NavigationManager Nav
+
+<div class="overflow-x-auto rounded-md border border-border mt-4">
+	<table class="w-full text-sm">
+		<thead class="bg-muted/40">
+			<tr>
+				<th class="text-left font-semibold text-foreground px-4 py-2 w-1/3">Element</th>
+				<th class="text-left font-semibold text-foreground px-4 py-2">Purpose</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach ( var element in Elements )
+			{
+				var anchor = PageTocRegistry.Slugify( element.Name );
+				<tr class="border-t border-border">
+					<td class="px-4 py-2 align-top" style="padding-left: @(Indent( element.Depth ));">
+						<a href="@($"{PagePath}#{anchor}")" class="font-mono text-primary no-underline hover:underline">
+							@element.Name
+						</a>
+					</td>
+					<td class="px-4 py-2 align-top text-muted-foreground">
+						<DescriptionRenderer Description="@element.Description" KnownElements="@Elements" />
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required ApiElement[] Elements { get; set; }
+
+	private string PagePath => "/" + Nav.ToBaseRelativePath( Nav.Uri ).Split( '?' )[ 0 ].Split( '#' )[ 0 ];
+
+	// Depth 0 → 1rem (default cell pad), each extra level adds 1.25rem so nesting is clear but not dramatic.
+	private static string Indent( int depth ) => $"{1 + depth * 1.25:0.##}rem";
+}

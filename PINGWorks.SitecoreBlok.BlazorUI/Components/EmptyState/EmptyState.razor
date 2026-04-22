@@ -1,0 +1,34 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="empty-state" class="@CssClass">
+	@if ( IconPath is not null )
+	{
+		<Icon Svg="@IconPath" ClassName="size-12 text-muted-foreground" />
+	}
+	@if ( Title is not null )
+	{
+		<h3 class="text-lg font-semibold mt-4">@Title</h3>
+	}
+	@if ( Description is not null )
+	{
+		<p class="text-sm text-muted-foreground mt-1 max-w-sm text-center">@Description</p>
+	}
+	@if ( ChildContent is not null )
+	{
+		<div class="mt-4">
+			@ChildContent
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? Title { get; set; }
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public string? IconPath { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "flex flex-col items-center justify-center py-12 px-4" )
+										.With( ClassName )
+										.Build();
+}

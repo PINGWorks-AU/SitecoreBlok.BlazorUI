@@ -1,0 +1,40 @@
+@page "/graphics/theming/shadows"
+@rendermode InteractiveServer
+
+<ComponentPage Title="Shadows" Description="Elevation levels from no shadow to extra-large.">
+
+	<div class="pt-2 pb-4">
+		<a href="/graphics/theming" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">&larr; Theming</a>
+	</div>
+
+	<Table Size="TableSize.Sm">
+		<TableHeader>
+			<TableRow>
+				<TableHead>Class</TableHead>
+				<TableHead>Preview</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody>
+			@foreach (var s in Shadows)
+			{
+				<TableRow>
+					<TableCell>
+						<code class="font-medium text-sm">@s</code>
+					</TableCell>
+					<TableCell>
+						<div class="w-24 h-16 rounded-lg border border-border bg-background @s"></div>
+					</TableCell>
+				</TableRow>
+			}
+		</TableBody>
+	</Table>
+
+</ComponentPage>
+
+@code {
+	private static readonly string[] Shadows =
+	[
+		"shadow-none", "shadow-sm", "shadow", "shadow-md",
+		"shadow-lg", "shadow-xl",
+	];
+}

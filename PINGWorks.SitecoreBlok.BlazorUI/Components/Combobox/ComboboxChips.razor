@@ -1,0 +1,33 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div @ref="Ref" data-slot="combobox-chips" class="@CssClass" @onclick="OnWrapperClick">
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] public required Combobox Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private ElementReference Ref;
+
+	private string CssClass => CssClassBuilder.Start(
+		"dark:bg-input/30 border-input flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border bg-background bg-clip-padding px-2.5 py-1.5 text-sm shadow-none transition-[color,box-shadow] text-foreground",
+		"has-data-[slot=combobox-chip]:px-1.5",
+		"focus-within:border-2 focus-within:border-primary",
+		"has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40 has-aria-invalid:border-destructive dark:has-aria-invalid:border-destructive/50 has-aria-invalid:ring-1" )
+										.With( ClassName )
+										.Build();
+
+	protected override void OnAfterRender( bool firstRender )
+	{
+		if ( firstRender )
+			Parent.RegisterAnchor( Ref );
+	}
+
+	private async Task OnWrapperClick()
+	{
+		if ( !Parent.IsOpen )
+			await Parent.Open();
+	}
+}

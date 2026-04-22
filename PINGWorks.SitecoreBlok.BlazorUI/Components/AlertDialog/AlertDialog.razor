@@ -1,0 +1,34 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if (Open)
+{
+	<div data-slot="alert-dialog" data-state="open">
+		<div data-slot="alert-dialog-overlay" class="fixed inset-0 z-50 bg-black/50"></div>
+		<div data-slot="alert-dialog-content" class="@ContentCssClass">
+			@ChildContent
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Open { get; set; }
+	[Parameter] public EventCallback<bool> OpenChanged { get; set; }
+
+	// `text-foreground` is explicit so the dialog text follows light/dark token
+	// flips. Blok's source omits it and relies on body-level inheritance, but
+	// the cascade does not reliably reach the fixed-positioned content in our
+	// Catalogue render path. Removing this regresses dark-mode text contrast.
+	private string ContentCssClass => CssClassBuilder.Start(
+		"bg-background text-foreground fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg px-7 py-5 shadow-lg duration-200 sm:max-w-md")
+										.With(ClassName)
+										.Build();
+
+	internal async Task Close()
+	{
+		Open = false;
+		if (OpenChanged.HasDelegate)
+			await OpenChanged.InvokeAsync(false);
+	}
+}

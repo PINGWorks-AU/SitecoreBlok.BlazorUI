@@ -1,0 +1,41 @@
+@page "/graphics/theming/typography"
+@rendermode InteractiveServer
+
+<ComponentPage Title="Typography" Description="Font size scale from text-3xs to text-9xl, using the Geist font family.">
+
+	<div class="pt-2 pb-4">
+		<a href="/graphics/theming" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">&larr; Theming</a>
+	</div>
+
+	<Table Size="TableSize.Sm">
+		<TableHeader>
+			<TableRow>
+				<TableHead>Class</TableHead>
+				<TableHead>Preview</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody>
+			@foreach (var size in FontSizes)
+			{
+				<TableRow>
+					<TableCell>
+						<code class="font-medium text-sm">@size</code>
+					</TableCell>
+					<TableCell ClassName="!whitespace-normal">
+						<span class="@size">The quick brown fox</span>
+					</TableCell>
+				</TableRow>
+			}
+		</TableBody>
+	</Table>
+
+</ComponentPage>
+
+@code {
+	private static readonly string[] FontSizes =
+	[
+		"text-3xs", "text-2xs", "text-xs", "text-sm", "text-base",
+		"text-lg", "text-xl", "text-2xl", "text-3xl", "text-4xl",
+		"text-5xl", "text-6xl", "text-7xl", "text-8xl", "text-9xl",
+	];
+}

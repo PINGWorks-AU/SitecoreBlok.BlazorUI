@@ -1,0 +1,40 @@
+@page "/primitives/kbd"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Kbd" Description="Displays keyboard input" Interactivity="ComponentInteractivity.Ssr" ApiElements="@KbdElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Single key" Code="@("<Kbd>Enter</Kbd>")">
+			<Kbd>Enter</Kbd>
+		</ComponentExample>
+
+		<ComponentExample Title="Key combination" Code="@("<Kbd>Ctrl</Kbd> + <Kbd>S</Kbd>")">
+			<div class="flex items-center gap-1">
+				<Kbd>Ctrl</Kbd>
+				<span class="text-sm text-muted-foreground">+</span>
+				<Kbd>S</Kbd>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] KbdElements =
+	[
+		new ApiElement(
+			Name: "Kbd",
+			Description: "Semantic `<kbd>` element styled as a muted pill for keyboard shortcuts. Compose multiple `Kbd`s with `+` separators for chords.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<kbd>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Key label — usually a short string like `Enter`, `Ctrl`, or `S`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<kbd>`." ),
+			]
+		),
+	];
+}

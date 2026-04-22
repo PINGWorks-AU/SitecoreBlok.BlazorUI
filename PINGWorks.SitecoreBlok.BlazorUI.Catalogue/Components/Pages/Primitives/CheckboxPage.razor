@@ -1,0 +1,60 @@
+@page "/primitives/checkbox"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Checkbox" Description="A control that allows the user to toggle between checked and not checked" Interactivity="ComponentInteractivity.Interactive" ApiElements="@CheckboxElements">
+
+	<DivergenceNote>
+		<p><strong>Ergonomic helpers baked in on top of Blok's bare primitive.</strong> Blok's <code>Checkbox</code> is a thin Radix wrapper with no label/description. We add <code>Label</code> (string) and <code>Description</code> (string) for the common checkbox-with-text pattern, plus <code>Enhanced</code> which wraps the whole control in a bordered card (the common "opt-in with explanation" pattern), plus <code>Indeterminate</code> and <code>DefaultChecked</code>. All additive — leave them unset to get Blok's bare behaviour. Bare usage composes a <code>&lt;Label&gt;</code> sibling yourself.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Checkbox Checked=\"@checked1\" CheckedChanged=\"@(v => checked1 = v)\" />")">
+			<Checkbox Checked="@Checked1" CheckedChanged="@(v => Checked1 = v)" />
+		</ComponentExample>
+
+		<ComponentExample Title="With label" Code="@("<Checkbox Checked=\"@checked2\" CheckedChanged=\"@(v => checked2 = v)\" Label=\"Accept terms and conditions\" />")">
+			<Checkbox Checked="@Checked2" CheckedChanged="@(v => Checked2 = v)" Label="Accept terms and conditions" />
+		</ComponentExample>
+
+		<ComponentExample Title="Enhanced with label and description" Code="@("<Checkbox Enhanced Checked=\"@checked3\" CheckedChanged=\"@(v => checked3 = v)\" Label=\"Email notifications\" Description=\"Receive emails about account activity\" />")">
+			<Checkbox Enhanced Checked="@Checked3" CheckedChanged="@(v => Checked3 = v)" Label="Email notifications" Description="Receive emails about account activity" />
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Checkbox Disabled Label=\"Disabled option\" />")">
+			<Checkbox Disabled Label="Disabled option" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool? Checked1 = false;
+	private bool? Checked2 = false;
+	private bool? Checked3 = true;
+
+	private static readonly ApiElement[] CheckboxElements =
+	[
+		new ApiElement(
+			Name: "Checkbox",
+			Description: "Tri-state checkbox with optional built-in label/description. Controlled via `Checked` (nullable `bool?`); pass `true`/`false`/`null` to represent checked/unchecked/indeterminate.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Checked",        "bool?",                false, "Controlled state. `true` = checked, `false` = unchecked, `null` with `Indeterminate=true` = indeterminate. Use `@bind-Checked` for two-way binding." ),
+				new ApiProperty( "CheckedChanged", "EventCallback<bool?>", false, "Fires when the user toggles the checkbox. Supports `@bind-Checked`." ),
+				new ApiProperty( "DefaultChecked", "bool?",                false, "Uncontrolled initial state. Only honoured when `Checked` is null." ),
+				new ApiProperty( "Indeterminate",  "bool",                 false, "When true and `Checked` is null, renders a minus-glyph indeterminate state. Default: `false`." ),
+				new ApiProperty( "Disabled",       "bool",                 false, "When true, the checkbox is non-interactive. Default: `false`." ),
+				new ApiProperty( "Label",          "string?",              false, "Built-in label text. When set, rendered as a `Label` associated with the checkbox via `for`/`id`." ),
+				new ApiProperty( "Description",    "string?",              false, "Helper text shown under the `Label`. Only applies when `Label` is also set." ),
+				new ApiProperty( "Enhanced",       "bool",                 false, "When true, wraps the checkbox + label + description in a bordered card that highlights when checked. Default: `false`." ),
+				new ApiProperty( "Id",             "string?",              false, "Element id. Default: a new GUID. Used to associate the built-in `Label` with the checkbox." ),
+				new ApiProperty( "ClassName",      "string?",              false, "Extra CSS classes appended to the checkbox button." ),
+				new ApiProperty( "ChildContent",   "RenderFragment?",      false, "Extra content rendered alongside the checkbox in the non-enhanced layout (e.g. a custom trailing element)." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,58 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@if ( Parent.IsOpen )
+{
+	@* Backdrop catches clicks outside the menu and closes it. *@
+	<div class="fixed inset-0 z-40" @onclick="OnBackdropClick"></div>
+	<div @ref="Ref" data-slot="dropdown-menu-content" class="@CssClass"
+		 style="left:@(Parent.X)px;top:@(Parent.Y)px;@( Parent.IsPositioned ? null : "visibility:hidden;" )">
+		@ChildContent
+	</div>
+}
+
+@code {
+	[CascadingParameter] public required DropdownMenu Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public DropdownMenuSide Side { get; set; } = DropdownMenuSide.Bottom;
+	[Parameter] public DropdownMenuAlign Align { get; set; } = DropdownMenuAlign.Start;
+	[Parameter] public double SideOffset { get; set; } = 4;
+
+	private ElementReference Ref;
+	private IJSObjectReference? Module;
+
+	private string CssClass => CssClassBuilder.Start( "bg-popover text-popover-foreground z-50 min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md fixed" )
+											.With( ClassName )
+											.Build();
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( Parent.IsOpen && !Parent.IsPositioned )
+		{
+			Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
+			var pos = await Module.InvokeAsync<DropdownPosition>(
+				"SitecoreUI.calcDropdownPosition",
+				Ref,
+				Parent.TriggerLeft, Parent.TriggerTop, Parent.TriggerRight, Parent.TriggerBottom,
+				Side.ToString().ToLowerInvariant(),
+				Align.ToString().ToLowerInvariant(),
+				SideOffset );
+			await Parent.UpdatePosition( pos.X, pos.Y );
+		}
+	}
+
+	private async Task OnBackdropClick() => await Parent.Close();
+
+	private record DropdownPosition( double X, double Y );
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+}

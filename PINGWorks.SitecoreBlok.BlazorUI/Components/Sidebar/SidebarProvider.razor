@@ -1,0 +1,36 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="this">
+	<div data-slot="sidebar-wrapper" class="@CssClass"
+			style="--sidebar-width:16rem;--sidebar-width-icon:3rem;"
+			@attributes="AdditionalAttributes">
+		@ChildContent
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool DefaultOpen { get; set; } = true;
+	[Parameter] public EventCallback<bool> OpenChanged { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	internal bool IsOpen { get; private set; } = true;
+	internal string State => IsOpen ? "expanded" : "collapsed";
+
+	private string CssClass => CssClassBuilder.Start( "group/sidebar-wrapper relative flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar" )
+												.With( ClassName )
+												.Build();
+
+	protected override void OnInitialized()
+	{
+		IsOpen = DefaultOpen;
+	}
+
+	public async Task ToggleSidebar()
+	{
+		IsOpen = !IsOpen;
+		await OpenChanged.InvokeAsync( IsOpen );
+		await InvokeAsync( StateHasChanged );
+	}
+}

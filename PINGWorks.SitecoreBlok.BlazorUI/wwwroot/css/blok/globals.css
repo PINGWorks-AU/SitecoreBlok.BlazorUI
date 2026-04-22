@@ -1,0 +1,275 @@
+@import "tailwindcss";
+@import "./tw-animate.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Tailwind v4 loads base + components + utilities via the @import "tailwindcss"
+	 line at the top of this file. The legacy v3 `@tailwind base/components/utilities`
+	 directives are no-ops here — leaving them commented out as documentation. */
+/* @tailwind base; */
+/* @tailwind components; */
+@tailwind utilities;
+
+@import "./colors.css";
+@import "./typography.css";
+@import "./borderRadius.css";
+@import "./breakpoints.css";
+@import "./shadows.css";
+
+:root {
+	--radius: 0.625rem;
+	/* Chakra semantic token mappings (light mode) */
+	--background: var(--color-white); /* chakra-body-bg: white */
+	--foreground: var(
+		--color-blackAlpha-900
+	); /* chakra-body-text: blackAlpha.900 */
+	--card: var(--color-white); /* chakra-card-bg: white */
+	--card-foreground: var(
+		--color-blackAlpha-900
+	); /* chakra-card-text: blackAlpha.900 */
+	--popover: var(--color-white); /* chakra-popover-bg: white */
+	--popover-foreground: var(
+		--color-blackAlpha-900
+	); /* chakra-popover-text: blackAlpha.900 */
+	--primary: var(--color-primary-500); /* primary-fg: primary.600 */
+	--primary-foreground: var(--color-white); /* chakra-inverse-text: white */
+	--primary-background: var(--color-primary-100);
+	--secondary: var(--color-gray-50);
+	--secondary-foreground: var(--color-blackAlpha-900);
+	--muted: var(--color-gray-50); /* chakra-subtle-bg: gray.50 */
+	--muted-foreground: var(
+		--color-blackAlpha-500
+	); /* chakra-subtle-text: blackAlpha.500 */
+	--accent: var(--color-gray-50);
+	--accent-foreground: var(--color-blackAlpha-900);
+	--destructive: var(--color-danger-500); /* danger-fg: danger.600 */
+	--border: var(
+		--color-blackAlpha-200
+	); /* chakra-border-color: blackAlpha.200 */
+	--input: var(
+		--color-blackAlpha-400
+	); /* chakra-placeholder-color: blackAlpha.400 */
+	--ring: #6987f9;
+	--chart-1: #4E41CC;
+	--chart-2: #0FB5AE;
+	--chart-3: #F08910;
+	--chart-4: #33C5E8;
+	--chart-5: #E055E2;
+	--primary-hover: var(--color-primary-600);
+	--primary-active: var(--color-primary-700);
+	--success-hover: var(--color-success-600);
+	--success-active: var(--color-success-700);
+	--danger-hover: var(--color-danger-600);
+	--danger-active: var(--color-danger-700);
+	--neutral-hover: var(--color-blackAlpha-600);
+	--neutral-active: var(--color-blackAlpha-700);
+	--sidebar: oklch(0.985 0 0);
+	--sidebar-foreground: oklch(0.145 0 0);
+	--sidebar-primary: oklch(0.205 0 0);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.97 0 0);
+	--sidebar-accent-foreground: oklch(0.205 0 0);
+	--sidebar-border: oklch(0.922 0 0);
+	--sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+	/* `color-scheme: dark` tells the browser to render native form controls
+		 (select dropdowns, scrollbars, date pickers, range thumbs) using their
+		 dark variant. Without this, a native <select>'s open popup stays a
+		 light bg even when our app is in dark mode — visible as white-on-white
+		 option text in dark mode (Calendar's month/year selects hit this). */
+	color-scheme: dark;
+
+	/* Core semantic tokens (dark mode) — aligned with blok/src/app/globals.css */
+	--background: var(--color-gray-800);
+	--foreground: var(--color-white);
+	--card: var(--color-gray-800);
+	--card-foreground: var(--color-white);
+	--popover: var(--color-gray-800);
+	--popover-foreground: var(--color-white);
+	--secondary: var(--color-gray-900);
+	--secondary-foreground: var(--color-white);
+	--muted: var(--color-gray-900);
+	--muted-foreground: var(--color-whiteAlpha-600);
+	--accent: var(--color-gray-900);
+	--accent-foreground: var(--color-white);
+	--primary: var(--color-primary-200);
+	--primary-foreground: var(--color-primary-200);
+	/* In light mode `--primary-background` is a pale primary tint (primary-100). That colour
+	   paired with `text-foreground` (which flips to white in dark mode) produces white-on-pale
+	   chip text with zero contrast — observed on ComboboxChip. Flip to a deep primary tint in
+	   dark mode so white text is legible. */
+	--primary-background: var(--color-primary-900);
+	--destructive: var(--color-danger-200);
+	--border: var(--color-whiteAlpha-200);
+	--input: var(--color-whiteAlpha-500);
+	--ring: #6987f9;
+	--chart-1: var(--color-purple-500);
+	--chart-2: var(--color-blue-500);
+	--chart-3: var(--color-cyan-500);
+	--chart-4: var(--color-teal-500);
+	--chart-5: var(--color-green-500);
+	--sidebar: oklch(0.205 0 0);
+	--sidebar-foreground: oklch(0.985 0 0);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.269 0 0);
+	--sidebar-accent-foreground: oklch(0.985 0 0);
+	--sidebar-border: oklch(1 0 0 / 10%);
+	--sidebar-ring: oklch(0.439 0 0);
+
+	/* Chakra-semantic surface tokens */
+	--color-body-bg: var(--color-gray-800);
+	--color-subtle-bg: var(--color-gray-900);
+	--color-body-text: var(--color-white);
+	--color-subtle-text: var(--color-whiteAlpha-600);
+	--color-placeholder-color: var(--color-whiteAlpha-500);
+	--color-inverse-text: var(--color-blackAlpha-900);
+	--color-border-color: var(--color-whiteAlpha-200);
+	--color-border-color-a11y: var(--color-whiteAlpha-400);
+
+	/* Foreground tokens (text on top of coloured surface) */
+	--color-primary-fg: var(--color-primary-200);
+	--color-danger-fg: var(--color-danger-200);
+	--color-warning-fg: var(--color-warning-200);
+	--color-success-fg: var(--color-success-200);
+	--color-info-fg: var(--color-info-200);
+	--color-neutral-fg: var(--color-whiteAlpha-700);
+
+	/* Flip the whole neutral-N palette in dark mode. The light-mode definitions
+		 in colors.css use blackAlpha-N (mostly-transparent black) — perfect for
+		 subtle accents on a white page, but invisible against the dark page bg.
+		 Mirroring with whiteAlpha-N keeps the same visual weight in dark mode.
+		 Skeleton (`bg-neutral-50`) was the trigger — a `bg-neutral-50` placeholder
+		 was rendering invisible against `bg-background` (gray-800) until this. */
+	--color-neutral-50: var(--color-whiteAlpha-200);
+	--color-neutral-100: var(--color-whiteAlpha-100);
+	--color-neutral-200: var(--color-whiteAlpha-200);
+	--color-neutral-300: var(--color-whiteAlpha-300);
+	--color-neutral-400: var(--color-whiteAlpha-400);
+	--color-neutral-500: var(--color-whiteAlpha-500);
+	--color-neutral-600: var(--color-whiteAlpha-600);
+	--color-neutral-700: var(--color-whiteAlpha-700);
+	--color-neutral-800: var(--color-whiteAlpha-800);
+	--color-neutral-900: var(--color-whiteAlpha-900);
+
+	/* Background tokens (alpha-based in dark mode) */
+	--color-primary-bg: rgba(217, 212, 255, 0.12);
+	--color-danger-bg: rgba(255, 204, 200, 0.12);
+	--color-warning-bg: rgba(253, 210, 145, 0.12);
+	--color-success-bg: rgba(139, 235, 208, 0.12);
+	--color-info-bg: rgba(217, 212, 255, 0.12);
+	--color-neutral-bg: var(--color-whiteAlpha-100);
+
+	/* Active background tokens */
+	--color-primary-bg-active: rgba(217, 212, 255, 0.24);
+	--color-danger-bg-active: rgba(255, 204, 200, 0.24);
+	--color-warning-bg-active: rgba(253, 210, 145, 0.24);
+	--color-success-bg-active: rgba(139, 235, 208, 0.24);
+	--color-info-bg-active: rgba(217, 212, 255, 0.24);
+	--color-neutral-bg-active: var(--color-whiteAlpha-300);
+
+	/* Direct colour tokens */
+	--color-primary: var(--color-primary-200);
+	--color-danger: var(--color-danger-200);
+	--color-success: var(--color-success-200);
+	--color-warning: var(--color-warning-200);
+	--color-info: var(--color-info-200);
+	--color-neutral: var(--color-whiteAlpha-600);
+
+	/* Button hover */
+	--primary-hover: var(--color-primary-300);
+	--danger-hover: var(--color-danger-300);
+	--success-hover: var(--color-success-300);
+	--warning-hover: var(--color-warning-300);
+	--info-hover: var(--color-info-300);
+	--neutral-hover: var(--color-whiteAlpha-700);
+
+	/* Button active */
+	--primary-active: var(--color-primary-400);
+	--danger-active: var(--color-danger-400);
+	--success-active: var(--color-success-400);
+	--warning-active: var(--color-warning-400);
+	--info-active: var(--color-info-400);
+	--neutral-active: var(--color-whiteAlpha-800);
+
+	/* Shadows — white tints in dark mode so they're visible against dark surfaces */
+	--shadow-xs: 0 0 0 1px rgba(255, 255, 255, 0.08);
+	--shadow-sm: 0 1px 2px 0 rgba(255, 255, 255, 0.08);
+	--shadow-base: 0 1px 3px 0 rgba(255, 255, 255, 0.12), 0 1px 2px 0 rgba(255, 255, 255, 0.08);
+	--shadow-md: 0 4px 6px -1px rgba(255, 255, 255, 0.12), 0 2px 4px -1px rgba(255, 255, 255, 0.08);
+	--shadow-lg: 0 10px 15px -3px rgba(255, 255, 255, 0.12), 0 4px 6px -2px rgba(255, 255, 255, 0.06);
+	--shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.12), 0 10px 10px -5px rgba(255, 255, 255, 0.05);
+	--shadow-2xl: 0 25px 50px -12px rgba(255, 255, 255, 0.28);
+	--shadow-inner: inset 0 2px 4px 0 rgba(255, 255, 255, 0.08);
+}
+
+@theme inline {
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary-background: var(--primary-background);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-primary-hover: var(--primary-hover);
+	--color-primary-active: var(--primary-active);
+	--color-success-hover: var(--success-hover);
+	--color-success-active: var(--success-active);
+	--color-danger-hover: var(--danger-hover);
+	--color-danger-active: var(--danger-active);
+	--color-neutral-hover: var(--neutral-hover);
+	--color-neutral-active: var(--neutral-active);
+	--color-backgrounds: var(--background);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+	code {
+		direction: ltr;
+	}
+}
+
+.scrollbar-hidden {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+	display: none;
+}

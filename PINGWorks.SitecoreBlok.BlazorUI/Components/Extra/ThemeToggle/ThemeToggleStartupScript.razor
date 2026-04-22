@@ -1,0 +1,27 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+		Synchronous first-paint dark-mode application.
+		Runs BEFORE the body parses, so there's no flash of light-themed content
+		(or light-themed scrollbars/dropdowns) on initial load when the user
+		previously chose dark mode. Mirrors the localStorage key used by
+		ThemeToggle.razor.js (STORAGE_KEY = "displayMode"). Setting `.dark` on
+		<html> activates the `:is(.dark *)` variant for everything in <body>;
+		the existing wrapper-level `.dark` (added by the Blazor JS later) is
+		still applied and is harmlessly redundant.
+	*@
+<script>
+	(function () {
+		try {
+			var mode = localStorage.getItem("displayMode");
+			if (mode === "dark") {
+				document.documentElement.classList.add("dark");
+				document.documentElement.style.colorScheme = "dark";
+			} else if (mode === "light") {
+				document.documentElement.style.colorScheme = "light";
+			}
+		} catch (e) {
+			/* localStorage unavailable in private/restricted contexts — fall back to default light */
+		}
+	})();
+</script>

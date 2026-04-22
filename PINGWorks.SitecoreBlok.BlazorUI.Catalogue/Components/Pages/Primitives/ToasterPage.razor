@@ -1,0 +1,128 @@
+@page "/primitives/toaster"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+@inject ToastService Toasts
+
+<ComponentPage Title="Toaster" Description="A toast notification system for temporary messages" Interactivity="ComponentInteractivity.Interactive" ApiElements="@ToasterElements">
+
+	<InstallationNote>
+		<ol class="list-decimal pl-5 space-y-1">
+			<li>
+				Register the BlazorUI services in <code class="text-xs bg-muted px-1 py-0.5 rounded">Program.cs</code>:
+				<CodeViewer Code="@("builder.Services.AddSitecoreBlokUI();")" Language="CodeLanguage.CSharp" ClassName="!mt-2" />
+			</li>
+			<li>
+				Place a single <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Toaster /&gt;</code> in your root layout (e.g. <code class="text-xs bg-muted px-1 py-0.5 rounded">MainLayout.razor</code>) so toasts have a host to render into. Set <code class="text-xs bg-muted px-1 py-0.5 rounded">Position</code> once here if you want to override the default bottom-right placement:
+				<CodeViewer Code="@("<Toaster @rendermode=\"InteractiveServer\" />")" Language="CodeLanguage.Razor" ClassName="!mt-2" />
+			</li>
+			<li>Inject <code class="text-xs bg-muted px-1 py-0.5 rounded">ToastService</code> wherever you want to surface a toast and call <code class="text-xs bg-muted px-1 py-0.5 rounded">Toasts.Show(...)</code>.</li>
+		</ol>
+	</InstallationNote>
+
+	<DivergenceNote>
+		<p><strong>Imperative service-based API kept; not a declarative composition.</strong> Blok wraps the <a href="https://sonner.emilkowal.ski" target="_blank" rel="noopener" class="text-primary underline">Sonner</a> React library — a JS-specific toast library that uses declarative <code>&lt;Toast&gt;&lt;ToastTitle/&gt;&lt;ToastAction/&gt;&lt;/Toast&gt;</code> composition. The equivalent BlazorUI component is <code>Toaster</code>, exposed via the <code>ToastService</code>: inject the service and call <code>Toasts.Show(title, description, variant)</code> from anywhere. This matches how Blazor apps idiomatically manage transient UI notifications. Users coming from Blok looking for "Sonner" will find a stub page <a href="/primitives/sonner" class="text-primary underline">here</a>.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("Toasts.Show( \"Notification\", \"Something happened.\" );")">
+			<Button Click="@(() => Toasts.Show("Notification", "Something happened."))">
+				Show Default Toast
+			</Button>
+		</ComponentExample>
+
+		<ComponentExample Title="Variants" Code="@("Toasts.Show( \"Saved!\", \"Your changes have been saved.\", ToastVariant.Success );\nToasts.Show( \"Error\", \"Something went wrong.\", ToastVariant.Error );\nToasts.Show( \"Warning\", \"Please check your input.\", ToastVariant.Warning );\nToasts.Show( \"Info\", \"Here is some information.\", ToastVariant.Info );")">
+			<div class="flex flex-wrap gap-2">
+				<Button Click="@(() => Toasts.Show("Saved!", "Your changes have been saved.", ToastVariant.Success))" ColorScheme="ButtonColor.Success">Success</Button>
+				<Button Click="@(() => Toasts.Show("Error", "Something went wrong.", ToastVariant.Error))" ColorScheme="ButtonColor.Danger">Error</Button>
+				<Button Click="@(() => Toasts.Show("Warning", "Please check your input.", ToastVariant.Warning))" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Warning</Button>
+				<Button Click="@(() => Toasts.Show("Info", "Here is some information.", ToastVariant.Info))" Variant="ButtonVariant.Outline">Info</Button>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Closable" Code="@("Toasts.Show( new ToastItem\n{\n    Title = \"Closable Toast\",\n    Description = \"Click the X in the top-right to dismiss.\",\n    Closable = true,\n    Duration = 0 // stays until dismissed\n} );")">
+			<Button Click="@(() => Toasts.Show( new ToastItem { Title = "Closable Toast", Description = "Click the X in the top-right corner to dismiss. This toast stays until you close it.", Closable = true, Duration = 0 } ))">
+				Show Closable Toast
+			</Button>
+		</ComponentExample>
+
+		<ComponentExample Title="With Action Content" Code="@("Toasts.Show( new ToastItem\n{\n    Title = \"File deleted\",\n    Description = \"report-q4.pdf was moved to trash.\",\n    Closable = true,\n    Duration = 0,\n    Content = @<Button Size=\"ButtonSize.Xs\" Variant=\"ButtonVariant.Outline\"\n                      Click=\"...\">Undo</Button>\n} );")">
+			<div class="flex items-center gap-4">
+				<Button Click="ShowActionToast">
+					Show Action Toast
+				</Button>
+				@if ( Undone )
+				{
+					<Badge ColorScheme="BadgeColor.Success">Undo successful!</Badge>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With Click Handler" Code="@("Toasts.Show( new ToastItem\n{\n    Title = \"New message\",\n    Description = \"You have a new message from Jane.\",\n    OnClick = () => { /* navigate or handle */ }\n} );")">
+			<div class="flex items-center gap-4">
+				<Button Click="ShowClickableToast">
+					Show Clickable Toast
+				</Button>
+				@if ( Clicked )
+				{
+					<Badge ColorScheme="BadgeColor.Primary">Toast clicked!</Badge>
+				}
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool Undone;
+	private bool Clicked;
+	private ToastItem? ActionToast;
+
+	private async Task ShowActionToast()
+	{
+		Undone = false;
+		ActionToast = new ToastItem
+		{
+			Title = "File deleted",
+			Description = "report-q4.pdf was moved to trash.",
+			Closable = true,
+			Duration = 0,
+			Content = @<Button Size="ButtonSize.Xs" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral"
+							   Click="OnUndo">Undo</Button>
+		};
+		await Toasts.Show( ActionToast );
+	}
+
+	private async Task OnUndo()
+	{
+		Undone = true;
+		if ( ActionToast is not null )
+			await Toasts.Dismiss( ActionToast );
+		await InvokeAsync( StateHasChanged );
+	}
+
+	private async Task ShowClickableToast()
+	{
+		Clicked = false;
+		await Toasts.Show( new ToastItem
+		{
+			Title = "New message",
+			Description = "You have a new message from Jane. Click to view.",
+			OnClick = () => { Clicked = true; InvokeAsync( StateHasChanged ); }
+		} );
+	}
+
+	private static readonly ApiElement[] ToasterElements =
+	[
+		new ApiElement(
+			Name: "Toaster",
+			Description: "The single toast host. Place one instance in your root layout and surface toasts from anywhere by injecting `ToastService` and calling `Show(...)`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Position", "ToastPosition", false, "Where the toast stack anchors on screen. Default: `ToastPosition.BottomRight`. Other values: `BottomLeft`, `TopRight`, `TopLeft`, `BottomCenter`, `TopCenter`." ),
+			]
+		),
+	];
+}

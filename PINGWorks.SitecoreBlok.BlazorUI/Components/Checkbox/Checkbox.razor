@@ -1,0 +1,131 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if ( Enhanced )
+{
+	<Label ForId="@Id" ClassName="hover:bg-accent/50 flex items-start gap-2 rounded-lg border p-3 has-[[aria-checked=true]]:border-info-600 has-[[aria-checked=true]]:bg-info-bg dark:has-[[aria-checked=true]]:border-info-900 dark:has-[[aria-checked=true]]:bg-info-950">
+		<button type="button" id="@Id" value="on" data-slot="checkbox" aria-checked="@(Checked ?? false ? "true" : "false")" data-state="@GetCheckedState().ToString().ToLower()" @onclick="SetCheckedState" disabled="@Disabled" data-disabled="@Disabled" role="checkbox" class="@CssClass" aria-label="@Label">
+			@if ( GetCheckedState() is State.Checked )
+			{
+				<span data-state="checked" data-slot="checkbox-indicator" class="flex items-center justify-center text-current data-[state=checked]:border-info-fg data-[state=checked]:bg-info-fg data-[state=checked]:text-inverse-text dark:data-[state=checked]:border-info-fg dark:data-[state=checked]:bg-info-fg" style="pointer-events: none;">
+					@* Don't use ResetClassName here — it strips the SizeClass that IconSize.Sm
+   generates, leaving the SVG with no dimensions and rendering it invisibly
+   inside the 16px checkbox button. *@
+<Icon IconSize="IconSize.Sm" Svg="@IconSvg.Check" />
+				</span>
+			}
+			else if ( GetCheckedState() is State.Indeterminate )
+			{
+				<span data-state="indeterminate" data-slot="checkbox-indicator" class="flex items-center justify-center text-current border-info-fg bg-info-fg text-inverse-text dark:border-info-fg dark:bg-info-fg" style="pointer-events: none;">
+					<Icon IconSize="IconSize.Sm" Svg="@IconSvg.Minus" />
+				</span>
+			}
+		</button>
+
+		@if ( Label is not null && Description is not null )
+		{
+			<div class="grid gap-2 font-normal">
+				<p class="text-sm leading-none font-medium"> @Label </p>
+				<p class="text-muted-foreground text-sm"> @Description </p>
+			</div>
+		}
+		else if ( Label is not null )
+		{
+			<p class="text-sm leading-none font-medium"> @Label </p>
+		}
+		</Label>
+}
+else
+{
+	<div class="flex items-start gap-3">
+		<button type="button" id="@Id" value="on" data-state="@GetCheckedState().ToString().ToLower()" @onclick="SetCheckedState" disabled="@Disabled" data-disabled="@Disabled" role="checkbox" class="@CssClass" aria-label="@Label">
+			@if ( GetCheckedState() is State.Checked )
+			{
+				<span data-state="checked" data-slot="checkbox-indicator" class="flex items-center justify-center text-current data-[state=checked]:border-info-fg data-[state=checked]:bg-info-fg data-[state=checked]:text-inverse-text dark:data-[state=checked]:border-info-fg dark:data-[state=checked]:bg-info-fg" style="pointer-events: none;">
+					@* Don't use ResetClassName here — it strips the SizeClass that IconSize.Sm
+   generates, leaving the SVG with no dimensions and rendering it invisibly
+   inside the 16px checkbox button. *@
+<Icon IconSize="IconSize.Sm" Svg="@IconSvg.Check" />
+				</span>
+			}
+			else if ( GetCheckedState() is State.Indeterminate )
+			{
+				<span data-state="indeterminate" data-slot="checkbox-indicator" class="flex items-center justify-center text-current border-info-fg bg-info-fg text-inverse-text dark:border-info-fg dark:bg-info-fg" style="pointer-events: none;">
+					<Icon IconSize="IconSize.Sm" Svg="@IconSvg.Minus" />
+				</span>
+			}
+		</button>
+
+		@if ( Label is not null && Description is null )
+		{
+			<Label ForId="@Id"> @Label </Label>
+		}
+		else if ( Label is not null && Description is not null )
+		{
+			<div class="grid gap-2">
+				<Label ForId="@Id"> @Label </Label>
+				<p class="text-muted-foreground text-sm"> @Description </p>
+			</div>
+		}
+
+		@if ( ChildContent is not null )
+		{
+			@ChildContent
+		}
+	</div>
+}
+
+@code {
+	private enum State { Unchecked, Checked, Indeterminate }
+
+	[Parameter] public string? Id { get; set; } = Guid.NewGuid().ToString( "D" );
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	[Parameter] public bool? DefaultChecked { get; set; }
+	[Parameter] public bool? Checked { get; set; }
+	[Parameter] public EventCallback<bool?> CheckedChanged { get; set; }
+
+	[Parameter] public bool Indeterminate { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public bool Enhanced { get; set; }
+
+	[Parameter] public string? Label { get; set; }
+	[Parameter] public string? Description { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "peer border-input dark:bg-input/30 inline-flex items-center justify-center overflow-hidden data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50" )
+										.With( "data-[state=checked]:border-info-600 data-[state=checked]:bg-info-600 data-[state=checked]:text-white dark:data-[state=checked]:border-info-700 dark:data-[state=checked]:bg-info-700", Enhanced )
+										.With( ClassName )
+										.Build();
+
+	// Controlled tri-state contract:
+	//   Checked=true                        → Checked
+	//   Checked=false                       → Unchecked
+	//   Checked=null && Indeterminate=true  → Indeterminate
+	// Uncontrolled callers may also pass DefaultChecked; Indeterminate is only
+	// honoured when neither Checked nor DefaultChecked has a value.
+	private State GetCheckedState()
+	{
+		if ( !Checked.HasValue )
+		{
+			if ( !DefaultChecked.HasValue )
+				return Indeterminate ? State.Indeterminate : State.Unchecked;
+
+			return DefaultChecked.Value ? State.Checked : State.Unchecked;
+		}
+
+		return Checked.Value ? State.Checked : State.Unchecked;
+	}
+
+	private async Task SetCheckedState()
+	{
+		if ( Checked.HasValue && Checked.Value )
+			Checked = false;
+		else if ( Checked.HasValue )
+			Checked = Indeterminate ? null : true;
+		else if ( !Checked.HasValue )
+			Checked = true;
+
+		if ( CheckedChanged.HasDelegate )
+			await CheckedChanged.InvokeAsync( Checked );
+	}
+}

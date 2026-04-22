@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git check-ignore *)",
+      "Bash(grep -iE '\\\\.\\(exe|dll|pdb|so|dylib|pfx|snk|key|pem|p12\\)$')",
+      "Bash(awk -F/ '{print $1}')",
+      "Bash(dotnet build *)",
+      "Bash(dotnet msbuild *)"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="search-input-right-element" class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start("flex h-auto items-center justify-center pr-1")
+										.With(ClassName)
+										.Build();
+}

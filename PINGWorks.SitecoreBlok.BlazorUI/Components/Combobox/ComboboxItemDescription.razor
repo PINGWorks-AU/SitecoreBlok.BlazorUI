@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="combobox-item-description" class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "text-xs leading-snug text-subtle-text" )
+											.With( ClassName )
+											.Build();
+}

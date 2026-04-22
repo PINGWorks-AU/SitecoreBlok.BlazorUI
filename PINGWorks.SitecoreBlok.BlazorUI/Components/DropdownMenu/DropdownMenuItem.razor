@@ -1,0 +1,48 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="dropdown-menu-item" data-variant="@( Variant.ToString().ToLowerInvariant() )"
+	 class="@CssClass" @onclick="HandleClick">
+	@ChildContent
+</div>
+
+@code {
+	@* Cascading parents — any combination may apply depending on where the item
+	   is placed (top-level DropdownMenu, ContextMenu, or nested in a Sub).
+	   Clicking an item closes ALL non-null ancestors so the whole menu chain
+	   dismisses, matching native menu behaviour. *@
+	[CascadingParameter] public DropdownMenu? ParentDropdownMenu { get; set; }
+	[CascadingParameter] public ContextMenu? ParentContextMenu { get; set; }
+	[CascadingParameter] public DropdownMenuSub? ParentSub { get; set; }
+
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public EventCallback Click { get; set; }
+	[Parameter] public DropdownMenuItemVariant Variant { get; set; } = DropdownMenuItemVariant.Default;
+	[Parameter] public bool Disabled { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none",
+		"hover:bg-neutral-bg focus:bg-neutral-bg",
+		"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-neutral-fg" )
+										.With( "data-[variant=destructive]:hover:text-destructive data-[variant=destructive]:hover:bg-destructive/10", Variant is DropdownMenuItemVariant.Destructive )
+										.With( "pointer-events-none opacity-50", Disabled )
+										.With( ClassName )
+										.Build();
+
+	private async Task HandleClick()
+	{
+		if ( Disabled )
+			return;
+
+		if ( Click.HasDelegate )
+			await Click.InvokeAsync();
+
+		// Close every ancestor menu — sub first, then root — so the chain dismisses.
+		if ( ParentSub is not null )
+			await ParentSub.Close();
+		if ( ParentDropdownMenu is not null )
+			await ParentDropdownMenu.Close();
+		if ( ParentContextMenu is not null )
+			await ParentContextMenu.Close();
+	}
+}

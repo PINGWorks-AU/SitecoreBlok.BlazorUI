@@ -1,0 +1,18 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="context-menu-trigger" class="@CssClass" @oncontextmenu="OnContext" @oncontextmenu:preventDefault @attributes="AdditionalAttributes">
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] public required ContextMenu Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "" )
+											.With( ClassName )
+											.Build();
+
+	private async Task OnContext( MouseEventArgs e ) => await Parent.OpenAt( e.ClientX, e.ClientY );
+}

@@ -1,0 +1,36 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if ( HasContent )
+{
+	<div data-slot="field-error" role="alert" aria-live="polite" class="@CssClass">
+		@if ( ChildContent is not null )
+		{
+			@ChildContent
+		}
+		else if ( Errors is { Count: 1 } )
+		{
+			<span>@Errors[0]</span>
+		}
+		else if ( Errors is { Count: > 1 } )
+		{
+			<ul class="list-disc list-inside space-y-1">
+				@foreach ( var error in Errors )
+				{
+					<li>@error</li>
+				}
+			</ul>
+		}
+	</div>
+}
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public List<string>? Errors { get; set; }
+
+	private bool HasContent => (Errors is { Count: > 0 }) || ChildContent is not null;
+
+	private string CssClass => CssClassBuilder.Start( "text-sm text-destructive -mt-1" )
+										.With( ClassName )
+										.Build();
+}

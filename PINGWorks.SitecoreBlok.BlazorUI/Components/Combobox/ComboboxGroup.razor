@@ -1,0 +1,47 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@implements IDisposable
+
+<div data-slot="combobox-group" role="group"
+	 aria-disabled="@( Disabled ? "true" : "false" )"
+	 data-disabled="@( Disabled ? "" : null )"
+	 class="@ClassName">
+	<CascadingValue Value="this">
+		@ChildContent
+	</CascadingValue>
+</div>
+
+@code {
+	[CascadingParameter] public Combobox? ParentCombobox { get; set; }
+	[CascadingParameter] public ComboboxList? ParentList { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	private readonly List<ComboboxItem> Items = [];
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		ParentList?.Register( this );
+	}
+
+	public void Dispose() => ParentList?.Unregister( this );
+
+	internal void Register( ComboboxItem item )
+	{
+		if ( !Items.Contains( item ) )
+			Items.Add( item );
+	}
+
+	internal void Unregister( ComboboxItem item ) => Items.Remove( item );
+
+	// True when no filter is applied, or any registered item matches the current filter.
+	// ComboboxLabel uses this to hide itself when all items in this group are filtered out —
+	// avoids stranded group labels with no visible children beneath them.
+	internal bool HasVisibleItems()
+	{
+		if ( ParentCombobox is null ) return true;
+		return Items.Any( ParentCombobox.ItemMatchesFilter );
+	}
+}

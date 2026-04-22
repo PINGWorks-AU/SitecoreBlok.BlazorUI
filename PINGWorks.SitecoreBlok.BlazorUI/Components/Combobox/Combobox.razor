@@ -1,0 +1,336 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<CascadingValue Value="this">
+	@ChildContent
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+	[Parameter] public List<string> Values { get; set; } = [];
+	[Parameter] public EventCallback<List<string>> ValuesChanged { get; set; }
+	[Parameter] public bool Multiple { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public string? InputValue { get; set; }
+	[Parameter] public EventCallback<string?> InputValueChanged { get; set; }
+
+	internal string ComboboxId { get; } = Guid.NewGuid().ToString();
+	internal bool IsOpen { get; private set; }
+	internal double X { get; private set; }
+	internal double Y { get; private set; }
+	internal double AnchorWidth { get; private set; }
+	internal double AvailableHeight { get; private set; }
+	internal string? SelectedLabel { get; private set; }
+	internal string? HighlightedValue { get; private set; }
+
+	private ElementReference AnchorRef;
+	private bool HasAnchorRef;
+	private IJSObjectReference? Module;
+
+	private readonly List<ComboboxItem> Items = [];
+
+	// Persists value→label mappings after items are disposed when the dropdown closes.
+	// Without this, ComboboxChip / GetDisplayLabel fall back to raw Value once the popup
+	// re-renders out of the DOM and unregisters items. Populated on Register, retained
+	// for the lifetime of the Combobox.
+	private readonly Dictionary<string, string> LabelCache = [];
+
+	// Items register on OnInitialized, which fires DURING a render pass. ComboboxInput
+	// has already read GetDisplayLabel() by the time items register — it'd display the raw
+	// Value instead of the Label. This flag schedules a single post-render re-render so
+	// the input picks up the newly-cached label. Same for ComboboxChip.
+	private bool LabelCacheDirty;
+
+	internal bool IsValueSelected( string? value )
+	{
+		if ( value is null ) return false;
+		return Multiple ? Values.Contains( value ) : Value == value;
+	}
+
+	internal bool ItemMatchesFilter( ComboboxItem item )
+	{
+		if ( string.IsNullOrWhiteSpace( InputValue ) ) return true;
+		var q = InputValue.Trim();
+		var valueHit = item.Value?.Contains( q, StringComparison.OrdinalIgnoreCase ) ?? false;
+		var labelHit = item.Label?.Contains( q, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return valueHit || labelHit;
+	}
+
+	internal int VisibleItemCount() => Items.Count( ItemMatchesFilter );
+
+	internal void Register( ComboboxItem item )
+	{
+		if ( !Items.Contains( item ) )
+			Items.Add( item );
+
+		if ( item.Value is not null && item.Label is not null )
+		{
+			if ( !LabelCache.TryGetValue( item.Value, out var existing ) || existing != item.Label )
+			{
+				LabelCache[ item.Value ] = item.Label;
+				LabelCacheDirty = true;
+			}
+		}
+
+		if ( !Multiple && Value is not null && item.Value == Value && item.Label is not null )
+			SelectedLabel = item.Label;
+	}
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( LabelCacheDirty )
+		{
+			LabelCacheDirty = false;
+			await InvokeAsync( StateHasChanged );
+		}
+	}
+
+	internal void Unregister( ComboboxItem item ) => Items.Remove( item );
+
+	internal void RegisterAnchor( ElementReference anchor )
+	{
+		AnchorRef = anchor;
+		HasAnchorRef = true;
+	}
+
+	internal string? GetDisplayLabel()
+	{
+		if ( Value is null ) return null;
+		if ( LabelCache.TryGetValue( Value, out var cached ) ) return cached;
+		if ( SelectedLabel is not null ) return SelectedLabel;
+		var item = Items.FirstOrDefault( i => i.Value == Value );
+		return item?.Label ?? Value;
+	}
+
+	internal string? GetLabelForValue( string value )
+	{
+		if ( LabelCache.TryGetValue( value, out var cached ) ) return cached;
+		var item = Items.FirstOrDefault( i => i.Value == value );
+		return item?.Label ?? value;
+	}
+
+	internal async Task SetInputValue( string? text )
+	{
+		InputValue = text;
+		if ( InputValueChanged.HasDelegate )
+			await InputValueChanged.InvokeAsync( InputValue );
+
+		// Backspacing to empty clears the single-select Value — the user has deleted the
+		// selected label character-by-character, which is a valid "reset to null" gesture.
+		// Multi-select chips are cleared by their own × remove buttons, not by backspace.
+		if ( text == string.Empty && !Multiple && Value is not null )
+		{
+			Value = null;
+			SelectedLabel = null;
+			if ( ValueChanged.HasDelegate )
+				await ValueChanged.InvokeAsync( null );
+		}
+
+		var visible = Items.Where( ItemMatchesFilter ).Select( i => i.Value ).OfType<string>().ToList();
+		if ( HighlightedValue is null || !visible.Contains( HighlightedValue ) )
+			HighlightedValue = visible.FirstOrDefault();
+
+		if ( !IsOpen )
+		{
+			await Open();
+		}
+		else
+		{
+			// Anti-revert: the anchor's width/position may shift as the user types because
+			// the Blok class string uses `w-fit`. Re-measure so the popup tracks the input.
+			await UpdateAnchorPosition();
+			await InvokeAsync( StateHasChanged );
+		}
+	}
+
+	internal async Task SetHighlight( string? value )
+	{
+		if ( HighlightedValue == value ) return;
+		HighlightedValue = value;
+		await InvokeAsync( StateHasChanged );
+	}
+
+	private async Task UpdateAnchorPosition()
+	{
+		if ( Module is null || !HasAnchorRef ) return;
+		var rect = await Module.InvokeAsync<ElementRect>( "SitecoreUI.getElementBounds", AnchorRef );
+		X = rect.Left;
+		Y = rect.Top + rect.Height + 6;
+		AnchorWidth = rect.Width;
+	}
+
+	internal async Task SelectValue( string? value, string? label )
+	{
+		if ( value is null ) return;
+
+		if ( Multiple )
+		{
+			var list = Values is null ? [] : new List<string>( Values );
+			if ( list.Contains( value ) ) list.Remove( value );
+			else list.Add( value );
+			Values = list;
+			if ( ValuesChanged.HasDelegate )
+				await ValuesChanged.InvokeAsync( Values );
+
+			InputValue = null;
+			if ( InputValueChanged.HasDelegate )
+				await InputValueChanged.InvokeAsync( null );
+
+			await InvokeAsync( StateHasChanged );
+		}
+		else
+		{
+			if ( Value != value )
+			{
+				Value = value;
+				SelectedLabel = label;
+				if ( ValueChanged.HasDelegate )
+					await ValueChanged.InvokeAsync( Value );
+			}
+			else if ( label is not null )
+			{
+				SelectedLabel = label;
+			}
+
+			// Clear the filter so the dropdown (when reopened) shows the full list.
+			// The input's displayed text falls back to the selected item's label via
+			// ComboboxInput.DisplayedInputValue while the dropdown is closed.
+			InputValue = null;
+			if ( InputValueChanged.HasDelegate )
+				await InputValueChanged.InvokeAsync( null );
+
+			await Close();
+		}
+	}
+
+	internal async Task RemoveValue( string value )
+	{
+		if ( !Multiple ) return;
+		var list = Values is null ? [] : new List<string>( Values );
+		if ( list.Remove( value ) )
+		{
+			Values = list;
+			if ( ValuesChanged.HasDelegate )
+				await ValuesChanged.InvokeAsync( Values );
+			await InvokeAsync( StateHasChanged );
+		}
+	}
+
+	internal async Task ClearValue()
+	{
+		if ( Multiple )
+		{
+			Values = [];
+			if ( ValuesChanged.HasDelegate )
+				await ValuesChanged.InvokeAsync( Values );
+		}
+		else
+		{
+			Value = null;
+			SelectedLabel = null;
+			if ( ValueChanged.HasDelegate )
+				await ValueChanged.InvokeAsync( null );
+		}
+
+		InputValue = null;
+		if ( InputValueChanged.HasDelegate )
+			await InputValueChanged.InvokeAsync( null );
+
+		await InvokeAsync( StateHasChanged );
+	}
+
+	internal async Task Toggle()
+	{
+		if ( Disabled ) return;
+		if ( IsOpen ) await Close();
+		else await Open();
+	}
+
+	internal async Task Open()
+	{
+		if ( Disabled || !HasAnchorRef ) return;
+
+		Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
+		var rect = await Module.InvokeAsync<ElementRect>( "SitecoreUI.getElementBounds", AnchorRef );
+		var win = await Module.InvokeAsync<WindowRect>( "SitecoreUI.getWindowBounds" );
+
+		X = rect.Left;
+		Y = rect.Top + rect.Height + 6;
+		AnchorWidth = rect.Width;
+		AvailableHeight = Math.Max( 160, win.WindowHeight - Y - 16 );
+
+		IsOpen = true;
+
+		var visible = Items.Where( ItemMatchesFilter ).Select( i => i.Value ).OfType<string>().ToList();
+		if ( HighlightedValue is null || !visible.Contains( HighlightedValue ) )
+			HighlightedValue = visible.FirstOrDefault();
+
+		await InvokeAsync( StateHasChanged );
+	}
+
+	internal async Task Close()
+	{
+		IsOpen = false;
+		// Closing discards any residual filter state so re-opening falls back to the
+		// current Value's label (or the placeholder if Value is null). Resets both the
+		// "typed text" case ("abc") and the "user-cleared" case ("") — both must go
+		// back to null so DisplayedInputValue picks up GetDisplayLabel on next open.
+		if ( InputValue is not null )
+		{
+			InputValue = null;
+			if ( InputValueChanged.HasDelegate )
+				await InputValueChanged.InvokeAsync( null );
+		}
+		await InvokeAsync( StateHasChanged );
+	}
+
+	internal async Task HandleKeyDown( Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e )
+	{
+		switch ( e.Key )
+		{
+			case "Escape":
+				if ( IsOpen ) await Close();
+				break;
+			case "ArrowDown":
+				if ( !IsOpen ) { await Open(); }
+				else { MoveHighlight( 1 ); await InvokeAsync( StateHasChanged ); }
+				break;
+			case "ArrowUp":
+				if ( !IsOpen ) { await Open(); }
+				else { MoveHighlight( -1 ); await InvokeAsync( StateHasChanged ); }
+				break;
+			case "Enter":
+				if ( IsOpen && HighlightedValue is not null )
+				{
+					var hit = Items.FirstOrDefault( i => i.Value == HighlightedValue );
+					if ( hit is not null )
+						await SelectValue( hit.Value, hit.Label );
+				}
+				break;
+		}
+	}
+
+	private void MoveHighlight( int delta )
+	{
+		var visible = Items.Where( ItemMatchesFilter ).Select( i => i.Value ).OfType<string>().ToList();
+		if ( visible.Count == 0 ) { HighlightedValue = null; return; }
+
+		var idx = HighlightedValue is null ? -1 : visible.IndexOf( HighlightedValue );
+		var next = idx + delta;
+		if ( next < 0 ) next = visible.Count - 1;
+		if ( next >= visible.Count ) next = 0;
+		HighlightedValue = visible[ next ];
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+}

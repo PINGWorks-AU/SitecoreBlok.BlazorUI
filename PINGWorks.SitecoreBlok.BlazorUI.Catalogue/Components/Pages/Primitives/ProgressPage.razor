@@ -1,0 +1,46 @@
+@page "/primitives/progress"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Progress" Description="Displays an indicator showing the completion progress of a task" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ProgressElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default (50%)" Code="@("<Progress Value=\"50\" />")">
+			<Progress Value="50" />
+		</ComponentExample>
+
+		<ComponentExample Title="Zero" Code="@("<Progress Value=\"0\" />")">
+			<Progress Value="0" />
+		</ComponentExample>
+
+		<ComponentExample Title="Complete (100%)" Code="@("<Progress Value=\"100\" />")">
+			<Progress Value="100" />
+		</ComponentExample>
+
+		<ComponentExample Title="Indeterminate" Code="@("<Progress IsIndeterminate=\"true\" />")">
+			<Progress IsIndeterminate="true" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ProgressElements =
+	[
+		new ApiElement(
+			Name: "Progress",
+			Description: "Horizontal bar that fills to a percentage of `MaxValue`, or animates a sliding pill when `IsIndeterminate` is set. Exposes ARIA `progressbar` semantics.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",                "int",                           false, "Current progress value, interpreted as a fraction of `MaxValue`. Default: `0`." ),
+				new ApiProperty( "MaxValue",             "int",                           false, "Upper bound for `Value`. Default: `100`." ),
+				new ApiProperty( "IsIndeterminate",      "bool",                          false, "When true, shows a looping indeterminate animation and ignores `Value`. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the outer track container." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the outer track container." ),
+			]
+		),
+	];
+}

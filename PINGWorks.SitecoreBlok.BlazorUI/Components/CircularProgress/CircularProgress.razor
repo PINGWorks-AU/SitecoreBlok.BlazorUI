@@ -1,0 +1,33 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="circular-progress" role="progressbar" aria-valuemin="0" aria-valuemax="@Max" aria-valuenow="@Value"
+	 aria-label="@($"Progress: {Percentage:N0}%")" class="@CssClass">
+	<svg viewBox="0 0 36 36" class="size-full">
+		<circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" stroke-width="@StrokeWidth"
+				class="text-neutral-bg" />
+		<circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" stroke-width="@StrokeWidth"
+				stroke-dasharray="@Circumference" stroke-dashoffset="@DashOffset"
+				stroke-linecap="round" class="text-primary transition-all duration-300"
+				transform="rotate(-90 18 18)" />
+	</svg>
+	@if (ShowLabel)
+	{
+		<span class="absolute inset-0 flex items-center justify-center text-xs font-medium">@($"{Percentage:N0}%")</span>
+	}
+</div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public int Value { get; set; }
+	[Parameter] public int Max { get; set; } = 100;
+	[Parameter] public bool ShowLabel { get; set; }
+	[Parameter] public int StrokeWidth { get; set; } = 3;
+
+	private double Percentage => Max > 0 ? (double)Value / Max * 100 : 0;
+	private double Circumference => 2 * Math.PI * 16;
+	private double DashOffset => Circumference - (Percentage / 100 * Circumference);
+
+	private string CssClass => CssClassBuilder.Start("relative inline-flex size-10")
+										.With(ClassName)
+										.Build();
+}

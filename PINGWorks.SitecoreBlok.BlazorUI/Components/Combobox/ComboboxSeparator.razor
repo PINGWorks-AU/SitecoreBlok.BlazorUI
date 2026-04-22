@@ -1,0 +1,29 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@implements IDisposable
+
+@* Separator hides itself when it would be stranded — first/last visible element in the list, or
+   stacked next to another visible separator. Driven by ComboboxList's child-order tracking so
+   separators around filtered-out groups disappear cleanly. *@
+@if ( ParentList is null || ParentList.ShouldRenderSeparator( this ) )
+{
+	@* `parity-no-text-pair`: separator is decorative — no text content. *@
+	<div data-slot="combobox-separator" class="@CssClass"></div>
+}
+
+@code {
+	[CascadingParameter] public ComboboxList? ParentList { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "bg-border -mx-1 my-1 h-px parity-no-text-pair" )
+											.With( ClassName )
+											.Build();
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		ParentList?.Register( this );
+	}
+
+	public void Dispose() => ParentList?.Unregister( this );
+}

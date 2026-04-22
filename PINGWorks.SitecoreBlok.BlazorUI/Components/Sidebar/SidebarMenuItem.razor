@@ -1,0 +1,16 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<li data-slot="sidebar-menu-item" data-sidebar="menu-item" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+</li>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"group/menu-item relative h-10 min-w-20 max-w-60 flex justify-between items-center" )
+		.With( ClassName )
+		.Build();
+}

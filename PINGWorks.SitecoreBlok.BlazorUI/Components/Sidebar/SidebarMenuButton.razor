@@ -1,0 +1,36 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* Tooltip-on-collapsed functionality from Blok's source is omitted — BlazorUI's Tooltip is pure-CSS
+   with no programmatic `hidden` prop or TooltipProvider context, and the consumer-visible API shape
+   (tooltip: string | TooltipContentProps) doesn't translate cleanly. Consumers wanting labels on
+   collapsed icons can wrap the button with their own Tooltip. *@
+<button data-slot="sidebar-menu-button" data-sidebar="menu-button"
+		data-size="@SizeAttr" data-active="@(IsActive.ToString().ToLowerInvariant())"
+		data-disabled="@(Disabled ? "true" : null)"
+		disabled="@Disabled"
+		class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+	@ChildContent
+</button>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool IsActive { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public SidebarMenuButtonSize Size { get; set; } = SidebarMenuButtonSize.Default;
+	[Parameter] public EventCallback OnClicked { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string SizeAttr => Size switch { SidebarMenuButtonSize.Sm => "sm", SidebarMenuButtonSize.Lg => "lg", _ => "default" };
+
+	private string CssClass => CssClassBuilder.Start(
+		"peer/menu-button flex w-full h-full items-center gap-2 overflow-hidden rounded-md p-2.5 text-left font-medium ring-primary/50 outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! bg-transparent text-neutral-fg hover:bg-(--color-neutral-100) hover:text-neutral-fg focus-visible:ring-2 active:bg-primary-bg active:text-primary-fg disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-primary-bg data-[active=true]:text-primary-fg data-[state=open]:hover:bg-(--color-neutral-100) data-[state=open]:hover:text-neutral-fg [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0" )
+		.With( "hover:bg-(--color-neutral-100) hover:text-neutral-fg" )
+		.With( "text-sm", Size is SidebarMenuButtonSize.Default )
+		.With( "text-xs", Size is SidebarMenuButtonSize.Sm )
+		.With( "text-sm group-data-[collapsible=icon]:p-0!", Size is SidebarMenuButtonSize.Lg )
+		.With( ClassName )
+		.Build();
+
+	private Task OnClick() => OnClicked.InvokeAsync();
+}

@@ -1,0 +1,343 @@
+@page "/primitives/table"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Table" Description="A responsive table component" Interactivity="ComponentInteractivity.Ssr" ApiElements="@TableElements">
+
+	<ExamplesSection>
+
+	<ComponentExample Title="Default" Code="@("<Table>\n    <TableHeader>\n        <TableRow>\n            <TableHead>Name</TableHead>\n            <TableHead>Email</TableHead>\n            <TableHead>Role</TableHead>\n            <TableHead>Status</TableHead>\n        </TableRow>\n    </TableHeader>\n    <TableBody>\n        <TableRow>\n            <TableCell>Alice Johnson</TableCell>\n            <TableCell>alice@example.com</TableCell>\n            <TableCell>Admin</TableCell>\n            <TableCell><Badge ColorScheme=\"BadgeColor.Success\">Active</Badge></TableCell>\n        </TableRow>\n        <TableRow>\n            <TableCell>Bob Smith</TableCell>\n            <TableCell>bob@example.com</TableCell>\n            <TableCell>Editor</TableCell>\n            <TableCell><Badge ColorScheme=\"BadgeColor.Neutral\">Inactive</Badge></TableCell>\n        </TableRow>\n        <TableRow>\n            <TableCell>Carol White</TableCell>\n            <TableCell>carol@example.com</TableCell>\n            <TableCell>Viewer</TableCell>\n            <TableCell><Badge ColorScheme=\"BadgeColor.Success\">Active</Badge></TableCell>\n        </TableRow>\n        <TableRow>\n            <TableCell>Dan Miller</TableCell>\n            <TableCell>dan@example.com</TableCell>\n            <TableCell>Editor</TableCell>\n            <TableCell><Badge ColorScheme=\"BadgeColor.Success\">Active</Badge></TableCell>\n        </TableRow>\n        <TableRow>\n            <TableCell>Eve Davis</TableCell>\n            <TableCell>eve@example.com</TableCell>\n            <TableCell>Viewer</TableCell>\n            <TableCell><Badge ColorScheme=\"BadgeColor.Neutral\">Inactive</Badge></TableCell>\n        </TableRow>\n    </TableBody>\n</Table>")">
+		<Table>
+			<TableHeader>
+				<TableRow>
+					<TableHead>Name</TableHead>
+					<TableHead>Email</TableHead>
+					<TableHead>Role</TableHead>
+					<TableHead>Status</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				<TableRow>
+					<TableCell>Alice Johnson</TableCell>
+					<TableCell>alice@example.com</TableCell>
+					<TableCell>Admin</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Bob Smith</TableCell>
+					<TableCell>bob@example.com</TableCell>
+					<TableCell>Editor</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Neutral">Inactive</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Carol White</TableCell>
+					<TableCell>carol@example.com</TableCell>
+					<TableCell>Viewer</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Dan Miller</TableCell>
+					<TableCell>dan@example.com</TableCell>
+					<TableCell>Editor</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Eve Davis</TableCell>
+					<TableCell>eve@example.com</TableCell>
+					<TableCell>Viewer</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Neutral">Inactive</Badge></TableCell>
+				</TableRow>
+			</TableBody>
+		</Table>
+	</ComponentExample>
+
+	<ComponentExample Title="Size variants" Code="@("<Table Size=\"TableSize.Sm\">...</Table>\n<Table Size=\"TableSize.Md\">...</Table>\n<Table Size=\"TableSize.Lg\">...</Table>")">
+		<div class="flex flex-col gap-8">
+			<div>
+				<p class="text-sm font-medium mb-2">Small</p>
+				<Table Size="TableSize.Sm">
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Role</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<TableRow>
+							<TableCell>Alice</TableCell>
+							<TableCell>Admin</TableCell>
+						</TableRow>
+						<TableRow>
+							<TableCell>Bob</TableCell>
+							<TableCell>Editor</TableCell>
+						</TableRow>
+					</TableBody>
+				</Table>
+			</div>
+			<div>
+				<p class="text-sm font-medium mb-2">Medium (default)</p>
+				<Table Size="TableSize.Md">
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Role</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<TableRow>
+							<TableCell>Alice</TableCell>
+							<TableCell>Admin</TableCell>
+						</TableRow>
+						<TableRow>
+							<TableCell>Bob</TableCell>
+							<TableCell>Editor</TableCell>
+						</TableRow>
+					</TableBody>
+				</Table>
+			</div>
+			<div>
+				<p class="text-sm font-medium mb-2">Large</p>
+				<Table Size="TableSize.Lg">
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Role</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<TableRow>
+							<TableCell>Alice</TableCell>
+							<TableCell>Admin</TableCell>
+						</TableRow>
+						<TableRow>
+							<TableCell>Bob</TableCell>
+							<TableCell>Editor</TableCell>
+						</TableRow>
+					</TableBody>
+				</Table>
+			</div>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="Sticky header and scroll" Code="@("<Table MaxHeight=\"300px\" StickyHeader=\"true\">\n    <TableHeader>\n        <TableRow>\n            <TableHead>Name</TableHead>\n            <TableHead>Email</TableHead>\n            <TableHead>Role</TableHead>\n            <TableHead>Status</TableHead>\n        </TableRow>\n    </TableHeader>\n    <TableBody>\n        <!-- 10 rows to demonstrate scrolling -->\n    </TableBody>\n</Table>")">
+		<Table MaxHeight="300px" StickyHeader="true">
+			<TableHeader>
+				<TableRow>
+					<TableHead>Name</TableHead>
+					<TableHead>Email</TableHead>
+					<TableHead>Role</TableHead>
+					<TableHead>Status</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				<TableRow>
+					<TableCell>Alice Johnson</TableCell>
+					<TableCell>alice@example.com</TableCell>
+					<TableCell>Admin</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Bob Smith</TableCell>
+					<TableCell>bob@example.com</TableCell>
+					<TableCell>Editor</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Carol White</TableCell>
+					<TableCell>carol@example.com</TableCell>
+					<TableCell>Viewer</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Neutral">Inactive</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Dan Miller</TableCell>
+					<TableCell>dan@example.com</TableCell>
+					<TableCell>Editor</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Eve Davis</TableCell>
+					<TableCell>eve@example.com</TableCell>
+					<TableCell>Viewer</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Neutral">Inactive</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Frank Lee</TableCell>
+					<TableCell>frank@example.com</TableCell>
+					<TableCell>Admin</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Grace Kim</TableCell>
+					<TableCell>grace@example.com</TableCell>
+					<TableCell>Editor</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Henry Park</TableCell>
+					<TableCell>henry@example.com</TableCell>
+					<TableCell>Viewer</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Neutral">Inactive</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Irene Cho</TableCell>
+					<TableCell>irene@example.com</TableCell>
+					<TableCell>Editor</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell>Jake Torres</TableCell>
+					<TableCell>jake@example.com</TableCell>
+					<TableCell>Admin</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+			</TableBody>
+		</Table>
+	</ComponentExample>
+
+	<ComponentExample Title="Pinned column" Code="@("<Table MaxWidth=\"500px\">\n    <TableHeader>\n        <TableRow>\n            <TableHead Pinned=\"true\">Name</TableHead>\n            <TableHead>Email</TableHead>\n            <TableHead>Department</TableHead>\n            <TableHead>Location</TableHead>\n            <TableHead>Status</TableHead>\n        </TableRow>\n    </TableHeader>\n    <TableBody>\n        <TableRow>\n            <TableCell Pinned=\"true\">Alice Johnson</TableCell>\n            <TableCell>alice@example.com</TableCell>\n            <TableCell>Engineering</TableCell>\n            <TableCell>New York</TableCell>\n            <TableCell>Active</TableCell>\n        </TableRow>\n    </TableBody>\n</Table>")">
+		<Table MaxWidth="500px">
+			<TableHeader>
+				<TableRow>
+					<TableHead Pinned="true">Name</TableHead>
+					<TableHead>Email</TableHead>
+					<TableHead>Department</TableHead>
+					<TableHead>Location</TableHead>
+					<TableHead>Status</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				<TableRow>
+					<TableCell Pinned="true">Alice Johnson</TableCell>
+					<TableCell>alice@example.com</TableCell>
+					<TableCell>Engineering</TableCell>
+					<TableCell>New York</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell Pinned="true">Bob Smith</TableCell>
+					<TableCell>bob@example.com</TableCell>
+					<TableCell>Marketing</TableCell>
+					<TableCell>San Francisco</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Neutral">Inactive</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell Pinned="true">Carol White</TableCell>
+					<TableCell>carol@example.com</TableCell>
+					<TableCell>Design</TableCell>
+					<TableCell>London</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell Pinned="true">Dan Miller</TableCell>
+					<TableCell>dan@example.com</TableCell>
+					<TableCell>Sales</TableCell>
+					<TableCell>Chicago</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Success">Active</Badge></TableCell>
+				</TableRow>
+				<TableRow>
+					<TableCell Pinned="true">Eve Davis</TableCell>
+					<TableCell>eve@example.com</TableCell>
+					<TableCell>Support</TableCell>
+					<TableCell>Toronto</TableCell>
+					<TableCell><Badge ColorScheme="BadgeColor.Neutral">Inactive</Badge></TableCell>
+				</TableRow>
+			</TableBody>
+		</Table>
+	</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] TableElements =
+	[
+		new ApiElement(
+			Name: "Table",
+			Description: "Container that provides the scroll wrapper, `data-table-size` and a cascading `Table` reference for children. Use with `TableHeader` / `TableBody` / `TableFooter` plus `TableRow` / `TableHead` / `TableCell`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Size",               "TableSize",       false, "Row-height preset. Default: `TableSize.Md`. Other values: `Sm`, `Lg`." ),
+				new ApiProperty( "StickyHeader",       "bool",            false, "When true (default) and `MaxHeight` is set, the `TableHeader` sticks to the top during scroll. Default: `true`." ),
+				new ApiProperty( "MaxHeight",          "string?",         false, "Optional CSS height (e.g. `\"300px\"`) that turns the container into a vertically scrollable region and enables `StickyHeader`." ),
+				new ApiProperty( "MaxWidth",           "string?",         false, "Optional CSS max-width that enables horizontal scrolling for pinned-column layouts." ),
+				new ApiProperty( "ClassName",          "string?",         false, "Extra CSS classes appended to the inner `<table>`." ),
+				new ApiProperty( "ContainerClassName", "string?",         false, "Extra CSS classes appended to the outer scroll container." ),
+				new ApiProperty( "ChildContent",       "RenderFragment?", false, "The table's header, body, footer and rows." ),
+			]
+		),
+		new ApiElement(
+			Name: "TableHeader",
+			Description: "Renders `<thead>`. Applies sticky-header styling automatically when the parent `Table` has `MaxHeight` set and `StickyHeader` is true.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<thead>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "One or more `TableRow` entries containing `TableHead` cells." ),
+			]
+		),
+		new ApiElement(
+			Name: "TableBody",
+			Description: "Renders `<tbody>` with row-border styling. Typically wraps a set of `TableRow` children.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<tbody>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "`TableRow` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "TableFooter",
+			Description: "Renders `<tfoot>` with muted background and top border, suitable for totals rows.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<tfoot>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "`TableRow` children for the footer." ),
+			]
+		),
+		new ApiElement(
+			Name: "TableRow",
+			Description: "Renders a `<tr>` with the default hover/selected styling.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<tr>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "`TableHead` or `TableCell` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "TableHead",
+			Description: "Renders a `<th>` with header typography. Pulls row-height padding from the parent `Table`'s `Size`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Pinned",       "bool",            false, "When true, the column pins to the left (`position: sticky`). Pair with `TableCell Pinned=\"true\"` in each row's first cell. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<th>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Header text or inline markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "TableCell",
+			Description: "Renders a `<td>` with body typography. Pulls row-height padding from the parent `Table`'s `Size`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Pinned",       "bool",            false, "When true, the cell pins to the left (`position: sticky`). Use on the first cell of each row when the corresponding `TableHead` is pinned. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<td>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Cell content." ),
+			]
+		),
+		new ApiElement(
+			Name: "TableCaption",
+			Description: "Renders a `<caption>` beneath the table with muted styling. Optional.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<caption>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Caption text." ),
+			]
+		),
+	];
+}

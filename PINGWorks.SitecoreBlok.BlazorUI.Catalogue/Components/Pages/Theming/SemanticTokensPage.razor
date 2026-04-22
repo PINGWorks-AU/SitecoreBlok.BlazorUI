@@ -1,0 +1,60 @@
+@page "/graphics/theming/semantic-tokens"
+@rendermode InteractiveServer
+
+<ComponentPage Title="Semantic tokens" Description="Role-based design tokens that map to CSS custom properties. These adapt automatically in dark mode.">
+
+	<div class="pt-2 pb-4">
+		<a href="/graphics/theming" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">&larr; Theming</a>
+	</div>
+
+	<Table Size="TableSize.Sm">
+		<TableHeader>
+			<TableRow>
+				<TableHead>Swatch</TableHead>
+				<TableHead>Token</TableHead>
+				<TableHead>Role</TableHead>
+				<TableHead>CSS Variable</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody>
+			@foreach (var token in SemanticTokens)
+			{
+				<TableRow>
+					<TableCell>
+						<div class="w-8 h-8 rounded-md border border-border" style="@($"background-color:var({token.Variable})")"></div>
+					</TableCell>
+					<TableCell>
+						<span class="font-medium">@token.Name</span>
+					</TableCell>
+					<TableCell>
+						<span class="text-sm text-muted-foreground">@token.Role</span>
+					</TableCell>
+					<TableCell>
+						<code class="text-xs text-muted-foreground">var(@token.Variable)</code>
+					</TableCell>
+				</TableRow>
+			}
+		</TableBody>
+	</Table>
+
+</ComponentPage>
+
+@code {
+	private record SemanticToken(string Name, string Variable, string Role);
+
+	private static readonly SemanticToken[] SemanticTokens =
+	[
+		new("background", "--background", "Page background"),
+		new("foreground", "--foreground", "Default text colour"),
+		new("card", "--card", "Card surface"),
+		new("card-foreground", "--card-foreground", "Card text colour"),
+		new("popover", "--popover", "Popover surface"),
+		new("muted", "--muted", "Muted surface"),
+		new("muted-foreground", "--muted-foreground", "Muted text colour"),
+		new("accent", "--accent", "Accent surface"),
+		new("border", "--border", "Default border"),
+		new("input", "--input", "Input border"),
+		new("ring", "--ring", "Focus ring"),
+		new("destructive", "--destructive", "Destructive action"),
+	];
+}

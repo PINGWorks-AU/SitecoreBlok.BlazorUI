@@ -1,0 +1,9 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* Portal functionality is unnecessary in Blazor — MenubarContent uses fixed positioning.
+   This component exists for API parity with the Blok source which exports MenubarPortal. *@
+@ChildContent
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

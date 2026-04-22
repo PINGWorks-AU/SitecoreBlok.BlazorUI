@@ -1,0 +1,157 @@
+@page "/primitives/carousel"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Carousel" Description="A slideshow component for cycling through elements" Interactivity="ComponentInteractivity.Interactive" ApiElements="@CarouselElements">
+
+	<DivergenceNote>
+		<p><strong>Custom implementation — not an Embla Carousel wrapper.</strong> Blok wraps <code>embla-carousel</code> with <code>opts</code>, <code>plugins</code>, <code>setApi</code>, and built-in keyboard navigation. Ours is hand-rolled with <code>CurrentIndex</code>, <code>TransitionDuration</code>, and a <code>CarouselOrientation</code> enum — there is no Embla API surface. Missing features: touch/swipe, autoplay, plugin ecosystem. Additive: user-configurable <code>TransitionDuration</code> (Blok hardcodes it).</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Carousel>\n    <CarouselContent>\n        <CarouselItem>\n            <div class=\"p-6 border rounded-lg text-center\">Slide 1</div>\n        </CarouselItem>\n        <CarouselItem>\n            <div class=\"p-6 border rounded-lg text-center\">Slide 2</div>\n        </CarouselItem>\n        <CarouselItem>\n            <div class=\"p-6 border rounded-lg text-center\">Slide 3</div>\n        </CarouselItem>\n    </CarouselContent>\n    <CarouselPrevious />\n    <CarouselNext />\n</Carousel>")">
+			<div class="px-12">
+				<Carousel>
+					<CarouselContent>
+						<CarouselItem>
+							<div class="p-6 border border-border rounded-lg text-center bg-muted/30">
+								<p class="text-4xl font-semibold">1</p>
+								<p class="text-sm text-muted-foreground mt-2">First slide</p>
+							</div>
+						</CarouselItem>
+						<CarouselItem>
+							<div class="p-6 border border-border rounded-lg text-center bg-muted/30">
+								<p class="text-4xl font-semibold">2</p>
+								<p class="text-sm text-muted-foreground mt-2">Second slide</p>
+							</div>
+						</CarouselItem>
+						<CarouselItem>
+							<div class="p-6 border border-border rounded-lg text-center bg-muted/30">
+								<p class="text-4xl font-semibold">3</p>
+								<p class="text-sm text-muted-foreground mt-2">Third slide</p>
+							</div>
+						</CarouselItem>
+						<CarouselItem>
+							<div class="p-6 border border-border rounded-lg text-center bg-muted/30">
+								<p class="text-4xl font-semibold">4</p>
+								<p class="text-sm text-muted-foreground mt-2">Fourth slide</p>
+							</div>
+						</CarouselItem>
+						<CarouselItem>
+							<div class="p-6 border border-border rounded-lg text-center bg-muted/30">
+								<p class="text-4xl font-semibold">5</p>
+								<p class="text-sm text-muted-foreground mt-2">Fifth slide</p>
+							</div>
+						</CarouselItem>
+					</CarouselContent>
+					<CarouselPrevious />
+					<CarouselNext />
+				</Carousel>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With Cards" Code="@("<Carousel>\n    <CarouselContent>\n        @for (var i = 0; i < 5; i++)\n        {\n            <CarouselItem>\n                <Card Style=\"CardStyle.Outline\" Padding=\"CardPadding.Md\">\n                    <CardContent>Card @(i + 1)</CardContent>\n                </Card>\n            </CarouselItem>\n        }\n    </CarouselContent>\n    <CarouselPrevious />\n    <CarouselNext />\n</Carousel>")">
+			<div class="px-12">
+				<Carousel>
+					<CarouselContent>
+						<CarouselItem>
+							<Card Style="CardStyle.Outline" Padding="CardPadding.Md">
+								<CardHeader>
+									<CardTitle>Getting Started</CardTitle>
+									<CardDescription>Learn the basics of the platform.</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<Badge ColorScheme="BadgeColor.Primary">Guide</Badge>
+								</CardContent>
+							</Card>
+						</CarouselItem>
+						<CarouselItem>
+							<Card Style="CardStyle.Outline" Padding="CardPadding.Md">
+								<CardHeader>
+									<CardTitle>Advanced Topics</CardTitle>
+									<CardDescription>Deep dive into advanced features.</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<Badge ColorScheme="BadgeColor.Teal">Tutorial</Badge>
+								</CardContent>
+							</Card>
+						</CarouselItem>
+						<CarouselItem>
+							<Card Style="CardStyle.Outline" Padding="CardPadding.Md">
+								<CardHeader>
+									<CardTitle>API Reference</CardTitle>
+									<CardDescription>Complete API documentation.</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<Badge ColorScheme="BadgeColor.Cyan">Reference</Badge>
+								</CardContent>
+							</Card>
+						</CarouselItem>
+					</CarouselContent>
+					<CarouselPrevious />
+					<CarouselNext />
+				</Carousel>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] CarouselElements =
+	[
+		new ApiElement(
+			Name: "Carousel",
+			Description: "Root of the carousel. Owns the current slide index and cascades itself to `CarouselContent`, `CarouselItem`, `CarouselPrevious`, and `CarouselNext` so they can read/update index state.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Orientation",          "CarouselOrientation",           false, "Slide direction. Default: `CarouselOrientation.Horizontal`. Other value: `Vertical`." ),
+				new ApiProperty( "TransitionDuration",   "int",                           false, "Slide transition length in milliseconds. Default: `300`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the outer carousel region." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Must contain a `CarouselContent` and typically a `CarouselPrevious` + `CarouselNext` pair." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the outer region." ),
+			]
+		),
+		new ApiElement(
+			Name: "CarouselContent",
+			Description: "Viewport + track. Clips overflow and translates the inner flex track by `CurrentIndex * 100%` on each change.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the inner track." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "One or more `CarouselItem` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "CarouselItem",
+			Description: "A single slide. Sized to fill the viewport (`basis-full`) and pads itself against the previous item. Registers with the parent `Carousel` on init to increment `ItemCount`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the slide wrapper." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Slide content." ),
+			]
+		),
+		new ApiElement(
+			Name: "CarouselPrevious",
+			Description: "Floating chevron-left button that calls `ScrollPrev` on the parent. Auto-disabled at the first slide.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the button." ),
+			]
+		),
+		new ApiElement(
+			Name: "CarouselNext",
+			Description: "Floating chevron-right button that calls `ScrollNext` on the parent. Auto-disabled at the last slide.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the button." ),
+			]
+		),
+	];
+}

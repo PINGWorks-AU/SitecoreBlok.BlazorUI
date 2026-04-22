@@ -1,0 +1,397 @@
+@page "/primitives/combobox"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Combobox" Description="Filterable select with search, single and multi-select, grouping, and chips." Interactivity="ComponentInteractivity.Interactive" ApiElements="@ComboboxElements">
+
+	<DivergenceNote>
+		<p><strong>Blazor-idiomatic bindings (paradigm translation, not a behavioural divergence).</strong> Blok wraps <code>@@base-ui/react/combobox</code> which exposes React state hooks. BlazorUI's port surfaces the same state through <code>@@bind-Value</code> (single) or <code>@@bind-Values</code> (multi) and <code>@@bind-InputValue</code> for the filter text. React's <code>useComboboxAnchor</code> hook has no Blazor equivalent &mdash; use <code>@@ref</code> on a plain element if you need to anchor the popover somewhere other than the input or chips wrapper.</p>
+		<p class="!mt-2"><strong>Known gaps.</strong> Keyboard navigation supports Arrow Up/Down, Enter, and Escape. Advanced behaviours from <code>@@base-ui</code> (Home/End jumps, typeahead buffering, tap-to-open on mobile pointer-coarse devices) are not yet ported.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Combobox @bind-Value=\"selectedFruit\" @bind-InputValue=\"filter\">\n    <ComboboxInput Placeholder=\"Pick a fruit\" />\n    <ComboboxContent>\n        <ComboboxList>\n            <ComboboxItem Value=\"apple\" Label=\"Apple\" />\n            <ComboboxItem Value=\"banana\" Label=\"Banana\" />\n            <ComboboxItem Value=\"cherry\" Label=\"Cherry\" />\n            <ComboboxItem Value=\"grape\" Label=\"Grape\" />\n            <ComboboxItem Value=\"kiwi\" Label=\"Kiwi\" />\n            <ComboboxItem Value=\"mango\" Label=\"Mango\" />\n            <ComboboxItem Value=\"orange\" Label=\"Orange\" />\n            <ComboboxItem Value=\"pear\" Label=\"Pear\" />\n        </ComboboxList>\n        <ComboboxEmpty>No fruits found.</ComboboxEmpty>\n    </ComboboxContent>\n</Combobox>")">
+			<div class="flex items-center gap-4">
+				<Combobox @bind-Value="SelectedFruit" @bind-InputValue="FruitFilter">
+					<ComboboxInput Placeholder="Pick a fruit" />
+					<ComboboxContent>
+						<ComboboxList>
+							<ComboboxItem Value="apple" Label="Apple" />
+							<ComboboxItem Value="banana" Label="Banana" />
+							<ComboboxItem Value="cherry" Label="Cherry" />
+							<ComboboxItem Value="grape" Label="Grape" />
+							<ComboboxItem Value="kiwi" Label="Kiwi" />
+							<ComboboxItem Value="mango" Label="Mango" />
+							<ComboboxItem Value="orange" Label="Orange" />
+							<ComboboxItem Value="pear" Label="Pear" />
+						</ComboboxList>
+						<ComboboxEmpty>No fruits found.</ComboboxEmpty>
+					</ComboboxContent>
+				</Combobox>
+				@if ( SelectedFruit is not null )
+				{
+					<span class="text-sm text-muted-foreground">Selected: @SelectedFruit</span>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Clear button" Code="@("<Combobox @bind-Value=\"selected\" @bind-InputValue=\"filter\">\n    <ComboboxInput Placeholder=\"Type to filter\" ShowClear=\"true\" />\n    <ComboboxContent>\n        <ComboboxList>\n            <ComboboxItem Value=\"red\" Label=\"Red\" />\n            <ComboboxItem Value=\"green\" Label=\"Green\" />\n            <ComboboxItem Value=\"blue\" Label=\"Blue\" />\n        </ComboboxList>\n    </ComboboxContent>\n</Combobox>")">
+			<Combobox @bind-Value="SelectedColor" @bind-InputValue="ColorFilter">
+				<ComboboxInput Placeholder="Type to filter" ShowClear="true" />
+				<ComboboxContent>
+					<ComboboxList>
+						<ComboboxItem Value="red" Label="Red" />
+						<ComboboxItem Value="green" Label="Green" />
+						<ComboboxItem Value="blue" Label="Blue" />
+					</ComboboxList>
+				</ComboboxContent>
+			</Combobox>
+		</ComponentExample>
+
+		<ComponentExample Title="Groups" Code="@("<Combobox @bind-Value=\"selectedFood\" @bind-InputValue=\"foodFilter\">\n    <ComboboxInput Placeholder=\"Pick a food\" />\n    <ComboboxContent>\n        <ComboboxList>\n            <ComboboxGroup>\n                <ComboboxLabel>Fruits</ComboboxLabel>\n                <ComboboxItem Value=\"apple\" Label=\"Apple\" />\n                <ComboboxItem Value=\"banana\" Label=\"Banana\" />\n            </ComboboxGroup>\n            <ComboboxSeparator />\n            <ComboboxGroup>\n                <ComboboxLabel>Vegetables</ComboboxLabel>\n                <ComboboxItem Value=\"carrot\" Label=\"Carrot\" />\n                <ComboboxItem Value=\"broccoli\" Label=\"Broccoli\" />\n            </ComboboxGroup>\n        </ComboboxList>\n    </ComboboxContent>\n</Combobox>")">
+			<Combobox @bind-Value="SelectedFood" @bind-InputValue="FoodFilter">
+				<ComboboxInput Placeholder="Pick a food" />
+				<ComboboxContent>
+					<ComboboxList>
+						<ComboboxGroup>
+							<ComboboxLabel>Fruits</ComboboxLabel>
+							<ComboboxItem Value="apple" Label="Apple" />
+							<ComboboxItem Value="banana" Label="Banana" />
+						</ComboboxGroup>
+						<ComboboxSeparator />
+						<ComboboxGroup>
+							<ComboboxLabel>Vegetables</ComboboxLabel>
+							<ComboboxItem Value="carrot" Label="Carrot" />
+							<ComboboxItem Value="broccoli" Label="Broccoli" />
+						</ComboboxGroup>
+					</ComboboxList>
+				</ComboboxContent>
+			</Combobox>
+		</ComponentExample>
+
+		<ComponentExample Title="With descriptions" Code="@("<Combobox @bind-Value=\"selectedPlan\" @bind-InputValue=\"planFilter\">\n    <ComboboxInput Placeholder=\"Pick a plan\" />\n    <ComboboxContent>\n        <ComboboxList>\n            <ComboboxItem Value=\"starter\" Label=\"Starter\">\n                <ComboboxItemText>\n                    <ComboboxItemTitle>Starter</ComboboxItemTitle>\n                    <ComboboxItemDescription>Up to 5 seats, community support.</ComboboxItemDescription>\n                </ComboboxItemText>\n            </ComboboxItem>\n            <ComboboxItem Value=\"team\" Label=\"Team\">\n                <ComboboxItemText>\n                    <ComboboxItemTitle>Team</ComboboxItemTitle>\n                    <ComboboxItemDescription>Unlimited seats, email support, usage dashboards.</ComboboxItemDescription>\n                </ComboboxItemText>\n            </ComboboxItem>\n            <ComboboxItem Value=\"enterprise\" Label=\"Enterprise\">\n                <ComboboxItemText>\n                    <ComboboxItemTitle>Enterprise</ComboboxItemTitle>\n                    <ComboboxItemDescription>Dedicated infra, SLAs, audit log exports.</ComboboxItemDescription>\n                </ComboboxItemText>\n            </ComboboxItem>\n        </ComboboxList>\n    </ComboboxContent>\n</Combobox>")">
+			<Combobox @bind-Value="SelectedPlan" @bind-InputValue="PlanFilter">
+				<ComboboxInput Placeholder="Pick a plan" />
+				<ComboboxContent>
+					<ComboboxList>
+						<ComboboxItem Value="starter" Label="Starter">
+							<ComboboxItemText>
+								<ComboboxItemTitle>Starter</ComboboxItemTitle>
+								<ComboboxItemDescription>Up to 5 seats, community support.</ComboboxItemDescription>
+							</ComboboxItemText>
+						</ComboboxItem>
+						<ComboboxItem Value="team" Label="Team">
+							<ComboboxItemText>
+								<ComboboxItemTitle>Team</ComboboxItemTitle>
+								<ComboboxItemDescription>Unlimited seats, email support, usage dashboards.</ComboboxItemDescription>
+							</ComboboxItemText>
+						</ComboboxItem>
+						<ComboboxItem Value="enterprise" Label="Enterprise">
+							<ComboboxItemText>
+								<ComboboxItemTitle>Enterprise</ComboboxItemTitle>
+								<ComboboxItemDescription>Dedicated infra, SLAs, audit log exports.</ComboboxItemDescription>
+							</ComboboxItemText>
+						</ComboboxItem>
+					</ComboboxList>
+				</ComboboxContent>
+			</Combobox>
+		</ComponentExample>
+
+		<ComponentExample Title="Multi-select with chips" Code="@("<Combobox Multiple=\"true\" @bind-Values=\"selectedTags\" @bind-InputValue=\"tagFilter\">\n    <ComboboxChips>\n        @foreach (var v in selectedTags)\n        {\n            <ComboboxChip Value=\"@v\" />\n        }\n        <ComboboxChipsInput Placeholder=\"@(selectedTags.Count == 0 ? \"Add tags...\" : null)\" />\n    </ComboboxChips>\n    <ComboboxContent>\n        <ComboboxList>\n            <ComboboxItem Value=\"design\" Label=\"Design\" />\n            <ComboboxItem Value=\"engineering\" Label=\"Engineering\" />\n            <ComboboxItem Value=\"product\" Label=\"Product\" />\n            <ComboboxItem Value=\"research\" Label=\"Research\" />\n            <ComboboxItem Value=\"support\" Label=\"Support\" />\n        </ComboboxList>\n    </ComboboxContent>\n</Combobox>")">
+			<Combobox Multiple="true" @bind-Values="SelectedTags" @bind-InputValue="TagFilter">
+				<ComboboxChips>
+					@foreach ( var v in SelectedTags )
+					{
+						<ComboboxChip Value="@v" @key="v" />
+					}
+					<ComboboxChipsInput Placeholder="@(SelectedTags.Count == 0 ? "Add tags..." : null)" />
+				</ComboboxChips>
+				<ComboboxContent>
+					<ComboboxList>
+						<ComboboxItem Value="design" Label="Design" />
+						<ComboboxItem Value="engineering" Label="Engineering" />
+						<ComboboxItem Value="product" Label="Product" />
+						<ComboboxItem Value="research" Label="Research" />
+						<ComboboxItem Value="support" Label="Support" />
+					</ComboboxList>
+				</ComboboxContent>
+			</Combobox>
+		</ComponentExample>
+
+		<ComponentExample Title="Input group (decorated input)" Code="@("<Combobox @bind-Value=\"selectedTimezone\" @bind-InputValue=\"timezoneFilter\">\n    <ComboboxInput Placeholder=\"Select a timezone\">\n        <InputGroupAddon Align=\"InputGroupAlign.InlineStart\">\n            <Icon Svg=\"@IconSvg.Earth\" />\n        </InputGroupAddon>\n    </ComboboxInput>\n    <ComboboxContent>\n        <ComboboxList>\n            <ComboboxGroup>\n                <ComboboxLabel>Americas</ComboboxLabel>\n                <ComboboxItem Value=\"est\" Label=\"Eastern Standard Time (EST)\" />\n                <ComboboxItem Value=\"cst\" Label=\"Central Standard Time (CST)\" />\n                <ComboboxItem Value=\"mst\" Label=\"Mountain Standard Time (MST)\" />\n                <ComboboxItem Value=\"pst\" Label=\"Pacific Standard Time (PST)\" />\n            </ComboboxGroup>\n            <ComboboxSeparator />\n            <ComboboxGroup>\n                <ComboboxLabel>Europe &amp; Africa</ComboboxLabel>\n                <ComboboxItem Value=\"gmt\" Label=\"Greenwich Mean Time (GMT)\" />\n                <ComboboxItem Value=\"cet\" Label=\"Central European Time (CET)\" />\n                <ComboboxItem Value=\"eet\" Label=\"Eastern European Time (EET)\" />\n            </ComboboxGroup>\n            <ComboboxSeparator />\n            <ComboboxGroup>\n                <ComboboxLabel>Asia</ComboboxLabel>\n                <ComboboxItem Value=\"ist\" Label=\"India Standard Time (IST)\" />\n                <ComboboxItem Value=\"cst_china\" Label=\"China Standard Time (CST)\" />\n                <ComboboxItem Value=\"jst\" Label=\"Japan Standard Time (JST)\" />\n            </ComboboxGroup>\n        </ComboboxList>\n    </ComboboxContent>\n</Combobox>")">
+			<Combobox @bind-Value="SelectedTimezone" @bind-InputValue="TimezoneFilter">
+				<ComboboxInput Placeholder="Select a timezone">
+					<InputGroupAddon Align="InputGroupAlign.InlineStart">
+						<Icon Svg="@IconSvg.Earth" />
+					</InputGroupAddon>
+				</ComboboxInput>
+				<ComboboxContent>
+					<ComboboxList>
+						<ComboboxGroup>
+							<ComboboxLabel>Americas</ComboboxLabel>
+							<ComboboxItem Value="est" Label="Eastern Standard Time (EST)" />
+							<ComboboxItem Value="cst" Label="Central Standard Time (CST)" />
+							<ComboboxItem Value="mst" Label="Mountain Standard Time (MST)" />
+							<ComboboxItem Value="pst" Label="Pacific Standard Time (PST)" />
+						</ComboboxGroup>
+						<ComboboxSeparator />
+						<ComboboxGroup>
+							<ComboboxLabel>Europe &amp; Africa</ComboboxLabel>
+							<ComboboxItem Value="gmt" Label="Greenwich Mean Time (GMT)" />
+							<ComboboxItem Value="cet" Label="Central European Time (CET)" />
+							<ComboboxItem Value="eet" Label="Eastern European Time (EET)" />
+						</ComboboxGroup>
+						<ComboboxSeparator />
+						<ComboboxGroup>
+							<ComboboxLabel>Asia</ComboboxLabel>
+							<ComboboxItem Value="ist" Label="India Standard Time (IST)" />
+							<ComboboxItem Value="cst_china" Label="China Standard Time (CST)" />
+							<ComboboxItem Value="jst" Label="Japan Standard Time (JST)" />
+						</ComboboxGroup>
+					</ComboboxList>
+				</ComboboxContent>
+			</Combobox>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Combobox Disabled=\"true\" Value=\"apple\">\n    <ComboboxInput Placeholder=\"Disabled\" />\n    <ComboboxContent>\n        <ComboboxList>\n            <ComboboxItem Value=\"apple\" Label=\"Apple\" />\n        </ComboboxList>\n    </ComboboxContent>\n</Combobox>")">
+			<Combobox Disabled="true" Value="apple">
+				<ComboboxInput Placeholder="Disabled" />
+				<ComboboxContent>
+					<ComboboxList>
+						<ComboboxItem Value="apple" Label="Apple" />
+					</ComboboxList>
+				</ComboboxContent>
+			</Combobox>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? SelectedFruit;
+	private string? FruitFilter;
+
+	private string? SelectedColor;
+	private string? ColorFilter;
+
+	private string? SelectedFood;
+	private string? FoodFilter;
+
+	private string? SelectedPlan;
+	private string? PlanFilter;
+
+	private List<string> SelectedTags = [];
+	private string? TagFilter;
+
+	private string? SelectedTimezone;
+	private string? TimezoneFilter;
+
+	private static readonly ApiElement[] ComboboxElements =
+	[
+		new ApiElement(
+			Name: "Combobox",
+			Description: "Root state container. Holds the single (`Value`) or multi (`Values`) selection, the filter text (`InputValue`), and the open/highlight state; cascades itself so descendants can read and mutate that state.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",             "string?",                    false, "Selected value in single-select mode. Supports two-way binding via `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",      "EventCallback<string?>",     false, "Fires whenever `Value` changes. Pair with `Value` for two-way binding." ),
+				new ApiProperty( "Values",            "List<string>",               false, "Selected values in multi-select mode. Supports two-way binding via `@bind-Values`. Default: empty list." ),
+				new ApiProperty( "ValuesChanged",     "EventCallback<List<string>>",false, "Fires whenever `Values` changes. Pair with `Values` for two-way binding." ),
+				new ApiProperty( "Multiple",          "bool",                       false, "Enables multi-select mode. Pair with `Values`/`ValuesChanged` and a `ComboboxChips` wrapper. Default: `false`." ),
+				new ApiProperty( "InputValue",        "string?",                    false, "Filter text typed into the input. Items are matched against `Value` and `Label`. Supports two-way binding via `@bind-InputValue`." ),
+				new ApiProperty( "InputValueChanged", "EventCallback<string?>",     false, "Fires whenever `InputValue` changes. Pair with `InputValue` for two-way binding." ),
+				new ApiProperty( "Disabled",          "bool",                       false, "Disables the whole combobox (input, trigger, items). Default: `false`." ),
+				new ApiProperty( "ChildContent",      "RenderFragment?",            false, "Should contain a `ComboboxInput` (or `ComboboxChips`) and a `ComboboxContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxInput",
+			Description: "Decorated text input used as the combobox anchor in single-select mode. Wraps an `InputGroup` with a chevron/clear button and forwards keystrokes to `Combobox.HandleKeyDown`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Placeholder",          "string?",                    false, "Placeholder text shown when no value is selected and no filter is typed." ),
+				new ApiProperty( "ShowTrigger",          "bool",                       false, "When true, renders the chevron toggle button. Hidden automatically when a clear button is visible. Default: `true`." ),
+				new ApiProperty( "ShowClear",            "bool",                       false, "When true, renders an ✕ button that clears the selection and filter. Default: `false`." ),
+				new ApiProperty( "Disabled",             "bool",                       false, "Disables the input independently of the parent `Combobox.Disabled`. Default: `false`." ),
+				new ApiProperty( "Name",                 "string?",                    false, "Forwarded as the `<input>` `name` attribute for form submission." ),
+				new ApiProperty( "ClassName",            "string?",                    false, "Extra CSS classes appended to the outer `InputGroup`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",            false, "Slot for `InputGroupAddon` decorations (leading icons, trailing buttons)." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",false, "Captured unmatched attributes, forwarded to the underlying `<input>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxChips",
+			Description: "Wrapper used as the combobox anchor in multi-select mode. Hosts one `ComboboxChip` per selected value plus a `ComboboxChipsInput` for typing the filter.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the chips wrapper." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain a `ComboboxChip` per selected value and a `ComboboxChipsInput`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxChip",
+			Description: "Pill rendered for a single selected value in multi-select mode. Resolves its label from the `Combobox` label cache and optionally shows an ✕ remove button.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string",          true,  "The value this chip represents. Clicking ✕ removes it from `Combobox.Values`." ),
+				new ApiProperty( "ShowRemove",   "bool",            false, "Whether to render the ✕ remove button. Default: `true`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the chip." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Override the chip's label content. When omitted, the resolved label for `Value` is rendered." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxChipsInput",
+			Description: "The `<input>` that sits inside `ComboboxChips` and captures filter text in multi-select mode.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Placeholder",          "string?",                    false, "Placeholder text shown when no chips are present and no filter is typed." ),
+				new ApiProperty( "Disabled",             "bool",                       false, "Disables the input. Default: `false`." ),
+				new ApiProperty( "Name",                 "string?",                    false, "Forwarded as the `<input>` `name` attribute for form submission." ),
+				new ApiProperty( "ClassName",            "string?",                    false, "Extra CSS classes appended to the input." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",false, "Captured unmatched attributes, forwarded to the underlying `<input>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxContent",
+			Description: "The popup container for the filtered list. Always mounted (hidden via `display:none`) so `ComboboxItem` instances can register their labels even before the dropdown opens.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the popup container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain a `ComboboxList` and optionally a `ComboboxEmpty`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxList",
+			Description: "Scrollable container for the option rows. Tracks child `ComboboxGroup` / `ComboboxItem` / `ComboboxSeparator` registration so separators can hide themselves when stranded.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the list element." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Items, groups, and separators." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxGroup",
+			Description: "Groups related items under a `ComboboxLabel`. Registers its items so the label can hide itself when every child is filtered out.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Disabled",     "bool",            false, "When true, disables every `ComboboxItem` inside this group (item-level `Disabled` is unioned with this). Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the group wrapper." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain a `ComboboxLabel` followed by `ComboboxItem` rows." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxLabel",
+			Description: "Non-interactive heading for a `ComboboxGroup`. Automatically hidden when its parent group has no items matching the current filter.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the label." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Label text." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxItem",
+			Description: "A selectable option row. Registers with the parent `Combobox` and (optional) `ComboboxGroup`, and matches the current filter on its `Value` or `Label`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string?",         true,  "The value this item represents. Returned via `Value`/`Values` when selected." ),
+				new ApiProperty( "Label",        "string?",         false, "Display text shown in the popup and cached for `ComboboxChip` / selected-label rendering." ),
+				new ApiProperty( "Disabled",     "bool",            false, "Disables this item independently of its group/combobox. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the item element." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Custom item body (use with `ComboboxItemText`/`ComboboxItemTitle`/`ComboboxItemDescription`). When omitted, the `Label` or raw `Value` is rendered." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxItemText",
+			Description: "Two-line text container placed inside a `ComboboxItem`. Holds a `ComboboxItemTitle` and a `ComboboxItemDescription`.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the text column." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain `ComboboxItemTitle` and `ComboboxItemDescription`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxItemTitle",
+			Description: "Primary line inside a `ComboboxItemText`. Rendered in semibold.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the title." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Title text." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxItemDescription",
+			Description: "Secondary line inside a `ComboboxItemText`. Rendered in a muted colour at smaller type.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the description." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Description text." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxSeparator",
+			Description: "Decorative divider between groups. Hides itself automatically when it would be stranded (first, last, or stacked next to another visible separator).",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName", "string?", false, "Extra CSS classes appended to the separator." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxEmpty",
+			Description: "Placeholder rendered when no items match the current filter. Uses CSS `:has()` to hide itself whenever at least one item is visible.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the empty-state element." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Message to display when no items match." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxTrigger",
+			Description: "Alternative button-style anchor (dropdown trigger). Toggles the popup and inherits the chevron affordance.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Disabled",             "bool",                       false, "Disables the trigger button. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                    false, "Extra CSS classes appended to the `<button>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",            false, "Trigger label — typically a `ComboboxValue`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",false, "Captured unmatched attributes, forwarded to the underlying `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxValue",
+			Description: "Read-only display of the current single-select label, with a fallback placeholder. Use inside a `ComboboxTrigger` when you don't want a text input.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Placeholder",  "string?",         false, "Muted text shown when no value is selected." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Override the displayed content. When omitted, the resolved label for `Value` is rendered." ),
+			]
+		),
+		new ApiElement(
+			Name: "ComboboxCollection",
+			Description: "Generic helper for binding a collection to the list. Iterates `Items` and renders `ItemTemplate` for each — lets you stamp out `ComboboxItem` rows from a data source without a hand-written `@foreach`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Items",        "IEnumerable<TItem>?",   false, "Source collection. Each element is passed to `ItemTemplate`." ),
+				new ApiProperty( "ItemTemplate", "RenderFragment<TItem>?",false, "Template rendered once per item. Typically produces a `ComboboxItem`." ),
+			]
+		),
+	];
+}

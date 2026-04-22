@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<fieldset data-slot="fieldset" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+</fieldset>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "flex flex-col gap-2" )
+										.With( ClassName )
+										.Build();
+}

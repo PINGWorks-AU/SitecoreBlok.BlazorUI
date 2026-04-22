@@ -1,0 +1,17 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<legend data-slot="field-legend" class="@CssClass">
+	@ChildContent
+</legend>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public FieldLegendVariant Variant { get; set; } = FieldLegendVariant.Legend;
+
+	private string CssClass => CssClassBuilder.Start()
+										.With( "text-lg font-semibold", Variant is FieldLegendVariant.Legend )
+										.With( "text-md font-medium", Variant is FieldLegendVariant.Label )
+										.With( ClassName )
+										.Build();
+}

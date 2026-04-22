@@ -1,0 +1,92 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="error-states" class="@CssClass">
+	<div class="flex flex-col items-center text-center gap-6 max-w-sm my-4">
+		<div class="w-32 h-32 [&>svg]:w-full [&>svg]:h-full">
+			@((MarkupString)ResolvedIllustration)
+		</div>
+
+		<div class="flex flex-col items-center gap-1.5">
+			<h1 class="text-2xl font-semibold">@ResolvedTitle</h1>
+			@if ( ResolvedErrorCode is not null )
+			{
+				<p class="text-sm text-muted-foreground">@ResolvedErrorCode</p>
+			}
+		</div>
+
+		<p class="text-base">@ResolvedDescription</p>
+
+		@if ( ChildContent is not null )
+		{
+			@ChildContent
+		}
+		else
+		{
+			<div class="flex flex-col items-center gap-2">
+				<Button Variant="ButtonVariant.Link" Click="OnRetry">Go to homepage</Button>
+			</div>
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public ErrorStateVariant Variant { get; set; } = ErrorStateVariant.Generic;
+	[Parameter] public string? Title { get; set; }
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public string? ErrorCode { get; set; }
+	[Parameter] public string? Illustration { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public EventCallback OnRetry { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "flex items-center justify-center h-full" )
+										.With( ClassName )
+										.Build();
+
+	private string ResolvedTitle => Title ?? Variant switch
+	{
+		ErrorStateVariant.Generic => "Something went wrong",
+		ErrorStateVariant.Http400 => "Bad request",
+		ErrorStateVariant.Http401 => "Unauthorized",
+		ErrorStateVariant.Http403 => "Forbidden",
+		ErrorStateVariant.Http404 => "Page not found",
+		ErrorStateVariant.Http500 => "Internal server error",
+		ErrorStateVariant.Http503 => "Service unavailable",
+		_ => "Something went wrong"
+	};
+
+	private string ResolvedDescription => Description ?? Variant switch
+	{
+		ErrorStateVariant.Generic => "Please try again. If the issue persists, contact support for assistance.",
+		ErrorStateVariant.Http400 => "The server could not understand the request. Please check your input and try again.",
+		ErrorStateVariant.Http401 => "You need to sign in to access this page.",
+		ErrorStateVariant.Http403 => "You don't have permission to access this page.",
+		ErrorStateVariant.Http404 => "The page you are looking for cannot be found.",
+		ErrorStateVariant.Http500 => "This page isn't working. Please try again later.",
+		ErrorStateVariant.Http503 => "The service you requested is not available at this time.",
+		_ => "Please try again."
+	};
+
+	private string? ResolvedErrorCode => ErrorCode ?? Variant switch
+	{
+		ErrorStateVariant.Http400 => "Error 400",
+		ErrorStateVariant.Http401 => "Error 401",
+		ErrorStateVariant.Http403 => "Error 403",
+		ErrorStateVariant.Http404 => "Error 404",
+		ErrorStateVariant.Http500 => "Error 500",
+		ErrorStateVariant.Http503 => "Error 503",
+		_ => null
+	};
+
+	private string ResolvedIllustration => Illustration ?? Variant switch
+	{
+		ErrorStateVariant.Generic => IllustrationSvg.Color.Alert,
+		ErrorStateVariant.Http400 => IllustrationSvg.Color.AlertCircle,
+		ErrorStateVariant.Http401 => IllustrationSvg.Color.Stop,
+		ErrorStateVariant.Http403 => IllustrationSvg.Color.Lock,
+		ErrorStateVariant.Http404 => IllustrationSvg.Color.MapSearch,
+		ErrorStateVariant.Http500 => IllustrationSvg.Color.AlertCircle,
+		ErrorStateVariant.Http503 => IllustrationSvg.Color.WrenchClock,
+		_ => IllustrationSvg.Color.Alert
+	};
+}

@@ -1,0 +1,70 @@
+@inject IJSRuntime JS
+
+<div class="pt-8 first:pt-0">
+	@if ( !string.IsNullOrEmpty( Title ) )
+	{
+		<h3 id="@Anchor" class="text-lg font-semibold mb-5 text-foreground scroll-mt-20">@Title</h3>
+	}
+
+	<div class="rounded-lg overflow-hidden">
+		<Tabs DefaultValue="preview" OnTabChanged="OnTabChanged">
+			<TabsList ClassName="border-b border-border px-2 bg-muted/30">
+				<TabsTrigger Value="preview" Variant="TabsVariant.Line">Preview</TabsTrigger>
+				@if ( !string.IsNullOrEmpty( Code ) )
+				{
+					<TabsTrigger Value="code" Variant="TabsVariant.Line">Code</TabsTrigger>
+				}
+			</TabsList>
+
+			<TabsContent Value="preview">
+				@* PreviewClassName is appended AFTER the defaults so pages can override
+				   padding/background with Tailwind's `!` important utilities when a sample
+				   needs extra breathing room (e.g. to avoid tooltip clipping). *@
+				<div class="@PreviewCssClass">
+					@ChildContent
+				</div>
+			</TabsContent>
+
+			@if ( !string.IsNullOrEmpty( Code ) )
+			{
+				<TabsContent Value="code">
+					<CodeViewer Code="@Code" ClassName="!rounded-none !m-0" />
+				</TabsContent>
+			}
+		</Tabs>
+	</div>
+</div>
+
+@code {
+	[Parameter] public string? Title { get; set; }
+	[Parameter] public string? Code { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	// Extra classes for the preview wrapper. Use `!`-prefixed Tailwind utilities to
+	// override the defaults (e.g. `!p-12` for extra padding around tooltip-bearing samples).
+	[Parameter] public string? PreviewClassName { get; set; }
+
+	// Cascaded from ExamplesSection (if present). Registering through the section,
+	// instead of the global PageTocRegistry directly, preserves markup order in the ToC.
+	[CascadingParameter] public TocSection? ParentTocSection { get; set; }
+
+	private string PreviewCssClass => string.IsNullOrEmpty( PreviewClassName )
+		? "p-6 bg-background"
+		: $"p-6 bg-background {PreviewClassName}";
+
+	private string? Anchor => string.IsNullOrEmpty( Title ) ? null : PageTocRegistry.Slugify( Title );
+
+	protected override void OnInitialized()
+	{
+		if ( ParentTocSection is not null && !string.IsNullOrEmpty( Title ) && Anchor is not null )
+			ParentTocSection.AddChild( Title, Anchor );
+	}
+
+	private async Task OnTabChanged( string? value )
+	{
+		if ( value == "code" )
+		{
+			await Task.Yield();
+			await JS.InvokeVoidAsync( "Prism.highlightAll" );
+		}
+	}
+}

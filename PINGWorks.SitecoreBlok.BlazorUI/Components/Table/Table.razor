@@ -1,0 +1,65 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="this">
+	<div data-slot="table-container" class="@ContainerCssClass" style="@ContainerStyle">
+		<div class="@ScrollCssClass">
+			<table data-slot="table" data-table-size="@( Size.ToString().ToLowerInvariant() )" class="@CssClass">
+				@ChildContent
+			</table>
+		</div>
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? ContainerClassName { get; set; }
+	[Parameter] public TableSize Size { get; set; } = TableSize.Md;
+	[Parameter] public bool StickyHeader { get; set; } = true;
+	[Parameter] public string? MaxHeight { get; set; }
+	[Parameter] public string? MaxWidth { get; set; }
+
+	internal bool IsStickyHeader => StickyHeader && MaxHeight is not null;
+
+	internal string SizeHeaderClasses => Size switch
+	{
+		TableSize.Sm => "h-[26px] min-h-[26px] py-1 px-4",
+		TableSize.Lg => "h-[42px] min-h-[42px] py-3 px-5",
+		_ => "h-[34px] min-h-[34px] py-2 px-5"
+	};
+
+	internal string SizeCellClasses => Size switch
+	{
+		TableSize.Sm => "min-h-[36px] py-1 px-4",
+		TableSize.Lg => "min-h-[56px] py-3 px-5",
+		_ => "min-h-[48px] py-2 px-5"
+	};
+
+	private string? ContainerStyle
+	{
+		get
+		{
+			var parts = new List<string>();
+			if ( MaxHeight is not null ) { parts.Add( $"max-height:{MaxHeight}" ); parts.Add( $"height:{MaxHeight}" ); }
+			if ( MaxWidth is not null ) parts.Add( $"max-width:{MaxWidth}" );
+			return parts.Count > 0 ? string.Join( ";", parts ) : null;
+		}
+	}
+
+	// `parity-no-text-pair`: the table container has no own text; cells (TableCell,
+	// TableHead) set text colour explicitly.
+	private string ContainerCssClass => CssClassBuilder.Start( "relative w-full overflow-hidden rounded-xl bg-background parity-no-text-pair" )
+										.With( "flex flex-col", MaxHeight is not null )
+										.With( ContainerClassName )
+										.Build();
+
+	private string ScrollCssClass => CssClassBuilder.Start( "w-full" )
+										.With( "min-h-0 flex-1 overflow-y-auto", MaxHeight is not null )
+										.With( "overflow-x-auto", MaxWidth is not null )
+										.With( "overflow-x-hidden", MaxHeight is not null && MaxWidth is null )
+										.Build();
+
+	private string CssClass => CssClassBuilder.Start( "w-full caption-bottom text-sm border-separate border-spacing-0" )
+										.With( ClassName )
+										.Build();
+}

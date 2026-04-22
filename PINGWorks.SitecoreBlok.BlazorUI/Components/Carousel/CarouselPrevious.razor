@@ -1,0 +1,21 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button data-slot="carousel-previous" type="button" disabled="@( !Parent.CanScrollPrev )"
+		class="@CssClass" @onclick="Parent.ScrollPrev">
+	<Icon Svg="@IconSvg.ChevronLeft" Scale="0.9" ResetClassName />
+	<span class="sr-only">Previous slide</span>
+</button>
+
+@code {
+	[CascadingParameter] public required Carousel Parent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	// `parity-no-text-pair`: icon-only button — no text content.
+	private string CssClass => CssClassBuilder.Start(
+		"absolute z-10 inline-flex items-center justify-center size-8 rounded-full border border-border bg-background shadow-sm cursor-pointer transition-colors parity-no-text-pair",
+		"hover:bg-neutral-bg disabled:opacity-50 disabled:cursor-not-allowed" )
+										.With( "left-2 top-1/2 -translate-y-1/2", Parent.Orientation is CarouselOrientation.Horizontal )
+										.With( "top-2 left-1/2 -translate-x-1/2", Parent.Orientation is CarouselOrientation.Vertical )
+										.With( ClassName )
+										.Build();
+}

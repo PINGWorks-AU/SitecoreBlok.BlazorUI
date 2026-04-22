@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<p class="@CssClass">
+	@ChildContent
+</p>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "text-center text-sm text-muted-foreground" )
+											.With( ClassName )
+											.Build();
+}

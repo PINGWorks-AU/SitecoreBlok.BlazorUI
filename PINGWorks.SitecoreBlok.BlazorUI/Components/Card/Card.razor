@@ -1,0 +1,49 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="card" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	[Parameter] public CardElevation Elevation { get; set; } = CardElevation.None;
+	[Parameter] public CardElevation? HoverElevation { get; set; }
+	[Parameter] public CardStyle Style { get; set; } = CardStyle.Flat;
+	[Parameter] public CardPadding Padding { get; set; } = CardPadding.Lg;
+
+	private bool HasHover => HoverElevation.HasValue && HoverElevation.Value != Elevation;
+
+	private string CssClass => CssClassBuilder.Start( "flex flex-col gap-6 border transition-shadow focus-visible:outline-none" )
+										// base elevation
+										.With( "shadow-none", Elevation is CardElevation.None )
+										.With( "shadow-xs", Elevation is CardElevation.Xs )
+										.With( "shadow-sm", Elevation is CardElevation.Sm )
+										.With( "shadow-base", Elevation is CardElevation.Base )
+										.With( "shadow-md", Elevation is CardElevation.Md )
+										.With( "shadow-lg", Elevation is CardElevation.Lg )
+										.With( "shadow-xl", Elevation is CardElevation.Xl )
+
+										// hover elevation (only when different from base)
+										.With( "hover:shadow-none", HasHover && HoverElevation is CardElevation.None )
+										.With( "hover:shadow-xs", HasHover && HoverElevation is CardElevation.Xs )
+										.With( "hover:shadow-sm", HasHover && HoverElevation is CardElevation.Sm )
+										.With( "hover:shadow-base", HasHover && HoverElevation is CardElevation.Base )
+										.With( "hover:shadow-md", HasHover && HoverElevation is CardElevation.Md )
+										.With( "hover:shadow-lg", HasHover && HoverElevation is CardElevation.Lg )
+										.With( "hover:shadow-xl", HasHover && HoverElevation is CardElevation.Xl )
+
+										// style
+										.With( "bg-background text-foreground border-transparent", Style is CardStyle.Flat )
+										.With( "bg-background text-foreground border-border", Style is CardStyle.Outline )
+										.With( "bg-subtle-bg text-foreground border-transparent", Style is CardStyle.Filled )
+
+										// padding
+										.With( "px-3 py-3 rounded-base", Padding is CardPadding.Sm )
+										.With( "px-5 py-5 rounded-md", Padding is CardPadding.Md )
+										.With( "px-7 py-7 rounded-lg", Padding is CardPadding.Lg )
+										.With( ClassName )
+										.Build();
+}

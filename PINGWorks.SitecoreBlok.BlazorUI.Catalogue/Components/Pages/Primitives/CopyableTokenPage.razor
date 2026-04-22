@@ -1,0 +1,92 @@
+@page "/primitives/copyabletoken"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+@*  One-off padding override on this page.
+	---------------------------------------
+	Every <ComponentExample> on this page passes PreviewClassName="!p-12" instead of
+	relying on the default p-6. CopyableToken shows a hover/click tooltip that floats
+	above the token; with the standard p-6 the tooltip clips against the preview area's
+	rounded border on the short edges. p-12 gives the tooltip room to render in full.
+
+	If this page is regenerated or edited in future, KEEP the PreviewClassName="!p-12"
+	override on every ComponentExample until the tooltip is redesigned (or the preview
+	container supports overflow-visible without breaking other components). Removing it
+	will re-introduce the clipping regression.
+*@
+
+<ComponentPage Title="CopyableToken" Description="Click-to-copy token displayed as an inline code label" Interactivity="ComponentInteractivity.Interactive" ApiElements="@CopyableTokenElements">
+
+	<DivergenceNote>
+		<p><strong>Interactive feedback beyond Blok.</strong> Blok's source renders a static tooltip with <code>Copy to clipboard</code> and silently copies on click. BlazorUI additionally:</p>
+		<ul class="list-disc pl-5 space-y-1 text-sm">
+			<li>Swaps the tooltip text to a confirmation message on click, then hides the tooltip after 1s (reset when the cursor leaves the token).</li>
+			<li>Exposes <code>CopyMessage</code> (default <code>"Copy to clipboard"</code>) and <code>CopiedMessage</code> (default <code>"Copied"</code>) parameters so callers can localise or re-word the states.</li>
+			<li>Fires a <code>Clicked</code> <code>EventCallback&lt;string&gt;</code> with the copied value so callers can react (analytics, a secondary toast, audit logging).</li>
+		</ul>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" PreviewClassName="!p-12" Code="@("<CopyableToken Token=\"api-key-4f2a9c71\" />")">
+			<CopyableToken Token="api-key-4f2a9c71" />
+		</ComponentExample>
+
+		<ComponentExample Title="UUID token" PreviewClassName="!p-12" Code="@("<CopyableToken Token=\"3b5e4d2f-7a1c-4f9b-8d6e-1a2b3c4d5e6f\" />")">
+			<CopyableToken Token="3b5e4d2f-7a1c-4f9b-8d6e-1a2b3c4d5e6f" />
+		</ComponentExample>
+
+		<ComponentExample Title="Inline within prose" PreviewClassName="!p-12" Code="@("<p class=\"text-sm\">\n    Run <CopyableToken Token=\"npm install\" /> in the project root to install dependencies.\n</p>")">
+			<p class="text-sm">
+				Run <CopyableToken Token="npm install" /> in the project root to install dependencies.
+			</p>
+		</ComponentExample>
+
+		<ComponentExample Title="Multiple tokens in a stack" PreviewClassName="!p-12" Code="@("<div class=\"flex flex-col items-start gap-2\">\n    <CopyableToken Token=\"client_id\" />\n    <CopyableToken Token=\"client_secret\" />\n    <CopyableToken Token=\"redirect_uri\" />\n</div>")">
+			<div class="flex flex-col items-start gap-2">
+				<CopyableToken Token="client_id" />
+				<CopyableToken Token="client_secret" />
+				<CopyableToken Token="redirect_uri" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Custom messages" PreviewClassName="!p-12" Code="@("<CopyableToken Token=\"sk-live-9f2a\"\n                CopyMessage=\"Click to copy secret\"\n                CopiedMessage=\"Secret copied!\" />")">
+			<CopyableToken Token="sk-live-9f2a"
+			               CopyMessage="Click to copy secret"
+			               CopiedMessage="Secret copied!" />
+		</ComponentExample>
+
+		<ComponentExample Title="Clicked callback" PreviewClassName="!p-12" Code="@("<CopyableToken Token=\"abc-123-def\" Clicked=\"OnCopy\" />\n@if (LastCopied is not null)\n{\n    <p class=\"text-sm text-muted-foreground mt-2\">Last copied: <code>@LastCopied</code></p>\n}\n\n@code {\n    private string? LastCopied;\n    private void OnCopy(string value) => LastCopied = value;\n}")">
+			<CopyableToken Token="abc-123-def" Clicked="OnCopy" />
+			@if ( LastCopied is not null )
+			{
+				<p class="text-sm text-muted-foreground mt-2">Last copied: <code>@LastCopied</code></p>
+			}
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? LastCopied;
+	private void OnCopy( string value ) => LastCopied = value;
+
+	private static readonly ApiElement[] CopyableTokenElements =
+	[
+		new ApiElement(
+			Name: "CopyableToken",
+			Description: "Inline `<code>` label that copies `Token` to the clipboard when clicked. Wraps a `Tooltip` that swaps from `CopyMessage` to `CopiedMessage` for a brief confirmation window.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Token",                "string",                     true,  "Text to display and copy to the clipboard on click." ),
+				new ApiProperty( "CopyMessage",          "string",                     false, "Tooltip text shown on hover before clicking. Default: `\"Copy to clipboard\"`." ),
+				new ApiProperty( "CopiedMessage",        "string",                     false, "Tooltip text shown briefly after a successful copy. Default: `\"Copied\"`." ),
+				new ApiProperty( "Clicked",              "EventCallback<string>",      false, "Fires with the copied value after the clipboard write succeeds. Useful for analytics or audit logging." ),
+				new ApiProperty( "ClassName",            "string?",                    false, "Extra CSS classes appended to the token `<code>` element." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",false, "Captured unmatched attributes, forwarded to the token `<code>` element." ),
+			]
+		),
+	];
+}

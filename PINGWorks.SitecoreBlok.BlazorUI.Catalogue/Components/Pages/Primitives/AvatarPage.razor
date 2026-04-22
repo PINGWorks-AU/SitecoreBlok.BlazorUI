@@ -1,0 +1,186 @@
+@page "/primitives/avatar"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Avatar" Description="An image element with a fallback for representing the user" Interactivity="ComponentInteractivity.Ssr" ApiElements="@AvatarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With image" Code="@("<Avatar>\n    <AvatarImage Src=\"https://i.pravatar.cc/40\" Alt=\"User avatar\" />\n    <AvatarFallback>RH</AvatarFallback>\n</Avatar>")">
+			<Avatar>
+				<AvatarImage Src="https://i.pravatar.cc/40" Alt="User avatar" />
+				<AvatarFallback>RH</AvatarFallback>
+			</Avatar>
+		</ComponentExample>
+
+		<ComponentExample Title="With fallback only" Code="@("<Avatar>\n    <AvatarFallback>RH</AvatarFallback>\n</Avatar>")">
+			<Avatar>
+				<AvatarFallback>RH</AvatarFallback>
+			</Avatar>
+		</ComponentExample>
+
+		<ComponentExample Title="Fallback after image error" Code="@("<Avatar>\n    <AvatarImage Src=\"https://example.invalid/missing.png\" Alt=\"Broken\" />\n    <AvatarFallback>!</AvatarFallback>\n</Avatar>")">
+			<Avatar>
+				<AvatarImage Src="https://example.invalid/missing.png" Alt="Broken" />
+				<AvatarFallback>!</AvatarFallback>
+			</Avatar>
+		</ComponentExample>
+
+		<ComponentExample Title="Sizes" Code="@("<Avatar ClassName=\"size-6\">...</Avatar>\n<Avatar ClassName=\"size-8\">...</Avatar>\n<Avatar ClassName=\"size-10\">...</Avatar>\n<Avatar ClassName=\"size-14\">...</Avatar>\n<Avatar ClassName=\"size-20\">...</Avatar>")">
+			<div class="flex items-end gap-3">
+				<Avatar ClassName="size-6">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=1" />
+					<AvatarFallback>1</AvatarFallback>
+				</Avatar>
+				<Avatar ClassName="size-8">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=2" />
+					<AvatarFallback>2</AvatarFallback>
+				</Avatar>
+				<Avatar ClassName="size-10">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=3" />
+					<AvatarFallback>3</AvatarFallback>
+				</Avatar>
+				<Avatar ClassName="size-14">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=4" />
+					<AvatarFallback>4</AvatarFallback>
+				</Avatar>
+				<Avatar ClassName="size-20">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=5" />
+					<AvatarFallback>5</AvatarFallback>
+				</Avatar>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Large" Code="@("<Avatar ClassName=\"size-20\">\n    <AvatarImage Src=\"...\" Alt=\"User avatar\" />\n    <AvatarFallback>RH</AvatarFallback>\n</Avatar>")">
+			<Avatar ClassName="size-20">
+				<AvatarImage Src="https://i.pravatar.cc/80" Alt="User avatar" />
+				<AvatarFallback>RH</AvatarFallback>
+			</Avatar>
+		</ComponentExample>
+
+		<ComponentExample Title="Overlapped" Code="@("<div class=\"flex -space-x-2\">\n    <Avatar ClassName=\"ring-2 ring-background\">...</Avatar>\n    ...\n    <Avatar ClassName=\"ring-2 ring-background\">\n        <AvatarFallback>+5</AvatarFallback>\n    </Avatar>\n</div>")">
+			<div class="flex -space-x-2">
+				<Avatar ClassName="ring-2 ring-background">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=a" />
+					<AvatarFallback>A</AvatarFallback>
+				</Avatar>
+				<Avatar ClassName="ring-2 ring-background">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=b" />
+					<AvatarFallback>B</AvatarFallback>
+				</Avatar>
+				<Avatar ClassName="ring-2 ring-background">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=c" />
+					<AvatarFallback>C</AvatarFallback>
+				</Avatar>
+				<Avatar ClassName="ring-2 ring-background">
+					<AvatarImage Src="https://i.pravatar.cc/40?u=d" />
+					<AvatarFallback>D</AvatarFallback>
+				</Avatar>
+				<Avatar ClassName="ring-2 ring-background">
+					<AvatarFallback>+5</AvatarFallback>
+				</Avatar>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Interactive (hover to spread)" Code="@("<div class=\"*:data-[slot=avatar]:ring-background flex -space-x-2 hover:space-x-1\n            *:data-[slot=avatar]:size-12 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale\n            *:data-[slot=avatar]:transition-all *:data-[slot=avatar]:duration-300 *:data-[slot=avatar]:ease-in-out\">\n    <Avatar><AvatarImage Src=\"...\" Alt=\"...\" /><AvatarFallback>SB</AvatarFallback></Avatar>\n    <Avatar><AvatarImage Src=\"...\" Alt=\"...\" /><AvatarFallback>PS</AvatarFallback></Avatar>\n    <Avatar><AvatarImage Src=\"...\" Alt=\"...\" /><AvatarFallback>ST</AvatarFallback></Avatar>\n</div>")">
+			<div class="*:data-[slot=avatar]:ring-background flex -space-x-2 hover:space-x-1
+						*:data-[slot=avatar]:size-12 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale
+						*:data-[slot=avatar]:transition-all *:data-[slot=avatar]:duration-300 *:data-[slot=avatar]:ease-in-out">
+				<Avatar>
+					<AvatarImage Src="https://i.pravatar.cc/80?u=spongebob" Alt="Spongebob" />
+					<AvatarFallback>SB</AvatarFallback>
+				</Avatar>
+				<Avatar>
+					<AvatarImage Src="https://i.pravatar.cc/80?u=patrick" Alt="Patrick Star" />
+					<AvatarFallback>PS</AvatarFallback>
+				</Avatar>
+				<Avatar>
+					<AvatarImage Src="https://i.pravatar.cc/80?u=squidward" Alt="Squidward" />
+					<AvatarFallback>ST</AvatarFallback>
+				</Avatar>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Click target" Code="@("<button type=\"button\" class=\"rounded-full focus-visible:ring-2 focus-visible:ring-primary outline-none\" @onclick=\"OnClick\">\n    <Avatar ClassName=\"transition hover:opacity-80 cursor-pointer\">\n        <AvatarImage Src=\"...\" />\n        <AvatarFallback>U</AvatarFallback>\n    </Avatar>\n</button>")">
+			<div class="flex items-center gap-4">
+				<button type="button" class="rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none"
+						@onclick="@(() => ClickCount++)">
+					<Avatar ClassName="transition hover:opacity-80 cursor-pointer">
+						<AvatarImage Src="https://i.pravatar.cc/40?u=interactive" />
+						<AvatarFallback>U</AvatarFallback>
+					</Avatar>
+				</button>
+				<span class="text-sm text-muted-foreground">Clicked @ClickCount time@(ClickCount == 1 ? "" : "s")</span>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Menu trigger" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger ClassName=\"rounded-full\">\n        <Avatar ClassName=\"cursor-pointer\">\n            <AvatarImage Src=\"...\" />\n            <AvatarFallback>U</AvatarFallback>\n        </Avatar>\n    </DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuItem>Profile</DropdownMenuItem>\n        ...\n    </DropdownMenuContent>\n</DropdownMenu>")">
+			<DropdownMenu>
+				<DropdownMenuTrigger ClassName="rounded-full">
+					<Avatar ClassName="cursor-pointer">
+						<AvatarImage Src="https://i.pravatar.cc/40?u=menu" />
+						<AvatarFallback>U</AvatarFallback>
+					</Avatar>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent>
+					<DropdownMenuGroup>
+						<DropdownMenuItem>
+							<Icon Svg="@IconSvg.Account" ClassName="size-4" /> Profile
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<Icon Svg="@IconSvg.Cog" ClassName="size-4" /> Settings
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive">
+							<Icon Svg="@IconSvg.Logout" ClassName="size-4" /> Sign out
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private int ClickCount;
+
+	private static readonly ApiElement[] AvatarElements =
+	[
+		new ApiElement(
+			Name: "Avatar",
+			Description: "Circular container that cascades itself to `AvatarImage` and `AvatarFallback` so they can coordinate on image load state. Size via `ClassName` with a Tailwind `size-*` utility.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the avatar wrapper. Use `size-*` here to resize." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Usually `AvatarImage` + `AvatarFallback`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the avatar wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "AvatarImage",
+			Description: "Renders an `<img>` inside the parent `Avatar`. Hides itself and flips the parent to the errored state if the image fails to load so `AvatarFallback` can take over.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Src",                  "string?",                       false, "Image URL. When null or empty, the component renders nothing and the fallback is shown." ),
+				new ApiProperty( "Alt",                  "string?",                       false, "Alt text forwarded to the underlying `<img>`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<img>`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<img>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "AvatarFallback",
+			Description: "Text or icon shown when `AvatarImage` has no `Src` or its load errored. Rendered centred with a muted background.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the fallback span." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Usually initials or a placeholder icon." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the fallback span." ),
+			]
+		),
+	];
+}

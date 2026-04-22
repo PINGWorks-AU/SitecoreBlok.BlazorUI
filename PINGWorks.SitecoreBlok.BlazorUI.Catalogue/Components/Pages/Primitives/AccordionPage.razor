@@ -1,0 +1,90 @@
+@page "/primitives/accordion"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Accordion" Description="A vertically stacked set of interactive headings that each reveal a section of content" Interactivity="ComponentInteractivity.Interactive" ApiElements="@AccordionElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Single (default)" Code="@("<Accordion>\n    <AccordionItem>\n        <AccordionTrigger>Is it accessible?</AccordionTrigger>\n        <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>\n    </AccordionItem>\n    <AccordionItem>\n        <AccordionTrigger>Is it styled?</AccordionTrigger>\n        <AccordionContent>Yes. It comes with default styles that match the design system.</AccordionContent>\n    </AccordionItem>\n    <AccordionItem>\n        <AccordionTrigger>Is it animated?</AccordionTrigger>\n        <AccordionContent>Yes. It uses CSS animations for smooth transitions.</AccordionContent>\n    </AccordionItem>\n</Accordion>")">
+			<Accordion>
+				<AccordionItem>
+					<AccordionTrigger>Is it accessible?</AccordionTrigger>
+					<AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
+				</AccordionItem>
+				<AccordionItem>
+					<AccordionTrigger>Is it styled?</AccordionTrigger>
+					<AccordionContent>Yes. It comes with default styles that match the design system.</AccordionContent>
+				</AccordionItem>
+				<AccordionItem>
+					<AccordionTrigger>Is it animated?</AccordionTrigger>
+					<AccordionContent>Yes. It uses CSS animations for smooth transitions.</AccordionContent>
+				</AccordionItem>
+			</Accordion>
+		</ComponentExample>
+
+		<ComponentExample Title="Multiple" Code="@("<Accordion Type=\"AccordionType.Multiple\">\n    <AccordionItem>\n        <AccordionTrigger>Section One</AccordionTrigger>\n        <AccordionContent>Content for section one.</AccordionContent>\n    </AccordionItem>\n    <AccordionItem>\n        <AccordionTrigger>Section Two</AccordionTrigger>\n        <AccordionContent>Content for section two.</AccordionContent>\n    </AccordionItem>\n</Accordion>")">
+			<Accordion Type="AccordionType.Multiple">
+				<AccordionItem>
+					<AccordionTrigger>Section One</AccordionTrigger>
+					<AccordionContent>Content for section one. You can open multiple sections at the same time.</AccordionContent>
+				</AccordionItem>
+				<AccordionItem>
+					<AccordionTrigger>Section Two</AccordionTrigger>
+					<AccordionContent>Content for section two. This section can be open alongside section one.</AccordionContent>
+				</AccordionItem>
+			</Accordion>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AccordionElements =
+	[
+		new ApiElement(
+			Name: "Accordion",
+			Description: "Root of the accordion. Controls expand-one-at-a-time versus expand-many behaviour and registers its `AccordionItem` children via a cascading value.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Type",         "AccordionType",    false, "Expansion mode. Default: `AccordionType.Single` (opening one item closes the others). Other value: `Multiple` (independent open state per item)." ),
+				new ApiProperty( "Disabled",     "bool",             false, "Disables every item. Item-level `Disabled` is unioned with this. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the outer container." ),
+				new ApiProperty( "ChildContent", "RenderFragment",   true,  "The accordion's items. Must contain one or more `AccordionItem` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "AccordionItem",
+			Description: "A single expandable row inside the `Accordion`. Holds its own open/closed state and registers with the parent on initialisation.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Disabled",     "bool",             false, "When true, this item cannot be toggled even if the parent is enabled. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the item wrapper." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Should contain one `AccordionTrigger` and one `AccordionContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "AccordionTrigger",
+			Description: "The clickable heading row that toggles its `AccordionItem`. Renders the chevron icon and handles the rotation animation when open.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the trigger button." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Trigger label — typically a string or inline markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "AccordionContent",
+			Description: "The revealed body of an `AccordionItem`. Uses a grid-template-rows 0fr→1fr transition so open/close animates smoothly without JS measurement.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the inner content wrapper." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "The body content revealed when the item is open." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,137 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button data-slot="button" class="@CssClass" type="button" @onclick="Click" disabled="@Disabled"
+		@attributes="AdditionalAttributes">
+
+	@if ( ChildContent is not null )
+	{
+		@ChildContent
+	}
+	else
+	{
+		@if ( StartIconSvg is not null )
+		{
+			<Icon Svg="@StartIconSvg" />
+		}
+
+		@Title
+
+		@if ( EndIconSvg is not null )
+		{
+			<Icon Svg="@EndIconSvg" />
+		}
+	}
+
+</button>
+
+@code {
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public ButtonVariant Variant { get; set; } = ButtonVariant.Default;
+	[Parameter] public ButtonColor? ColorScheme { get; set; }
+	[Parameter] public ButtonSize Size { get; set; } = ButtonSize.Default;
+
+	// Resolve default colour scheme the way Blok does:
+	//   Default / Link   → Primary (unless overridden)
+	//   Outline / Ghost  → Neutral (unless overridden)
+	private ButtonColor ResolvedColorScheme => ColorScheme ?? ( Variant switch
+	{
+		ButtonVariant.Outline or ButtonVariant.Ghost => ButtonColor.Neutral,
+		_ => ButtonColor.Primary
+	} );
+	[Parameter] public string? ClassName { get; set; }
+
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	/* Additional to Blok */
+	[Parameter] public string? Title { get; set; }
+	[Parameter] public string? StartIconSvg { get; set; }
+	[Parameter] public string? EndIconSvg { get; set; }
+	[Parameter] public EventCallback Click { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	private string? CssClass => CssClassBuilder.Start(
+													// Layout & Sizing
+													"inline-flex items-center justify-center",
+													"gap-2 whitespace-nowrap",
+													"shrink-0",
+
+													// `align-middle` is required because `inline-flex`'s baseline is
+													// derived from its FIRST flex item. A button starting with text
+													// (`Save <Icon/>`) gets a text baseline ~75% down its box; a button
+													// starting with an Icon (`<Icon/> Create`) gets a bottom-edge
+													// baseline. Without an explicit vertical-align, sibling buttons on
+													// the same line drift vertically by ~6px depending on which child
+													// comes first. align-middle forces all buttons to share the same
+													// midline-anchored alignment.
+													"align-middle",
+
+													// Typography
+													"text-md font-semibold",
+
+													// Icon Styles
+													"[&_svg]:pointer-events-none",
+													"[&_svg]:w-[1.375rem] [&_svg]:h-[1.375rem]",
+													"[&_svg]:shrink-0",
+
+													// Interactive States
+													"transition-all",
+													"cursor-pointer",
+													"disabled:pointer-events-none disabled:opacity-50",
+
+													// Focus & Validation States
+													"outline-none",
+													"focus-visible:border-primary focus-visible:ring-primary/50 focus-visible:ring-[3px]",
+													"aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+													"aria-invalid:border-destructive"
+												)
+
+												// variant
+												// NOTE — Default variant deliberately does NOT set `text-primary-foreground`
+												// here. Each compound variant below sets `text-inverse-text` which is the
+												// correct token: white in light mode, dark in dark mode (so it stays
+												// readable against the colour-flipping `bg-primary`/`bg-success`/etc).
+												// Adding `text-primary-foreground` here causes a CSS specificity tie that
+												// the foreground token (which evaluates to LIGHT primary-200 in dark mode)
+												// can win, producing washed-out light text on a light bg in dark mode.
+												.With( "border bg-background hover:bg-neutral-bg hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50", Variant is ButtonVariant.Outline )
+												.With( "bg-transparent hover:bg-neutral-bg active:bg-neutral-bg-active", Variant is ButtonVariant.Ghost )
+												.With( "text-primary underline-offset-4 hover:underline", Variant is ButtonVariant.Link )
+
+												// size
+												.With( "h-10 min-w-10 px-4 rounded-4xl", Size is ButtonSize.Default )
+												.With( "h-12 min-w-12 px-6 rounded-4xl", Size is ButtonSize.Lg )
+												.With( "h-8 min-w-8 px-3 rounded-4xl", Size is ButtonSize.Sm )
+												.With( "h-6 min-w-6 px-2 rounded-4xl text-xs [&_svg]:!w-[18px] [&_svg]:!h-[18px]", Size is ButtonSize.Xs )
+												.With( "size-10 rounded-full", Size is ButtonSize.Icon )
+												.With( "size-12 rounded-full", Size is ButtonSize.IconLg )
+												.With( "size-8 rounded-full", Size is ButtonSize.IconSm )
+												.With( "size-6 rounded-full [&_svg]:!w-[18px] [&_svg]:!h-[18px]", Size is ButtonSize.IconXs )
+
+												// color
+												.With( "bg-[length:250%_100%] !bg-transparent", ResolvedColorScheme is ButtonColor.Ai )
+
+												// compound
+												.With( "bg-primary text-inverse-text hover:bg-primary-hover active:bg-primary-active", Variant is ButtonVariant.Default && ResolvedColorScheme is ButtonColor.Primary )
+												.With( "bg-success text-inverse-text hover:bg-success-hover active:bg-success-active", Variant is ButtonVariant.Default && ResolvedColorScheme is ButtonColor.Success )
+												.With( "bg-danger text-inverse-text hover:bg-danger-hover active:bg-danger-active", Variant is ButtonVariant.Default && ResolvedColorScheme is ButtonColor.Danger )
+												.With( "bg-neutral text-inverse-text hover:bg-neutral-hover active:bg-neutral-active", Variant is ButtonVariant.Default && ResolvedColorScheme is ButtonColor.Neutral )
+												.With( "ai-500 text-inverse-text hover:ai-600 active:ai-700", Variant is ButtonVariant.Default && ResolvedColorScheme is ButtonColor.Ai )
+												.With( "border text-primary-fg hover:bg-primary-bg hover:text-primary-fg active:bg-primary-bg-active", Variant is ButtonVariant.Outline && ResolvedColorScheme is ButtonColor.Primary )
+												.With( "border text-success-fg hover:bg-success-bg hover:text-success-fg active:bg-success-bg-active", Variant is ButtonVariant.Outline && ResolvedColorScheme is ButtonColor.Success )
+												.With( "border text-danger-fg hover:bg-danger-bg hover:text-danger-fg active:bg-danger-bg-active", Variant is ButtonVariant.Outline && ResolvedColorScheme is ButtonColor.Danger )
+												// `text-neutral-fg` flips correctly in dark mode (whiteAlpha-700) — do
+												// NOT add `dark:text-gray-800` overrides; they force dark text on the
+												// dark `bg-input/30` surface and the label becomes unreadable.
+												.With( "border text-neutral-fg hover:bg-neutral-bg hover:text-neutral-fg active:bg-neutral-bg-active", Variant is ButtonVariant.Outline && ResolvedColorScheme is ButtonColor.Neutral )
+												.With( "text-primary-fg hover:bg-primary-bg hover:text-primary-fg active:bg-primary-bg-active", Variant is ButtonVariant.Ghost && ResolvedColorScheme is ButtonColor.Primary )
+												.With( "text-success-fg hover:bg-success-bg hover:text-success-fg active:bg-success-bg-active", Variant is ButtonVariant.Ghost && ResolvedColorScheme is ButtonColor.Success )
+												.With( "text-danger-fg hover:bg-danger-bg hover:text-danger-fg active:bg-danger-bg-active", Variant is ButtonVariant.Ghost && ResolvedColorScheme is ButtonColor.Danger )
+												// `text-neutral-fg` flips correctly in dark mode — see Outline+Neutral note above.
+												.With( "text-neutral-fg hover:bg-neutral-bg hover:text-neutral-fg active:bg-neutral-bg-active", Variant is ButtonVariant.Ghost && ResolvedColorScheme is ButtonColor.Neutral )
+												.With( "text-primary active:text-primary-700", Variant is ButtonVariant.Link && ResolvedColorScheme is ButtonColor.Primary )
+												.With( "text-success active:text-success-700", Variant is ButtonVariant.Link && ResolvedColorScheme is ButtonColor.Success )
+												.With( "text-danger active:text-danger-700", Variant is ButtonVariant.Link && ResolvedColorScheme is ButtonColor.Danger )
+												.With( "text-neutral active:text-neutral-700", Variant is ButtonVariant.Link && ResolvedColorScheme is ButtonColor.Neutral )
+												.With( ClassName )
+												.Build();
+}

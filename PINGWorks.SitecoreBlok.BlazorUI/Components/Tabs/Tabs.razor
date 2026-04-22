@@ -1,0 +1,45 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="this">
+	<div data-slot="tabs" class="@CssClass">
+		@ChildContent
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+	[Parameter] public string? DefaultValue { get; set; }
+
+	/// <summary>Fires when the active tab changes, providing the new tab value.</summary>
+	[Parameter] public EventCallback<string?> OnTabChanged { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "flex flex-col" )
+										.With( ClassName )
+										.Build();
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		if ( Value is null && DefaultValue is not null )
+			Value = DefaultValue;
+	}
+
+	internal async Task SelectTab( string value )
+	{
+		var previous = Value;
+		Value = value;
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+
+		if ( OnTabChanged.HasDelegate && value != previous )
+			await OnTabChanged.InvokeAsync( Value );
+
+		await InvokeAsync( StateHasChanged );
+	}
+}

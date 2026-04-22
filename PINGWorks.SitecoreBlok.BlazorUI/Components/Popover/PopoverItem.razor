@@ -1,0 +1,78 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@if ( Item is not null )
+{
+	<div id="@( $"{Item.Id}-overlay" )" @onclick="HidePopoverByOverlay" data-state="open" data-slot="dialog-overlay" class="@( $"fixed inset-0 z-50 {(Item.Overlay?"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 bg-black/50":"")}" )" style="pointer-events: auto;" data-aria-hidden="true" aria-hidden="true"></div>
+	<div @ref="PopupContainer" id="@( $"{Item.Id}-popup" )" data-radix-popper-content-wrapper="" dir="ltr" style="@ContainerStyle" class="@Item.ClassName">
+		@Item.ChildContent
+	</div>
+}
+
+@code {
+	[Parameter] public required Popover Item { get; set; }
+	[Parameter] public EventCallback Hide { get; set; }
+
+	private IJSObjectReference? Module;
+	private ElementReference? PopupContainer;
+
+	private double Top;
+	private double Left;
+	private double Width;
+	private double Height;
+
+	private ElementRect AnchorRect = new();
+	private WindowRect WindowRect = new();
+	private string ContainerStyle => $"position:fixed;left:0px;top:0px;transform:translate({Left}px, {Top}px);min-width:max-content;z-index:50;--radix-popper-transform-origin:0% 0px;--radix-popper-anchor-width:{AnchorRect.Width}px;--radix-popper-anchor-height:{AnchorRect.Height}px;--radix-popper-available-width:{WindowRect.DocWidth}px;--radix-popper-available-height:{WindowRect.DocHeight}px";
+
+	protected async override Task OnAfterRenderAsync( bool firstRender )
+	{
+		Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
+		await GetPosition( Item );
+	}
+
+	private async Task HidePopoverByOverlay()
+	{
+		if ( Item.CloseOnBackgroundClick && Hide.HasDelegate )
+			await Hide.InvokeAsync();
+	}
+
+	private async Task GetPosition( Popover popover )
+	{
+		if ( Module is null || Item.Anchor is null )
+			return;
+
+		AnchorRect = await Module.InvokeAsync<ElementRect>( "SitecoreUI.getElementBounds", Item.Anchor );
+		WindowRect = await Module.InvokeAsync<WindowRect>( "SitecoreUI.getWindowBounds" );
+
+		var rect = await Module.InvokeAsync<ElementRect>( "SitecoreUI.getElementBounds", PopupContainer );
+		var newHeight = rect.Height;
+		var newWidth = rect.Width;
+
+		var showBelow = (AnchorRect.Top + AnchorRect.Height + Height) < WindowRect.WindowHeight;
+
+		var newTop = showBelow ? AnchorRect.Top + AnchorRect.Height : AnchorRect.Top - Height;
+		var newLeft = AnchorRect.Left;
+
+		if ( newHeight != Height || newWidth != Width || newTop != Top || newLeft != Left )
+		{
+			Height = newHeight;
+			Width = newWidth;
+			Top = newTop;
+			Left = newLeft;
+			await InvokeAsync( StateHasChanged );
+		}
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+}

@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<ol data-slot="breadcrumb-list" class="@CssClass">
+	@ChildContent
+</ol>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start("text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5")
+										.With(ClassName)
+										.Build();
+}

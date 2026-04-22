@@ -1,0 +1,109 @@
+@page "/primitives/calendar"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Calendar" Description="A date field component that allows users to enter and edit a date" Interactivity="ComponentInteractivity.Interactive" ApiElements="@CalendarElements">
+
+	<DivergenceNote>
+		<p><strong>Hand-rolled Calendar, not a <code>react-day-picker</code> wrapper.</strong> Blok's Calendar is a thin wrapper around <code>react-day-picker</code> exposing <code>captionLayout</code>, <code>formatters</code>, <code>buttonVariant</code>, <code>showOutsideDays</code>, and a <code>components</code> override prop. We implement the calendar from scratch with Blazor-native parameters: <code>Value</code>, <code>RangeStart</code>/<code>RangeEnd</code>, <code>MinDate</code>/<code>MaxDate</code>, <code>YearRangeStart</code>, and <code>NumberOfMonths</code>. There is no <code>react-day-picker</code> compatibility layer — Blok-style props will not work. Range selection, min/max bounds, and multi-month panels are supported out of the box.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Calendar @bind-Value=\"selectedDate\" />")">
+			<div class="space-y-4">
+				<Calendar @bind-Value="SelectedDate" />
+				@if ( SelectedDate is not null )
+				{
+					<p class="text-sm text-muted-foreground">Selected: @SelectedDate.Value.ToShortDateString()</p>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With min/max date constraints" Code="@("<Calendar @bind-Value=\"constrainedDate\"\n          MinDate=\"DateTime.Today\"\n          MaxDate=\"DateTime.Today.AddMonths(3)\" />")">
+			<div class="space-y-4">
+				<Calendar @bind-Value="ConstrainedDate"
+						  MinDate="DateTime.Today"
+						  MaxDate="DateTime.Today.AddMonths(3)" />
+				@if ( ConstrainedDate is not null )
+				{
+					<p class="text-sm text-muted-foreground">Selected: @ConstrainedDate.Value.ToShortDateString()</p>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Date Range Selection" Code="@("<Calendar @bind-RangeStart=\"rangeStart\" @bind-RangeEnd=\"rangeEnd\" />")">
+			<div class="space-y-4">
+				<Calendar @bind-RangeStart="RangeStart" @bind-RangeEnd="RangeEnd" />
+				@if ( RangeStart.HasValue )
+				{
+					<p class="text-sm text-muted-foreground">
+						@if ( RangeEnd.HasValue )
+						{
+							@($"Range: {RangeStart.Value:d MMM yyyy} — {RangeEnd.Value:d MMM yyyy} ({(RangeEnd.Value - RangeStart.Value).Days} days)")
+						}
+						else
+						{
+							@($"Start: {RangeStart.Value:d MMM yyyy} — click another date for end")
+						}
+					</p>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Two Months with Range" Code="@("<Calendar @bind-RangeStart=\"twoMonthStart\" @bind-RangeEnd=\"twoMonthEnd\"\n          NumberOfMonths=\"2\" />")">
+			<div class="space-y-4">
+				<Calendar @bind-RangeStart="TwoMonthStart" @bind-RangeEnd="TwoMonthEnd"
+						  NumberOfMonths="2" />
+				@if ( TwoMonthStart.HasValue )
+				{
+					<p class="text-sm text-muted-foreground">
+						@if ( TwoMonthEnd.HasValue )
+						{
+							@($"Range: {TwoMonthStart.Value:d MMM yyyy} — {TwoMonthEnd.Value:d MMM yyyy} ({(TwoMonthEnd.Value - TwoMonthStart.Value).Days} days)")
+						}
+						else
+						{
+							@($"Start: {TwoMonthStart.Value:d MMM yyyy} — click another date for end")
+						}
+					</p>
+				}
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private DateTime? SelectedDate;
+	private DateTime? ConstrainedDate;
+	private DateTime? RangeStart;
+	private DateTime? RangeEnd;
+	private DateTime? TwoMonthStart;
+	private DateTime? TwoMonthEnd;
+
+	private static readonly ApiElement[] CalendarElements =
+	[
+		new ApiElement(
+			Name: "Calendar",
+			Description: "Month-grid date picker. Supports single-date selection via `Value`/`ValueChanged` or range selection via `RangeStart`/`RangeEnd`. Range mode is activated when either range `*Changed` callback is wired up.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",             "DateTime?",                  false, "Single-date selection. Use `@bind-Value` for two-way binding." ),
+				new ApiProperty( "ValueChanged",      "EventCallback<DateTime?>",   false, "Fires when the selected date changes. Supports `@bind-Value`." ),
+				new ApiProperty( "RangeStart",        "DateTime?",                  false, "Start of the selected range. Wiring `RangeStartChanged` (or using `@bind-RangeStart`) switches the calendar into range-selection mode." ),
+				new ApiProperty( "RangeStartChanged", "EventCallback<DateTime?>",   false, "Fires when the range start changes. Supports `@bind-RangeStart`." ),
+				new ApiProperty( "RangeEnd",          "DateTime?",                  false, "End of the selected range. Set alongside `RangeStart` for range-mode." ),
+				new ApiProperty( "RangeEndChanged",   "EventCallback<DateTime?>",   false, "Fires when the range end changes. Supports `@bind-RangeEnd`." ),
+				new ApiProperty( "MinDate",           "DateTime?",                  false, "Minimum selectable date. Dates before this render disabled." ),
+				new ApiProperty( "MaxDate",           "DateTime?",                  false, "Maximum selectable date. Dates after this render disabled." ),
+				new ApiProperty( "YearRangeStart",    "int",                        false, "First year offered in the year dropdown. Default: current year − 10. Overridden by `MinDate` when present." ),
+				new ApiProperty( "YearRangeEnd",      "int",                        false, "Last year offered in the year dropdown. Default: current year + 10. Overridden by `MaxDate` when present." ),
+				new ApiProperty( "NumberOfMonths",    "int",                        false, "How many month panels to show side-by-side. Default: `1`. Use `2` for a typical range-picker layout." ),
+				new ApiProperty( "ClassName",         "string?",                    false, "Extra CSS classes appended to the outer card." ),
+			]
+		),
+	];
+}

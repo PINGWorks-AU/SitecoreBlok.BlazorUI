@@ -1,0 +1,10 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<nav aria-label="breadcrumb" data-slot="breadcrumb" @attributes="AdditionalAttributes">
+	@ChildContent
+</nav>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

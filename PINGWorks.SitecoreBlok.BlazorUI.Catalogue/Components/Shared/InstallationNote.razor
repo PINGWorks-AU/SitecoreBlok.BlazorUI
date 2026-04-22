@@ -1,0 +1,19 @@
+@* Use at the top of a Catalogue primitive page when the component requires
+   setup beyond importing it — e.g. a script tag in the host page, a service
+   registration in Program.cs, or a root-level component placed in the layout
+   (App.razor / MainLayout.razor). Always renders regardless of whether the
+   page also shows an interactivity / scripts badge. *@
+
+<div class="border-l-4 border-blue-500 pl-4 py-3 mb-6 bg-blue-50 dark:bg-blue-900/20 rounded-r-md text-foreground">
+	<h4 class="font-semibold text-blue-700 dark:text-blue-300 mb-2 flex items-center gap-2">
+		<Icon Svg="@IconSvg.Tools" ClassName="size-5" />
+		Installation instructions
+	</h4>
+	<div class="text-sm space-y-2">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required RenderFragment ChildContent { get; set; }
+}

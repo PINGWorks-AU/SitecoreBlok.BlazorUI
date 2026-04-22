@@ -1,0 +1,82 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="stepper" class="@CssClass">
+	@for ( var i = 0; i < Steps.Count; i++ )
+	{
+		var step = Steps[i];
+		var state = i < ActiveStep ? "completed" : i == ActiveStep ? "active" : "pending";
+
+		<div class="@( Orientation is StepperOrientation.Horizontal ? "flex items-center" : "flex flex-col" )">
+			<div class="flex items-center gap-3">
+				<div class="@StepCircleClass( state )">
+					@if ( state is "completed" )
+					{
+						<Icon Svg="@IconSvg.Check" Scale="0.7" ResetClassName />
+					}
+					else
+					{
+						<span class="text-xs font-medium">@( i + 1 )</span>
+					}
+				</div>
+				<div class="flex flex-col">
+					<span class="@StepLabelClass( state )">@step.Label</span>
+					@if ( step.Description is not null )
+					{
+						<span class="text-xs text-muted-foreground">@step.Description</span>
+					}
+				</div>
+			</div>
+
+			@if ( i < Steps.Count - 1 )
+			{
+				<div class="@ConnectorClass( state )"></div>
+			}
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter, EditorRequired] public required List<StepperStep> Steps { get; set; }
+	[Parameter] public int ActiveStep { get; set; }
+	[Parameter] public EventCallback<int> ActiveStepChanged { get; set; }
+	[Parameter] public StepperOrientation Orientation { get; set; } = StepperOrientation.Horizontal;
+
+	private string CssClass => CssClassBuilder.Start()
+										.With( "flex items-start gap-0", Orientation is StepperOrientation.Horizontal )
+										.With( "flex flex-col gap-0", Orientation is StepperOrientation.Vertical )
+										.With( ClassName )
+										.Build();
+
+	// `text-white` (literal) — NOT `text-inverse-text` — on the completed step
+	// circle. Same reason as Calendar's selected day: the `bg-primary` surface
+	// flips with mode, but in dark mode `text-inverse-text` would resolve to
+	// the wrong colour for the now-light primary surface. Caught by Check 5.
+	//
+	// NOTE — these helpers use CssClassBuilder rather than `state switch =>`
+	// returning literal strings, because the parity harness's class-string
+	// extraction only scans CssClassBuilder.Start/With/Reset calls. A switch
+	// returning class strings would be invisible to the harness and every
+	// class inside would be reported as drift from the Blok source.
+	private static string StepCircleClass( string state ) => CssClassBuilder.Start( "flex items-center justify-center size-8 rounded-full border-2 shrink-0" )
+										.With( "border-primary bg-primary text-white", state is "completed" )
+										.With( "border-primary text-primary", state is "active" )
+										.With( "border-border text-muted-foreground", state is not "completed" and not "active" )
+										.Build();
+
+	private static string StepLabelClass( string state ) => CssClassBuilder.Start( "text-sm font-medium" )
+										.With( "text-foreground", state is "completed" or "active" )
+										.With( "text-muted-foreground", state is not "completed" and not "active" )
+										.Build();
+
+	// `parity-no-text-pair` on each conditional too — connector is decorative
+	// (thin line between step circles, no text content). The marker has to be
+	// in the SAME string literal as the surface bg because the harness checks
+	// each .With(...) string independently.
+	private string ConnectorClass( string state ) => CssClassBuilder.Start()
+										.With( "flex-1 h-px min-w-8 mx-3", Orientation is StepperOrientation.Horizontal )
+										.With( "w-px min-h-6 ml-4 my-1", Orientation is StepperOrientation.Vertical )
+										.With( "bg-primary parity-no-text-pair", state is "completed" )
+										.With( "bg-border", state is not "completed" )
+										.Build();
+}

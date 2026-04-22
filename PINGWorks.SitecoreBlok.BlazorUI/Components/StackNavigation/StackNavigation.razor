@@ -1,0 +1,209 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@inject NavigationManager Navigation
+
+<aside class="@AsideCssClass" @attributes="AdditionalAttributes">
+	@if ( !IsHorizontal && Header is not null )
+	{
+		<div class="shrink-0 flex w-full justify-center">@Header</div>
+	}
+
+	@* Firefox respects `scrollbar-width` / `scrollbar-color` only as a CSS
+	   declaration, and Tailwind v4 doesn't emit a utility for them — so the
+	   Firefox side of the thin/styled scrollbar ships via an inline style.
+	   The Webkit/Chromium/Edge side is expressed via utilities on BodyCssClass.
+	   Horizontal orientation doesn't need the override (the `overflow-x-auto`
+	   scrollbar is the intended UX there). *@
+	<div class="@BodyCssClass" style="@BodyInlineStyle">
+		<nav class="@NavCssClass">
+			@for ( var i = 0; i < Items.Count; i++ )
+			{
+				var index = i;
+				var element = Items[index];
+
+				@if ( element is StackNavigationDivider divider )
+				{
+					<div @key="@( $"divider-{index}" )">
+						@if ( RenderDivider is not null )
+						{
+							@RenderDivider( divider )
+						}
+						else
+						{
+							<div class="@DividerCssClass( divider )"></div>
+						}
+					</div>
+				}
+				else if ( element is StackNavigationItem navItem )
+				{
+					<div @key="@( string.IsNullOrEmpty( navItem.Path ) ? (object)$"item-{index}" : navItem.Path )">
+						@if ( RenderItem is not null )
+						{
+							@RenderItem( navItem )
+						}
+						else
+						{
+							@* When OnItemClick is wired we need to opt the <a> out of Blazor's
+							   enhanced-navigation interceptor — otherwise enhanced-nav fetches the
+							   new page before our @onclick:preventDefault can run, and the user's
+							   PreventDefault = true has no effect. data-enhance-nav="false"
+							   tells the enhanced-nav router to leave this link alone; the Blazor
+							   circuit's click handler still fires, our preventDefault stops the
+							   browser default, and we drive the navigation via NavigationManager
+							   ourselves. Middle/ctrl-click still work because those don't trigger
+							   @onclick. DO NOT remove the attribute expecting preventDefault to
+							   work on its own. *@
+							<a href="@navItem.Path"
+								data-enhance-nav="@( OnItemClick.HasDelegate ? "false" : null )"
+								@onclick="@( e => HandleItemClick( navItem, e ) )"
+								@onclick:preventDefault="@OnItemClick.HasDelegate"
+								@oncontextmenu:preventDefault="true"
+								class="@ItemCssClass( navItem )"
+								aria-label="@navItem.Name">
+								<div aria-hidden="true" class="shrink-0 flex items-center justify-center w-[22px] h-[22px]">
+									@navItem.Icon
+								</div>
+								<span class="@ItemTextClass" title="@navItem.Name">@navItem.Name</span>
+								@if ( !IsHorizontal && navItem.Badge is not null )
+								{
+									<div class="absolute top-1 right-1">@navItem.Badge</div>
+								}
+							</a>
+						}
+					</div>
+				}
+			}
+		</nav>
+	</div>
+
+	@if ( !IsHorizontal && Footer is not null )
+	{
+		<div class="shrink-0 flex justify-center overflow-hidden mx-2 py-1.5 text-3xs text-neutral-fg">
+			@Footer
+		</div>
+	}
+</aside>
+
+@code {
+	[Parameter, EditorRequired] public required List<StackNavigationElement> Items { get; set; }
+	[Parameter] public RenderFragment<StackNavigationItem>? RenderItem { get; set; }
+	[Parameter] public RenderFragment<StackNavigationDivider>? RenderDivider { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? NavClassName { get; set; }
+	[Parameter] public string Width { get; set; } = "w-[72px]";
+	[Parameter] public RenderFragment? Header { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+	[Parameter] public StackNavigationOrientation Orientation { get; set; } = StackNavigationOrientation.Vertical;
+	[Parameter] public StackNavigationColorScheme ColorScheme { get; set; } = StackNavigationColorScheme.Neutral;
+	[Parameter] public string? Pathname { get; set; }
+	[Parameter] public EventCallback<StackNavigationItemClickedEventArgs> OnItemClick { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private bool IsHorizontal => Orientation is StackNavigationOrientation.Horizontal;
+
+	// If the consumer supplies `shadow-none` in ClassName, drop the default `shadow-base`
+	// so the override actually wins. Matches Blok's `hasShadowNone` check.
+	private bool HasShadowNone => ClassName?.Contains( "shadow-none" ) ?? false;
+
+	private string CurrentPath => Pathname ?? GetPathFromNavigation();
+
+	private string GetPathFromNavigation()
+	{
+		var relative = Navigation.ToBaseRelativePath( Navigation.Uri );
+		var path = relative.Split( '?', '#' )[ 0 ];
+		return "/" + path.TrimStart( '/' );
+	}
+
+	private string AsideCssClass => CssClassBuilder.Start()
+										.With( "bg-background p-1.5 text-sidebar-foreground", true )
+										.With( $"{Width} min-h-full flex flex-col opacity-100", !IsHorizontal )
+										.With( "w-full flex flex-row items-center overflow-x-auto", IsHorizontal )
+										.With( "shadow-base", !HasShadowNone )
+										.With( ClassName )
+										.Build();
+
+	// Vertical orientation: show a thin, styled vertical scrollbar and suppress
+	// the horizontal one. `overflow-y-auto overflow-x-hidden` replaces Blok's
+	// `overflow-auto` so the narrow rail can't trigger a horizontal scrollbar
+	// when an item's label ellipsizes. The `[&::-webkit-scrollbar]:*` utilities
+	// mirror the ScrollArea primitive's look (thin thumb, transparent track,
+	// rounded-full thumb, no scrollbar buttons).
+	//
+	// The three pieces together prevent the scrollbar from clipping items:
+	//   1. `-mr-1.5` on the body — extends the viewport 6px into what was the
+	//      rail's right padding. The rail's own bg colour fills the exposed
+	//      strip, so visually the scrollbar lives at the rail's right edge.
+	//   2. `scrollbar-gutter:stable` (via BodyInlineStyle) — reserves 6px for
+	//      the scrollbar WHETHER OR NOT it's currently visible. Keeps items'
+	//      available width constant across scroll/no-scroll states.
+	//   3. Firefox `scrollbar-width:thin; scrollbar-color:...` (BodyInlineStyle)
+	//      — matches the Webkit styling on Gecko. Tailwind v4 has no utility.
+	// Net effect: items stretch to 60px always (matches Blok's default, Blok's
+	// 72px rail - 12px padding = 60px content). Blok's `overflow-auto` would
+	// clip these same 56px-min items against a 16px scrollbar; we instead
+	// reserve a stable 6px gutter and place the scrollbar at the rail's edge.
+	// DO NOT remove any of the three pieces thinking they're cosmetic — each
+	// one is load-bearing for the no-clip guarantee.
+	private string BodyCssClass => CssClassBuilder.Start()
+										.With( "flex-1 overflow-y-auto overflow-x-hidden -mr-1.5", !IsHorizontal )
+										.With( "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-button]:!h-0 [&::-webkit-scrollbar-button]:!w-0", !IsHorizontal )
+										.With( "flex-1 overflow-x-auto overflow-y-hidden", IsHorizontal )
+										.Build();
+
+	// Inline style carries three things Tailwind v4 doesn't expose as
+	// utilities: `scrollbar-gutter:stable` (layout-stable scrollbar reserve)
+	// and Firefox's `scrollbar-width` / `scrollbar-color`. Vertical only —
+	// horizontal orientation keeps the browser default.
+	private string? BodyInlineStyle => IsHorizontal ? null : "scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:var(--border) transparent;";
+
+	private string NavCssClass => CssClassBuilder.Start()
+										.With( "flex flex-col gap-1", !IsHorizontal )
+										.With( "flex flex-row items-center justify-center gap-1 h-full", IsHorizontal )
+										.With( NavClassName )
+										.Build();
+
+	private string ItemCssClass( StackNavigationItem item )
+	{
+		var isActive = CurrentPath == item.Path;
+		return CssClassBuilder.Start(
+				"flex flex-col items-center justify-center rounded-md transition-colors",
+				"text-3xs font-medium cursor-pointer no-underline relative opacity-100" )
+				.With( "overflow-hidden h-14 min-w-14 min-h-14 p-1.5 gap-1", !IsHorizontal )
+				.With( "min-w-14 w-fit h-14 p-1.5 gap-1 overflow-hidden", IsHorizontal )
+				.With( "text-neutral-fg hover:bg-neutral-bg hover:text-neutral-fg active:bg-neutral-200 active:text-neutral-fg",
+					ColorScheme is StackNavigationColorScheme.Neutral && !isActive )
+				.With( "bg-neutral-bg text-neutral-fg hover:bg-neutral-bg hover:text-neutral-fg active:bg-neutral-200 active:text-neutral-fg",
+					ColorScheme is StackNavigationColorScheme.Neutral && isActive )
+				.With( "text-neutral-fg hover:bg-neutral-bg hover:text-neutral-fg active:bg-primary-bg active:text-primary-fg",
+					ColorScheme is StackNavigationColorScheme.Primary && !isActive )
+				.With( "bg-primary-bg text-primary-fg hover:bg-primary-bg hover:text-primary-fg active:bg-primary-bg active:text-primary-fg",
+					ColorScheme is StackNavigationColorScheme.Primary && isActive )
+				.With( item.ClassName )
+				.Build();
+	}
+
+	private string ItemTextClass => CssClassBuilder.Start( "text-3xs text-center whitespace-nowrap" )
+										.With( "overflow-hidden text-ellipsis w-full block leading-[150%] tracking-normal", !IsHorizontal )
+										.With( "leading-tight", IsHorizontal )
+										.Build();
+
+	private string DividerCssClass( StackNavigationDivider divider ) => CssClassBuilder.Start()
+										.With( "w-14 h-px opacity-100 bg-border", !IsHorizontal )
+										.With( "w-px h-6 bg-border opacity-100", IsHorizontal )
+										.With( divider.ClassName )
+										.Build();
+
+	private async Task HandleItemClick( StackNavigationItem item, MouseEventArgs e )
+	{
+		if ( !OnItemClick.HasDelegate )
+			return;
+
+		var args = new StackNavigationItemClickedEventArgs { Item = item, Mouse = e };
+		await OnItemClick.InvokeAsync( args );
+
+		if ( !args.PreventDefault && !string.IsNullOrEmpty( item.Path ) )
+		{
+			Navigation.NavigateTo( item.Path );
+		}
+	}
+}

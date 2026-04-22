@@ -1,0 +1,41 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="action-bar" class="@OuterCssClass">
+	<div class="@InnerCssClass">
+		<div class="flex items-center gap-4">
+			<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" ColorScheme="ButtonColor.Neutral" Click="OnCancel" ClassName="hover:bg-neutral-bg">
+				<Icon Svg="@IconSvg.Close" Scale="1" ResetClassName />
+			</Button>
+			<span class="font-semibold text-neutral-fg">@SelectedCount selected</span>
+		</div>
+
+		<div class="flex items-center gap-2 ml-auto">
+			@ChildContent
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Open { get; set; }
+	[Parameter] public EventCallback<bool> OpenChanged { get; set; }
+	[Parameter] public int SelectedCount { get; set; }
+	[Parameter] public EventCallback OnCancel { get; set; }
+	[Parameter] public ActionBarAlign Align { get; set; } = ActionBarAlign.Center;
+
+	// Uses opacity + pointer-events rather than translate-y. A `transform` on an ancestor
+	// breaks `position: fixed` for descendants (CSS spec), which would stop child popovers
+	// like DropdownMenu from positioning correctly when opened from within the ActionBar.
+	private string OuterCssClass => CssClassBuilder.Start( "fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 transition-opacity duration-300 ease-in-out" )
+										.With( "opacity-100", Open )
+										.With( "opacity-0 pointer-events-none", !Open )
+										.With( ClassName )
+										.Build();
+
+	private string InnerCssClass => CssClassBuilder.Start( "flex items-center justify-between gap-4 border-t border-border bg-background text-foreground rounded-lg shadow-lg px-4 py-3 max-w-2xl w-full" )
+										.With( "ml-4", Align is ActionBarAlign.Left )
+										.With( "mx-auto", Align is ActionBarAlign.Center )
+										.With( "mr-4 ml-auto", Align is ActionBarAlign.Right )
+										.Build();
+}

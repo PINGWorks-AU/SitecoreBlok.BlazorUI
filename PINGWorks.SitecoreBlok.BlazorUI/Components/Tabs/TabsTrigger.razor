@@ -1,0 +1,33 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button data-slot="tabs-trigger" type="button" role="tab"
+		aria-selected="@(IsActive ? "true" : "false")"
+		data-state="@(IsActive ? "active" : "inactive")"
+		disabled="@Disabled"
+		class="@CssClass" @onclick="Select">
+	@ChildContent
+</button>
+
+@code {
+	[CascadingParameter] public required Tabs Parent { get; set; }
+
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter, EditorRequired] public required string Value { get; set; }
+	[Parameter] public TabsVariant Variant { get; set; } = TabsVariant.Line;
+	[Parameter] public bool Disabled { get; set; }
+
+	private bool IsActive => Parent.Value == Value;
+
+	private string CssClass => CssClassBuilder.Start("inline-flex h-9 items-center justify-center gap-1.5 text-md font-medium whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4")
+										.With("text-neutral-fg data-[state=active]:text-primary-fg border-b-2 border-transparent data-[state=active]:border-primary-fg hover:cursor-pointer px-4 -mb-[2px]", Variant is TabsVariant.Line)
+										.With("text-neutral-fg data-[state=active]:text-primary-fg data-[state=active]:bg-primary-bg hover:cursor-pointer px-4 rounded-full", Variant is TabsVariant.SoftRounded)
+										.With(ClassName)
+										.Build();
+
+	private async Task Select()
+	{
+		if (Disabled) return;
+		await Parent.SelectTab(Value);
+	}
+}

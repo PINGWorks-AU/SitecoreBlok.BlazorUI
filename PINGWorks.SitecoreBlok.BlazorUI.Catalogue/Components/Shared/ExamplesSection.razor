@@ -1,0 +1,25 @@
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@inject PageTocRegistry Toc
+
+<CascadingValue Value="Section" IsFixed="true">
+	<section>
+		<h2 id="examples" class="text-2xl font-semibold tracking-tight text-foreground scroll-mt-20 mt-4 mb-6">Examples</h2>
+		<div class="space-y-0">
+			@ChildContent
+		</div>
+	</section>
+</CascadingValue>
+
+@code {
+	[Parameter, EditorRequired] public required RenderFragment ChildContent { get; set; }
+
+	// Created in OnInitialized (before children init) and cascaded so each child
+	// ComponentExample registers its H3 against THIS section, not the global registry.
+	// That's what preserves markup order in the ToC — see PageTocRegistry for details.
+	private TocSection? Section;
+
+	protected override void OnInitialized()
+	{
+		Section = Toc.BeginSection( title: "Examples", anchor: "examples" );
+	}
+}

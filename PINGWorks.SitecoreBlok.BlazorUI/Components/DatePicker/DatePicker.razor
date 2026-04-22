@@ -1,0 +1,103 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@inject PopoverService Pops
+
+<div data-slot="date-picker" class="relative inline-block" @ref="Trigger">
+	<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="Toggle" Disabled="@Disabled"
+			aria-label="@TriggerAriaLabel"
+			ClassName="@( $"gap-2 font-normal {( Value.HasValue ? "" : "text-muted-foreground" )} {ClassName}" )">
+		<Icon Svg="@IconSvg.CalendarBlankOutline" ClassName="size-4 text-muted-foreground" aria-hidden="true" />
+		@( Value.HasValue ? Value.Value.ToString( Format ) : RangeStart.HasValue && RangeEnd.HasValue ? $"{RangeStart.Value.ToString( Format )} — {RangeEnd.Value.ToString( Format )}" : RangeStart.HasValue ? $"{RangeStart.Value.ToString( Format )} — ..." : Placeholder )
+	</Button>
+
+	<Popover Id="@Id" OnClose="Close" ClassName="shadow-lg rounded-lg">
+		<Calendar Value="@Value" ValueChanged="OnDateSelected"
+				  RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
+				  RangeEnd="@RangeEnd" RangeEndChanged="OnRangeEndSelected"
+				  MinDate="@MinDate" MaxDate="@MaxDate"
+				  NumberOfMonths="@NumberOfMonths"
+				  ClassName="border-0 shadow-none" />
+	</Popover>
+</div>
+
+@code {
+	private string Id = Guid.NewGuid().ToString();
+
+	[Parameter] public string? ClassName { get; set; }
+
+	// Single date mode
+	[Parameter] public DateTime? Value { get; set; }
+	[Parameter] public EventCallback<DateTime?> ValueChanged { get; set; }
+
+	// Range mode
+	[Parameter] public DateTime? RangeStart { get; set; }
+	[Parameter] public EventCallback<DateTime?> RangeStartChanged { get; set; }
+	[Parameter] public DateTime? RangeEnd { get; set; }
+	[Parameter] public EventCallback<DateTime?> RangeEndChanged { get; set; }
+
+	[Parameter] public DateTime? MinDate { get; set; }
+	[Parameter] public DateTime? MaxDate { get; set; }
+	[Parameter] public string Placeholder { get; set; } = "Pick a date";
+	[Parameter] public string Format { get; set; } = "d MMM yyyy";
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public int NumberOfMonths { get; set; } = 1;
+	[Parameter] public DatePickerAriaLabels? AriaLabels { get; set; }
+
+	private string? TriggerAriaLabel => AriaLabels?.PopoverTrigger ?? Placeholder;
+
+	private bool IsRange => RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate;
+
+	private ElementReference? Trigger;
+	private bool IsOpen;
+
+	private async Task Toggle()
+	{
+		if ( Disabled ) return;
+
+		if ( IsOpen )
+			await Close();
+		else
+		{
+			IsOpen = true;
+			await Pops.Show( Id, Trigger );
+		}
+	}
+
+	private async Task Close()
+	{
+		IsOpen = false;
+	}
+
+	private async Task OnDateSelected( DateTime? date )
+	{
+		Value = date;
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+
+		await Pops.Hide( Id );
+		await Close();
+	}
+
+	private async Task OnRangeStartSelected( DateTime? date )
+	{
+		RangeStart = date;
+
+		if ( RangeStartChanged.HasDelegate )
+			await RangeStartChanged.InvokeAsync( RangeStart );
+	}
+
+	private async Task OnRangeEndSelected( DateTime? date )
+	{
+		RangeEnd = date;
+
+		if ( RangeEndChanged.HasDelegate )
+			await RangeEndChanged.InvokeAsync( RangeEnd );
+
+		if ( date.HasValue )
+		{
+			await Pops.Hide( Id );
+			await Close();
+		}
+	}
+}

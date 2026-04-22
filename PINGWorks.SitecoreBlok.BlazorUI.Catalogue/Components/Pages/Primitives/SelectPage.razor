@@ -1,0 +1,202 @@
+@page "/primitives/select"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Select" Description="Displays a list of options for the user to pick from" Interactivity="ComponentInteractivity.Interactive" ApiElements="@SelectElements">
+
+	<InstallationNote>
+		<p>Select's dropdown renders through the shared Popover infrastructure, so the same setup applies:</p>
+		<ol class="list-decimal pl-5 space-y-1">
+			<li>
+				Register the BlazorUI services in <code class="text-xs bg-muted px-1 py-0.5 rounded">Program.cs</code>:
+				<CodeViewer Code="@("builder.Services.AddSitecoreBlokUI();")" Language="CodeLanguage.CSharp" ClassName="!mt-2" />
+			</li>
+			<li>
+				Place a single <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Popovers /&gt;</code> container in your root layout:
+				<CodeViewer Code="@("<Popovers @rendermode=\"InteractiveServer\" />")" Language="CodeLanguage.Razor" ClassName="!mt-2" />
+			</li>
+		</ol>
+	</InstallationNote>
+
+	<DivergenceNote>
+		<p><strong>Now composable: <code>SelectTrigger</code> + <code>SelectValue</code> + <code>SelectContent</code> are separate components.</strong> Previously the entire trigger button + popover was bundled inside <code>Select</code>. To match Blok, you now compose <code>SelectTrigger</code> (the visible button), <code>SelectValue</code> (the placeholder/value display), and <code>SelectContent</code> (the open menu). <code>Placeholder</code> moved from <code>Select</code> onto <code>SelectValue</code>. <code>SelectGroup</code> no longer takes a <code>Label</code> string param — use the new <code>SelectLabel</code> component as a child instead.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Select @bind-Value=\"selectedFruit\">\n    <SelectTrigger>\n        <SelectValue Placeholder=\"Pick a fruit\" />\n    </SelectTrigger>\n    <SelectContent>\n        <SelectItem Value=\"apple\" Label=\"Apple\" />\n        <SelectItem Value=\"banana\" Label=\"Banana\" />\n        <SelectItem Value=\"cherry\" Label=\"Cherry\" />\n        <SelectItem Value=\"grape\" Label=\"Grape\" />\n    </SelectContent>\n</Select>")">
+			<div class="flex items-center gap-4">
+				<Select @bind-Value="SelectedFruit">
+					<SelectTrigger>
+						<SelectValue Placeholder="Pick a fruit" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem Value="apple" Label="Apple" />
+						<SelectItem Value="banana" Label="Banana" />
+						<SelectItem Value="cherry" Label="Cherry" />
+						<SelectItem Value="grape" Label="Grape" />
+					</SelectContent>
+				</Select>
+				@if ( SelectedFruit is not null )
+				{
+					<span class="text-sm text-muted-foreground">Selected: @SelectedFruit</span>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With groups" Code="@("<Select @bind-Value=\"selectedFood\">\n    <SelectTrigger>\n        <SelectValue Placeholder=\"Pick a food\" />\n    </SelectTrigger>\n    <SelectContent>\n        <SelectGroup>\n            <SelectLabel>Fruits</SelectLabel>\n            <SelectItem Value=\"apple\" Label=\"Apple\" />\n            <SelectItem Value=\"banana\" Label=\"Banana\" />\n        </SelectGroup>\n        <SelectSeparator />\n        <SelectGroup>\n            <SelectLabel>Vegetables</SelectLabel>\n            <SelectItem Value=\"carrot\" Label=\"Carrot\" />\n            <SelectItem Value=\"broccoli\" Label=\"Broccoli\" />\n        </SelectGroup>\n    </SelectContent>\n</Select>")">
+			<div class="flex items-center gap-4">
+				<Select @bind-Value="SelectedFood">
+					<SelectTrigger>
+						<SelectValue Placeholder="Pick a food" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectGroup>
+							<SelectLabel>Fruits</SelectLabel>
+							<SelectItem Value="apple" Label="Apple" />
+							<SelectItem Value="banana" Label="Banana" />
+						</SelectGroup>
+						<SelectSeparator />
+						<SelectGroup>
+							<SelectLabel>Vegetables</SelectLabel>
+							<SelectItem Value="carrot" Label="Carrot" />
+							<SelectItem Value="broccoli" Label="Broccoli" />
+						</SelectGroup>
+					</SelectContent>
+				</Select>
+				@if ( SelectedFood is not null )
+				{
+					<span class="text-sm text-muted-foreground">Selected: @SelectedFood</span>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Small trigger" Code="@("<SelectTrigger Sm=\"true\">\n    <SelectValue Placeholder=\"Smaller select\" />\n</SelectTrigger>")">
+			<Select @bind-Value="SelectedSm">
+				<SelectTrigger Sm="true">
+					<SelectValue Placeholder="Smaller select" />
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem Value="one" Label="One" />
+					<SelectItem Value="two" Label="Two" />
+					<SelectItem Value="three" Label="Three" />
+				</SelectContent>
+			</Select>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? SelectedFruit;
+	private string? SelectedFood;
+	private string? SelectedSm;
+
+	private static readonly ApiElement[] SelectElements =
+	[
+		new ApiElement(
+			Name: "Select",
+			Description: "Root of the select. Owns the bound `Value`, cascades itself to children, and drives the shared `PopoverService` to open / close the dropdown.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string?",                false, "The currently-selected item value. Use `@bind-Value` for two-way binding." ),
+				new ApiProperty( "ValueChanged", "EventCallback<string?>", false, "Fires when the user picks a different item. Part of the `@bind-Value` pair." ),
+				new ApiProperty( "Disabled",     "bool",                   false, "When true, the trigger is non-interactive and the dropdown will not open. Default: `false`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",        false, "Should contain a `SelectTrigger` and a `SelectContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectTrigger",
+			Description: "The visible button that opens the dropdown. Shows the current `SelectValue` and a chevron icon, and wires the anchor reference used to position the popover.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Sm",                   "bool",                          false, "Renders the smaller 32px variant. Default: `false` (40px)." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<button>` element." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Trigger content — normally a single `SelectValue`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<button>` element." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectValue",
+			Description: "Displays the label of the current `Select.Value`, or the `Placeholder` when nothing is selected. Always placed inside a `SelectTrigger`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Placeholder",  "string?",          false, "Text shown when no value is selected. Default: `null`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectContent",
+			Description: "Dropdown menu that renders through the shared `Popovers` host. Hosts `SelectGroup`, `SelectItem`, `SelectSeparator`, etc.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the listbox container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Menu content — `SelectItem`s, `SelectGroup`s, and optional `SelectSeparator`s." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectGroup",
+			Description: "Logical grouping of items inside `SelectContent`. Usually accompanied by a `SelectLabel` as its first child.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Disabled",     "bool",             false, "When true, all items in the group are disabled (unioned with each item's own `Disabled`). Default: `false`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Typically one `SelectLabel` followed by one or more `SelectItem`s." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectLabel",
+			Description: "Small uppercase heading rendered at the top of a `SelectGroup`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the label container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Label text." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectItem",
+			Description: "A single option. Renders its `Label` (falling back to `ChildContent`, then `Value`) plus a check icon when selected.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string?",          true,  "The value this item reports back to the parent `Select` when chosen." ),
+				new ApiProperty( "Label",        "string?",          false, "Display label. When set, also cached so the trigger keeps displaying the correct label after the popover closes." ),
+				new ApiProperty( "Disabled",     "bool",             false, "When true, this item cannot be selected. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the item container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Custom label markup. Used when `Label` is not supplied." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectSeparator",
+			Description: "Thin horizontal divider between groups or items inside `SelectContent`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the separator." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectScrollUpButton",
+			Description: "Decorative chevron-up indicator rendered above a long item list. Currently cosmetic — no auto-scroll behaviour wired.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the button container." ),
+			]
+		),
+		new ApiElement(
+			Name: "SelectScrollDownButton",
+			Description: "Decorative chevron-down indicator rendered below a long item list. Currently cosmetic — no auto-scroll behaviour wired.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the button container." ),
+			]
+		),
+	];
+}

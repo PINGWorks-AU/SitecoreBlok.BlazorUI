@@ -1,0 +1,10 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="dropdown-menu-group" role="group" class="@( ClassName ?? string.Empty )">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+}

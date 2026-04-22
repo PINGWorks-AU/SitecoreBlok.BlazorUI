@@ -1,0 +1,247 @@
+@page "/primitives/navigationmenu"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="NavigationMenu"
+               Description="A collection of links for navigating websites, with hover-activated dropdown panels"
+               Interactivity="ComponentInteractivity.Interactive"
+               ApiElements="@NavigationMenuElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<NavigationMenu>\n    <NavigationMenuList>\n        <NavigationMenuItem>\n            <Trigger>\n                <NavigationMenuTrigger>Getting Started</NavigationMenuTrigger>\n            </Trigger>\n            <Content>\n                <NavigationMenuContent ClassName=\"w-[400px]\">\n                    <NavigationMenuLink Href=\"#\">...</NavigationMenuLink>\n                </NavigationMenuContent>\n            </Content>\n        </NavigationMenuItem>\n    </NavigationMenuList>\n</NavigationMenu>")">
+			<NavigationMenu>
+				<NavigationMenuList>
+					<NavigationMenuItem>
+						<Trigger>
+							<NavigationMenuTrigger>Getting Started</NavigationMenuTrigger>
+						</Trigger>
+						<Content>
+							<NavigationMenuContent ClassName="w-[400px]">
+								<div class="grid gap-1">
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Introduction</div>
+										<div class="text-xs text-muted-foreground">Get up and running with the design system.</div>
+									</NavigationMenuLink>
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Installation</div>
+										<div class="text-xs text-muted-foreground">How to install and configure the library.</div>
+									</NavigationMenuLink>
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Typography</div>
+										<div class="text-xs text-muted-foreground">Styles for headings, paragraphs, and more.</div>
+									</NavigationMenuLink>
+								</div>
+							</NavigationMenuContent>
+						</Content>
+					</NavigationMenuItem>
+					<NavigationMenuItem>
+						<Trigger>
+							<NavigationMenuTrigger>Components</NavigationMenuTrigger>
+						</Trigger>
+						<Content>
+							<NavigationMenuContent ClassName="w-[500px]">
+								<div class="grid grid-cols-2 gap-1">
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Alert</div>
+										<div class="text-xs text-muted-foreground">Displays a callout for attention.</div>
+									</NavigationMenuLink>
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Button</div>
+										<div class="text-xs text-muted-foreground">Triggers an action or event.</div>
+									</NavigationMenuLink>
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Card</div>
+										<div class="text-xs text-muted-foreground">Container for related content.</div>
+									</NavigationMenuLink>
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Dialog</div>
+										<div class="text-xs text-muted-foreground">Modal overlay for focused tasks.</div>
+									</NavigationMenuLink>
+								</div>
+							</NavigationMenuContent>
+						</Content>
+					</NavigationMenuItem>
+					<NavigationMenuItem>
+						<Trigger>
+							<NavigationMenuLink Href="#" ClassName="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-md font-medium text-neutral-fg hover:bg-neutral-bg">
+								Documentation
+							</NavigationMenuLink>
+						</Trigger>
+					</NavigationMenuItem>
+				</NavigationMenuList>
+			</NavigationMenu>
+		</ComponentExample>
+
+		<ComponentExample Title="With Active State" Code="@("<NavigationMenuItem>\n    <Trigger>\n        <NavigationMenuTrigger Active>Products</NavigationMenuTrigger>\n    </Trigger>\n    <Content>...</Content>\n</NavigationMenuItem>")">
+			<NavigationMenu>
+				<NavigationMenuList>
+					<NavigationMenuItem>
+						<Trigger>
+							<NavigationMenuTrigger Active>Products</NavigationMenuTrigger>
+						</Trigger>
+						<Content>
+							<NavigationMenuContent ClassName="w-[300px]">
+								<div class="grid gap-1">
+									<NavigationMenuLink Href="#" Active>
+										<div class="text-sm font-medium">XM Cloud</div>
+										<div class="text-xs text-muted-foreground">Content management platform.</div>
+									</NavigationMenuLink>
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Content Hub</div>
+										<div class="text-xs text-muted-foreground">Digital asset management.</div>
+									</NavigationMenuLink>
+								</div>
+							</NavigationMenuContent>
+						</Content>
+					</NavigationMenuItem>
+					<NavigationMenuItem>
+						<Trigger>
+							<NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+						</Trigger>
+						<Content>
+							<NavigationMenuContent ClassName="w-[300px]">
+								<div class="grid gap-1">
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Blog</div>
+										<div class="text-xs text-muted-foreground">Latest news and articles.</div>
+									</NavigationMenuLink>
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Support</div>
+										<div class="text-xs text-muted-foreground">Get help from the team.</div>
+									</NavigationMenuLink>
+								</div>
+							</NavigationMenuContent>
+						</Content>
+					</NavigationMenuItem>
+				</NavigationMenuList>
+			</NavigationMenu>
+		</ComponentExample>
+
+		<ComponentExample Title="With Indicator" Code="@("<NavigationMenu>\n    <NavigationMenuList>\n        <NavigationMenuIndicator />\n        <NavigationMenuItem>...</NavigationMenuItem>\n    </NavigationMenuList>\n</NavigationMenu>")">
+			<NavigationMenu>
+				<NavigationMenuList>
+					<NavigationMenuIndicator />
+					<NavigationMenuItem>
+						<Trigger>
+							<NavigationMenuTrigger>Getting Started</NavigationMenuTrigger>
+						</Trigger>
+						<Content>
+							<NavigationMenuContent ClassName="w-[300px]">
+								<div class="grid gap-1">
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Introduction</div>
+										<div class="text-xs text-muted-foreground">Get up and running quickly.</div>
+									</NavigationMenuLink>
+								</div>
+							</NavigationMenuContent>
+						</Content>
+					</NavigationMenuItem>
+					<NavigationMenuItem>
+						<Trigger>
+							<NavigationMenuTrigger>Components</NavigationMenuTrigger>
+						</Trigger>
+						<Content>
+							<NavigationMenuContent ClassName="w-[300px]">
+								<div class="grid gap-1">
+									<NavigationMenuLink Href="#">
+										<div class="text-sm font-medium">Button</div>
+										<div class="text-xs text-muted-foreground">Triggers an action or event.</div>
+									</NavigationMenuLink>
+								</div>
+							</NavigationMenuContent>
+						</Content>
+					</NavigationMenuItem>
+				</NavigationMenuList>
+			</NavigationMenu>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] NavigationMenuElements =
+	[
+		new ApiElement(
+			Name: "NavigationMenu",
+			Description: "Root `<nav>` container. Renders a shared hover-activated viewport for all item dropdowns. Set `Viewport=\"false\"` to suppress the viewport (plain nav bar only).",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Viewport",             "bool",                          false, "When true (default), a shared viewport panel is rendered below the menu bar. Set to false for a plain nav bar with no dropdowns." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<nav>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Should contain a `NavigationMenuList` and optionally a `NavigationMenuIndicator` inside the list." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<nav>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "NavigationMenuList",
+			Description: "Horizontal `<ul>` holding the top-level `NavigationMenuItem`s and an optional `NavigationMenuIndicator`. Place inside a `NavigationMenu`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<ul>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "One or more `NavigationMenuItem` children, plus an optional `NavigationMenuIndicator`." ),
+			]
+		),
+		new ApiElement(
+			Name: "NavigationMenuItem",
+			Description: "One item in the menu bar. Supplies a `Trigger` slot for the visible button and an optional `Content` slot whose content is shown in the shared viewport on hover.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Trigger",      "RenderFragment?", false, "The visible menu entry — typically a `NavigationMenuTrigger` (opens dropdown) or a `NavigationMenuLink` (plain link)." ),
+				new ApiProperty( "Content",      "RenderFragment?", false, "Optional dropdown body, usually a `NavigationMenuContent`. Omit for non-dropdown items." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the item `<li>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "NavigationMenuTrigger",
+			Description: "Styled `<button>` for a `NavigationMenuItem`'s `Trigger` slot. Renders a chevron that rotates when the shared viewport is open for this item.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Active",               "bool",                          false, "When true, applies primary bg/fg styling. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<button>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Trigger label." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "NavigationMenuContent",
+			Description: "Inner wrapper for the dropdown body. Place inside a `NavigationMenuItem`'s `Content` slot.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes — commonly `w-[400px]` to size the dropdown panel." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Links or custom markup shown in the dropdown." ),
+			]
+		),
+		new ApiElement(
+			Name: "NavigationMenuLink",
+			Description: "Styled `<a>` for use inside `NavigationMenuContent` or as a plain menu-bar entry in a `NavigationMenuItem`'s `Trigger` slot.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Href",                 "string?",                       false, "URL to navigate to." ),
+				new ApiProperty( "Active",               "bool",                          false, "When true, applies accent background styling. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<a>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Link content — title, description, icons." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<a>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "NavigationMenuIndicator",
+			Description: "Optional diamond-shaped arrow caret that tracks the active trigger, rendered inside `NavigationMenuList`. Positioned automatically via the parent `NavigationMenu`'s state.",
+			Depth: 2,
+			Properties: []
+		),
+		new ApiElement(
+			Name: "NavigationMenuViewport",
+			Description: "Represents the shared popup viewport. Rendered internally by `NavigationMenu` — consumers do not need to add this component manually.",
+			Depth: 1,
+			Properties: []
+		),
+	];
+}

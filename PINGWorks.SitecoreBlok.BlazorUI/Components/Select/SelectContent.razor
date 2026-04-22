@@ -1,0 +1,39 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* Popover renders content inside the global Popovers host (Popovers.razor at layout level),
+   not inside the Select component tree. The outer `CascadingValue<Select>` from Select.razor
+   does NOT cross that render boundary — so SelectItem's [CascadingParameter] ParentSelect
+   would resolve to null and clicking wouldn't update the value.
+   Re-wrapping @ChildContent in another CascadingValue here captures the value in the
+   RenderFragment closure, so the cascade is re-established wherever Popovers ultimately
+   renders the content. Same reasoning applies to ParentSelectGroup and any future cascades. *@
+<Popover Id="@Parent.SelectId" OnClose="OnPopoverClose" ClassName="">
+	<div data-side="bottom" data-align="start" role="listbox" data-state="open" dir="ltr"
+		 data-slot="select-content" class="@CssClass" tabindex="-1"
+		 style="box-sizing: border-box; display: flex; flex-direction: column; outline: none; --radix-select-content-transform-origin: var(--radix-popper-transform-origin); --radix-select-content-available-width: var(--radix-popper-available-width); --radix-select-content-available-height: var(--radix-popper-available-height); --radix-select-trigger-width: var(--radix-popper-anchor-width); --radix-select-trigger-height: var(--radix-popper-anchor-height); pointer-events: auto;">
+		<style>[data-radix-select-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-select-viewport]::-webkit-scrollbar{display:none}</style>
+		<div data-radix-select-viewport="" role="presentation" class="p-1 h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1" style="position: relative; flex: 1 1 0%; overflow: hidden auto;">
+			<CascadingValue Value="Parent">
+				@ChildContent
+			</CascadingValue>
+		</div>
+	</div>
+</Popover>
+
+@code {
+	[CascadingParameter] public required Select Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"bg-popover text-popover-foreground",
+		"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+		"data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+		"relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin)",
+		"overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
+		"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1" )
+											.With( ClassName )
+											.Build();
+
+	private async Task OnPopoverClose() => await Parent.Close();
+}

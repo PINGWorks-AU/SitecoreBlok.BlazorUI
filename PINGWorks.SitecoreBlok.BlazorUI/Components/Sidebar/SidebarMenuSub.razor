@@ -1,0 +1,17 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<ul data-slot="sidebar-menu-sub" data-sidebar="menu-sub" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+</ul>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5",
+		"group-data-[collapsible=icon]:hidden" )
+		.With( ClassName )
+		.Build();
+}

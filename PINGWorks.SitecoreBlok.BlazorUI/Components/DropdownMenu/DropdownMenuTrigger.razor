@@ -1,0 +1,27 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button @ref="Ref" type="button" data-slot="dropdown-menu-trigger"
+		class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+	@ChildContent
+</button>
+
+@code {
+	[CascadingParameter] public required DropdownMenu Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private ElementReference Ref;
+
+	private string CssClass => CssClassBuilder.Start( "relative inline-block" )
+											.With( ClassName )
+											.Build();
+
+	protected override void OnAfterRender( bool firstRender )
+	{
+		if ( firstRender )
+			Parent.RegisterTriggerRef( Ref );
+	}
+
+	private async Task OnClick() => await Parent.Toggle();
+}

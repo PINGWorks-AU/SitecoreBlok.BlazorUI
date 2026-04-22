@@ -1,0 +1,81 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* Mobile Sheet-based rendering is not ported — Blok switches to a Sheet when useIsMobile() returns
+   true, but our Tooltip lacks TooltipProvider/delayDuration parity and the Sheet round-trip fights
+   Blazor SSR. Desktop rendering only; consumers can wrap with <Sheet> directly for mobile. *@
+@if ( Collapsible is SidebarCollapsible.None )
+{
+	<div data-slot="sidebar" class="@NoneCssClass" @attributes="AdditionalAttributes">
+		@ChildContent
+	</div>
+}
+else
+{
+	<div class="group peer hidden text-sidebar-foreground md:block"
+			data-state="@State"
+			data-collapsible="@CollapsibleAttr"
+			data-variant="@VariantAttr"
+			data-side="@SideAttr"
+			data-slot="sidebar">
+		<div data-slot="sidebar-gap" class="@GapCssClass"></div>
+		<div data-slot="sidebar-container" class="@ContainerCssClass" @attributes="AdditionalAttributes">
+			<div data-sidebar="sidebar" data-slot="sidebar-inner"
+					class="flex h-full w-full flex-col px-2 py-6 group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm bg-sidebar text-sidebar-foreground">
+				@ChildContent
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	[CascadingParameter] public SidebarProvider? Provider { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public SidebarSide Side { get; set; } = SidebarSide.Left;
+	[Parameter] public SidebarVariant Variant { get; set; } = SidebarVariant.Sidebar;
+	[Parameter] public SidebarCollapsible Collapsible { get; set; } = SidebarCollapsible.Offcanvas;
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string State => Provider?.State ?? "expanded";
+	private string SideAttr => Side is SidebarSide.Right ? "right" : "left";
+	private string VariantAttr => Variant switch { SidebarVariant.Floating => "floating", SidebarVariant.Inset => "inset", _ => "sidebar" };
+	private string CollapsibleAttr => State == "collapsed" ? ( Collapsible switch { SidebarCollapsible.Icon => "icon", SidebarCollapsible.None => "none", _ => "offcanvas" } ) : "";
+
+	private string NoneCssClass => CssClassBuilder.Start( "flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground" )
+												.With( ClassName )
+												.Build();
+
+	private string GapCssClass
+	{
+		get
+		{
+			var iconCls = Variant is SidebarVariant.Floating or SidebarVariant.Inset
+				? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
+				: "group-data-[collapsible=icon]:w-(--sidebar-width-icon)";
+			return CssClassBuilder.Start(
+				"relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear",
+				"group-data-[collapsible=offcanvas]:w-0",
+				"group-data-[side=right]:rotate-180",
+				iconCls ).Build();
+		}
+	}
+
+	private string ContainerCssClass
+	{
+		get
+		{
+			var sideCls = Side is SidebarSide.Left
+				? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
+				: "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]";
+			var iconCls = Variant is SidebarVariant.Floating or SidebarVariant.Inset
+				? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
+				: "group-data-[collapsible=icon]:w-(--sidebar-width-icon)";
+			return CssClassBuilder.Start(
+				"absolute inset-y-0 z-10 hidden h-full w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+				sideCls,
+				iconCls )
+				.With( ClassName )
+				.Build();
+		}
+	}
+}

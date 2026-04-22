@@ -1,0 +1,114 @@
+@page "/primitives/tooltip"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Tooltip" Description="A popup that displays information related to an element on hover" Interactivity="ComponentInteractivity.Ssr" ApiElements="@TooltipElements">
+
+	<DivergenceNote>
+		<p><strong>CSS-only hover; no Radix portal or delay configurability.</strong> Blok wraps Radix UI's Tooltip primitive which uses a portal, computed positioning, and a configurable <code>delayDuration</code>. BlazorUI's Tooltip uses a pure CSS <code>group-hover</code> mechanism — no JavaScript, no portal, no delay. Trade-off: simpler and SSR-safe, but the tooltip is positioned relative to the trigger's nearest positioned ancestor (instead of the viewport), so it can be clipped by overflow containers. <code>TooltipProvider</code> is intentionally not implemented (it has no analog without a delay system).</p>
+		<p><strong>Text colour: <code>text-white</code>, not <code>text-inverse-text</code>.</strong> Blok's source uses <code>text-inverse-text</code> on the <code>bg-gray-700</code> tooltip surface. Our token <code>--color-inverse-text</code> flips to a dark colour in dark mode (which is correct on light surfaces like buttons) — but the tooltip surface is hardcoded gray-700 in <em>both</em> modes, so the inverted token would render dark text on a dark surface. We use <code>text-white</code> literal to keep tooltip text readable in dark mode.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Bottom (default)" Code="@("<Tooltip>\n    <TooltipTrigger>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\">Hover me</Button>\n    </TooltipTrigger>\n    <TooltipContent>This is a tooltip</TooltipContent>\n</Tooltip>")">
+			<div class="flex justify-center py-20">
+				<Tooltip>
+					<TooltipTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Hover me</Button>
+					</TooltipTrigger>
+					<TooltipContent>This is a tooltip</TooltipContent>
+				</Tooltip>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Top" Code="@("<Tooltip>\n    <TooltipTrigger>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\">Top</Button>\n    </TooltipTrigger>\n    <TooltipContent Side=\"TooltipSide.Top\">Tooltip on top</TooltipContent>\n</Tooltip>")">
+			<div class="flex justify-center py-20">
+				<Tooltip>
+					<TooltipTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Top</Button>
+					</TooltipTrigger>
+					<TooltipContent Side="TooltipSide.Top">Tooltip on top</TooltipContent>
+				</Tooltip>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Left" Code="@("<Tooltip>\n    <TooltipTrigger>\n        <Button>Left</Button>\n    </TooltipTrigger>\n    <TooltipContent Side=\"TooltipSide.Left\">Tooltip on left</TooltipContent>\n</Tooltip>")">
+			<div class="flex justify-center py-20">
+				<Tooltip>
+					<TooltipTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Left</Button>
+					</TooltipTrigger>
+					<TooltipContent Side="TooltipSide.Left">Tooltip on left</TooltipContent>
+				</Tooltip>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Right" Code="@("<Tooltip>\n    <TooltipTrigger>\n        <Button>Right</Button>\n    </TooltipTrigger>\n    <TooltipContent Side=\"TooltipSide.Right\">Tooltip on right</TooltipContent>\n</Tooltip>")">
+			<div class="flex justify-center py-20">
+				<Tooltip>
+					<TooltipTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Right</Button>
+					</TooltipTrigger>
+					<TooltipContent Side="TooltipSide.Right">Tooltip on right</TooltipContent>
+				</Tooltip>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Rich content" Code="@("<Tooltip>\n    <TooltipTrigger>\n        <Button>Rich</Button>\n    </TooltipTrigger>\n    <TooltipContent>\n        <div class=\"flex items-center gap-2\">\n            <Icon Svg=\"@IconSvg.Information\" ClassName=\"size-3.5\" />\n            <span>Now with icons and formatted markup</span>\n        </div>\n    </TooltipContent>\n</Tooltip>")">
+			<div class="flex justify-center py-20">
+				<Tooltip>
+					<TooltipTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Rich content</Button>
+					</TooltipTrigger>
+					<TooltipContent>
+						<div class="flex items-center gap-2">
+							<Icon Svg="@IconSvg.Information" ClassName="size-3.5" />
+							<span>Now with icons and formatted markup</span>
+						</div>
+					</TooltipContent>
+				</Tooltip>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] TooltipElements =
+	[
+		new ApiElement(
+			Name: "Tooltip",
+			Description: "Root wrapper that sets up the CSS `group` used to drive hover-based visibility of the `TooltipContent` child.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Must contain a `TooltipTrigger` and a `TooltipContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "TooltipTrigger",
+			Description: "Wraps the element that activates the tooltip on hover. Renders an inline-flex `<span>` around its child.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the trigger wrapper." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "The element the user hovers over — usually a `Button` or icon." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the trigger wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "TooltipContent",
+			Description: "The popup body shown on trigger hover. Positioned via `Side` relative to the trigger's nearest positioned ancestor.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Side",                 "TooltipSide",                   false, "Placement relative to the trigger. Default: `TooltipSide.Bottom`. Other values: `Top`, `Left`, `Right`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the tooltip body." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Tooltip content — plain text or inline markup." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the tooltip body." ),
+			]
+		),
+	];
+}

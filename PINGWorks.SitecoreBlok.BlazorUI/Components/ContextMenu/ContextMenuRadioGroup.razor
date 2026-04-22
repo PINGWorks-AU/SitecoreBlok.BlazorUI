@@ -1,0 +1,21 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="this">
+	<div data-slot="context-menu-radio-group" role="group" class="@( ClassName ?? string.Empty )">
+		@ChildContent
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	internal async Task Select( string? value )
+	{
+		Value = value;
+		await ValueChanged.InvokeAsync( value );
+		await InvokeAsync( StateHasChanged );
+	}
+}

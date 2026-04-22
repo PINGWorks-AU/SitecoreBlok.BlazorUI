@@ -1,0 +1,29 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button data-slot="sidebar-menu-action" data-sidebar="menu-action" class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+	@ChildContent
+</button>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool ShowOnHover { get; set; }
+	[Parameter] public EventCallback OnClicked { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"absolute right-1 -translate-y-0.5 flex aspect-square h-8 items-center justify-center rounded-md p-0 text-neutral-fg ring-sidebar-ring outline-hidden transition-transform",
+		"peer-hover/menu-button:text-neutral-fg peer-active/menu-button:text-primary-fg",
+		"hover:bg-transparent hover:text-primary-fg focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 cursor-pointer",
+		"peer-data-[disabled=true]/menu-button:pointer-events-none peer-data-[disabled=true]/menu-button:opacity-50",
+		"after:absolute after:-inset-2 md:after:hidden",
+		"peer-data-[size=sm]/menu-button:top-1",
+		"peer-data-[size=default]/menu-button:top-1.5",
+		"peer-data-[size=lg]/menu-button:top-2.5",
+		"group-data-[collapsible=icon]:hidden" )
+		.With( "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0", ShowOnHover )
+		.With( ClassName )
+		.Build();
+
+	private Task OnClick() => OnClicked.InvokeAsync();
+}

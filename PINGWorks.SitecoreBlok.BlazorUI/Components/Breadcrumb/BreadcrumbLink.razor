@@ -1,0 +1,16 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<a data-slot="breadcrumb-link" href="@Href" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+</a>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? Href { get; set; }
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start("hover:text-foreground transition-colors")
+										.With(ClassName)
+										.Build();
+}

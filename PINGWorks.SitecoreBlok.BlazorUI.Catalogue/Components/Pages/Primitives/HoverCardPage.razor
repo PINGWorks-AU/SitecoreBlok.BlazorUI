@@ -1,0 +1,138 @@
+@page "/primitives/hovercard"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="HoverCard" Description="For sighted users to preview content available behind a link" Interactivity="ComponentInteractivity.Interactive" ApiElements="@HoverCardElements">
+
+	<DivergenceNote>
+		<p><strong>No explicit <code>TooltipProvider</code>-style root.</strong> Blok wraps Radix UI's HoverCard primitive which honours a shared <code>delayDuration</code> context. BlazorUI's HoverCard self-manages <code>OpenDelay</code> / <code>CloseDelay</code> per instance (defaults <code>700</code> / <code>300</code> ms, matching Radix), so no provider component is required.</p>
+		<p><strong>Hover-only; focus does not open the card.</strong> Radix opens the card on keyboard focus for a11y. For now BlazorUI's trigger responds only to mouse <code>mouseenter</code> / <code>mouseleave</code>. If you need keyboard-driven preview, use <code>Popover</code>.</p>
+		<p><strong>Positioning is computed from trigger bounds with a known <code>w-64</code> (256px) content width.</strong> Content height is unknown pre-render, so <code>Side="HoverCardSide.Top"</code> and <code>Side="HoverCardSide.Left"</code> use a short height estimate on the first open; the enter animation masks the minor correction.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<HoverCard>\n    <HoverCardTrigger>\n        <Button Variant=\"ButtonVariant.Link\">@sitecore</Button>\n    </HoverCardTrigger>\n    <HoverCardContent>\n        <div class=\"flex justify-between gap-4\">\n            <Avatar>\n                <AvatarImage Src=\"https://github.com/sitecore.png\" Alt=\"@sitecore\" />\n                <AvatarFallback>SC</AvatarFallback>\n            </Avatar>\n            <div class=\"space-y-1\">\n                <h4 class=\"text-sm font-semibold\">@@sitecore</h4>\n                <p class=\"text-sm\">The official Sitecore repositories on GitHub.</p>\n                <div class=\"text-muted-foreground flex items-center gap-2 text-xs\">\n                    <Icon Svg=\"@IconSvg.Calendar\" ClassName=\"size-3\" />\n                    <span>Joined December 2006</span>\n                </div>\n            </div>\n        </div>\n    </HoverCardContent>\n</HoverCard>")">
+			<div class="flex justify-center py-16">
+				<HoverCard>
+					<HoverCardTrigger>
+						<Button Variant="ButtonVariant.Link">@("@sitecore")</Button>
+					</HoverCardTrigger>
+					<HoverCardContent>
+						<div class="flex justify-between gap-4">
+							<Avatar>
+								<AvatarImage Src="https://github.com/sitecore.png" Alt="sitecore" />
+								<AvatarFallback>SC</AvatarFallback>
+							</Avatar>
+							<div class="space-y-1">
+								<h4 class="text-sm font-semibold">@("@sitecore")</h4>
+								<p class="text-sm">The official Sitecore repositories on GitHub.</p>
+								<div class="text-muted-foreground flex items-center gap-2 text-xs">
+									<Icon Svg="@IconSvg.Calendar" ClassName="size-3" />
+									<span>Joined December 2006</span>
+								</div>
+							</div>
+						</div>
+					</HoverCardContent>
+				</HoverCard>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Side: top" Code="@("<HoverCard>\n    <HoverCardTrigger>\n        <Button Variant=\"ButtonVariant.Outline\">Hover me</Button>\n    </HoverCardTrigger>\n    <HoverCardContent Side=\"HoverCardSide.Top\">\n        <p class=\"text-sm\">Card appears above the trigger.</p>\n    </HoverCardContent>\n</HoverCard>")">
+			<div class="flex justify-center py-20">
+				<HoverCard>
+					<HoverCardTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Hover me</Button>
+					</HoverCardTrigger>
+					<HoverCardContent Side="HoverCardSide.Top">
+						<p class="text-sm">Card appears above the trigger.</p>
+					</HoverCardContent>
+				</HoverCard>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Side: right" Code="@("<HoverCard>\n    <HoverCardTrigger>\n        <Button Variant=\"ButtonVariant.Outline\">Hover me</Button>\n    </HoverCardTrigger>\n    <HoverCardContent Side=\"HoverCardSide.Right\">\n        <p class=\"text-sm\">Card appears to the right of the trigger.</p>\n    </HoverCardContent>\n</HoverCard>")">
+			<div class="flex justify-center py-20">
+				<HoverCard>
+					<HoverCardTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Hover me</Button>
+					</HoverCardTrigger>
+					<HoverCardContent Side="HoverCardSide.Right">
+						<p class="text-sm">Card appears to the right of the trigger.</p>
+					</HoverCardContent>
+				</HoverCard>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Alignment: start" Code="@("<HoverCard>\n    <HoverCardTrigger>\n        <Button Variant=\"ButtonVariant.Outline\">Align start</Button>\n    </HoverCardTrigger>\n    <HoverCardContent Align=\"HoverCardAlign.Start\">\n        <p class=\"text-sm\">The card aligns to the start edge of the trigger.</p>\n    </HoverCardContent>\n</HoverCard>")">
+			<div class="flex justify-center py-16">
+				<HoverCard>
+					<HoverCardTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Align start</Button>
+					</HoverCardTrigger>
+					<HoverCardContent Align="HoverCardAlign.Start">
+						<p class="text-sm">The card aligns to the start edge of the trigger.</p>
+					</HoverCardContent>
+				</HoverCard>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Custom delay" Code="@("<HoverCard OpenDelay=\"150\" CloseDelay=\"100\">\n    <HoverCardTrigger>\n        <Button Variant=\"ButtonVariant.Outline\">Fast open</Button>\n    </HoverCardTrigger>\n    <HoverCardContent>\n        <p class=\"text-sm\">Opens after 150ms instead of the default 700ms.</p>\n    </HoverCardContent>\n</HoverCard>")">
+			<div class="flex justify-center py-16">
+				<HoverCard OpenDelay="150" CloseDelay="100">
+					<HoverCardTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Fast open</Button>
+					</HoverCardTrigger>
+					<HoverCardContent>
+						<p class="text-sm">Opens after 150ms instead of the default 700ms.</p>
+					</HoverCardContent>
+				</HoverCard>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] HoverCardElements =
+	[
+		new ApiElement(
+			Name: "HoverCard",
+			Description: "Root container that owns the open/close state and timing. Cascades itself to `HoverCardTrigger` and `HoverCardContent` children.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "OpenDelay",    "int",               false, "Milliseconds to wait after mouse enter before opening. Default: `700`." ),
+				new ApiProperty( "CloseDelay",   "int",               false, "Milliseconds to wait after mouse leave before closing. Default: `300`." ),
+				new ApiProperty( "OpenChanged",  "EventCallback<bool>", false, "Invoked when the card opens or closes." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",   false, "Should contain one `HoverCardTrigger` and one `HoverCardContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "HoverCardTrigger",
+			Description: "Element that opens the `HoverCard` on mouse enter. Registers its bounds with the parent so the content can position itself.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the trigger `<span>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Trigger content — typically a link, button, or avatar." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the trigger `<span>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "HoverCardContent",
+			Description: "Pop-over body rendered at fixed position when the `HoverCard` is open. Hovering the body keeps it open via a cancelled close timer.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Side",                 "HoverCardSide",                 false, "Which edge of the trigger to anchor to. Default: `HoverCardSide.Bottom`. Other values: `Top`, `Right`, `Left`." ),
+				new ApiProperty( "Align",                "HoverCardAlign",                false, "Alignment along the chosen side. Default: `HoverCardAlign.Center`. Other values: `Start`, `End`." ),
+				new ApiProperty( "SideOffset",           "int",                           false, "Pixel gap between trigger and content along the chosen side. Default: `4`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the content container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "The pop-over's body content." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the content container." ),
+			]
+		),
+	];
+}

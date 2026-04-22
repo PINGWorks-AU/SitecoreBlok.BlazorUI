@@ -1,0 +1,260 @@
+@page "/primitives/card"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Card" Description="Displays a card with header, content, and footer" Interactivity="ComponentInteractivity.Ssr" ApiElements="@CardElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Card>\n    <CardHeader>\n        <CardTitle>Card Title</CardTitle>\n        <CardDescription>Card description goes here.</CardDescription>\n    </CardHeader>\n    <CardContent>This is the card content area.</CardContent>\n    <CardFooter>\n        <Button>Action</Button>\n    </CardFooter>\n</Card>")">
+			<Card>
+				<CardHeader>
+					<CardTitle>Card Title</CardTitle>
+					<CardDescription>Card description goes here.</CardDescription>
+				</CardHeader>
+				<CardContent>This is the card content area.</CardContent>
+				<CardFooter>
+					<Button>Action</Button>
+				</CardFooter>
+			</Card>
+		</ComponentExample>
+
+		<ComponentExample Title="Elevation" Code="@("<Card Elevation=\"CardElevation.None\">...</Card>\n<Card Elevation=\"CardElevation.Xs\">...</Card>\n<Card Elevation=\"CardElevation.Sm\">...</Card>\n<Card Elevation=\"CardElevation.Base\">...</Card>\n<Card Elevation=\"CardElevation.Md\">...</Card>\n<Card Elevation=\"CardElevation.Lg\">...</Card>")">
+			<div class="grid grid-cols-3 gap-4">
+				<Card Elevation="CardElevation.None" Padding="CardPadding.Sm">
+					<CardContent>None</CardContent>
+				</Card>
+				<Card Elevation="CardElevation.Xs" Padding="CardPadding.Sm">
+					<CardContent>Xs</CardContent>
+				</Card>
+				<Card Elevation="CardElevation.Sm" Padding="CardPadding.Sm">
+					<CardContent>Sm</CardContent>
+				</Card>
+				<Card Elevation="CardElevation.Base" Padding="CardPadding.Sm">
+					<CardContent>Base</CardContent>
+				</Card>
+				<Card Elevation="CardElevation.Md" Padding="CardPadding.Sm">
+					<CardContent>Md</CardContent>
+				</Card>
+				<Card Elevation="CardElevation.Lg" Padding="CardPadding.Sm">
+					<CardContent>Lg</CardContent>
+				</Card>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Styles" Code="@("<Card Style=\"CardStyle.Flat\">...</Card>\n<Card Style=\"CardStyle.Outline\">...</Card>\n<Card Style=\"CardStyle.Filled\">...</Card>")">
+			<div class="grid grid-cols-3 gap-4">
+				<Card Style="CardStyle.Flat" Padding="CardPadding.Sm">
+					<CardContent>Flat</CardContent>
+				</Card>
+				<Card Style="CardStyle.Outline" Padding="CardPadding.Sm">
+					<CardContent>Outline</CardContent>
+				</Card>
+				<Card Style="CardStyle.Filled" Padding="CardPadding.Sm">
+					<CardContent>Filled</CardContent>
+				</Card>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Padding" Code="@("<Card Padding=\"CardPadding.Sm\">...</Card>\n<Card Padding=\"CardPadding.Md\">...</Card>\n<Card Padding=\"CardPadding.Lg\">...</Card>")">
+			<div class="grid grid-cols-3 gap-4">
+				<Card Padding="CardPadding.Sm" Style="CardStyle.Outline">
+					<CardContent>Sm padding</CardContent>
+				</Card>
+				<Card Padding="CardPadding.Md" Style="CardStyle.Outline">
+					<CardContent>Md padding</CardContent>
+				</Card>
+				<Card Padding="CardPadding.Lg" Style="CardStyle.Outline">
+					<CardContent>Lg padding</CardContent>
+				</Card>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Hover Elevation" Code="@("<Card Elevation=\"CardElevation.None\" HoverElevation=\"CardElevation.Md\"\n      Style=\"CardStyle.Outline\" ClassName=\"cursor-pointer\">\n    <CardContent>None → Md on hover</CardContent>\n</Card>\n\n<Card Elevation=\"CardElevation.Xs\" HoverElevation=\"CardElevation.Lg\"\n      Style=\"CardStyle.Outline\" ClassName=\"cursor-pointer\">\n    <CardContent>Xs → Lg on hover</CardContent>\n</Card>\n\n<Card Elevation=\"CardElevation.Sm\" Style=\"CardStyle.Outline\">\n    <CardContent>No HoverElevation — no effect</CardContent>\n</Card>")">
+			<p class="text-sm text-muted-foreground mb-4">Set <code>HoverElevation</code> to a different level than <code>Elevation</code> to get a shadow lift on hover. Omit it for no hover effect.</p>
+			<div class="grid grid-cols-3 gap-4">
+				<Card Elevation="CardElevation.None" HoverElevation="CardElevation.Md" Style="CardStyle.Outline" Padding="CardPadding.Sm" ClassName="cursor-pointer">
+					<CardContent>
+						<p class="text-sm font-medium">None → Md</p>
+						<p class="text-xs text-muted-foreground">Hover me</p>
+					</CardContent>
+				</Card>
+				<Card Elevation="CardElevation.Xs" HoverElevation="CardElevation.Lg" Style="CardStyle.Outline" Padding="CardPadding.Sm" ClassName="cursor-pointer">
+					<CardContent>
+						<p class="text-sm font-medium">Xs → Lg</p>
+						<p class="text-xs text-muted-foreground">Hover me</p>
+					</CardContent>
+				</Card>
+				<Card Elevation="CardElevation.Sm" Style="CardStyle.Outline" Padding="CardPadding.Sm">
+					<CardContent>
+						<p class="text-sm font-medium">Sm (no hover)</p>
+						<p class="text-xs text-muted-foreground">No HoverElevation set</p>
+					</CardContent>
+				</Card>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With CardAction" Code="@("<Card Style=\"CardStyle.Outline\">\n    <CardHeader>\n        <CardTitle>Project Settings</CardTitle>\n        <CardDescription>Manage your project configuration.</CardDescription>\n        <CardAction>\n            <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Edit</Button>\n        </CardAction>\n    </CardHeader>\n    <CardContent>Header action button aligned to the top-right.</CardContent>\n</Card>")">
+			<Card Style="CardStyle.Outline">
+				<CardHeader>
+					<CardTitle>Project Settings</CardTitle>
+					<CardDescription>Manage your project configuration.</CardDescription>
+					<CardAction>
+						<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Edit</Button>
+					</CardAction>
+				</CardHeader>
+				<CardContent>Header action button aligned to the top-right.</CardContent>
+			</Card>
+		</ComponentExample>
+
+		<ComponentExample Title="Vertical Detail Card" Code="@("<Card Style=\"CardStyle.Outline\" Elevation=\"CardElevation.Xs\" HoverElevation=\"CardElevation.Md\" ClassName=\"cursor-pointer\">\n    <CardHeader>\n        <CardTitle>Getting Started with XM Cloud</CardTitle>\n        <CardDescription>Learn how to set up your first instance.</CardDescription>\n    </CardHeader>\n    <CardContent>\n        <div class=\"flex gap-2\">\n            <Badge ColorScheme=\"BadgeColor.Primary\">Guide</Badge>\n            <Badge ColorScheme=\"BadgeColor.Teal\">XM Cloud</Badge>\n        </div>\n    </CardContent>\n    <CardFooter>\n        <span class=\"text-xs text-muted-foreground\">Updated 2 days ago</span>\n    </CardFooter>\n</Card>")">
+			<div class="grid grid-cols-2 gap-4">
+				<Card Style="CardStyle.Outline" Elevation="CardElevation.Xs" HoverElevation="CardElevation.Md" ClassName="cursor-pointer">
+					<CardHeader>
+						<CardTitle>Getting Started with XM Cloud</CardTitle>
+						<CardDescription>Learn how to set up your first XM Cloud instance and begin building.</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div class="flex gap-2">
+							<Badge ColorScheme="BadgeColor.Primary">Guide</Badge>
+							<Badge ColorScheme="BadgeColor.Teal">XM Cloud</Badge>
+						</div>
+					</CardContent>
+					<CardFooter>
+						<span class="text-xs text-muted-foreground">Updated 2 days ago</span>
+					</CardFooter>
+				</Card>
+				<Card Style="CardStyle.Outline" Elevation="CardElevation.Xs" HoverElevation="CardElevation.Md" ClassName="cursor-pointer">
+					<CardHeader>
+						<CardTitle>Content Hub Integration</CardTitle>
+						<CardDescription>Connect your DAM assets to your web experiences seamlessly.</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div class="flex gap-2">
+							<Badge ColorScheme="BadgeColor.Success">Tutorial</Badge>
+							<Badge ColorScheme="BadgeColor.Cyan">Content Hub</Badge>
+						</div>
+					</CardContent>
+					<CardFooter>
+						<span class="text-xs text-muted-foreground">Updated 5 days ago</span>
+					</CardFooter>
+				</Card>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Horizontal Small Card" Code="@("<Card Style=\"CardStyle.Outline\" Padding=\"CardPadding.Sm\" Elevation=\"CardElevation.Xs\" HoverElevation=\"CardElevation.Sm\"\n      ClassName=\"cursor-pointer flex-row items-center\">\n    <div class=\"shrink-0 size-12 rounded-md bg-primary-bg flex items-center justify-center\">\n        <Icon Svg=\"@@IconSvg.FileDocument\" ClassName=\"size-6 text-primary-fg\" />\n    </div>\n    <CardContent>\n        <p class=\"text-sm font-medium\">Document Title</p>\n        <p class=\"text-xs text-muted-foreground\">PDF - 2.4 MB</p>\n    </CardContent>\n</Card>")">
+			<div class="space-y-3 max-w-md">
+				<Card Style="CardStyle.Outline" Padding="CardPadding.Sm" Elevation="CardElevation.Xs" HoverElevation="CardElevation.Sm" ClassName="cursor-pointer flex-row items-center">
+					<div class="shrink-0 size-12 rounded-md bg-primary-bg flex items-center justify-center">
+						<Icon Svg="@IconSvg.FileDocument" ClassName="size-6 text-primary-fg" />
+					</div>
+					<CardContent>
+						<p class="text-sm font-medium">Campaign Brief Q4</p>
+						<p class="text-xs text-muted-foreground">PDF - 2.4 MB</p>
+					</CardContent>
+				</Card>
+				<Card Style="CardStyle.Outline" Padding="CardPadding.Sm" Elevation="CardElevation.Xs" HoverElevation="CardElevation.Sm" ClassName="cursor-pointer flex-row items-center">
+					<div class="shrink-0 size-12 rounded-md bg-success-bg flex items-center justify-center">
+						<Icon Svg="@IconSvg.Image" ClassName="size-6 text-success-fg" />
+					</div>
+					<CardContent>
+						<p class="text-sm font-medium">Hero Banner Asset</p>
+						<p class="text-xs text-muted-foreground">PNG - 1.1 MB</p>
+					</CardContent>
+				</Card>
+				<Card Style="CardStyle.Outline" Padding="CardPadding.Sm" Elevation="CardElevation.Xs" HoverElevation="CardElevation.Sm" ClassName="cursor-pointer flex-row items-center">
+					<div class="shrink-0 size-12 rounded-md bg-warning-bg flex items-center justify-center">
+						<Icon Svg="@IconSvg.Video" ClassName="size-6 text-warning-fg" />
+					</div>
+					<CardContent>
+						<p class="text-sm font-medium">Product Demo Video</p>
+						<p class="text-xs text-muted-foreground">MP4 - 48.2 MB</p>
+					</CardContent>
+				</Card>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] CardElements =
+	[
+		new ApiElement(
+			Name: "Card",
+			Description: "Top-level card container. Combines `Style` (border treatment), `Elevation` (resting shadow), `HoverElevation` (shadow on hover), and `Padding` (inner spacing + corner radius) into one composable surface.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Elevation",            "CardElevation",                 false, "Resting shadow depth. Default: `CardElevation.None`. Other values: `Xs`, `Sm`, `Base`, `Md`, `Lg`, `Xl`." ),
+				new ApiProperty( "HoverElevation",       "CardElevation?",                false, "Shadow depth on hover. Only applied when different from `Elevation`; leave unset for no hover effect." ),
+				new ApiProperty( "Style",                "CardStyle",                     false, "Border/background treatment. Default: `CardStyle.Flat`. Other values: `Outline` (bordered), `Filled` (subtle fill, no border)." ),
+				new ApiProperty( "Padding",              "CardPadding",                   false, "Inner padding + corner radius preset. Default: `CardPadding.Lg`. Other values: `Sm`, `Md`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the card. Use to override flex direction (`flex-row`) or add `cursor-pointer`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Card body. Typically `CardHeader` + `CardContent` + `CardFooter`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the card container." ),
+			]
+		),
+		new ApiElement(
+			Name: "CardHeader",
+			Description: "Top section of the `Card`. Holds `CardTitle`, `CardDescription`, and optionally a `CardAction` that auto-aligns to the top-right via CSS grid.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the header grid." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Usually `CardTitle` + `CardDescription`, optionally with a `CardAction`." ),
+			]
+		),
+		new ApiElement(
+			Name: "CardContent",
+			Description: "Main body slot of the `Card`. No built-in padding of its own — relies on the parent `Card`'s `Padding` setting.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the content div." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Card body content." ),
+			]
+		),
+		new ApiElement(
+			Name: "CardFooter",
+			Description: "Bottom section of the `Card`. Flex row with centred alignment.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the footer." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Usually buttons or secondary metadata." ),
+			]
+		),
+		new ApiElement(
+			Name: "CardTitle",
+			Description: "Heading inside the `CardHeader`. Renders as a semibold text block.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the title div." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Card title text." ),
+			]
+		),
+		new ApiElement(
+			Name: "CardDescription",
+			Description: "Subheading inside the `CardHeader`. Rendered in muted-foreground small text.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the description div." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Short descriptive text." ),
+			]
+		),
+		new ApiElement(
+			Name: "CardAction",
+			Description: "Optional trailing action inside the `CardHeader`. Auto-positions to the top-right via CSS grid column placement — the `CardHeader` detects this child and switches to a two-column layout.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the action container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Usually a single compact `Button`." ),
+			]
+		),
+	];
+}

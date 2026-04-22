@@ -1,0 +1,51 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* Content renders in the same render tree as Combobox — not via Popovers host — so items
+   re-render live as Parent.InputValue changes (filter typing). Fixed-positioned to escape
+   overflow/clipping like DropdownMenu. Anti-revert: do NOT wrap this in <Popover>; the
+   Popovers host does not re-render when Combobox state changes, which breaks the filter.
+
+   The popup is ALWAYS mounted and hidden via display:none when closed — NOT wrapped in
+   `@if IsOpen`. This lets ComboboxItems register with the parent (populating the LabelCache)
+   even when the dropdown hasn't been opened yet, so pre-selected values render the item's
+   Label in the input instead of the raw value, and ComboboxChip can resolve value→label. *@
+@if ( Parent.IsOpen )
+{
+	<div class="fixed inset-0 z-40" @onclick="OnBackdropClick"></div>
+}
+<div data-slot="combobox-content" data-state="@( Parent.IsOpen ? "open" : "closed" )" data-side="bottom"
+	 class="@CssClass"
+	 style="@ContentStyle">
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] public required Combobox Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string ContentStyle
+	{
+		get
+		{
+			if ( !Parent.IsOpen ) return "display:none";
+			return $"left:{Parent.X}px;top:{Parent.Y}px;min-width:{Parent.AnchorWidth}px;--radix-popper-anchor-width:{Parent.AnchorWidth}px;--radix-popper-available-height:{Parent.AvailableHeight}px;";
+		}
+	}
+
+	@* Anti-revert: `fixed` is required so the inline `left`/`top` style actually positions
+	   the element — without it, the popup flows in normal document order and the style is ignored.
+	   See DropdownMenuContent for the same pattern. *@
+	private string CssClass => CssClassBuilder.Start(
+		"fixed bg-popover text-popover-foreground",
+		"data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95",
+		"data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+		"ring-foreground/10 group/combobox-content max-h-96 z-50",
+		"overflow-hidden rounded-md shadow-md ring-1 duration-100",
+		"*:data-[slot=input-group]:bg-input/30 *:data-[slot=input-group]:border-input/30",
+		"*:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-8 *:data-[slot=input-group]:shadow-none" )
+									.With( ClassName )
+									.Build();
+
+	private async Task OnBackdropClick() => await Parent.Close();
+}

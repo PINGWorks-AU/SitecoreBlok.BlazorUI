@@ -1,0 +1,39 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<span data-slot="combobox-chip" class="@CssClass">
+	@if ( ChildContent is not null )
+	{
+		@ChildContent
+	}
+	else
+	{
+		@Parent.GetLabelForValue( Value )
+	}
+	@if ( ShowRemove )
+	{
+		<button type="button" data-slot="combobox-chip-remove"
+				class="-ml-1 opacity-50 hover:opacity-100 focus-visible:outline-none rounded-sm"
+				@onclick="OnRemoveClick"
+				@onclick:stopPropagation="true">
+			<Icon Svg="@IconSvg.Close" Scale="0.7"
+				ClassName="pointer-events-none" />
+		</button>
+	}
+</span>
+
+@code {
+	[CascadingParameter] public required Combobox Parent { get; set; }
+	[Parameter, EditorRequired] public required string Value { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool ShowRemove { get; set; } = true;
+
+	private string CssClass => CssClassBuilder.Start(
+		"bg-primary-background text-foreground flex h-[calc(--spacing(5.5))] w-fit items-center justify-center gap-1 rounded-sm px-1.5 text-xs font-medium whitespace-nowrap",
+		"has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50",
+		"has-data-[slot=combobox-chip-remove]:pr-0" )
+										.With( ClassName )
+										.Build();
+
+	private async Task OnRemoveClick() => await Parent.RemoveValue( Value );
+}

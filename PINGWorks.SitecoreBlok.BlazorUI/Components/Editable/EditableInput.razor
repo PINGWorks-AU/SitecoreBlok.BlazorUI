@@ -1,0 +1,97 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@if (Context?.IsEditing == true)
+{
+	<input @ref="InputRef"
+		   data-slot="editable-input"
+		   type="text"
+		   value="@Context.Value"
+		   placeholder="@Context.Placeholder"
+		   disabled="@Context.IsDisabled"
+		   class="@CssClass"
+		   @oninput="HandleInput"
+		   @onblur="HandleBlur"
+		   @onkeydown="HandleKeyDown"
+		   @attributes="AdditionalAttributes" />
+}
+
+@code {
+	[CascadingParameter] private EditableContext? Context { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private ElementReference InputRef;
+	private bool WasEditing;
+	private bool ShouldFocusAfterRender;
+	private IJSObjectReference? Module;
+
+	protected override void OnParametersSet()
+	{
+		if (Context?.IsEditing == true && !WasEditing)
+			ShouldFocusAfterRender = true;
+		WasEditing = Context?.IsEditing ?? false;
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (ShouldFocusAfterRender && Context?.IsEditing == true)
+		{
+			ShouldFocusAfterRender = false;
+			try
+			{
+				if (Context.SelectAllOnFocus)
+				{
+					// Import ensures window.SitecoreUI is set; then call via IJSRuntime which correctly resolves ElementReference
+					Module ??= await JS.InvokeAsync<IJSObjectReference>("import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js");
+					await Module.InvokeVoidAsync("SitecoreUI.focusAndSelectAll", InputRef);
+				}
+				else
+				{
+					await InputRef.FocusAsync();
+				}
+			}
+			catch { }
+		}
+	}
+
+	private async Task HandleInput(ChangeEventArgs e)
+	{
+		if (Context is null) return;
+		await Context.HandleChange(e.Value?.ToString() ?? "");
+	}
+
+	private async Task HandleBlur()
+	{
+		if (Context?.SubmitOnBlur == true && Context?.IsEditing == true)
+			await Context.SubmitEdit();
+	}
+
+	private async Task HandleKeyDown(KeyboardEventArgs e)
+	{
+		if (Context is null) return;
+		if (e.Key == "Enter")
+			await Context.SubmitEdit();
+		else if (e.Key == "Escape")
+			await Context.CancelEdit();
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+
+	private string CssClass => CssClassBuilder.Start(
+		"placeholder:text-muted-foreground selection:bg-primary selection:text-inverse-text",
+		"flex h-10 w-full min-w-0 rounded-sm border border-2 border-input bg-transparent dark:bg-transparent",
+		"px-3 py-1 text-base outline-none",
+		"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+		"md:text-sm focus-visible:ring-0 focus-visible:border-primary transition-colors")
+		.With(ClassName)
+		.Build();
+}

@@ -1,0 +1,54 @@
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@inject MigrationStatusService Migration
+
+<nav class="w-60 shrink-0 border-r border-border bg-background h-screen sticky top-0 overflow-y-auto">
+	<div class="px-4 h-14 flex items-center border-b border-border">
+		<a href="/" class="text-base font-bold text-foreground no-underline tracking-tight">Blok Blazor</a>
+	</div>
+
+	<div class="px-3 py-4 space-y-1">
+		<NavLink href="/" class="flex items-center rounded-md px-3 py-1.5 text-sm hover:bg-neutral-bg no-underline text-foreground" Match="NavLinkMatch.All">
+			Home
+		</NavLink>
+		<NavLink href="/primitives" class="flex items-center rounded-md px-3 py-1.5 text-sm hover:bg-neutral-bg no-underline text-foreground" Match="NavLinkMatch.All">
+			All primitives
+		</NavLink>
+
+		<div class="space-y-0.5 pt-3">
+			@foreach ( var entry in NavEntries )
+			{
+				<NavLink href="@($"primitives/{entry.Name.ToLowerInvariant()}")" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-neutral-bg no-underline text-foreground/70 hover:text-foreground transition-colors" ActiveClass="bg-primary-bg text-primary-fg font-semibold">
+					<span class="flex-1 truncate">@entry.Name</span>
+					@if ( entry.Status == ComponentStatus.Improved )
+					{
+						<Badge ColorScheme="BadgeColor.Blue" Size="BadgeSize.Sm">Improved</Badge>
+					}
+					else if ( entry.Status == ComponentStatus.Additional )
+					{
+						<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Additional</Badge>
+					}
+				</NavLink>
+			}
+		</div>
+	</div>
+</nav>
+
+@code {
+	private sealed record NavEntry( string Name, ComponentStatus? Status );
+
+	// Cross-reference stub pages (rendered in the Catalogue but not tracked in MIGRATION_STATUS.md).
+	// Keep this list tiny — each entry needs a real page under Primitives/{Name}Page.razor.
+	private static readonly NavEntry[] Stubs =
+	[
+		new( "Navigation (Side)", null ),
+		new( "Navigation (Stack)", null ),
+		new( "Sonner", null ),
+	];
+
+	private NavEntry[] NavEntries =>
+		Migration.Ported
+			.Select( e => new NavEntry( e.Name, e.Status ) )
+			.Concat( Stubs )
+			.OrderBy( e => e.Name, StringComparer.OrdinalIgnoreCase )
+			.ToArray();
+}

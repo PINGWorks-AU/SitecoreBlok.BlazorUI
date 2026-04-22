@@ -1,0 +1,13 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* `parity-no-text-pair`: skeleton is a placeholder — no text content. *@
+<div data-slot="skeleton" class="@CssClass" @attributes="AdditionalAttributes"></div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "animate-pulse rounded-md bg-neutral-50 parity-no-text-pair" )
+											.With( ClassName )
+											.Build();
+}

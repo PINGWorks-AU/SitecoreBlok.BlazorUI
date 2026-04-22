@@ -1,0 +1,110 @@
+@page "/primitives/alert"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Alert" Description="Displays a callout for user attention" Interactivity="ComponentInteractivity.Ssr" ApiElements="@AlertElements">
+
+	<DivergenceNote>
+		<p><strong>Additive feature: <code>Closeable</code> parameter.</strong> When set, Alert renders a built-in close button at the top right that hides the alert when clicked. Blok has no close affordance — consumers wire up dismissal themselves at the call site.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Alert>\n    <AlertTitle>Heads up!</AlertTitle>\n    <AlertDescription>This is a default alert.</AlertDescription>\n</Alert>")">
+			<Alert>
+				<AlertTitle>Heads up!</AlertTitle>
+				<AlertDescription>This is a default alert.</AlertDescription>
+			</Alert>
+		</ComponentExample>
+
+		<ComponentExample Title="Variants" Code="@("<Alert Variant=\"AlertVariant.Primary\">\n    <AlertTitle>Information</AlertTitle>\n    <AlertDescription>This is a primary alert.</AlertDescription>\n</Alert>\n<Alert Variant=\"AlertVariant.Danger\">\n    <AlertTitle>Error</AlertTitle>\n    <AlertDescription>This is a danger alert.</AlertDescription>\n</Alert>\n<Alert Variant=\"AlertVariant.Warning\">\n    <AlertTitle>Warning</AlertTitle>\n    <AlertDescription>This is a warning alert.</AlertDescription>\n</Alert>\n<Alert Variant=\"AlertVariant.Success\">\n    <AlertTitle>Success</AlertTitle>\n    <AlertDescription>This is a success alert.</AlertDescription>\n</Alert>")">
+			<div class="mb-4">
+				<Alert Variant="AlertVariant.Primary">
+					<AlertTitle>Information</AlertTitle>
+					<AlertDescription>This is a primary alert.</AlertDescription>
+				</Alert>
+			</div>
+			<div class="mb-4">
+				<Alert Variant="AlertVariant.Danger">
+					<AlertTitle>Error</AlertTitle>
+					<AlertDescription>This is a danger alert.</AlertDescription>
+				</Alert>
+			</div>
+			<div class="mb-4">
+				<Alert Variant="AlertVariant.Warning">
+					<AlertTitle>Warning</AlertTitle>
+					<AlertDescription>This is a warning alert.</AlertDescription>
+				</Alert>
+			</div>
+			<Alert Variant="AlertVariant.Success">
+				<AlertTitle>Success</AlertTitle>
+				<AlertDescription>This is a success alert.</AlertDescription>
+			</Alert>
+		</ComponentExample>
+
+		<ComponentExample Title="With close button (Blazor-only)" Code="@("<Alert Closeable Variant=\"AlertVariant.Primary\">\n    <AlertTitle>Dismissible</AlertTitle>\n    <AlertDescription>Click the X to close this alert.</AlertDescription>\n</Alert>")">
+			<Alert Closeable Variant="AlertVariant.Primary">
+				<AlertTitle>Dismissible</AlertTitle>
+				<AlertDescription>Click the X to close this alert.</AlertDescription>
+			</Alert>
+		</ComponentExample>
+
+		<ComponentExample Title="Custom body — anything inside Alert" Code="@("@* Alert renders the variant Icon + your children. Use AlertTitle/AlertDescription\n   for the standard layout, or pass any markup directly. *@\n<Alert Variant=\"AlertVariant.Warning\">\n    <div class=\"col-start-2 grid gap-1\">\n        <div class=\"font-semibold\">Your session is about to expire</div>\n        <p class=\"text-sm\">\n            You've been idle for 14 minutes. Click the button to extend.\n        </p>\n        <div class=\"pt-1\">\n            <Button Size=\"ButtonSize.Sm\" Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\">Stay signed in</Button>\n        </div>\n    </div>\n</Alert>")">
+			<Alert Variant="AlertVariant.Warning">
+				<div class="col-start-2 grid gap-1">
+					<div class="font-semibold">Your session is about to expire</div>
+					<p class="text-sm">
+						You've been idle for 14 minutes. For security, we'll sign you out in a moment unless you stay active.
+						Click the button to extend your session and continue where you left off.
+					</p>
+					<div class="pt-1">
+						<Button Size="ButtonSize.Sm" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Stay signed in</Button>
+					</div>
+				</div>
+			</Alert>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AlertElements =
+	[
+		new ApiElement(
+			Name: "Alert",
+			Description: "Container that renders a variant-appropriate icon plus its children. Accepts `AlertTitle`/`AlertDescription` for the standard layout or arbitrary markup for custom bodies.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Variant",              "AlertVariant",                  false, "Visual style / semantic meaning. Default: `AlertVariant.Default`. Other values: `Primary`, `Danger`, `Warning`, `Success`." ),
+				new ApiProperty( "Closeable",            "bool",                          false, "Blazor-only. When true, renders a close button at the top-right that hides the `Alert`. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the alert container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Alert body. Usually `AlertTitle` + `AlertDescription`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the alert container." ),
+			]
+		),
+		new ApiElement(
+			Name: "AlertTitle",
+			Description: "Heading placed in the `Alert`'s text column. Line-clamped to one line with semibold weight.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the title container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Title text or inline markup." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the title container." ),
+			]
+		),
+		new ApiElement(
+			Name: "AlertDescription",
+			Description: "Body text block placed in the `Alert`'s text column. Supports multi-line prose.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the description container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Description content. Paragraphs and inline elements render with relaxed leading." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the description container." ),
+			]
+		),
+	];
+}

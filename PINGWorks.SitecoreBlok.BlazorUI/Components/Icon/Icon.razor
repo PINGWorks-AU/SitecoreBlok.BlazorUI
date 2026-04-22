@@ -1,0 +1,148 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if (Variant == IconVariant.Default)
+{
+	@* Default variant: svg is the root element — ClassName lands directly on the SVG,
+	   which is required for rotation animations (Accordion chevron, TreeNode chevron)
+	   that use [&>svg]:rotate-* or pass transition-transform via ClassName. *@
+	<svg data-slot="icon" fill="@( AiGradient.HasValue ? "url(#ai-gradient)" : Fill )" transform="@( Scale.HasValue ? $"scale({Scale.Value})" : string.Empty )" viewBox="@ViewBox" aria-label="@Title" class="@CssClass" @attributes="AdditionalAttributes">
+		@if ( AiGradient is not null )
+		{
+			<defs>
+				<linearGradient id="ai-gradient" y1="100%" y2="0">
+					<stop stop-color="@($"var(--color-purple-{(int)AiGradient}00)")" offset="0%" />
+					<stop stop-color="@($"var(--color-red-{(int)AiGradient}00)")" offset="100%" />
+				</linearGradient>
+			</defs>
+		}
+		@if ( Title is not null )
+		{
+			<title>@Title</title>
+		}
+		<path d="@Svg" />
+	</svg>
+}
+else
+{
+	@* Subtle / Filled variants: span carries the tile background + padding + border-radius;
+	   SVG inside carries only the size class. ClassName goes on the span, AdditionalAttributes on the SVG. *@
+	<span data-slot="icon" class="@WrapperClass">
+		<svg fill="@( AiGradient.HasValue ? "url(#ai-gradient)" : Fill )" transform="@( Scale.HasValue ? $"scale({Scale.Value})" : string.Empty )" viewBox="@ViewBox" aria-label="@Title" class="@SizeClass" @attributes="AdditionalAttributes">
+			@if ( AiGradient is not null )
+			{
+				<defs>
+					<linearGradient id="ai-gradient" y1="100%" y2="0">
+						<stop stop-color="@($"var(--color-purple-{(int)AiGradient}00)")" offset="0%" />
+						<stop stop-color="@($"var(--color-red-{(int)AiGradient}00)")" offset="100%" />
+					</linearGradient>
+				</defs>
+			}
+			@if ( Title is not null )
+			{
+				<title>@Title</title>
+			}
+			<path d="@Svg" />
+		</svg>
+	</span>
+}
+
+@code {
+	[Parameter, EditorRequired] public required string Svg { get; set; }
+
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string ViewBox { get; set; } = "0 0 24 24";
+	[Parameter] public string? Title { get; set; }
+	[Parameter] public string Fill { get; set; } = "currentColor";
+
+	[Parameter] public double? Scale { get; set; }
+	[Parameter] public IconSize IconSize { get; set; } = IconSize.Default;
+	[Parameter] public IconVariant Variant { get; set; } = IconVariant.Default;
+
+	// Nullable: for Default variant, null means "inherit color from parent" (backward-compatible).
+	// For Subtle/Filled variants, null defaults to Primary.
+	[Parameter] public IconColorScheme? ColorScheme { get; set; }
+
+	[Parameter] public AiGradient? AiGradient { get; set; }
+
+	[Parameter] public bool ResetClassName { get; set; }
+
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	// `ResetClassName` opts out of the LAYOUT defaults (`inline-block align-middle
+	// shrink-0`) so the consumer can fully control positioning. It does NOT strip
+	// the `SizeClass` derived from `IconSize` — that would leave the SVG with no
+	// dimensions and render it at viewBox-intrinsic size, which is invisible
+	// inside small containers (e.g. Checkbox's 16px indicator). Original behaviour
+	// stripped SizeClass too; that was a footgun and broke the Checkbox tick.
+	private string CssClass => CssClassBuilder.Start()
+		.With( "inline-block align-middle shrink-0", !ResetClassName )
+		.With( SizeClass )
+		.With( ColorSchemeClass )
+		.With( ClassName )
+		.Build();
+
+	// Span wrapper class for Subtle / Filled variants — mirrors Blok's iconVariants CVA output.
+	private string WrapperClass => CssClassBuilder.Start( "inline-flex items-center justify-center p-1 rounded-md" )
+		.With( TileClass )
+		.With( ClassName )
+		.Build();
+
+	private string SizeClass => IconSize switch
+	{
+		IconSize.Sm      => "size-4",
+		IconSize.Md      => "size-5",
+		IconSize.Default => "size-6",
+		IconSize.Lg      => "size-7",
+		IconSize.Xl      => "size-9",
+		IconSize.Xxl     => "size-11",
+		IconSize.Custom  => string.Empty,   // no size class — consumer controls via ClassName
+		_                => "size-6"
+	};
+
+	// Text-color class for Default variant — only applied when ColorScheme is explicitly set,
+	// preserving the existing behavior of inheriting color from the parent element.
+	private string ColorSchemeClass => ColorScheme switch
+	{
+		IconColorScheme.Primary => "text-primary-fg",
+		IconColorScheme.Neutral => "text-neutral-fg",
+		IconColorScheme.Success => "text-success-fg",
+		IconColorScheme.Danger  => "text-danger-fg",
+		IconColorScheme.Warning => "text-warning-fg",
+		IconColorScheme.Yellow  => "text-yellow-800 dark:text-yellow-200",
+		IconColorScheme.Teal    => "text-teal-800 dark:text-teal-200",
+		IconColorScheme.Cyan    => "text-cyan-800 dark:text-cyan-200",
+		IconColorScheme.Blue    => "text-blue-800 dark:text-blue-200",
+		IconColorScheme.Purple  => "text-info-fg",
+		IconColorScheme.Pink    => "text-pink-800 dark:text-pink-200",
+		_                       => string.Empty
+	};
+
+	// Combined text + background classes for Subtle / Filled tiles.
+	// Matches Blok's compound variant output (colorScheme base text + variant compound bg).
+	private string TileClass => (Variant, ColorScheme ?? IconColorScheme.Primary) switch
+	{
+		(IconVariant.Subtle, IconColorScheme.Primary) => "text-primary-fg bg-primary-bg",
+		(IconVariant.Subtle, IconColorScheme.Neutral) => "text-neutral-fg bg-neutral-bg",
+		(IconVariant.Subtle, IconColorScheme.Success) => "text-success-fg bg-success-bg",
+		(IconVariant.Subtle, IconColorScheme.Danger)  => "text-danger-fg bg-danger-bg",
+		(IconVariant.Subtle, IconColorScheme.Warning) => "text-warning-fg bg-warning-bg",
+		(IconVariant.Subtle, IconColorScheme.Yellow)  => "text-yellow-800 dark:text-yellow-800 bg-yellow-100",
+		(IconVariant.Subtle, IconColorScheme.Teal)    => "text-teal-800 dark:text-teal-200 bg-teal-100 dark:bg-teal-800",
+		(IconVariant.Subtle, IconColorScheme.Cyan)    => "text-cyan-800 dark:text-cyan-200 bg-cyan-100 dark:bg-cyan-800",
+		(IconVariant.Subtle, IconColorScheme.Blue)    => "text-blue-800 dark:text-blue-200 bg-blue-100 dark:bg-blue-800",
+		(IconVariant.Subtle, IconColorScheme.Purple)  => "text-info-fg bg-info-bg",
+		(IconVariant.Subtle, IconColorScheme.Pink)    => "text-pink-800 dark:text-pink-200 bg-pink-100 dark:bg-pink-800",
+		(IconVariant.Filled, IconColorScheme.Primary) => "bg-primary-fg text-background",
+		(IconVariant.Filled, IconColorScheme.Neutral) => "bg-neutral-fg text-background",
+		(IconVariant.Filled, IconColorScheme.Success) => "bg-success-fg text-background",
+		(IconVariant.Filled, IconColorScheme.Danger)  => "bg-danger-fg text-background",
+		(IconVariant.Filled, IconColorScheme.Warning) => "bg-warning-fg text-background",
+		(IconVariant.Filled, IconColorScheme.Yellow)  => "bg-yellow-800 dark:bg-yellow-200 text-background dark:text-background",
+		(IconVariant.Filled, IconColorScheme.Teal)    => "bg-teal-800 dark:bg-teal-200 text-background dark:text-background",
+		(IconVariant.Filled, IconColorScheme.Cyan)    => "bg-cyan-800 dark:bg-cyan-200 text-background dark:text-background",
+		(IconVariant.Filled, IconColorScheme.Blue)    => "bg-blue-800 dark:bg-blue-200 text-background dark:text-background",
+		(IconVariant.Filled, IconColorScheme.Purple)  => "bg-info-fg text-background",
+		(IconVariant.Filled, IconColorScheme.Pink)    => "bg-pink-800 dark:bg-pink-200 text-background dark:text-background",
+		_                                             => string.Empty
+	};
+}

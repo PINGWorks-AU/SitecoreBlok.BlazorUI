@@ -1,0 +1,67 @@
+@page "/primitives/badge"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Badge" Description="Displays a small count or status indicator" Interactivity="ComponentInteractivity.Ssr" ApiElements="@BadgeElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Badge>Default</Badge>")">
+			<Badge>Default</Badge>
+		</ComponentExample>
+
+		<ComponentExample Title="Sizing" Code="@("<Badge Size=\"BadgeSize.Sm\">Small</Badge>\n<Badge Size=\"BadgeSize.Md\">Medium</Badge>\n<Badge Size=\"BadgeSize.Lg\">Large</Badge>")">
+			<Badge Size="BadgeSize.Sm">Small</Badge>
+			<Badge Size="BadgeSize.Md">Medium</Badge>
+			<Badge Size="BadgeSize.Lg">Large</Badge>
+		</ComponentExample>
+
+		<ComponentExample Title="Color Schemes" Code="@("<Badge ColorScheme=\"BadgeColor.Neutral\">Neutral</Badge>\n<Badge ColorScheme=\"BadgeColor.Primary\">Primary</Badge>\n<Badge ColorScheme=\"BadgeColor.Danger\">Danger</Badge>\n<Badge ColorScheme=\"BadgeColor.Success\">Success</Badge>\n<Badge ColorScheme=\"BadgeColor.Warning\">Warning</Badge>\n<Badge ColorScheme=\"BadgeColor.Yellow\">Yellow</Badge>\n<Badge ColorScheme=\"BadgeColor.Teal\">Teal</Badge>\n<Badge ColorScheme=\"BadgeColor.Cyan\">Cyan</Badge>\n<Badge ColorScheme=\"BadgeColor.Blue\">Blue</Badge>\n<Badge ColorScheme=\"BadgeColor.Pink\">Pink</Badge>")">
+			<Badge ColorScheme="BadgeColor.Neutral">Neutral</Badge>
+			<Badge ColorScheme="BadgeColor.Primary">Primary</Badge>
+			<Badge ColorScheme="BadgeColor.Danger">Danger</Badge>
+			<Badge ColorScheme="BadgeColor.Success">Success</Badge>
+			<Badge ColorScheme="BadgeColor.Warning">Warning</Badge>
+			<Badge ColorScheme="BadgeColor.Yellow">Yellow</Badge>
+			<Badge ColorScheme="BadgeColor.Teal">Teal</Badge>
+			<Badge ColorScheme="BadgeColor.Cyan">Cyan</Badge>
+			<Badge ColorScheme="BadgeColor.Blue">Blue</Badge>
+			<Badge ColorScheme="BadgeColor.Pink">Pink</Badge>
+		</ComponentExample>
+
+		<ComponentExample Title="Bold variant" Code="@("<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Primary\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Danger\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Success\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Warning\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Neutral\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Yellow\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Teal\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Cyan\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Blue\">Bold</Badge>\n<Badge Variant=\"BadgeVariant.Bold\" ColorScheme=\"BadgeColor.Pink\">Bold</Badge>")">
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Primary">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Danger">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Success">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Warning">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Neutral">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Yellow">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Teal">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Cyan">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Blue">Bold</Badge>
+			<Badge Variant="BadgeVariant.Bold" ColorScheme="BadgeColor.Pink">Bold</Badge>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] BadgeElements =
+	[
+		new ApiElement(
+			Name: "Badge",
+			Description: "Inline pill-shaped chip for status, counts, or tags. Colour is controlled by `ColorScheme`, visual weight by `Variant`, and height by `Size`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Size",                 "BadgeSize",                     false, "Height + text size. Default: `BadgeSize.Md`. Other values: `Sm`, `Lg`." ),
+				new ApiProperty( "Variant",              "BadgeVariant",                  false, "Visual weight. Default: `BadgeVariant.Default` (normal). Other value: `Bold` (uppercase + bold)." ),
+				new ApiProperty( "ColorScheme",          "BadgeColor",                    false, "Colour palette. Default: `BadgeColor.Neutral`. Other values: `Primary`, `Danger`, `Success`, `Warning`, `Yellow`, `Teal`, `Cyan`, `Blue`, `Pink`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the badge." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Badge label — usually a short string or an inline `Icon` + text." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the badge span." ),
+			]
+		),
+	];
+}

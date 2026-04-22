@@ -1,0 +1,111 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@typeparam TItem
+
+@{
+	if ( !Parent.IsVisibleInSearch( Item ) )
+		return;
+
+	var hasChildren = Parent.HasChildren( Item );
+	var autoExpanded = Parent.IsAutoExpandedBySearch( Item );
+	var expanded = hasChildren && ( Parent.IsExpanded( Item ) || autoExpanded );
+	var state = expanded ? "open" : "closed";
+	var disabled = Parent.IsDisabled( Item );
+	var selected = Parent.IsSelected( Item );
+	var loading = Parent.IsLoading( Item );
+	var errored = Parent.IsErrored( Item );
+	var iconPath = Parent.ResolveIcon( Item );
+	var badge = Parent.ResolveBadge( Item );
+	var rowClass = TreeView<TItem>.GetRowClass( isSelected: selected, isDisabled: disabled, hoverEnabled: Parent.EnableRowHover );
+}
+
+<li role="treeitem" aria-level="@(Depth + 1)" aria-expanded="@(hasChildren ? expanded.ToString().ToLowerInvariant() : null)" aria-disabled="@(disabled ? "true" : null)" aria-selected="@(Parent.SelectionMode != TreeSelectionMode.None ? selected.ToString().ToLowerInvariant() : null)" class="list-none">
+	<div class="group/tree-row flex items-center gap-1 py-1.5 pr-2 rounded-sm cursor-pointer @rowClass" style="padding-left: calc(0.5rem + (@Depth * 1.25rem))" @onclick="HandleRowClickAsync">
+		@if ( loading )
+		{
+			<span class="inline-flex items-center justify-center size-5" aria-label="Loading">
+				<Spinner ClassName="size-4" />
+			</span>
+		}
+		else if ( hasChildren )
+		{
+			<button type="button" data-slot="tree-chevron-button" data-state="@state" aria-label="@(expanded ? "Collapse" : "Expand")" @onclick="HandleToggleAsync" @onclick:stopPropagation="true" class="inline-flex items-center justify-center size-5 rounded-sm cursor-pointer hover:bg-blackAlpha-50 dark:hover:bg-whiteAlpha-100 [&[data-state=open]_svg]:rotate-90">
+				<Icon Svg="@IconSvg.ChevronRight" IconSize="IconSize.Sm" ClassName="transition-transform duration-200" />
+			</button>
+		}
+		else
+		{
+			<span class="inline-block size-5" aria-hidden="true"></span>
+		}
+
+		@if ( Parent.Checkable )
+		{
+			var checkState = Parent.GetCheckState( Item );
+			<div @onclick:stopPropagation="true">
+				<Checkbox
+					Checked="@(checkState == TreeView<TItem>.CheckState.Checked ? true : checkState == TreeView<TItem>.CheckState.Indeterminate ? (bool?)null : false)"
+					Indeterminate="@(checkState == TreeView<TItem>.CheckState.Indeterminate)"
+					Disabled="@disabled"
+					CheckedChanged="@(async (bool? _) => await Parent.ToggleCheckAsync( Item ))" />
+			</div>
+		}
+
+		@if ( iconPath is not null )
+		{
+			<Icon Svg="@iconPath" IconSize="IconSize.Sm" ClassName="shrink-0" />
+		}
+
+		<span class="truncate flex-1">
+			@if ( Parent.LabelTemplateInternal is not null )
+			{
+				@Parent.LabelTemplateInternal( Item )
+			}
+			else
+			{
+				@Parent.RenderHighlightedText( Item )
+			}
+		</span>
+
+		@if ( !string.IsNullOrEmpty( badge ) )
+		{
+			<Badge Size="BadgeSize.Sm" ColorScheme="BadgeColor.Neutral">@badge</Badge>
+		}
+
+		@if ( Parent.ActionsTemplateInternal is not null )
+		{
+			<span class="opacity-0 group-hover/tree-row:opacity-100 transition-opacity shrink-0" @onclick:stopPropagation="true">
+				@Parent.ActionsTemplateInternal( Item )
+			</span>
+		}
+	</div>
+
+	@if ( hasChildren && expanded )
+	{
+		if ( errored )
+		{
+			<div class="flex items-center gap-2 py-1.5 pr-2 text-sm text-danger-fg" style="padding-left: calc(1.75rem + (@Depth * 1.25rem))">
+				<span>Failed to load.</span>
+				<Button Variant="ButtonVariant.Link" Size="ButtonSize.Xs" Click="HandleRetryAsync">Retry</Button>
+			</div>
+		}
+		else
+		{
+			<ul role="group" class="list-none @(Parent.ShowConnectorLinesInternal ? "border-l border-border ml-5" : "")">
+				@foreach ( var child in Parent.ResolveChildren( Item ) )
+				{
+					<TreeNode TItem="TItem" Item="child" Depth="@(Depth + 1)" />
+				}
+			</ul>
+		}
+	}
+</li>
+
+@code {
+	[CascadingParameter] public required TreeView<TItem> Parent { get; set; }
+	[Parameter, EditorRequired] public required TItem Item { get; set; }
+	[Parameter] public int Depth { get; set; }
+
+	private async Task HandleToggleAsync() => await Parent.ToggleExpandedAsync( Item );
+	private async Task HandleRowClickAsync() => await Parent.HandleRowClickAsync( Item );
+	private async Task HandleRetryAsync() => await Parent.LoadChildrenAsync( Item );
+}

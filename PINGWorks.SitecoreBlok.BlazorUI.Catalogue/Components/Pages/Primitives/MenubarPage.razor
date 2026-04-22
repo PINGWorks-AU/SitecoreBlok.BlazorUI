@@ -1,0 +1,449 @@
+@page "/primitives/menubar"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Menubar"
+			   Description="A horizontal application menu bar with multiple top-level menus, each opening a dropdown with items, submenus, checkboxes, and radio groups."
+			   Interactivity="ComponentInteractivity.Interactive"
+			   ApiElements="@MenubarElements">
+
+	<DivergenceNote>
+		<p><strong>No keyboard navigation.</strong> Blok's Menubar uses Radix UI which provides full keyboard support (arrow keys, <kbd>Enter</kbd>, <kbd>Esc</kbd>, roving focus). This Blazor port does not implement keyboard navigation — use mouse interaction. This is a known gap with no simple CSS-only workaround.</p>
+		<p><strong><code>MenubarPortal</code> is a no-op.</strong> In Blok, <code>MenubarPortal</code> portals content to <code>document.body</code> for z-index stacking. In Blazor, <code>MenubarContent</code> uses <code>position:fixed</code> directly, so <code>MenubarPortal</code> exists only for API parity and is a transparent pass-through wrapper.</p>
+		<p><strong>Hover-to-switch is supported.</strong> When any menu is open and the user hovers over another trigger, the new menu opens automatically — matching standard menubar behaviour.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@(@"<Menubar>
+    <MenubarMenu>
+        <MenubarTrigger>File</MenubarTrigger>
+        <MenubarContent>
+            <MenubarItem>New File <MenubarShortcut>Ctrl+N</MenubarShortcut></MenubarItem>
+            <MenubarItem>Open <MenubarShortcut>Ctrl+O</MenubarShortcut></MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem>Save <MenubarShortcut>Ctrl+S</MenubarShortcut></MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem Variant=""MenubarItemVariant.Destructive"">Close</MenubarItem>
+        </MenubarContent>
+    </MenubarMenu>
+    <MenubarMenu>
+        <MenubarTrigger>Edit</MenubarTrigger>
+        <MenubarContent>
+            <MenubarItem>Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut></MenubarItem>
+            <MenubarItem>Redo <MenubarShortcut>Ctrl+Y</MenubarShortcut></MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem>Cut <MenubarShortcut>Ctrl+X</MenubarShortcut></MenubarItem>
+            <MenubarItem>Copy <MenubarShortcut>Ctrl+C</MenubarShortcut></MenubarItem>
+            <MenubarItem>Paste <MenubarShortcut>Ctrl+V</MenubarShortcut></MenubarItem>
+        </MenubarContent>
+    </MenubarMenu>
+    <MenubarMenu>
+        <MenubarTrigger>View</MenubarTrigger>
+        <MenubarContent>
+            <MenubarItem>Zoom In <MenubarShortcut>Ctrl++</MenubarShortcut></MenubarItem>
+            <MenubarItem>Zoom Out <MenubarShortcut>Ctrl+-</MenubarShortcut></MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem>Full Screen <MenubarShortcut>F11</MenubarShortcut></MenubarItem>
+        </MenubarContent>
+    </MenubarMenu>
+</Menubar>")">
+			<Menubar>
+				<MenubarMenu>
+					<MenubarTrigger>File</MenubarTrigger>
+					<MenubarContent>
+						<MenubarItem Click="@(() => LastAction = "New File")">New File <MenubarShortcut>Ctrl+N</MenubarShortcut></MenubarItem>
+						<MenubarItem Click="@(() => LastAction = "Open")">Open <MenubarShortcut>Ctrl+O</MenubarShortcut></MenubarItem>
+						<MenubarSeparator />
+						<MenubarItem Click="@(() => LastAction = "Save")">Save <MenubarShortcut>Ctrl+S</MenubarShortcut></MenubarItem>
+						<MenubarSeparator />
+						<MenubarItem Variant="MenubarItemVariant.Destructive" Click="@(() => LastAction = "Close")">Close</MenubarItem>
+					</MenubarContent>
+				</MenubarMenu>
+				<MenubarMenu>
+					<MenubarTrigger>Edit</MenubarTrigger>
+					<MenubarContent>
+						<MenubarItem Click="@(() => LastAction = "Undo")">Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut></MenubarItem>
+						<MenubarItem Click="@(() => LastAction = "Redo")">Redo <MenubarShortcut>Ctrl+Y</MenubarShortcut></MenubarItem>
+						<MenubarSeparator />
+						<MenubarItem Click="@(() => LastAction = "Cut")">Cut <MenubarShortcut>Ctrl+X</MenubarShortcut></MenubarItem>
+						<MenubarItem Click="@(() => LastAction = "Copy")">Copy <MenubarShortcut>Ctrl+C</MenubarShortcut></MenubarItem>
+						<MenubarItem Click="@(() => LastAction = "Paste")">Paste <MenubarShortcut>Ctrl+V</MenubarShortcut></MenubarItem>
+					</MenubarContent>
+				</MenubarMenu>
+				<MenubarMenu>
+					<MenubarTrigger>View</MenubarTrigger>
+					<MenubarContent>
+						<MenubarItem Click="@(() => LastAction = "Zoom In")">Zoom In <MenubarShortcut>Ctrl++</MenubarShortcut></MenubarItem>
+						<MenubarItem Click="@(() => LastAction = "Zoom Out")">Zoom Out <MenubarShortcut>Ctrl+-</MenubarShortcut></MenubarItem>
+						<MenubarSeparator />
+						<MenubarItem Click="@(() => LastAction = "Full Screen")">Full Screen <MenubarShortcut>F11</MenubarShortcut></MenubarItem>
+					</MenubarContent>
+				</MenubarMenu>
+			</Menubar>
+			@if ( LastAction is not null )
+			{
+				<p class="mt-2 text-sm text-muted-foreground">Last action: @LastAction</p>
+			}
+		</ComponentExample>
+
+		<ComponentExample Title="With Submenu" Code="@(@"<Menubar>
+    <MenubarMenu>
+        <MenubarTrigger>File</MenubarTrigger>
+        <MenubarContent>
+            <MenubarItem>New</MenubarItem>
+            <MenubarSeparator />
+            <MenubarSub>
+                <MenubarSubTrigger>Share</MenubarSubTrigger>
+                <MenubarSubContent>
+                    <MenubarItem>Email Link</MenubarItem>
+                    <MenubarItem>Copy Link</MenubarItem>
+                    <MenubarItem>Message</MenubarItem>
+                </MenubarSubContent>
+            </MenubarSub>
+            <MenubarSub>
+                <MenubarSubTrigger>Export As</MenubarSubTrigger>
+                <MenubarSubContent>
+                    <MenubarItem>PDF</MenubarItem>
+                    <MenubarItem>CSV</MenubarItem>
+                    <MenubarItem>JSON</MenubarItem>
+                </MenubarSubContent>
+            </MenubarSub>
+        </MenubarContent>
+    </MenubarMenu>
+</Menubar>")">
+			<Menubar>
+				<MenubarMenu>
+					<MenubarTrigger>File</MenubarTrigger>
+					<MenubarContent>
+						<MenubarItem Click="@(() => LastAction = "New")">New</MenubarItem>
+						<MenubarSeparator />
+						<MenubarSub>
+							<MenubarSubTrigger>Share</MenubarSubTrigger>
+							<MenubarSubContent>
+								<MenubarItem Click="@(() => LastAction = "Share via Email")">Email Link</MenubarItem>
+								<MenubarItem Click="@(() => LastAction = "Copy Link")">Copy Link</MenubarItem>
+								<MenubarItem Click="@(() => LastAction = "Share via Message")">Message</MenubarItem>
+							</MenubarSubContent>
+						</MenubarSub>
+						<MenubarSub>
+							<MenubarSubTrigger>Export As</MenubarSubTrigger>
+							<MenubarSubContent>
+								<MenubarItem Click="@(() => LastAction = "Export PDF")">PDF</MenubarItem>
+								<MenubarItem Click="@(() => LastAction = "Export CSV")">CSV</MenubarItem>
+								<MenubarItem Click="@(() => LastAction = "Export JSON")">JSON</MenubarItem>
+							</MenubarSubContent>
+						</MenubarSub>
+					</MenubarContent>
+				</MenubarMenu>
+			</Menubar>
+			@if ( LastAction is not null )
+			{
+				<p class="mt-2 text-sm text-muted-foreground">Last action: @LastAction</p>
+			}
+		</ComponentExample>
+
+		<ComponentExample Title="With Checkbox Items" Code="@(@"<Menubar>
+    <MenubarMenu>
+        <MenubarTrigger>View</MenubarTrigger>
+        <MenubarContent>
+            <MenubarLabel>Panels</MenubarLabel>
+            <MenubarCheckboxItem @bind-Checked=""ShowStatusBar"">Status Bar</MenubarCheckboxItem>
+            <MenubarCheckboxItem @bind-Checked=""ShowSidebar"">Sidebar</MenubarCheckboxItem>
+            <MenubarCheckboxItem @bind-Checked=""ShowActivityBar"">Activity Bar</MenubarCheckboxItem>
+        </MenubarContent>
+    </MenubarMenu>
+</Menubar>")">
+			<div class="flex items-center gap-4">
+				<Menubar>
+					<MenubarMenu>
+						<MenubarTrigger>View</MenubarTrigger>
+						<MenubarContent>
+							<MenubarLabel>Panels</MenubarLabel>
+							<MenubarCheckboxItem @bind-Checked="ShowStatusBar">Status Bar</MenubarCheckboxItem>
+							<MenubarCheckboxItem @bind-Checked="ShowSidebar">Sidebar</MenubarCheckboxItem>
+							<MenubarCheckboxItem @bind-Checked="ShowActivityBar">Activity Bar</MenubarCheckboxItem>
+						</MenubarContent>
+					</MenubarMenu>
+				</Menubar>
+				<span class="text-sm text-muted-foreground">
+					Status: @(ShowStatusBar ? "✓" : "✗") &nbsp;
+					Sidebar: @(ShowSidebar ? "✓" : "✗") &nbsp;
+					Activity: @(ShowActivityBar ? "✓" : "✗")
+				</span>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With Radio Group" Code="@(@"<Menubar>
+    <MenubarMenu>
+        <MenubarTrigger>Format</MenubarTrigger>
+        <MenubarContent>
+            <MenubarLabel>Text Size</MenubarLabel>
+            <MenubarRadioGroup @bind-Value=""TextSize"">
+                <MenubarRadioItem Value=""small"">Small</MenubarRadioItem>
+                <MenubarRadioItem Value=""medium"">Medium</MenubarRadioItem>
+                <MenubarRadioItem Value=""large"">Large</MenubarRadioItem>
+            </MenubarRadioGroup>
+            <MenubarSeparator />
+            <MenubarLabel>Font</MenubarLabel>
+            <MenubarRadioGroup @bind-Value=""Font"">
+                <MenubarRadioItem Value=""sans"">Sans-serif</MenubarRadioItem>
+                <MenubarRadioItem Value=""serif"">Serif</MenubarRadioItem>
+                <MenubarRadioItem Value=""mono"">Monospace</MenubarRadioItem>
+            </MenubarRadioGroup>
+        </MenubarContent>
+    </MenubarMenu>
+</Menubar>")">
+			<div class="flex items-center gap-4">
+				<Menubar>
+					<MenubarMenu>
+						<MenubarTrigger>Format</MenubarTrigger>
+						<MenubarContent>
+							<MenubarLabel>Text Size</MenubarLabel>
+							<MenubarRadioGroup @bind-Value="TextSize">
+								<MenubarRadioItem Value="small">Small</MenubarRadioItem>
+								<MenubarRadioItem Value="medium">Medium</MenubarRadioItem>
+								<MenubarRadioItem Value="large">Large</MenubarRadioItem>
+							</MenubarRadioGroup>
+							<MenubarSeparator />
+							<MenubarLabel>Font</MenubarLabel>
+							<MenubarRadioGroup @bind-Value="Font">
+								<MenubarRadioItem Value="sans">Sans-serif</MenubarRadioItem>
+								<MenubarRadioItem Value="serif">Serif</MenubarRadioItem>
+								<MenubarRadioItem Value="mono">Monospace</MenubarRadioItem>
+							</MenubarRadioGroup>
+						</MenubarContent>
+					</MenubarMenu>
+				</Menubar>
+				<span class="text-sm text-muted-foreground">Size: @TextSize &nbsp; Font: @Font</span>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Inset Items" Code="@(@"<Menubar>
+    <MenubarMenu>
+        <MenubarTrigger>Help</MenubarTrigger>
+        <MenubarContent>
+            <MenubarLabel Inset=""true"">Resources</MenubarLabel>
+            <MenubarItem Inset=""true"">Documentation</MenubarItem>
+            <MenubarItem Inset=""true"">Release Notes</MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem Inset=""true"">Report Issue</MenubarItem>
+        </MenubarContent>
+    </MenubarMenu>
+</Menubar>")">
+			<Menubar>
+				<MenubarMenu>
+					<MenubarTrigger>Help</MenubarTrigger>
+					<MenubarContent>
+						<MenubarLabel Inset="true">Resources</MenubarLabel>
+						<MenubarItem Inset="true" Click="@(() => LastAction = "Documentation")">Documentation</MenubarItem>
+						<MenubarItem Inset="true" Click="@(() => LastAction = "Release Notes")">Release Notes</MenubarItem>
+						<MenubarSeparator />
+						<MenubarItem Inset="true" Click="@(() => LastAction = "Report Issue")">Report Issue</MenubarItem>
+					</MenubarContent>
+				</MenubarMenu>
+			</Menubar>
+			@if ( LastAction is not null )
+			{
+				<p class="mt-2 text-sm text-muted-foreground">Last action: @LastAction</p>
+			}
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? LastAction;
+	private bool ShowStatusBar = true;
+	private bool ShowSidebar = false;
+	private bool ShowActivityBar = true;
+	private string? TextSize = "medium";
+	private string? Font = "sans";
+
+	private static readonly ApiElement[] MenubarElements =
+	[
+		new ApiElement(
+			Name: "Menubar",
+			Description: "Root horizontal bar container. Tracks all registered `MenubarMenu` children and closes any open menu when another opens.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the bar `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Should contain one or more `MenubarMenu` children." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the root `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarMenu",
+			Description: "State container for one top-level menu. Groups a `MenubarTrigger` and a `MenubarContent`. Registers with the parent `Menubar` to enable close-others-on-open behaviour.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain one `MenubarTrigger` and one `MenubarContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarTrigger",
+			Description: "Button that toggles the parent `MenubarMenu`. Hovering while another menu is open immediately switches to this menu.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the `<button>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Trigger label." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarContent",
+			Description: "Fixed-positioned dropdown panel that appears below the trigger. Uses JS-based collision avoidance to stay within the viewport.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Side",         "DropdownMenuSide",  false, "Preferred opening side relative to the trigger. Default: `Bottom`." ),
+				new ApiProperty( "Align",        "DropdownMenuAlign", false, "Alignment along the trigger's cross-axis. Default: `Start`." ),
+				new ApiProperty( "SideOffset",   "double",            false, "Gap in pixels between trigger and menu surface. Default: `8` (matches Blok's default)." ),
+				new ApiProperty( "ClassName",    "string?",           false, "Extra CSS classes appended to the content `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",   false, "Menu items — `MenubarItem`, `MenubarLabel`, `MenubarGroup`, `MenubarSeparator`, `MenubarCheckboxItem`, `MenubarRadioGroup`, nested `MenubarSub`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarGroup",
+			Description: "Logical `role=\"group\"` wrapper around a set of items. No visual styling — use `MenubarSeparator` to visually divide groups.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "`MenubarItem` children belonging to this group." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the group `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarItem",
+			Description: "Clickable menu row. Fires `Click` then closes the menu chain (sub and parent) on activation.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "Variant",              "MenubarItemVariant",          false, "Visual style. Default: `MenubarItemVariant.Default`. Other value: `Destructive` (red text + red hover bg)." ),
+				new ApiProperty( "Inset",                "bool",                        false, "Adds `pl-8` left padding so label-only items align with icon items. Default: `false`." ),
+				new ApiProperty( "Disabled",             "bool",                        false, "When true, item is muted and ignores clicks. Default: `false`." ),
+				new ApiProperty( "Click",                "EventCallback",               false, "Invoked when the item is clicked, before the menu closes." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the item `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Item label and optional `Icon` / `MenubarShortcut` children." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the item `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarLabel",
+			Description: "Non-interactive section heading rendered in medium-weight muted text.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "Inset",                "bool",                        false, "Adds `pl-8` so the label aligns with inset items. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the label `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Heading text." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the label `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarSeparator",
+			Description: "1px horizontal rule used to divide sections within a `MenubarContent`.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ClassName", "string?", false, "Extra CSS classes appended to the separator `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarShortcut",
+			Description: "Right-aligned keyboard-hint label placed inside a `MenubarItem`. Rendered in small, tracked, muted text.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the `<span>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Shortcut text (e.g. `Ctrl+S`)." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the `<span>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarCheckboxItem",
+			Description: "Togglable menu item. Renders a check icon indicator when `Checked` is true. Closes the menu on activation.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "Checked",              "bool",                        false, "Whether the item is checked. Default: `false`." ),
+				new ApiProperty( "CheckedChanged",       "EventCallback<bool>",         false, "Invoked with the new checked state when the item is clicked." ),
+				new ApiProperty( "Disabled",             "bool",                        false, "When true, item is muted and ignores clicks. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the item `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Item label." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the item `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarRadioGroup",
+			Description: "Provides a shared selection value for child `MenubarRadioItem` components via a cascading parameter.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                     false, "The currently selected value." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",      false, "Invoked with the newly selected value when a child `MenubarRadioItem` is clicked." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "`MenubarRadioItem` children." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the group `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarRadioItem",
+			Description: "Single-selection menu item. Renders a filled circle indicator when its `Value` matches the parent `MenubarRadioGroup` value. Closes the menu on activation.",
+			Depth: 4,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                     false, "The value this item represents. Compared against `MenubarRadioGroup.Value` to determine selected state." ),
+				new ApiProperty( "Disabled",             "bool",                        false, "When true, item is muted and ignores clicks. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the item `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Item label." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the item `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarSub",
+			Description: "Nested submenu state container. Tracks hover open/close and the trigger bounds so `MenubarSubContent` can position itself with collision avoidance.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain one `MenubarSubTrigger` and one `MenubarSubContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarSubTrigger",
+			Description: "Hover-activated submenu opener. Displays a right chevron and opens the parent `MenubarSub` on mouseenter.",
+			Depth: 4,
+			Properties:
+			[
+				new ApiProperty( "Inset",        "bool",            false, "Adds `pl-8` so the label aligns with inset items. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the trigger `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Trigger label." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarSubContent",
+			Description: "Submenu surface. Renders to the right of its trigger with collision avoidance. Closes on mouseleave.",
+			Depth: 4,
+			Properties:
+			[
+				new ApiProperty( "Side",         "DropdownMenuSide",  false, "Preferred opening side. Default: `Right`. Flips to `Left` when the right side overflows the viewport." ),
+				new ApiProperty( "Align",        "DropdownMenuAlign", false, "Alignment along the trigger's cross-axis. Default: `Start`." ),
+				new ApiProperty( "SideOffset",   "double",            false, "Gap in pixels between subtrigger and submenu surface. Default: `0`." ),
+				new ApiProperty( "ClassName",    "string?",           false, "Extra CSS classes appended to the submenu surface." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",   false, "Submenu items." ),
+			]
+		),
+		new ApiElement(
+			Name: "MenubarPortal",
+			Description: "Pass-through wrapper that exists for API parity with Blok's `MenubarPortal`. In Blazor, `MenubarContent` uses `position:fixed` directly so no portal is needed.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Content passed through unchanged." ),
+			]
+		),
+	];
+}

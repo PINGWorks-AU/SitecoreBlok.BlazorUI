@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<tbody data-slot="table-body" class="@CssClass">
+	@ChildContent
+</tbody>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "[&_tr]:border-b [&_tr]:border-border [&_tr:last-child]:border-b-0" )
+										.With( ClassName )
+										.Build();
+}

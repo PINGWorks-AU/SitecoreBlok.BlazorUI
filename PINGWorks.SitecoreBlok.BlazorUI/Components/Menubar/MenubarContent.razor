@@ -1,0 +1,59 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@if ( ParentMenu.IsOpen )
+{
+	@* Backdrop catches clicks outside the menu and closes it. *@
+	<div class="fixed inset-0 z-40" @onclick="OnBackdropClick"></div>
+	<div @ref="Ref" data-slot="menubar-content" class="@CssClass"
+		 style="left:@(ParentMenu.X)px;top:@(ParentMenu.Y)px;@( ParentMenu.IsPositioned ? null : "visibility:hidden;" )">
+		@ChildContent
+	</div>
+}
+
+@code {
+	[CascadingParameter] public required MenubarMenu ParentMenu { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public DropdownMenuSide Side { get; set; } = DropdownMenuSide.Bottom;
+	[Parameter] public DropdownMenuAlign Align { get; set; } = DropdownMenuAlign.Start;
+	[Parameter] public double SideOffset { get; set; } = 8;
+
+	private ElementReference Ref;
+	private IJSObjectReference? Module;
+
+	private string CssClass => CssClassBuilder.Start(
+		"fixed z-50 min-w-[12rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md" )
+											.With( ClassName )
+											.Build();
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( ParentMenu.IsOpen && !ParentMenu.IsPositioned )
+		{
+			Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
+			var pos = await Module.InvokeAsync<MenubarContentPosition>(
+				"SitecoreUI.calcDropdownPosition",
+				Ref,
+				ParentMenu.TriggerLeft, ParentMenu.TriggerTop, ParentMenu.TriggerRight, ParentMenu.TriggerBottom,
+				Side.ToString().ToLowerInvariant(),
+				Align.ToString().ToLowerInvariant(),
+				SideOffset );
+			await ParentMenu.UpdatePosition( pos.X, pos.Y );
+		}
+	}
+
+	private async Task OnBackdropClick() => await ParentMenu.Close();
+
+	private record MenubarContentPosition( double X, double Y );
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+}

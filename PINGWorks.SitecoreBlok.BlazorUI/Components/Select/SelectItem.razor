@@ -1,0 +1,71 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@implements IDisposable
+
+<div role="option" @onclick="SetSelected" aria-disabled="@( IsDisabled ? "true" : "false" )" data-disabled="@( IsDisabled ? "" : null )" aria-selected="@( IsSelected ? "true" : "false" )" data-state="@( IsSelected ? "checked" : "unchecked" )" tabindex="-1" data-slot="select-item" class="@( $"focus:bg-accent hover:bg-accent/70 focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2 {ClassName}" )">
+
+	@if ( IsSelected )
+	{
+		<span class="absolute right-2 flex size-3.5 items-center justify-center">
+			<span aria-hidden="true">
+				<Icon Scale="0.9" Svg="@IconSvg.Check" ResetClassName />
+			</span>
+		</span>
+	}
+
+	@if ( Label is not null )
+	{
+		<span>
+			@Label
+		</span>
+	}
+	else if ( ChildContent is not null )
+	{
+		@ChildContent
+	}
+	else
+	{
+		<span>
+			@Value
+		</span>
+	}
+
+</div>
+
+@code {
+	[CascadingParameter] public Select? ParentSelect { get; set; }
+	[CascadingParameter] public SelectGroup? ParentSelectGroup { get; set; }
+
+	[Parameter, EditorRequired] public string? Value { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? Label { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private bool IsDisabled => Disabled || (ParentSelectGroup?.Disabled ?? false) || (ParentSelect?.Disabled ?? false);
+	private bool IsSelected => ParentSelect is not null && Value == ParentSelect.Value;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		if ( ParentSelect is not null )
+			ParentSelect.Register( this );
+	}
+
+	private async Task SetSelected()
+	{
+		if ( Disabled )
+			return;
+
+		// Pass both Value AND Label so the parent caches the label for display
+		// before this item is disposed when the popover closes.
+		if ( ParentSelect is not null )
+			await ParentSelect.SetValue( Value, Label );
+	}
+
+	public void Dispose()
+	{
+		ParentSelect?.Unregister( this );
+	}
+}

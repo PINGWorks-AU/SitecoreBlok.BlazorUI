@@ -1,0 +1,19 @@
+@* Use at the top of a Catalogue primitive page when the Blazor implementation
+   deliberately differs from Blok's API in a way users should be aware of.
+   Examples: extra parameters we expose that Blok doesn't, RenderFragment slots
+   where Blok takes a string, an additive convenience feature like a built-in
+   close button. Should NOT be used for cosmetic or token-naming differences. *@
+
+<div class="border-l-4 border-warning-500 pl-4 py-3 mb-6 bg-warning-bg/30 rounded-r-md text-foreground">
+	<h4 class="font-semibold text-warning-fg mb-2 flex items-center gap-2">
+		<Icon Svg="@IconSvg.AlertCircle" ClassName="size-5" />
+		Divergence from Blok
+	</h4>
+	<div class="text-sm space-y-2">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required RenderFragment ChildContent { get; set; }
+}

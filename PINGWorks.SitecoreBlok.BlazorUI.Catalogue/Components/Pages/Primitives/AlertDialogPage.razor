@@ -1,0 +1,119 @@
+@page "/primitives/alertdialog"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="AlertDialog" Description="A modal dialog that interrupts the user with important content and expects a response" Interactivity="ComponentInteractivity.Interactive" ApiElements="@AlertDialogElements">
+
+	<DivergenceNote>
+		<p><strong>Trigger, Portal, Overlay, and Content are collapsed into a single <code>&lt;AlertDialog Open&gt;</code>.</strong> Blok exports <code>AlertDialogTrigger</code>, <code>AlertDialogPortal</code>, <code>AlertDialogOverlay</code>, and <code>AlertDialogContent</code> as separate sub-components that consumers compose around the root. We bake the overlay and content into the root and drive open/close with <code>Open</code>/<code>OpenChanged</code> two-way binding — trigger the dialog from any button's <code>Click</code> handler. The <code>AlertDialogHeader</code>, <code>AlertDialogFooter</code>, <code>AlertDialogTitle</code>, <code>AlertDialogDescription</code>, <code>AlertDialogAction</code>, <code>AlertDialogCancel</code> splits remain. No focus trap and no <kbd>Esc</kbd>-to-close (Blok gets those via Radix).</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Danger\"\n        Click=\"@(() => alertOpen = true)\">Delete Account</Button>\n<AlertDialog @bind-Open=\"alertOpen\">\n    <AlertDialogHeader>\n        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>\n        <AlertDialogDescription>\n            This action cannot be undone. This will permanently\n            delete your account and remove your data from our servers.\n        </AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n        <AlertDialogCancel Click=\"@(() => alertOpen = false)\">Cancel</AlertDialogCancel>\n        <AlertDialogAction Click=\"@(() => alertOpen = false)\">Continue</AlertDialogAction>\n    </AlertDialogFooter>\n</AlertDialog>")">
+			<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Danger"
+					Click="@(() => AlertOpen = true)">Delete Account</Button>
+			<AlertDialog @bind-Open="AlertOpen">
+				<AlertDialogHeader>
+					<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+					<AlertDialogDescription>
+						This action cannot be undone. This will permanently
+						delete your account and remove your data from our servers.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel Click="@(() => AlertOpen = false)">Cancel</AlertDialogCancel>
+					<AlertDialogAction Click="@(() => AlertOpen = false)">Continue</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialog>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool AlertOpen;
+
+	private static readonly ApiElement[] AlertDialogElements =
+	[
+		new ApiElement(
+			Name: "AlertDialog",
+			Description: "Root of the modal. Renders a fixed-position overlay plus centred content panel when `Open` is true. Drive open/close via `@bind-Open` and compose `AlertDialogHeader`/`AlertDialogFooter` inside.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Open",         "bool",                false, "Controls visibility. The dialog renders nothing when false. Default: `false`." ),
+				new ApiProperty( "OpenChanged",  "EventCallback<bool>", false, "Fires when `Open` changes. Supports `@bind-Open`." ),
+				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes appended to the content panel." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",     false, "Dialog body. Typically `AlertDialogHeader` + `AlertDialogFooter`." ),
+			]
+		),
+		new ApiElement(
+			Name: "AlertDialogHeader",
+			Description: "Top section of the dialog. Stacks `AlertDialogTitle` and `AlertDialogDescription` vertically with centre alignment on mobile and left alignment on `sm+`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes appended to the header container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",     false, "Usually `AlertDialogTitle` + `AlertDialogDescription`." ),
+			]
+		),
+		new ApiElement(
+			Name: "AlertDialogFooter",
+			Description: "Bottom section of the dialog. Reverses button order on mobile (primary on top) and right-aligns on `sm+`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes appended to the footer container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",     false, "Usually `AlertDialogCancel` + `AlertDialogAction`." ),
+			]
+		),
+		new ApiElement(
+			Name: "AlertDialogTitle",
+			Description: "Heading inside the `AlertDialogHeader`. Renders semibold and large.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes appended to the title container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",     false, "Title text or inline markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "AlertDialogDescription",
+			Description: "Body prose inside the `AlertDialogHeader`. Placed directly under the title.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes appended to the description container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",     false, "Description text — usually a paragraph explaining the consequences of the action." ),
+			]
+		),
+		new ApiElement(
+			Name: "AlertDialogAction",
+			Description: "Primary confirm button inside the `AlertDialogFooter`. Renders as a `Default` `Button` with `ButtonColor.Danger` by default. Wire `Click` to your confirm handler — typically also closes the dialog.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Click",        "EventCallback",       false, "Invoked when the action button is clicked." ),
+				new ApiProperty( "ColorScheme",  "ButtonColor",         false, "Button colour. Default: `ButtonColor.Danger`." ),
+				new ApiProperty( "Size",         "ButtonSize",          false, "Button size. Default: `ButtonSize.Default`." ),
+				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes passed through to the underlying `Button`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",     false, "Button label." ),
+			]
+		),
+		new ApiElement(
+			Name: "AlertDialogCancel",
+			Description: "Cancel button inside the `AlertDialogFooter`. Renders as a `Ghost` `Button` with `ButtonColor.Neutral` by default. Wire `Click` to close the dialog.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Click",        "EventCallback",       false, "Invoked when the cancel button is clicked." ),
+				new ApiProperty( "ColorScheme",  "ButtonColor",         false, "Button colour. Default: `ButtonColor.Neutral`." ),
+				new ApiProperty( "Size",         "ButtonSize",          false, "Button size. Default: `ButtonSize.Default`." ),
+				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes passed through to the underlying `Button`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",     false, "Button label." ),
+			]
+		),
+	];
+}

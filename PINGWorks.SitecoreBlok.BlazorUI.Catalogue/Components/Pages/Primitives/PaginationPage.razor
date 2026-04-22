@@ -1,0 +1,171 @@
+@page "/primitives/pagination"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Pagination" Description="Navigation between pages of content" Interactivity="ComponentInteractivity.Interactive" ApiElements="@PaginationElements">
+
+	<DivergenceNote>
+		<p><strong>Composable parts only — no built-in <code>CurrentPage</code> / <code>TotalPages</code> data-driven mode.</strong> Blok exports 7 separate components (Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis) and the consumer composes them. Compose the page numbers yourself (see examples below) or wrap the composable parts in your own helper component.</p>
+		<p><strong>Additive: <code>Click</code> and <code>Disabled</code> parameters on links.</strong> Blok's <code>PaginationLink</code> takes only <code>href</code> (URL navigation). Our <code>PaginationLink</code> additionally accepts a Blazor <code>EventCallback Click</code> (renders a <code>&lt;button&gt;</code>) and a <code>Disabled</code> flag — natural for SPA-style pagination with no URL changes.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Pagination>\n    <PaginationContent>\n        <PaginationItem>\n            <PaginationPrevious Disabled=\"@(currentPage <= 1)\" Click=\"@(() => currentPage--)\" />\n        </PaginationItem>\n        @foreach (var pageNo in PageNumbers(currentPage, totalPages))\n        {\n            <PaginationItem>\n                @if (pageNo == -1)\n                {\n                    <PaginationEllipsis />\n                }\n                else\n                {\n                    <PaginationLink IsActive=\"@(page == currentPage)\" Click=\"@(() => currentPage = pageNo)\">@pageNo</PaginationLink>\n                }\n            </PaginationItem>\n        }\n        <PaginationItem>\n            <PaginationNext Disabled=\"@(currentPage >= totalPages)\" Click=\"@(() => currentPage++)\" />\n        </PaginationItem>\n    </PaginationContent>\n</Pagination>")">
+			<Pagination>
+				<PaginationContent>
+					<PaginationItem>
+						<PaginationPrevious Disabled="@(CurrentPage <= 1)" Click="@(() => GoTo(CurrentPage - 1))" />
+					</PaginationItem>
+					@foreach ( var pageNo in PageNumbers( CurrentPage, TotalPages ) )
+					{
+						<PaginationItem>
+							@if ( pageNo == -1 )
+							{
+								<PaginationEllipsis />
+							}
+							else
+							{
+								<PaginationLink IsActive="@( pageNo == CurrentPage )" Click="@(() => GoTo(pageNo))">@pageNo</PaginationLink>
+							}
+						</PaginationItem>
+					}
+					<PaginationItem>
+						<PaginationNext Disabled="@(CurrentPage >= TotalPages)" Click="@(() => GoTo(CurrentPage + 1))" />
+					</PaginationItem>
+				</PaginationContent>
+			</Pagination>
+			<p class="text-sm text-muted-foreground mt-3 text-center">Page @CurrentPage of @TotalPages</p>
+		</ComponentExample>
+
+		<ComponentExample Title="With href links (URL navigation)" Code="@("<Pagination>\n    <PaginationContent>\n        <PaginationItem>\n            <PaginationPrevious Href=\"?page=@(currentPage - 1)\" />\n        </PaginationItem>\n        <PaginationItem><PaginationLink Href=\"?page=1\" IsActive>1</PaginationLink></PaginationItem>\n        <PaginationItem><PaginationLink Href=\"?page=2\">2</PaginationLink></PaginationItem>\n        <PaginationItem><PaginationLink Href=\"?page=3\">3</PaginationLink></PaginationItem>\n        <PaginationItem>\n            <PaginationNext Href=\"?page=@(currentPage + 1)\" />\n        </PaginationItem>\n    </PaginationContent>\n</Pagination>")">
+			<Pagination>
+				<PaginationContent>
+					<PaginationItem>
+						<PaginationPrevious Href="#" />
+					</PaginationItem>
+					<PaginationItem><PaginationLink Href="#" IsActive="true">1</PaginationLink></PaginationItem>
+					<PaginationItem><PaginationLink Href="#">2</PaginationLink></PaginationItem>
+					<PaginationItem><PaginationLink Href="#">3</PaginationLink></PaginationItem>
+					<PaginationItem><PaginationEllipsis /></PaginationItem>
+					<PaginationItem><PaginationLink Href="#">10</PaginationLink></PaginationItem>
+					<PaginationItem>
+						<PaginationNext Href="#" />
+					</PaginationItem>
+				</PaginationContent>
+			</Pagination>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private int CurrentPage = 1;
+	private const int TotalPages = 10;
+
+	private void GoTo( int page )
+	{
+		if ( page < 1 || page > TotalPages ) return;
+		CurrentPage = page;
+	}
+
+	private static IEnumerable<int> PageNumbers( int current, int total )
+	{
+		var pages = new List<int>();
+		var start = Math.Max( 2, current - 1 );
+		var end = Math.Min( total - 1, current + 1 );
+
+		pages.Add( 1 );
+		if ( start > 2 ) pages.Add( -1 );
+		for ( var i = start; i <= end; i++ ) pages.Add( i );
+		if ( end < total - 1 ) pages.Add( -1 );
+		if ( total > 1 ) pages.Add( total );
+
+		return pages;
+	}
+
+	private static readonly ApiElement[] PaginationElements =
+	[
+		new ApiElement(
+			Name: "Pagination",
+			Description: "Root `<nav aria-label=\"pagination\">` wrapper. Contains a single `PaginationContent` list.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<nav>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain a single `PaginationContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "PaginationContent",
+			Description: "Horizontal `<ul>` holding the `PaginationItem`s. Place inside a `Pagination`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<ul>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "One or more `PaginationItem` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "PaginationItem",
+			Description: "Wrapper `<li>` for a single pagination control — typically a `PaginationLink`, `PaginationPrevious`, `PaginationNext`, or `PaginationEllipsis`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<li>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "A single pagination control." ),
+			]
+		),
+		new ApiElement(
+			Name: "PaginationLink",
+			Description: "Clickable page number. Renders as an `<a href>` when `Href` is set (URL navigation) or a `<button>` with `Click` otherwise (SPA-style). Highlights itself when `IsActive` is true.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Href",                 "string?",                       false, "URL for link mode. When set, the control renders as an `<a>`." ),
+				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked on button-mode click. Used when `Href` is not supplied. Additional to Blok." ),
+				new ApiProperty( "IsActive",             "bool",                          false, "Marks this link as the current page. Emits `aria-current=\"page\"` and applies the active styling. Default: `false`." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true in button mode, disables the control. Additional to Blok. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the control." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Link contents — usually a page number or icon." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the control." ),
+			]
+		),
+		new ApiElement(
+			Name: "PaginationPrevious",
+			Description: "Convenience wrapper around `PaginationLink` that renders a left-chevron glyph and `aria-label=\"Go to previous page\"`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Href",                 "string?",                       false, "URL for link mode. When set, the control renders as an `<a>`." ),
+				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked on button-mode click." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true in button mode, disables the control. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the control." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the control." ),
+			]
+		),
+		new ApiElement(
+			Name: "PaginationNext",
+			Description: "Convenience wrapper around `PaginationLink` that renders a right-chevron glyph and `aria-label=\"Go to next page\"`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Href",                 "string?",                       false, "URL for link mode. When set, the control renders as an `<a>`." ),
+				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked on button-mode click." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true in button mode, disables the control. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the control." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the control." ),
+			]
+		),
+		new ApiElement(
+			Name: "PaginationEllipsis",
+			Description: "Decorative `…` placeholder used when the page list is truncated. Marked `aria-hidden` with a visually-hidden \"More pages\" label.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName", "string?", false, "Extra CSS classes appended to the ellipsis container." ),
+			]
+		),
+	];
+}

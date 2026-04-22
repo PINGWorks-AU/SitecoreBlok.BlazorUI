@@ -1,0 +1,13 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<Button Variant="ButtonVariant.Default" ColorScheme="@ColorScheme" Size="@Size" Click="Click" ClassName="@ClassName">
+	@ChildContent
+</Button>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public EventCallback Click { get; set; }
+	[Parameter] public ButtonColor ColorScheme { get; set; } = ButtonColor.Danger;
+	[Parameter] public ButtonSize Size { get; set; } = ButtonSize.Default;
+}

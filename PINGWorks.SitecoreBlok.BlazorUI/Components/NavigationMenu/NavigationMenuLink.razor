@@ -1,0 +1,23 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<a data-slot="navigation-menu-link" href="@Href" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+</a>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? Href { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public bool Active { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"flex flex-col gap-1 rounded-sm p-2 text-sm no-underline transition-all outline-none",
+		"hover:bg-accent hover:text-accent-foreground",
+		"focus:bg-accent focus:text-accent-foreground",
+		"focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-1",
+		"[&_svg:not([class*='text-'])]:text-muted-foreground [&_svg:not([class*='size-'])]:size-4" )
+										.With( "bg-accent/50 text-accent-foreground", Active )
+										.With( ClassName )
+										.Build();
+}

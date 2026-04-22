@@ -1,0 +1,21 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* `grid-template-rows: 0fr → 1fr` transition gives a smooth, content-size-aware
+   open/close animation without any JS measurement. Same pattern as AccordionContent. *@
+<div data-slot="collapsible-content" data-state="@( Parent.Open ? "open" : "closed" )"
+	 class="@CssClass"
+	 style="grid-template-rows: @( Parent.Open ? "1fr" : "0fr" )">
+	<div class="overflow-hidden">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[CascadingParameter] public required Collapsible Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "grid transition-[grid-template-rows] duration-200 ease-out" )
+											.With( ClassName )
+											.Build();
+}

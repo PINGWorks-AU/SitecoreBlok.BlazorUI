@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PINGWorks.SitecoreBlok.BlazorUI\PINGWorks.SitecoreBlok.BlazorUI.csproj" />
+		<ProjectReference Include="..\PINGWorks.SitecoreBlok.BlazorUI.Icons\PINGWorks.SitecoreBlok.BlazorUI.Icons.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\MIGRATION_STATUS.md" Link="MIGRATION_STATUS.md" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<TailwindCliFileName>tailwindcss-windows-x64.exe</TailwindCliFileName>
+		<TailwindCliPath>$(MSBuildThisFileDirectory)..\$(TailwindCliFileName)</TailwindCliPath>
+		<!-- Override TailwindCliUrl to pin a specific version, e.g. https://github.com/tailwindlabs/tailwindcss/releases/download/v4.1.13/tailwindcss-windows-x64.exe -->
+		<TailwindCliUrl Condition="'$(TailwindCliUrl)' == ''">https://github.com/tailwindlabs/tailwindcss/releases/latest/download/$(TailwindCliFileName)</TailwindCliUrl>
+	</PropertyGroup>
+
+	<Target Name="DownloadTailwindCLI" BeforeTargets="BuildTailwindCSS" Condition="!Exists('$(TailwindCliPath)')">
+		<Message Importance="high" Text="Tailwind CLI not found at $(TailwindCliPath). Downloading from $(TailwindCliUrl)..." />
+		<DownloadFile SourceUrl="$(TailwindCliUrl)" DestinationFolder="$(MSBuildThisFileDirectory).." DestinationFileName="$(TailwindCliFileName)" />
+	</Target>
+
+	<Target Name="BuildTailwindCSS" BeforeTargets="ResolveStaticWebAssetsInputs;Build">
+		<Exec Command="&quot;$(TailwindCliPath)&quot; -i wwwroot/css/catalogue.css -o wwwroot/css/catalogue-blok.css --minify" WorkingDirectory="$(MSBuildProjectDirectory)" />
+	</Target>
+
+</Project>

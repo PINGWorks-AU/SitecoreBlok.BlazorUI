@@ -1,0 +1,30 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="menubar" class="@CssClass" @attributes="AdditionalAttributes">
+	<CascadingValue Value="this">
+		@ChildContent
+	</CascadingValue>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private List<MenubarMenu> RegisteredMenus = [];
+
+	private string CssClass => CssClassBuilder.Start( "flex h-9 items-center gap-1 rounded-md border bg-background text-foreground p-1 shadow-xs" )
+											.With( ClassName )
+											.Build();
+
+	internal bool HasAnyOpen => RegisteredMenus.Any( m => m.IsOpen );
+
+	internal void Register( MenubarMenu menu ) => RegisteredMenus.Add( menu );
+	internal void Unregister( MenubarMenu menu ) => RegisteredMenus.Remove( menu );
+
+	internal async Task NotifyOpening( MenubarMenu opening )
+	{
+		foreach ( var menu in RegisteredMenus.Where( m => m != opening && m.IsOpen ) )
+			await menu.Close();
+	}
+}

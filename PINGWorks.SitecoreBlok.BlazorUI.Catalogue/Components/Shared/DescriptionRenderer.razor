@@ -1,0 +1,59 @@
+@* Renders a description string. Text wrapped in backticks (`X`) becomes an inline <code>.
+   If the backtick content (or its dotted root — "Accordion" in "Accordion.Item") matches
+   a KnownElements name, the code span becomes a same-page link to that element's H3.
+   Global <code> styling (see catalogue.css) handles the code appearance. *@
+
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@inject NavigationManager Nav
+
+@foreach ( var segment in Parse() )
+{
+	if ( !segment.IsCode )
+	{
+		@segment.Text
+	}
+	else if ( segment.LinkAnchor is not null )
+	{
+		<a href="@($"{PagePath}#{segment.LinkAnchor}")" class="no-underline hover:underline">
+			<code>@segment.Text</code>
+		</a>
+	}
+	else
+	{
+		<code>@segment.Text</code>
+	}
+}
+
+@code {
+	[Parameter, EditorRequired] public required string Description { get; set; }
+	[Parameter] public ApiElement[]? KnownElements { get; set; }
+
+	private string PagePath => "/" + Nav.ToBaseRelativePath( Nav.Uri ).Split( '?' )[ 0 ].Split( '#' )[ 0 ];
+
+	private IEnumerable<Segment> Parse()
+	{
+		if ( string.IsNullOrEmpty( Description ) )
+			yield break;
+
+		var parts = Description.Split( '`' );
+		for ( var i = 0; i < parts.Length; i++ )
+		{
+			var text = parts[ i ];
+			if ( i % 2 == 0 )
+			{
+				if ( !string.IsNullOrEmpty( text ) )
+					yield return new Segment( text, IsCode: false, LinkAnchor: null );
+			}
+			else
+			{
+				// Resolve link: match either the full content or its dotted root to a known element name.
+				var root = text.Split( '.' )[ 0 ];
+				var match = KnownElements?.FirstOrDefault( e => e.Name == text || e.Name == root );
+				var anchor = match is null ? null : PageTocRegistry.Slugify( match.Name );
+				yield return new Segment( text, IsCode: true, LinkAnchor: anchor );
+			}
+		}
+	}
+
+	private sealed record Segment( string Text, bool IsCode, string? LinkAnchor );
+}

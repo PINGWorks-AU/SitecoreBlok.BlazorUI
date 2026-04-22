@@ -1,0 +1,129 @@
+@page "/primitives/tabs"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Tabs" Description="A set of layered sections of content displayed one at a time" Interactivity="ComponentInteractivity.Interactive" ApiElements="@TabsElements">
+
+	<ExamplesSection>
+
+	<ComponentExample Title="Line variant (default)" Code="@("<Tabs DefaultValue=\"account\">\n    <TabsList>\n        <TabsTrigger Value=\"account\">Account</TabsTrigger>\n        <TabsTrigger Value=\"password\">Password</TabsTrigger>\n        <TabsTrigger Value=\"settings\">Settings</TabsTrigger>\n    </TabsList>\n    <TabsContent Value=\"account\">Account settings content.</TabsContent>\n    <TabsContent Value=\"password\">Password settings content.</TabsContent>\n    <TabsContent Value=\"settings\">General settings content.</TabsContent>\n</Tabs>")">
+		<Tabs DefaultValue="account">
+			<TabsList>
+				<TabsTrigger Value="account">Account</TabsTrigger>
+				<TabsTrigger Value="password">Password</TabsTrigger>
+				<TabsTrigger Value="settings">Settings</TabsTrigger>
+			</TabsList>
+			<TabsContent Value="account">
+				<p class="text-sm text-muted-foreground pt-2">Make changes to your account here. Click save when you are done.</p>
+			</TabsContent>
+			<TabsContent Value="password">
+				<p class="text-sm text-muted-foreground pt-2">Change your password here. After saving, you will be logged out.</p>
+			</TabsContent>
+			<TabsContent Value="settings">
+				<p class="text-sm text-muted-foreground pt-2">Configure general application settings.</p>
+			</TabsContent>
+		</Tabs>
+	</ComponentExample>
+
+	<ComponentExample Title="Line variant with icons" Code="@("<Tabs DefaultValue=\"account\">\n    <TabsList>\n        <TabsTrigger Value=\"account\" Variant=\"TabsVariant.Line\">\n            <Icon Svg=\"@IconSvg.Account\" ClassName=\"size-4\" /> Account\n        </TabsTrigger>\n        <TabsTrigger Value=\"settings\" Variant=\"TabsVariant.Line\">\n            <Icon Svg=\"@IconSvg.Cog\" ClassName=\"size-4\" /> Settings\n        </TabsTrigger>\n        <TabsTrigger Value=\"notifications\" Variant=\"TabsVariant.Line\">\n            <Icon Svg=\"@IconSvg.Bell\" ClassName=\"size-4\" /> Notifications\n        </TabsTrigger>\n    </TabsList>\n    <TabsContent Value=\"account\">Account content</TabsContent>\n    <TabsContent Value=\"settings\">Settings content</TabsContent>\n    <TabsContent Value=\"notifications\">Notifications content</TabsContent>\n</Tabs>")">
+		<Tabs DefaultValue="account">
+			<TabsList>
+				<TabsTrigger Value="account" Variant="TabsVariant.Line">
+					<Icon Svg="@IconSvg.Account" ClassName="size-4" /> Account
+				</TabsTrigger>
+				<TabsTrigger Value="settings" Variant="TabsVariant.Line">
+					<Icon Svg="@IconSvg.Cog" ClassName="size-4" /> Settings
+				</TabsTrigger>
+				<TabsTrigger Value="notifications" Variant="TabsVariant.Line">
+					<Icon Svg="@IconSvg.Bell" ClassName="size-4" /> Notifications
+				</TabsTrigger>
+			</TabsList>
+			<TabsContent Value="account">
+				<p class="text-sm text-muted-foreground pt-2">Manage your account details, profile information, and preferences.</p>
+			</TabsContent>
+			<TabsContent Value="settings">
+				<p class="text-sm text-muted-foreground pt-2">Configure application behavior, themes, and integrations.</p>
+			</TabsContent>
+			<TabsContent Value="notifications">
+				<p class="text-sm text-muted-foreground pt-2">Choose which notifications you want to receive and how.</p>
+			</TabsContent>
+		</Tabs>
+	</ComponentExample>
+
+	<ComponentExample Title="Soft-rounded variant" Code="@("<Tabs DefaultValue=\"overview\">\n    <TabsList Variant=\"TabsVariant.SoftRounded\">\n        <TabsTrigger Value=\"overview\" Variant=\"TabsVariant.SoftRounded\">Overview</TabsTrigger>\n        <TabsTrigger Value=\"analytics\" Variant=\"TabsVariant.SoftRounded\">Analytics</TabsTrigger>\n        <TabsTrigger Value=\"reports\" Variant=\"TabsVariant.SoftRounded\">Reports</TabsTrigger>\n    </TabsList>\n    <TabsContent Value=\"overview\">Overview content.</TabsContent>\n    <TabsContent Value=\"analytics\">Analytics content.</TabsContent>\n    <TabsContent Value=\"reports\">Reports content.</TabsContent>\n</Tabs>")">
+		<Tabs DefaultValue="overview">
+			<TabsList Variant="TabsVariant.SoftRounded">
+				<TabsTrigger Value="overview" Variant="TabsVariant.SoftRounded">Overview</TabsTrigger>
+				<TabsTrigger Value="analytics" Variant="TabsVariant.SoftRounded">Analytics</TabsTrigger>
+				<TabsTrigger Value="reports" Variant="TabsVariant.SoftRounded">Reports</TabsTrigger>
+			</TabsList>
+			<TabsContent Value="overview">
+				<p class="text-sm text-muted-foreground pt-2">Overview of your project metrics and status.</p>
+			</TabsContent>
+			<TabsContent Value="analytics">
+				<p class="text-sm text-muted-foreground pt-2">Detailed analytics and data visualizations.</p>
+			</TabsContent>
+			<TabsContent Value="reports">
+				<p class="text-sm text-muted-foreground pt-2">Generated reports and exports.</p>
+			</TabsContent>
+		</Tabs>
+	</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] TabsElements =
+	[
+		new ApiElement(
+			Name: "Tabs",
+			Description: "Root of the tabs control. Holds the active tab `Value`, coordinates its `TabsTrigger` and `TabsContent` children via a cascading value, and raises `OnTabChanged` when the selection changes.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string?",                false, "The active tab's value. Use with `ValueChanged` or `@bind-Value` for controlled tabs." ),
+				new ApiProperty( "ValueChanged", "EventCallback<string?>", false, "Invoked when the active tab changes. Use with `@bind-Value` for two-way binding." ),
+				new ApiProperty( "DefaultValue", "string?",                false, "Initial active tab value when `Value` is not bound. Applied on first render only." ),
+				new ApiProperty( "OnTabChanged", "EventCallback<string?>", false, "Fires when the active tab changes to a different value (not on the initial render)." ),
+				new ApiProperty( "ClassName",    "string?",                false, "Extra CSS classes appended to the outer container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",        false, "Must contain a `TabsList` and one or more `TabsContent` entries." ),
+			]
+		),
+		new ApiElement(
+			Name: "TabsList",
+			Description: "Horizontal bar that holds the `TabsTrigger` buttons. Draws the bottom border for the line variant.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Variant",      "TabsVariant",     false, "Visual style. Default: `TabsVariant.Line` (underline). Other value: `SoftRounded` (pill background). Match the variant on the triggers." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the list container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "`TabsTrigger` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "TabsTrigger",
+			Description: "Clickable tab button. Sets the parent `Tabs.Value` to its own `Value` when pressed.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string",          true,  "Identifier matched against the parent `Tabs.Value`. Pair with a `TabsContent` using the same value." ),
+				new ApiProperty( "Variant",      "TabsVariant",     false, "Visual style. Default: `TabsVariant.Line`. Must match the `TabsList` variant." ),
+				new ApiProperty( "Disabled",     "bool",            false, "When true, the trigger is non-interactive and visually muted. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<button>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Trigger label — usually text, optionally with a leading `Icon`." ),
+			]
+		),
+		new ApiElement(
+			Name: "TabsContent",
+			Description: "Panel that only renders when the parent `Tabs.Value` matches its own `Value`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string",          true,  "Identifier matched against the parent `Tabs.Value`. Pair with a `TabsTrigger` using the same value." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the panel." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "The panel's content." ),
+			]
+		),
+	];
+}

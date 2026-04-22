@@ -1,0 +1,22 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* When inside a ComboboxGroup, hide this label if the group has no items currently matching
+   the filter — avoids stranded group headings with no visible options below them. *@
+@if ( ParentGroup is null || ParentGroup.HasVisibleItems() )
+{
+	<div data-slot="combobox-label" class="@CssClass">
+		@ChildContent
+	</div>
+}
+
+@code {
+	[CascadingParameter] public ComboboxGroup? ParentGroup { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"text-muted-foreground px-2 py-1.5 text-xs",
+		"pointer-coarse:px-3 pointer-coarse:py-2 pointer-coarse:text-sm" )
+										.With( ClassName )
+										.Build();
+}

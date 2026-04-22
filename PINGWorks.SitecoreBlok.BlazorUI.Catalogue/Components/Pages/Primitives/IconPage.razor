@@ -1,0 +1,129 @@
+@page "/primitives/icon"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Icon" Description="Renders an SVG icon from a path string" Interactivity="ComponentInteractivity.Ssr" ApiElements="@IconElements">
+
+	<DivergenceNote>
+		<p><strong>Structural divergence from Blok for the <code>default</code> variant.</strong> Blok always wraps the icon in a <code>&lt;span&gt;</code> that hosts the variant/colorScheme classes; <code>className</code> lands on the span, not the SVG. Our implementation diverges for the <code>Default</code> variant only: the <code>&lt;svg&gt;</code> is the root element and <code>ClassName</code> lands directly on it. This is required so that rotation animations (e.g. Accordion chevron) that pass <code>transition-transform rotate-*</code> via <code>ClassName</code> animate correctly — targeting the SVG with <code>[&amp;>svg]:rotate-*</code> or via <code>ClassName</code> both land on the same element.</p>
+		<p>For <code>Subtle</code> and <code>Filled</code> variants a <code>&lt;span&gt;</code> wrapper is rendered, matching Blok's structure exactly. <code>ClassName</code> goes on the span in those cases.</p>
+		<p>The <code>ColorScheme</code> parameter is nullable for the <code>Default</code> variant. When not set (the default), the icon inherits its fill color from the parent element — preserving backward compatibility with all existing usages that rely on color inheritance (Button, Alert, Checkbox, etc.). Pass <code>ColorScheme</code> explicitly to pin an icon's color independently of its context.</p>
+		<p>Additional Blazor-specific parameters with no Blok equivalent: <code>Scale</code> (SVG transform for visual tweaks), <code>AiGradient</code> (purple-to-red gradient fill), <code>ResetClassName</code> (opts out of layout defaults), and <code>ViewBox</code> (Blok hardcodes <code>0 0 24 24</code>). The companion <code>IconSvg</code> static class bundles 300+ MDI path strings; the larger <code>PINGWorks.SitecoreBlok.BlazorUI.Icons</code> package ships 7,500+.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Icon Svg=\"@IconSvg.Check\" />")">
+			<Icon Svg="@IconSvg.Check" />
+		</ComponentExample>
+
+		<ComponentExample Title="Sizes"
+			Code="@("<Icon Svg=\"@IconSvg.Star\" IconSize=\"IconSize.Sm\" />\n<Icon Svg=\"@IconSvg.Star\" IconSize=\"IconSize.Md\" />\n<Icon Svg=\"@IconSvg.Star\" />\n<Icon Svg=\"@IconSvg.Star\" IconSize=\"IconSize.Lg\" />\n<Icon Svg=\"@IconSvg.Star\" IconSize=\"IconSize.Xl\" />\n<Icon Svg=\"@IconSvg.Star\" IconSize=\"IconSize.Xxl\" />")">
+			<div class="flex items-end gap-4">
+				<Icon Svg="@IconSvg.Star" IconSize="IconSize.Sm" />
+				<Icon Svg="@IconSvg.Star" IconSize="IconSize.Md" />
+				<Icon Svg="@IconSvg.Star" />
+				<Icon Svg="@IconSvg.Star" IconSize="IconSize.Lg" />
+				<Icon Svg="@IconSvg.Star" IconSize="IconSize.Xl" />
+				<Icon Svg="@IconSvg.Star" IconSize="IconSize.Xxl" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Color scheme"
+			Code="@("<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Primary\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Neutral\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Success\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Danger\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Warning\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Purple\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Blue\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Teal\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Cyan\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Yellow\" />\n<Icon Svg=\"@IconSvg.Star\" ColorScheme=\"IconColorScheme.Pink\" />")">
+			<div class="flex items-center gap-4">
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Primary" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Neutral" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Success" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Danger" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Warning" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Purple" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Blue" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Teal" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Cyan" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Yellow" />
+				<Icon Svg="@IconSvg.Star" ColorScheme="IconColorScheme.Pink" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Subtle variant"
+			Code="@("<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Neutral\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Success\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Danger\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Warning\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Purple\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Blue\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Teal\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Cyan\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Yellow\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Subtle\" ColorScheme=\"IconColorScheme.Pink\" />")">
+			<div class="flex items-center gap-4">
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Neutral" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Success" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Danger" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Warning" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Purple" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Blue" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Teal" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Cyan" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Yellow" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Subtle" ColorScheme="IconColorScheme.Pink" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Filled variant"
+			Code="@("<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Neutral\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Success\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Danger\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Warning\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Purple\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Blue\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Teal\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Cyan\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Yellow\" />\n<Icon Svg=\"@IconSvg.Star\" Variant=\"IconVariant.Filled\" ColorScheme=\"IconColorScheme.Pink\" />")">
+			<div class="flex items-center gap-4">
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Neutral" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Success" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Danger" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Warning" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Purple" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Blue" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Teal" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Cyan" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Yellow" />
+				<Icon Svg="@IconSvg.Star" Variant="IconVariant.Filled" ColorScheme="IconColorScheme.Pink" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Different scales" Code="@("<Icon Svg=\"@IconSvg.Check\" Scale=\"0.75\" />\n<Icon Svg=\"@IconSvg.Check\" />\n<Icon Svg=\"@IconSvg.Check\" Scale=\"1.5\" />\n<Icon Svg=\"@IconSvg.Check\" Scale=\"2.0\" />")">
+			<div class="flex items-center gap-6">
+				<Icon Svg="@IconSvg.Check" Scale="0.75" />
+				<Icon Svg="@IconSvg.Check" />
+				<Icon Svg="@IconSvg.Check" Scale="1.5" />
+				<Icon Svg="@IconSvg.Check" Scale="2.0" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Various icons" Code="@("<Icon Svg=\"@IconSvg.Account\" />\n<Icon Svg=\"@IconSvg.Check\" />\n<Icon Svg=\"@IconSvg.ChevronDown\" />\n<Icon Svg=\"@IconSvg.AccessPoint\" />")">
+			<div class="flex items-center gap-4">
+				<Icon Svg="@IconSvg.Account" />
+				<Icon Svg="@IconSvg.Check" />
+				<Icon Svg="@IconSvg.ChevronDown" />
+				<Icon Svg="@IconSvg.AccessPoint" />
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] IconElements =
+	[
+		new ApiElement(
+			Name: "Icon",
+			Description: "Renders an inline `<svg>` from an MDI-style path string. Sized via `IconSize` or `ClassName` (`size-X`); visually fine-tuned via `Scale`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Svg",                  "string",                        true,  "SVG path data to render inside the `<path d>`. Pass a constant from `IconSvg` or the `PINGWorks.SitecoreBlok.BlazorUI.Icons` package." ),
+				new ApiProperty( "Variant",              "IconVariant",                   false, "Visual tile style. Default: `IconVariant.Default` (no tile, svg is root element). `Subtle` adds a soft tinted background tile; `Filled` adds a solid background tile. Tile variants render a `<span>` wrapper." ),
+				new ApiProperty( "ColorScheme",          "IconColorScheme?",              false, "Color token applied to the icon and (for tile variants) the tile background. Default: `null` (inherits color from parent) for `Default` variant; `Primary` for `Subtle`/`Filled`. Values: `Primary`, `Neutral`, `Success`, `Danger`, `Warning`, `Yellow`, `Teal`, `Cyan`, `Blue`, `Purple`, `Pink`." ),
+				new ApiProperty( "IconSize",             "IconSize",                      false, "Preset size token. Default: `IconSize.Default` (`size-6`). Other values: `Sm` (`size-4`), `Md` (`size-5`), `Lg` (`size-7`), `Xl` (`size-9`), `Xxl` (`size-11`), `Custom` (emits no size class — control size entirely via `ClassName`)." ),
+				new ApiProperty( "Scale",                "double?",                       false, "SVG `transform=\"scale(n)\"` factor. Scales the glyph without changing the containing box — use for visual tweaks." ),
+				new ApiProperty( "Fill",                 "string",                        false, "Fill colour for the path. Default: `\"currentColor\"`. Ignored when `AiGradient` is set." ),
+				new ApiProperty( "ViewBox",              "string",                        false, "SVG `viewBox`. Default: `\"0 0 24 24\"` (MDI canvas)." ),
+				new ApiProperty( "Title",                "string?",                       false, "Accessible label. Rendered as a `<title>` element and applied to `aria-label`." ),
+				new ApiProperty( "AiGradient",           "AiGradient?",                   false, "When set, replaces the fill with a purple-to-red linear gradient at the given palette step (e.g. `G500`)." ),
+				new ApiProperty( "ResetClassName",       "bool",                          false, "Opts out of the layout defaults (`inline-block align-middle shrink-0`) on the `Default` variant. Does NOT strip the size class. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes. For `Default` variant appended to the `<svg>`; for `Subtle`/`Filled` variants appended to the outer `<span>`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<svg>` in all variants." ),
+			]
+		),
+	];
+}

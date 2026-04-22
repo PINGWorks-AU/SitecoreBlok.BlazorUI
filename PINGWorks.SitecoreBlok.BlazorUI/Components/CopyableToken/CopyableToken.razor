@@ -1,0 +1,107 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IDisposable
+@inject IJSRuntime JS
+
+<Tooltip>
+	<TooltipTrigger>
+		@* `text-muted-foreground` is a Blazor-only addition (Blok omits it). Required by parity Check 4:
+		   `bg-muted` without a paired text token falls back to inherited body colour, which breaks dark
+		   mode for fixed-positioned / portal-rendered descendants. Do not remove. *@
+		<code dir="ltr" @onclick="HandleCopy" @onmouseleave="ResetOnLeave" class="@CssClass" @attributes="AdditionalAttributes">@Token</code>
+	</TooltipTrigger>
+	<TooltipContent ClassName="@TooltipOverride">@CurrentMessage</TooltipContent>
+</Tooltip>
+
+@code {
+	[Parameter, EditorRequired] public required string Token { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string CopyMessage { get; set; } = "Copy to clipboard";
+	[Parameter] public string CopiedMessage { get; set; } = "Copied";
+	[Parameter] public EventCallback<string> Clicked { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	// Tooltip visibility and the displayed message are intentionally tracked on separate state
+	// variables. They change at different instants so the user does not see the pre-click message
+	// flash through the fading-out tooltip. Timeline after a click:
+	//   T=0      TooltipVisibility=ForceShown, Message=Copied         (forced visible, "Copied" text)
+	//   T=1000   TooltipVisibility=ForceHidden, Message=Copied        (tooltip fades out over 150ms;
+	//                                                                  text stays "Copied" so the
+	//                                                                  fading balloon shows the right
+	//                                                                  label to the very last frame)
+	//   T=1300   Message=Copy                                         (fade is complete; safe to
+	//                                                                  restore default text under the
+	//                                                                  still-force-hidden tooltip)
+	//   mouseleave  both reset to default                             (hover can start a fresh cycle)
+	private enum TooltipVisibilityState { Default, ForceShown, ForceHidden }
+	private enum MessageState { Copy, Copied }
+
+	private TooltipVisibilityState TooltipVisibility = TooltipVisibilityState.Default;
+	private MessageState Message = MessageState.Copy;
+	private CancellationTokenSource? SuppressionCts;
+
+	private string CurrentMessage => Message == MessageState.Copied ? CopiedMessage : CopyMessage;
+
+	// `!opacity-*` / `!pointer-events-*` override TooltipContent's default `group-hover/tooltip:opacity-100`
+	// driver so the copied feedback can force-show for 1s, then force-hide while the cursor is still
+	// over the trigger. Without `!important` the hover rule wins and we cannot dismiss the tooltip.
+	private string? TooltipOverride => TooltipVisibility switch
+	{
+		TooltipVisibilityState.ForceShown => "!opacity-100 !pointer-events-auto",
+		TooltipVisibilityState.ForceHidden => "!opacity-0 !pointer-events-none",
+		_ => null,
+	};
+
+	private string CssClass => CssClassBuilder.Start( "cursor-pointer rounded bg-muted text-muted-foreground px-[0.3rem] py-[0.2rem] font-mono text-sm hover:bg-muted/80 transition-colors inline-block" )
+										.With( ClassName )
+										.Build();
+
+	private async Task HandleCopy()
+	{
+		await JS.InvokeVoidAsync( "navigator.clipboard.writeText", Token );
+		await Clicked.InvokeAsync( Token );
+
+		TooltipVisibility = TooltipVisibilityState.ForceShown;
+		Message = MessageState.Copied;
+		StateHasChanged();
+
+		SuppressionCts?.Cancel();
+		SuppressionCts = new CancellationTokenSource();
+		var token = SuppressionCts.Token;
+
+		try
+		{
+			// Phase 1 (1000ms): tooltip stays forced-visible with "Copied" text.
+			await Task.Delay( 1000, token );
+
+			// Phase 2: start fading the tooltip out. Text stays "Copied" so the fading balloon
+			// displays the correct label for the whole 150ms transition.
+			TooltipVisibility = TooltipVisibilityState.ForceHidden;
+			StateHasChanged();
+
+			// Phase 3 (300ms): wait for the fade to finish (150ms transition + 150ms buffer),
+			// then reset the text. Tooltip stays force-hidden until the cursor leaves, so the
+			// text swap happens behind an invisible element — no flicker visible to the user.
+			await Task.Delay( 300, token );
+			Message = MessageState.Copy;
+			StateHasChanged();
+		}
+		catch ( TaskCanceledException ) { }
+	}
+
+	private void ResetOnLeave()
+	{
+		if ( TooltipVisibility == TooltipVisibilityState.Default && Message == MessageState.Copy )
+			return;
+
+		SuppressionCts?.Cancel();
+		TooltipVisibility = TooltipVisibilityState.Default;
+		Message = MessageState.Copy;
+		StateHasChanged();
+	}
+
+	public void Dispose()
+	{
+		SuppressionCts?.Cancel();
+		SuppressionCts?.Dispose();
+	}
+}

@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="timeline-connector" class="@CssClass"></div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public TimelineConnectorVariant Variant { get; set; } = TimelineConnectorVariant.Solid;
+
+	private string CssClass => CssClassBuilder.Start( "flex-1 min-h-4" )
+											.With( "w-0.25 bg-border", Variant is TimelineConnectorVariant.Solid )
+											.With( "w-0 border-l-2 border-dashed border-border", Variant is TimelineConnectorVariant.Dashed )
+											.With( "w-0 border-l-2 border-dotted border-border", Variant is TimelineConnectorVariant.Dotted )
+											.With( ClassName )
+											.Build();
+}

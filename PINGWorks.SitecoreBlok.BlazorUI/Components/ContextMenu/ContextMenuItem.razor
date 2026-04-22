@@ -1,0 +1,39 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="context-menu-item"
+	 data-variant="@( Variant.ToString().ToLowerInvariant() )"
+	 data-inset="@( Inset ? "true" : null )"
+	 role="menuitem"
+	 class="@CssClass"
+	 @onclick="HandleClick">
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] public ContextMenu? ParentContextMenu { get; set; }
+	[CascadingParameter] public ContextMenuSub? ParentSub { get; set; }
+
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public EventCallback Click { get; set; }
+	[Parameter] public ContextMenuItemVariant Variant { get; set; } = ContextMenuItemVariant.Default;
+	[Parameter] public bool Inset { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"focus:text-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none hover:bg-neutral-bg hover:text-foreground",
+		"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[0.8rem] [&_svg:not([class*='text-'])]:text-neutral-fg" )
+												.With( "pl-8", Inset )
+												.With( "text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 hover:text-destructive", Variant is ContextMenuItemVariant.Destructive )
+												.With( "pointer-events-none opacity-50", Disabled )
+												.With( ClassName )
+												.Build();
+
+	private async Task HandleClick()
+	{
+		if ( Disabled ) return;
+		if ( Click.HasDelegate ) await Click.InvokeAsync();
+		if ( ParentSub is not null ) await ParentSub.Close();
+		if ( ParentContextMenu is not null ) await ParentContextMenu.Close();
+	}
+}

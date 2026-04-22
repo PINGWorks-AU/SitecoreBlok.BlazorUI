@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<nav data-slot="pagination" aria-label="pagination" class="@CssClass">
+	@ChildContent
+</nav>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "mx-auto flex w-full justify-center" )
+											.With( ClassName )
+											.Build();
+}

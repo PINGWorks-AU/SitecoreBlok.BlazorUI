@@ -1,0 +1,21 @@
+@import '../../../PINGWorks.SitecoreBlok.BlazorUI/wwwroot/css/blok/geist-font.css';
+@import '../../../PINGWorks.SitecoreBlok.BlazorUI/wwwroot/css/blok/globals.css';
+
+@source '../../Components';
+@source '../../../PINGWorks.SitecoreBlok.BlazorUI/Components';
+
+/* Inline <code> styling applied automatically across the Catalogue.
+   `code:not(pre code)` excludes Prism syntax-highlighted blocks (<pre><code>),
+   whose appearance is owned by prism.css. Background is a touch darker than
+   the page; the border is a hair darker still. */
+@layer base {
+	code:not(pre code) {
+		background-color: var( --color-neutral-50 );
+		border: 1px solid var( --color-border );
+		border-radius: 0.25rem;
+		padding: 0.05em 0.4em;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+		font-size: 0.875em;
+		line-height: 1.4;
+	}
+}

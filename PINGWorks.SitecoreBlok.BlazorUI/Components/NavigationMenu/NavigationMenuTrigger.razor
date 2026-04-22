@@ -1,0 +1,30 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button data-slot="navigation-menu-trigger" type="button" data-state="@(IsOpen ? "open" : "closed")" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+	<Icon Svg="@IconSvg.ChevronDown" ClassName="@ChevronClass" />
+</button>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public bool Active { get; set; }
+
+	[CascadingParameter( Name = "NavigationMenuItemOpen" )] private bool IsOpen { get; set; }
+
+	private string ChevronClass => IsOpen
+		? "relative top-px ml-1 size-3 transition duration-300 rotate-180"
+		: "relative top-px ml-1 size-3 transition duration-300";
+
+	private string CssClass => CssClassBuilder.Start(
+		"group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-neutral-fg text-md font-medium",
+		"hover:bg-neutral-bg hover:text-neutral-fg",
+		"focus:bg-accent focus:text-accent-foreground",
+		"disabled:pointer-events-none disabled:opacity-50",
+		"data-[state=open]:hover:bg-accent data-[state=open]:text-neutral-fg data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50",
+		"focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1" )
+										.With( "bg-primary-bg text-primary-fg hover:bg-primary-bg hover:text-primary-fg", Active )
+										.With( ClassName )
+										.Build();
+}

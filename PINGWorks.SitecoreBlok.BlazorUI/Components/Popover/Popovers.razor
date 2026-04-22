@@ -1,0 +1,52 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject PopoverService Pops
+
+<div></div>
+
+@foreach ( var item in ActivePopovers )
+{
+	<PopoverItem Item="item" Hide="() => HidePopover(item)" @key="@item.Id" />
+}
+
+@code {
+
+	private List<Popover> ActivePopovers = [];
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		Pops.OnShow += ShowPopover;
+		Pops.OnHide += HidePopover;
+	}
+
+	private async Task HidePopover( Popover popover )
+	{
+		if ( ActivePopovers.Remove( popover ) && popover.OnClose.HasDelegate )
+			await popover.OnClose.InvokeAsync();
+
+		await InvokeAsync(StateHasChanged);
+	}
+	private async Task ShowPopover( Popover popover )
+	{
+		if ( ActivePopovers.Contains( popover ) )
+			return;
+
+		ActivePopovers.Add( popover );
+
+		await InvokeAsync( StateHasChanged );
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			Pops.OnShow -= ShowPopover;
+			Pops.OnHide -= HidePopover;
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+}

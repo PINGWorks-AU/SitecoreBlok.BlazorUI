@@ -1,0 +1,59 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="this" IsFixed>
+	<div data-slot="toggle-group" data-variant="@( Variant.ToString().ToLowerInvariant() )" data-size="@( Size.ToString().ToLowerInvariant() )"
+		 role="group" class="@CssClass" @attributes="AdditionalAttributes">
+		@ChildContent
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	[Parameter] public ToggleVariant Variant { get; set; } = ToggleVariant.Default;
+	[Parameter] public ToggleSize Size { get; set; } = ToggleSize.Default;
+	[Parameter] public ToggleGroupType Type { get; set; } = ToggleGroupType.Single;
+	[Parameter] public bool Disabled { get; set; }
+
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+	[Parameter] public List<string> Values { get; set; } = [];
+	[Parameter] public EventCallback<List<string>> ValuesChanged { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "group/toggle-group flex w-fit items-center rounded-md" )
+										.With( ClassName )
+										.Build();
+
+	internal bool IsItemPressed( string value )
+	{
+		return Type is ToggleGroupType.Single
+			? Value == value
+			: Values.Contains( value );
+	}
+
+	internal async Task ToggleItem( string value )
+	{
+		if ( Disabled ) return;
+
+		if ( Type is ToggleGroupType.Single )
+		{
+			Value = Value == value ? null : value;
+
+			if ( ValueChanged.HasDelegate )
+				await ValueChanged.InvokeAsync( Value );
+		}
+		else
+		{
+			if ( Values.Contains( value ) )
+				Values.Remove( value );
+			else
+				Values.Add( value );
+
+			if ( ValuesChanged.HasDelegate )
+				await ValuesChanged.InvokeAsync( Values );
+		}
+	}
+}

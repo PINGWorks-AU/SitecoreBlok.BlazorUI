@@ -1,0 +1,75 @@
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@inject PageTocRegistry Toc
+
+<PageTitle>@Title - Blok Blazor</PageTitle>
+
+<div class="flex gap-10 py-4">
+
+	<div class="flex-1 min-w-0 max-w-4xl space-y-2">
+		<div>
+			<h1 class="text-3xl font-bold tracking-tight text-foreground">@Title</h1>
+			<p class="text-muted-foreground mt-2 text-base">@Description</p>
+
+			@if ( Interactivity is not null || RequiresScripts )
+			{
+				<div class="mt-4 flex flex-wrap items-center gap-2">
+					@if ( Interactivity is ComponentInteractivity.Interactive )
+					{
+						<Badge ColorScheme="BadgeColor.Blue" Size="BadgeSize.Lg" ClassName="gap-1.5">
+							<Icon Svg="@IconSvg.Flash" ResetClassName ClassName="size-3.5" />
+							Interactive-mode
+						</Badge>
+					}
+					else if ( Interactivity is ComponentInteractivity.Ssr )
+					{
+						<Badge ColorScheme="BadgeColor.Yellow" Size="BadgeSize.Lg" ClassName="gap-1.5">
+							<Icon Svg="@IconSvg.ServerOutline" ResetClassName ClassName="size-3.5" />
+							SSR mode
+						</Badge>
+					}
+					@if ( RequiresScripts )
+					{
+						<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Lg" ClassName="gap-1.5">
+							<Icon Svg="@IconSvg.ScriptText" ResetClassName ClassName="size-3.5" />
+							Requires supporting scripts
+						</Badge>
+					}
+				</div>
+			}
+		</div>
+
+		<Separator ClassName="!mt-6" />
+
+		@* ChildContent renders verbatim: leading blocks (e.g. DivergenceNote) sit first,
+		   then the page wraps its examples in <ExamplesSection> so the Examples H2 lands
+		   AFTER any preamble. *@
+		@ChildContent
+
+		@if ( ApiElements is not null && ApiElements.Length > 0 )
+		{
+			<ApiSection Elements="@ApiElements" />
+		}
+	</div>
+
+	<aside class="hidden xl:block w-56 shrink-0 ml-auto">
+		<div class="sticky top-4">
+			<PageToc />
+		</div>
+	</aside>
+
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required string Title { get; set; }
+	[Parameter, EditorRequired] public required string Description { get; set; }
+	[Parameter] public ComponentInteractivity? Interactivity { get; set; }
+	[Parameter] public bool RequiresScripts { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public ApiElement[]? ApiElements { get; set; }
+
+	protected override void OnInitialized()
+	{
+		// Fresh page = fresh ToC. This fires on each page navigation.
+		Toc.Reset();
+	}
+}

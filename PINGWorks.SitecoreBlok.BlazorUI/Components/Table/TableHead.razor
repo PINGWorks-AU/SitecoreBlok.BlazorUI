@@ -1,0 +1,20 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<th data-slot="table-head" class="@CssClass">
+	@ChildContent
+</th>
+
+@code {
+	[CascadingParameter] public Table? ParentTable { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Pinned { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "whitespace-nowrap text-left align-middle font-medium text-neutral-fg",
+		"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]" )
+										.With( ParentTable?.SizeHeaderClasses ?? "h-[34px] min-h-[34px] py-2 px-5" )
+										// `parity-no-text-pair`: text-neutral-fg is in the Start args.
+										.With( "sticky left-0 z-20 bg-background parity-no-text-pair", Pinned )
+										.With( ClassName )
+										.Build();
+}

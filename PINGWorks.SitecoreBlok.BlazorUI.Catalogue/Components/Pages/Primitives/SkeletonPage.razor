@@ -1,0 +1,39 @@
+@page "/primitives/skeleton"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Skeleton" Description="Used to show a placeholder while content is loading" Interactivity="ComponentInteractivity.Ssr" ApiElements="@SkeletonElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Skeleton ClassName=\"h-4 w-48\" />")">
+			<Skeleton ClassName="h-4 w-48" />
+		</ComponentExample>
+
+		<ComponentExample Title="Various sizes" Code="@("<Skeleton ClassName=\"h-4 w-64\" />\n<Skeleton ClassName=\"h-8 w-32\" />\n<Skeleton ClassName=\"h-12 w-12 rounded-full\" />")">
+			<div class="space-y-3">
+				<Skeleton ClassName="h-4 w-64" />
+				<Skeleton ClassName="h-8 w-32" />
+				<Skeleton ClassName="h-12 w-12 rounded-full" />
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] SkeletonElements =
+	[
+		new ApiElement(
+			Name: "Skeleton",
+			Description: "A pulsing rounded block sized by `ClassName`. Use it as a placeholder while real content loads; stack several together to rough out a card or list row.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the skeleton element. Set `height`, `width`, and `rounded-*` here to shape the placeholder." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the skeleton element." ),
+			]
+		),
+	];
+}

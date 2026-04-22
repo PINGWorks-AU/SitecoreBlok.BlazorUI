@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<span data-slot="breadcrumb-ellipsis" role="presentation" aria-hidden="true" class="@CssClass">
+	<Icon Svg="@IconSvg.DotsHorizontal" Scale="0.9" ClassName="h-4 w-4" />
+	<span class="sr-only">More</span>
+</span>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start("flex size-9 items-center justify-center")
+										.With(ClassName)
+										.Build();
+}

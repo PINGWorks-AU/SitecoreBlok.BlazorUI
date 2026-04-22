@@ -1,0 +1,59 @@
+@page "/graphics/favicons"
+@rendermode InteractiveServer
+@using Icons = PINGWorks.SitecoreBlok.BlazorUI.Icons
+
+<ComponentPage Title="Favicons" Description="Product favicons for Sitecore platform applications. Access via FaviconSvg.*.">
+
+	<Table>
+		<TableHeader>
+			<TableRow>
+				<TableHead>Icon</TableHead>
+				<TableHead>Product</TableHead>
+				<TableHead>Property</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody>
+			@foreach ( var item in Items )
+			{
+				<TableRow>
+					<TableCell>
+						<div class="w-8 h-8 [&>svg]:w-full [&>svg]:h-full">
+							@((MarkupString)item.Svg)
+						</div>
+					</TableCell>
+					<TableCell>
+						<span class="text-sm font-medium">@item.Product</span>
+					</TableCell>
+					<TableCell>
+						<code class="text-sm">FaviconSvg.@item.Name</code>
+					</TableCell>
+				</TableRow>
+			}
+		</TableBody>
+	</Table>
+
+</ComponentPage>
+
+@code {
+	private static readonly (string Name, string Product, string Svg)[] Items =
+	[
+		("Blok", "Blok", Icons.FaviconSvg.Blok),
+		("Cdp", "CDP", Icons.FaviconSvg.Cdp),
+		("Connect", "Connect", Icons.FaviconSvg.Connect),
+		("ContentHub", "Content Hub", Icons.FaviconSvg.ContentHub),
+		("ContentHubOne", "Content Hub ONE", Icons.FaviconSvg.ContentHubOne),
+		("ExperienceCommerce", "Experience Commerce", Icons.FaviconSvg.ExperienceCommerce),
+		("ExperienceManager", "Experience Manager", Icons.FaviconSvg.ExperienceManager),
+		("ExperiencePlatform", "Experience Platform", Icons.FaviconSvg.ExperiencePlatform),
+		("OrderCloud", "OrderCloud", Icons.FaviconSvg.OrderCloud),
+		("Personalize", "Personalize", Icons.FaviconSvg.Personalize),
+		("Search", "Search", Icons.FaviconSvg.Search),
+		("Sitecore", "Sitecore", Icons.FaviconSvg.Sitecore),
+		("SitecoreAi", "Sitecore AI", Icons.FaviconSvg.SitecoreAi),
+		("SitecoreAiDeploy", "Sitecore AI Deploy", Icons.FaviconSvg.SitecoreAiDeploy),
+		("Stream", "Stream", Icons.FaviconSvg.Stream),
+		("XmCloud", "XM Cloud", Icons.FaviconSvg.XmCloud),
+		("XmCloudContent", "XM Cloud Content", Icons.FaviconSvg.XmCloudContent),
+		("XmCloudDeploy", "XM Cloud Deploy", Icons.FaviconSvg.XmCloudDeploy),
+	];
+}

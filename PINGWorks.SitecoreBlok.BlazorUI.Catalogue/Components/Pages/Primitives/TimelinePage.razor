@@ -1,0 +1,225 @@
+@page "/primitives/timeline"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Timeline" Description="Displays a list of events in chronological order" Interactivity="ComponentInteractivity.Ssr" ApiElements="@TimelineElements">
+
+	<DivergenceNote>
+		<p><strong>Composable: previous <code>Title</code>/<code>Description</code> string parameters replaced by composable sub-components.</strong> The old <code>TimelineItem</code> hardcoded a marker dot, a connector line, and Title/Description as strings. To match Blok, you now compose <code>TimelineSeparator</code> (column on the left containing <code>TimelineIndicator</code> and <code>TimelineConnector</code>) and <code>TimelineContent</code> (column on the right containing <code>TimelineTitle</code>, <code>TimelineDescription</code>, and any rich content). All sub-components also support `ClassName` overrides and additional Blazor parameters not in Blok where it adds flexibility.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Timeline>\n    <TimelineItem>\n        <TimelineSeparator>\n            <TimelineIndicator />\n            <TimelineConnector />\n        </TimelineSeparator>\n        <TimelineContent>\n            <TimelineTitle>Project kickoff</TimelineTitle>\n            <TimelineDescription>The team gathered to define goals and scope.</TimelineDescription>\n        </TimelineContent>\n    </TimelineItem>\n    ...\n</Timeline>")">
+			<Timeline>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator />
+						<TimelineConnector />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Project kickoff</TimelineTitle>
+						<TimelineDescription>The team gathered to define goals and scope for the new platform.</TimelineDescription>
+					</TimelineContent>
+				</TimelineItem>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator />
+						<TimelineConnector />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Design review</TimelineTitle>
+						<TimelineDescription>Wireframes and mockups were presented and approved.</TimelineDescription>
+					</TimelineContent>
+				</TimelineItem>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator />
+						<TimelineConnector />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Development sprint</TimelineTitle>
+						<TimelineDescription>Core features were implemented across frontend and backend services.</TimelineDescription>
+					</TimelineContent>
+				</TimelineItem>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Launch day</TimelineTitle>
+						<TimelineDescription>The platform went live and was made available to all users.</TimelineDescription>
+					</TimelineContent>
+				</TimelineItem>
+			</Timeline>
+		</ComponentExample>
+
+		<ComponentExample Title="Indicator variants" Code="@("<Timeline>\n    <TimelineItem>\n        <TimelineSeparator>\n            <TimelineIndicator Variant=\"TimelineIndicatorVariant.Solid\" />\n            <TimelineConnector />\n        </TimelineSeparator>\n        <TimelineContent><TimelineTitle>Solid</TimelineTitle></TimelineContent>\n    </TimelineItem>\n    <TimelineItem>\n        <TimelineSeparator>\n            <TimelineIndicator Variant=\"TimelineIndicatorVariant.Outline\" />\n            <TimelineConnector Variant=\"TimelineConnectorVariant.Dashed\" />\n        </TimelineSeparator>\n        <TimelineContent><TimelineTitle>Outline + dashed</TimelineTitle></TimelineContent>\n    </TimelineItem>\n    <TimelineItem>\n        <TimelineSeparator>\n            <TimelineIndicator Variant=\"TimelineIndicatorVariant.Subtle\" />\n        </TimelineSeparator>\n        <TimelineContent><TimelineTitle>Subtle</TimelineTitle></TimelineContent>\n    </TimelineItem>\n</Timeline>")">
+			<Timeline>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator Variant="TimelineIndicatorVariant.Solid" />
+						<TimelineConnector />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Solid indicator</TimelineTitle>
+					</TimelineContent>
+				</TimelineItem>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator Variant="TimelineIndicatorVariant.Outline" />
+						<TimelineConnector Variant="TimelineConnectorVariant.Dashed" />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Outline indicator + dashed connector</TimelineTitle>
+					</TimelineContent>
+				</TimelineItem>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator Variant="TimelineIndicatorVariant.Subtle" />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Subtle indicator (last item, no connector)</TimelineTitle>
+					</TimelineContent>
+				</TimelineItem>
+			</Timeline>
+		</ComponentExample>
+
+		<ComponentExample Title="With rich content (Cards, Badges, icons)" Code="@("<TimelineItem>\n    <TimelineSeparator>\n        <TimelineIndicator Size=\"TimelineIndicatorSize.Md\">\n            <Icon Svg=\"@IconSvg.Check\" ClassName=\"size-4\" />\n        </TimelineIndicator>\n        <TimelineConnector />\n    </TimelineSeparator>\n    <TimelineContent>\n        <TimelineTitle>Feature released</TimelineTitle>\n        <Card Padding=\"CardPadding.Md\">\n            <p class=\"text-sm font-medium\">v2.4.0</p>\n            <p class=\"text-sm text-muted-foreground\">Includes dark mode support.</p>\n        </Card>\n    </TimelineContent>\n</TimelineItem>")">
+			<Timeline>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator Size="TimelineIndicatorSize.Md">
+							<Icon Svg="@IconSvg.Check" ClassName="size-4" />
+						</TimelineIndicator>
+						<TimelineConnector />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Feature released</TimelineTitle>
+						<Card Padding="CardPadding.Md">
+							<p class="text-sm font-medium">v2.4.0 Released</p>
+							<p class="text-sm text-muted-foreground">Includes dark mode support and improved table performance.</p>
+						</Card>
+					</TimelineContent>
+				</TimelineItem>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator Size="TimelineIndicatorSize.Md" Variant="TimelineIndicatorVariant.Outline" />
+						<TimelineConnector />
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Status update</TimelineTitle>
+						<Badge ColorScheme="BadgeColor.Success">Deployed</Badge>
+					</TimelineContent>
+				</TimelineItem>
+				<TimelineItem>
+					<TimelineSeparator>
+						<TimelineIndicator Size="TimelineIndicatorSize.Md" Variant="TimelineIndicatorVariant.Subtle">
+							<Icon Svg="@IconSvg.AlertCircle" ClassName="size-4" />
+						</TimelineIndicator>
+					</TimelineSeparator>
+					<TimelineContent>
+						<TimelineTitle>Bug reported</TimelineTitle>
+						<Card Padding="CardPadding.Md">
+							<p class="text-sm font-medium">Issue #342</p>
+							<p class="text-sm text-muted-foreground">Sidebar navigation fails to collapse on mobile viewports.</p>
+						</Card>
+					</TimelineContent>
+				</TimelineItem>
+			</Timeline>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] TimelineElements =
+	[
+		new ApiElement(
+			Name: "Timeline",
+			Description: "Root container for a vertical list of `TimelineItem` children. Controls the shared vertical rhythm between items.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Size",         "TimelineSize",     false, "Vertical rhythm between items. Default: `TimelineSize.Md`. Other values: `Sm`, `Lg`." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the root container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "The timeline's items. Usually one or more `TimelineItem`." ),
+			]
+		),
+		new ApiElement(
+			Name: "TimelineItem",
+			Description: "A single row in the `Timeline`. Lays out a `TimelineSeparator` and a `TimelineContent` side by side.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the item wrapper." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Should contain one `TimelineSeparator` and one `TimelineContent`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the item wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "TimelineSeparator",
+			Description: "The left column of a `TimelineItem`. Holds a `TimelineIndicator` and an optional `TimelineConnector` that draws the vertical line down to the next item.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the separator column." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Usually a `TimelineIndicator` followed by an optional `TimelineConnector`." ),
+			]
+		),
+		new ApiElement(
+			Name: "TimelineIndicator",
+			Description: "The marker dot / icon bubble in a `TimelineSeparator`. Accepts an icon as child content and varies shape/weight via `Variant`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Variant",              "TimelineIndicatorVariant",      false, "Visual style. Default: `TimelineIndicatorVariant.Solid`. Other values: `Outline`, `Subtle`, `Plain`." ),
+				new ApiProperty( "Size",                 "TimelineIndicatorSize",         false, "Indicator diameter. Default: `TimelineIndicatorSize.Sm`. Other values: `Md`, `Lg`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the indicator." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Optional icon or badge rendered inside the indicator." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the indicator." ),
+			]
+		),
+		new ApiElement(
+			Name: "TimelineConnector",
+			Description: "Vertical line drawn below a `TimelineIndicator` to join it to the next item. Omit on the last `TimelineItem`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Variant",   "TimelineConnectorVariant", false, "Line style. Default: `TimelineConnectorVariant.Solid`. Other values: `Dashed`, `Dotted`." ),
+				new ApiProperty( "ClassName", "string?",                  false, "Extra CSS classes appended to the connector." ),
+			]
+		),
+		new ApiElement(
+			Name: "TimelineContent",
+			Description: "The right column of a `TimelineItem`. Stacks `TimelineTitle`, `TimelineDescription`, and any rich content.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the content column." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "The item's body — usually a `TimelineTitle`, a `TimelineDescription`, and/or arbitrary markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "TimelineTitle",
+			Description: "Heading line in a `TimelineContent`. Renders as a `<p>` with medium weight.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the title." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Title text or inline markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "TimelineDescription",
+			Description: "Secondary body text in a `TimelineContent`. Renders as a small muted `<p>`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the description." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Description text or inline markup." ),
+			]
+		),
+	];
+}

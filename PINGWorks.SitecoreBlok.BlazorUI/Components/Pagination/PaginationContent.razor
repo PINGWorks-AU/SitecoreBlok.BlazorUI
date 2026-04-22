@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<ul data-slot="pagination-content" class="@CssClass">
+	@ChildContent
+</ul>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "flex flex-row items-center gap-1" )
+											.With( ClassName )
+											.Build();
+}

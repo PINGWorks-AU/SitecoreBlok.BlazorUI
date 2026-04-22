@@ -1,0 +1,30 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div aria-valuemax="@MaxValue" aria-valuemin="0" role="progressbar" data-state="@(IsIndeterminate ? "indeterminate" : "determinate")" data-max="@MaxValue" data-slot="progress" data-indeterminate="@(IsIndeterminate ? "" : null)" aria-label="@(IsIndeterminate ? "Progress" : $"Progress: {Position:N0}%")" class="@CssClass" @attributes="AdditionalAttributes">
+	<div data-slot="progress-indicator" class="@IndicatorCssClass" style="@IndicatorStyle">
+	</div>
+</div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public int Value { get; set; }
+	[Parameter] public int MaxValue { get; set; } = 100;
+	[Parameter] public bool IsIndeterminate { get; set; }
+
+	private double Position => (double)Value / MaxValue * 100;
+
+	private string CssClass => CssClassBuilder.Start( "relative h-2 w-full overflow-hidden rounded-full bg-neutral-bg" )
+										.With( ClassName )
+										.Build();
+
+	// `parity-no-text-pair`: progress fill is decorative — no text content.
+	private string IndicatorCssClass => CssClassBuilder.Start( "h-full rounded-full transition-all" )
+										.With( "absolute min-w-[50%] w-[50%] bg-primary parity-no-text-pair", IsIndeterminate )
+										.With( "flex-1 w-full bg-primary parity-no-text-pair", !IsIndeterminate )
+										.Build();
+
+	private string? IndicatorStyle => IsIndeterminate
+		? "animation:progressIndeterminate 1.5s ease infinite"
+		: $"transform:translateX({Position - 100}%)";
+}

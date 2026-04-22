@@ -1,0 +1,47 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if ( Parent.IsOpen )
+{
+	<div data-slot="hover-card-portal">
+		@* position:fixed applied inline so the Blok class string stays unmodified.
+		   The enter animations (fade+zoom, slide-in-from-*) match Blok; close animations
+		   do not fire because the element unmounts via @@if, consistent with DropdownMenu. *@
+		<div data-slot="hover-card-content" class="@CssClass"
+				data-state="open" data-side="@SideAttr" data-align="@AlignAttr"
+				style="position:fixed;left:@(Parent.X)px;top:@(Parent.Y)px;"
+				@onmouseenter="OnEnter" @onmouseleave="OnLeave" @attributes="AdditionalAttributes">
+			@ChildContent
+		</div>
+	</div>
+}
+
+@code {
+	[CascadingParameter] public required HoverCard Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public HoverCardSide Side { get; set; } = HoverCardSide.Bottom;
+	[Parameter] public HoverCardAlign Align { get; set; } = HoverCardAlign.Center;
+	[Parameter] public int SideOffset { get; set; } = 4;
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-64 origin-(--radix-hover-card-content-transform-origin) rounded-md border p-4 shadow-md outline-hidden" )
+												.With( ClassName )
+												.Build();
+
+	private string SideAttr => Side.ToString().ToLowerInvariant();
+	private string AlignAttr => Align.ToString().ToLowerInvariant();
+
+	protected override void OnParametersSet()
+	{
+		Parent.SetContentConfig( Side, Align, SideOffset );
+	}
+
+	private Task OnEnter()
+	{
+		Parent.CancelCloseTimer();
+		return Task.CompletedTask;
+	}
+
+	private Task OnLeave() => Parent.RequestClose();
+}

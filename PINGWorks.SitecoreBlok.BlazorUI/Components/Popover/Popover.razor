@@ -1,0 +1,29 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@implements IDisposable
+
+@inject PopoverService Pops
+
+@code {
+	[Parameter, EditorRequired] public required string Id { get; set; }
+
+	[Parameter] public bool Overlay { get; set; }
+	[Parameter] public bool CloseOnBackgroundClick { get; set; } = true;
+
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public EventCallback OnClose { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	public ElementReference? Anchor { get; set; }
+
+	override protected void OnInitialized()
+	{
+		base.OnInitialized();
+		Pops.Register( this );
+	}
+
+	public void Dispose()
+	{
+		Pops.Unregister( this.Id );
+	}
+}

@@ -1,0 +1,24 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="timeline-indicator" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public TimelineIndicatorVariant Variant { get; set; } = TimelineIndicatorVariant.Solid;
+	[Parameter] public TimelineIndicatorSize Size { get; set; } = TimelineIndicatorSize.Sm;
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "relative z-10 flex shrink-0 items-center justify-center rounded-full" )
+											.With( "bg-foreground text-background", Variant is TimelineIndicatorVariant.Solid )
+											.With( "border border-border bg-background text-foreground", Variant is TimelineIndicatorVariant.Outline )
+											.With( "bg-muted text-foreground", Variant is TimelineIndicatorVariant.Subtle )
+											.With( "bg-background text-foreground", Variant is TimelineIndicatorVariant.Plain )
+											.With( "size-5", Size is TimelineIndicatorSize.Sm )
+											.With( "size-8", Size is TimelineIndicatorSize.Md )
+											.With( "size-10", Size is TimelineIndicatorSize.Lg )
+											.With( ClassName )
+											.Build();
+}

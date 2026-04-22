@@ -1,0 +1,28 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<span @ref="Ref" data-slot="hover-card-trigger" class="@CssClass"
+		@onmouseenter="OnEnter" @onmouseleave="OnLeave" @attributes="AdditionalAttributes">
+	@ChildContent
+</span>
+
+@code {
+	[CascadingParameter] public required HoverCard Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private ElementReference Ref;
+
+	private string CssClass => CssClassBuilder.Start( "inline-flex" )
+											.With( ClassName )
+											.Build();
+
+	protected override void OnAfterRender( bool firstRender )
+	{
+		if ( firstRender )
+			Parent.RegisterTriggerRef( Ref );
+	}
+
+	private Task OnEnter() => Parent.RequestOpen();
+	private Task OnLeave() => Parent.RequestClose();
+}

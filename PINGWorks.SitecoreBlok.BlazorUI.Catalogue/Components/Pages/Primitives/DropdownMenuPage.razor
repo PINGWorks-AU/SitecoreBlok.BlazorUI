@@ -1,0 +1,241 @@
+@page "/primitives/dropdownmenu"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="DropdownMenu" Description="A menu that appears on click, typically used for contextual actions" Interactivity="ComponentInteractivity.Interactive" ApiElements="@DropdownMenuElements">
+
+	<DivergenceNote>
+		<p><strong>Reduced sub-component set compared to Blok's Radix-based menu.</strong> Blok exports <code>DropdownMenuCheckboxItem</code>, <code>DropdownMenuRadioGroup</code>, <code>DropdownMenuRadioItem</code>, and <code>DropdownMenuPortal</code> in addition to the standard items. We don't currently ship these — use a regular <code>DropdownMenuItem</code> with your own check/radio state management if you need toggle behaviour. The core pieces (<code>DropdownMenuTrigger</code>, <code>DropdownMenuContent</code>, <code>DropdownMenuItem</code>, <code>DropdownMenuLabel</code>, <code>DropdownMenuGroup</code>, <code>DropdownMenuSeparator</code>, <code>DropdownMenuShortcut</code>, and nested <code>DropdownMenuSub</code>/<code>DropdownMenuSubTrigger</code>/<code>DropdownMenuSubContent</code>) all match Blok's composition. No keyboard navigation (arrows / <kbd>Enter</kbd> / <kbd>Esc</kbd>) — Blok gets that via Radix.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\">Open Menu</Button>\n    </DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuLabel>Actions</DropdownMenuLabel>\n        <DropdownMenuGroup>\n            <DropdownMenuItem>Edit</DropdownMenuItem>\n            <DropdownMenuItem>Duplicate</DropdownMenuItem>\n        </DropdownMenuGroup>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\">Delete</DropdownMenuItem>\n    </DropdownMenuContent>\n</DropdownMenu>")">
+			<DropdownMenu>
+				<DropdownMenuTrigger>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Open Menu</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent>
+					<DropdownMenuLabel>Actions</DropdownMenuLabel>
+					<DropdownMenuGroup>
+						<DropdownMenuItem>Edit</DropdownMenuItem>
+						<DropdownMenuItem>Duplicate</DropdownMenuItem>
+					</DropdownMenuGroup>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive">Delete</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</ComponentExample>
+
+		<ComponentExample Title="With click handlers" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\">Actions</Button>\n    </DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuLabel>My Account</DropdownMenuLabel>\n        <DropdownMenuGroup>\n            <DropdownMenuItem Click=\"@(() => lastAction = \"Profile\")\">Profile</DropdownMenuItem>\n            <DropdownMenuItem Click=\"@(() => lastAction = \"Settings\")\">Settings</DropdownMenuItem>\n        </DropdownMenuGroup>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\" Click=\"@(() => lastAction = \"Log out\")\">Log out</DropdownMenuItem>\n    </DropdownMenuContent>\n</DropdownMenu>")">
+			<div class="flex items-center gap-4">
+				<DropdownMenu>
+					<DropdownMenuTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Actions</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent>
+						<DropdownMenuLabel>My Account</DropdownMenuLabel>
+						<DropdownMenuGroup>
+							<DropdownMenuItem Click="@(() => LastAction = "Profile")">Profile</DropdownMenuItem>
+							<DropdownMenuItem Click="@(() => LastAction = "Settings")">Settings</DropdownMenuItem>
+						</DropdownMenuGroup>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive" Click="@(() => LastAction = "Log out")">Log out</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+				@if ( LastAction is not null )
+				{
+					<span class="text-sm text-muted-foreground">Last action: @LastAction</span>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With Submenu" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger><Button>File</Button></DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuItem>New File</DropdownMenuItem>\n        <DropdownMenuSeparator />\n        <DropdownMenuSub>\n            <DropdownMenuSubTrigger>Share</DropdownMenuSubTrigger>\n            <DropdownMenuSubContent>\n                <DropdownMenuItem>Email</DropdownMenuItem>\n                <DropdownMenuItem>Slack</DropdownMenuItem>\n            </DropdownMenuSubContent>\n        </DropdownMenuSub>\n        <DropdownMenuSub>\n            <DropdownMenuSubTrigger>Export as</DropdownMenuSubTrigger>\n            <DropdownMenuSubContent>\n                <DropdownMenuItem>PDF</DropdownMenuItem>\n                <DropdownMenuItem>CSV</DropdownMenuItem>\n            </DropdownMenuSubContent>\n        </DropdownMenuSub>\n    </DropdownMenuContent>\n</DropdownMenu>")">
+			<div class="flex items-center gap-4">
+				<DropdownMenu>
+					<DropdownMenuTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">File</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent>
+						<DropdownMenuItem Click="@(() => LastAction = "New File")">New File</DropdownMenuItem>
+						<DropdownMenuItem Click="@(() => LastAction = "Open")">Open</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuSub>
+							<DropdownMenuSubTrigger>Share</DropdownMenuSubTrigger>
+							<DropdownMenuSubContent>
+								<DropdownMenuItem Click="@(() => LastAction = "Share via Email")">Email</DropdownMenuItem>
+								<DropdownMenuItem Click="@(() => LastAction = "Share via Slack")">Slack</DropdownMenuItem>
+								<DropdownMenuItem Click="@(() => LastAction = "Share via Teams")">Teams</DropdownMenuItem>
+							</DropdownMenuSubContent>
+						</DropdownMenuSub>
+						<DropdownMenuSub>
+							<DropdownMenuSubTrigger>Export as</DropdownMenuSubTrigger>
+							<DropdownMenuSubContent>
+								<DropdownMenuItem Click="@(() => LastAction = "Export PDF")">PDF</DropdownMenuItem>
+								<DropdownMenuItem Click="@(() => LastAction = "Export CSV")">CSV</DropdownMenuItem>
+								<DropdownMenuItem Click="@(() => LastAction = "Export JSON")">JSON</DropdownMenuItem>
+							</DropdownMenuSubContent>
+						</DropdownMenuSub>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive" Click="@(() => LastAction = "Delete")">Delete</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+				@if ( LastAction is not null )
+				{
+					<span class="text-sm text-muted-foreground">Last action: @LastAction</span>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With Shortcuts and Icons" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger><Button>Edit</Button></DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuItem>\n            <Icon Svg=\"@@IconSvg.ContentCut\" ClassName=\"size-4\" /> Cut\n            <DropdownMenuShortcut>Ctrl+X</DropdownMenuShortcut>\n        </DropdownMenuItem>\n        <DropdownMenuItem>\n            <Icon Svg=\"@@IconSvg.ContentCopy\" ClassName=\"size-4\" /> Copy\n            <DropdownMenuShortcut>Ctrl+C</DropdownMenuShortcut>\n        </DropdownMenuItem>\n    </DropdownMenuContent>\n</DropdownMenu>")">
+			<DropdownMenu>
+				<DropdownMenuTrigger>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Edit</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent>
+					<DropdownMenuGroup>
+						<DropdownMenuItem>
+							<Icon Svg="@IconSvg.ContentCut" ClassName="size-4" /> Cut
+							<DropdownMenuShortcut>Ctrl+X</DropdownMenuShortcut>
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<Icon Svg="@IconSvg.ContentCopy" ClassName="size-4" /> Copy
+							<DropdownMenuShortcut>Ctrl+C</DropdownMenuShortcut>
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<Icon Svg="@IconSvg.ContentPaste" ClassName="size-4" /> Paste
+							<DropdownMenuShortcut>Ctrl+V</DropdownMenuShortcut>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? LastAction;
+
+	private static readonly ApiElement[] DropdownMenuElements =
+	[
+		new ApiElement(
+			Name: "DropdownMenu",
+			Description: "Root state container. Tracks open state and the anchor coordinate so `DropdownMenuContent` can render below the trigger button.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain one `DropdownMenuTrigger` and one `DropdownMenuContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuTrigger",
+			Description: "Click target that toggles the parent menu. Registers its bounding rect so the content can position itself below.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                    false, "Extra CSS classes appended to the `<button>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",            false, "Trigger content — typically a `Button`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",false, "Captured unmatched attributes, forwarded to the underlying `<button>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuContent",
+			Description: "Positioned menu surface. Renders relative to the trigger using smart collision-avoidance (matching Blok's Radix `avoidCollisions` default). A full-viewport backdrop closes the menu on outside click.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Side",         "DropdownMenuSide",  false, "Preferred opening side relative to the trigger. Default: `Bottom`. Flips to the opposite side when the preferred side overflows the viewport. Other values: `Top`, `Left`, `Right`." ),
+				new ApiProperty( "Align",        "DropdownMenuAlign", false, "Alignment of the menu along the trigger's cross-axis. Default: `Start`. Other values: `Center`, `End`." ),
+				new ApiProperty( "SideOffset",   "double",            false, "Gap in pixels between trigger and menu surface. Default: `4` (matches Blok's explicit default)." ),
+				new ApiProperty( "ClassName",    "string?",           false, "Extra CSS classes appended to the menu surface." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",   false, "Menu items — `DropdownMenuItem`, `DropdownMenuLabel`, `DropdownMenuGroup`, `DropdownMenuSeparator`, nested `DropdownMenuSub`." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuLabel",
+			Description: "Non-interactive heading row inside a menu. Rendered in uppercase muted text.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the label `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Heading text." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuGroup",
+			Description: "Logical grouping wrapper around a set of items. Renders a `role=\"group\"` `<div>` with no visual separator — use `DropdownMenuSeparator` for that.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the group `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "`DropdownMenuItem` children belonging to this group." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuItem",
+			Description: "Clickable menu row. On click, fires `Click` and then closes every ancestor menu (including `DropdownMenuSub` and `ContextMenu`) so the whole chain dismisses.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Variant",      "DropdownMenuItemVariant", false, "Visual style. Default: `DropdownMenuItemVariant.Default`. Other value: `Destructive` (red hover + destructive bg tint)." ),
+				new ApiProperty( "Disabled",     "bool",                    false, "When true, the item is muted and ignores clicks. Default: `false`." ),
+				new ApiProperty( "Click",        "EventCallback",           false, "Invoked when the item is clicked, before the menu chain closes." ),
+				new ApiProperty( "ClassName",    "string?",                 false, "Extra CSS classes appended to the item `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",         false, "Item label and optional `Icon` / `DropdownMenuShortcut` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuSeparator",
+			Description: "1px horizontal divider between groups or individual items.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName", "string?", false, "Extra CSS classes appended to the separator `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuShortcut",
+			Description: "Right-aligned keyboard-hint label placed inside a `DropdownMenuItem`. Rendered in small, tracked, muted text.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<span>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Shortcut text (e.g. `Ctrl+X`)." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuSub",
+			Description: "Nested submenu state container. Tracks hover open/close and the trigger bounds so `DropdownMenuSubContent` can position itself with collision avoidance.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain one `DropdownMenuSubTrigger` and one `DropdownMenuSubContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuSubTrigger",
+			Description: "Hover-activated submenu opener. Displays a right chevron and opens the parent `DropdownMenuSub` on mouseenter.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the trigger `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Trigger label." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuSubContent",
+			Description: "Submenu surface. Renders relative to its trigger with collision avoidance; closes on mouseleave.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "Side",         "DropdownMenuSide",  false, "Preferred opening side relative to the subtrigger. Default: `Right`. Flips to `Left` when the right side overflows. Other values: `Top`, `Bottom`, `Left`." ),
+				new ApiProperty( "Align",        "DropdownMenuAlign", false, "Alignment along the trigger's cross-axis. Default: `Start`. Other values: `Center`, `End`." ),
+				new ApiProperty( "SideOffset",   "double",            false, "Gap in pixels between subtrigger and submenu surface. Default: `0`." ),
+				new ApiProperty( "ClassName",    "string?",           false, "Extra CSS classes appended to the submenu surface." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",   false, "Submenu items." ),
+			]
+		),
+	];
+}

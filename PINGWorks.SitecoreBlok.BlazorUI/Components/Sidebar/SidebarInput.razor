@@ -1,0 +1,32 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<Input ClassName="@CssClass"
+		Value="Value" ValueChanged="ValueChanged"
+		AdditionalAttributes="ExtraAttributes" />
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	// parity-no-text-pair: the inner <Input> primitive already sets `text-foreground` on the
+	// <input> element itself, so the cascade from this wrapper class is not the source of text
+	// colour. Matches Blok's source, which also lacks an explicit text token here.
+	private string CssClass => CssClassBuilder.Start( "h-8 w-full bg-background shadow-none parity-no-text-pair" )
+											.With( ClassName )
+											.Build();
+
+	private Dictionary<string, object> ExtraAttributes
+	{
+		get
+		{
+			var dict = AdditionalAttributes is null
+				? new Dictionary<string, object>()
+				: new Dictionary<string, object>( AdditionalAttributes );
+			dict["data-slot"] = "sidebar-input";
+			dict["data-sidebar"] = "input";
+			return dict;
+		}
+	}
+}

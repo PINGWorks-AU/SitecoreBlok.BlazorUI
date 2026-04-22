@@ -1,0 +1,15 @@
+@page "/primitives/sonner"
+@rendermode InteractiveServer
+
+<ComponentPage Title="Sonner" Description="Toast notification system — see Toaster." Interactivity="ComponentInteractivity.Interactive">
+
+	<InstallationNote>
+		<p>Setup lives on the <a href="/primitives/toaster" class="text-primary underline">Toaster</a> page — same <code class="text-xs bg-muted px-1 py-0.5 rounded">AddSitecoreBlokUI()</code> registration and root-level <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Toaster /&gt;</code> layout component.</p>
+	</InstallationNote>
+
+	<DivergenceNote>
+		<p><strong>Called <code>Toaster</code> in BlazorUI.</strong> <a href="https://sonner.emilkowal.ski" target="_blank" rel="noopener" class="text-primary underline">Sonner</a> is the React/JS toast library Blok wraps. The BlazorUI equivalent is <a href="/primitives/toaster" class="text-primary underline"><code>Toaster</code></a>, with an imperative service API (<code>ToastService.Show(...)</code>) — idiomatic for Blazor rather than the declarative composition Sonner uses.</p>
+		<p>Visit <a href="/primitives/toaster" class="text-primary underline">/primitives/toaster</a> for usage examples.</p>
+	</DivergenceNote>
+
+</ComponentPage>

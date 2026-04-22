@@ -1,0 +1,304 @@
+@page "/primitives/editable"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Editable"
+			   Description="An inline editable text component that allows users to edit text in place."
+			   Interactivity="ComponentInteractivity.Interactive"
+			   ApiElements="@EditableElements">
+
+	<DivergenceNote>
+		<p>
+			<strong><code>EditableRootProvider</code> accepts explicit Blazor parameters instead of a pre-built hook result.</strong>
+			Blok's React implementation exports a <code>useEditable</code> hook and an <code>EditableRootProvider</code> that takes the hook's return value as its <code>value</code> prop. Blazor has no hook pattern; <code>EditableRootProvider</code> instead accepts <code>IsEditing</code> / <code>@@bind-IsEditing</code> and <code>Value</code> / <code>@@bind-Value</code> parameters, letting the parent component manage all state explicitly.
+			The <code>useEditable</code> and <code>useEditableContext</code> React hooks have no Blazor equivalent and are omitted.
+		</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Input" Code="@CodeInput">
+			<Editable @bind-Value="@Text1">
+				<EditablePreview />
+				<EditableInput />
+			</Editable>
+		</ComponentExample>
+
+		<ComponentExample Title="Textarea" Code="@CodeTextarea">
+			<Editable @bind-Value="@Text2" SubmitOnBlur="false">
+				<EditablePreview />
+				<EditableTextarea />
+				<EditableControl>
+					<EditableSubmitTrigger />
+					<EditableCancelTrigger />
+				</EditableControl>
+			</Editable>
+		</ComponentExample>
+
+		<ComponentExample Title="With controls" Code="@CodeWithControls">
+			<Editable @bind-Value="@Text3" SubmitOnBlur="false">
+				<EditablePreview />
+				<EditableInput />
+				<EditableControl>
+					<EditableEditTrigger />
+					<EditableSubmitTrigger />
+					<EditableCancelTrigger />
+				</EditableControl>
+			</Editable>
+		</ComponentExample>
+
+		<ComponentExample Title="Double-click to edit" Code="@CodeDblclick">
+			<Editable @bind-Value="@Text4" ActivationMode="EditableActivationMode.Dblclick">
+				<EditablePreview />
+				<EditableInput />
+			</Editable>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code='@("<Editable DefaultValue=\"Cannot edit this\" IsDisabled=\"true\">\n    <EditablePreview />\n    <EditableInput />\n</Editable>")'>
+			<Editable DefaultValue="Cannot edit this" IsDisabled="true">
+				<EditablePreview />
+				<EditableInput />
+			</Editable>
+		</ComponentExample>
+
+		<ComponentExample Title="Start in edit view" Code="@CodeStartEdit">
+			<Editable @bind-Value="@Text5" StartWithEditView="true">
+				<EditablePreview />
+				<EditableInput />
+			</Editable>
+		</ComponentExample>
+
+		<ComponentExample Title="Sizes" Code="@CodeSizes">
+			<div class="flex flex-col gap-4">
+				<Editable DefaultValue="Small text" Size="EditableSize.Sm">
+					<EditablePreview />
+					<EditableInput />
+				</Editable>
+				<Editable DefaultValue="Medium text">
+					<EditablePreview />
+					<EditableInput />
+				</Editable>
+				<Editable DefaultValue="Large text" Size="EditableSize.Lg">
+					<EditablePreview />
+					<EditableInput />
+				</Editable>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Controlled (EditableRootProvider)" Code="@CodeControlled">
+			<EditableRootProvider @bind-IsEditing="IsEditing"
+								  @bind-Value="ControlledText">
+				<EditablePreview />
+				<EditableInput />
+			</EditableRootProvider>
+			<p class="mt-2 text-sm text-muted-foreground">Current value: <code>@ControlledText</code> | Editing: <code>@IsEditing</code></p>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string Text1 { get; set; } = "Click to edit this text";
+	private string Text2 { get; set; } = "This is a longer piece of text that spans multiple lines. Click to edit it and add more content";
+	private string Text3 { get; set; } = "Click the Edit button or the text to start";
+	private string Text4 { get; set; } = "Double-click to edit this text";
+	private string Text5 { get; set; } = "Pre-opened for editing";
+	private string ControlledText { get; set; } = "Externally controlled value";
+	private bool IsEditing { get; set; }
+
+	private static readonly string CodeInput = """
+		<Editable @bind-Value="@text">
+		    <EditablePreview />
+		    <EditableInput />
+		</Editable>
+		""";
+
+	private static readonly string CodeTextarea = """
+		<Editable @bind-Value="@text" SubmitOnBlur="false">
+		    <EditablePreview />
+		    <EditableTextarea />
+		    <EditableControl>
+		        <EditableSubmitTrigger />
+		        <EditableCancelTrigger />
+		    </EditableControl>
+		</Editable>
+		""";
+
+	private static readonly string CodeWithControls = """
+		<Editable @bind-Value="@text" SubmitOnBlur="false">
+		    <EditablePreview />
+		    <EditableInput />
+		    <EditableControl>
+		        <EditableEditTrigger />
+		        <EditableSubmitTrigger />
+		        <EditableCancelTrigger />
+		    </EditableControl>
+		</Editable>
+		""";
+
+	private static readonly string CodeDblclick = """
+		<Editable @bind-Value="@text" ActivationMode="EditableActivationMode.Dblclick">
+		    <EditablePreview />
+		    <EditableInput />
+		</Editable>
+		""";
+
+	private static readonly string CodeStartEdit = """
+		<Editable @bind-Value="@text" StartWithEditView="true">
+		    <EditablePreview />
+		    <EditableInput />
+		</Editable>
+		""";
+
+	private static readonly string CodeSizes = """
+		<Editable DefaultValue="Small text" Size="EditableSize.Sm">
+		    <EditablePreview />
+		    <EditableInput />
+		</Editable>
+		<Editable DefaultValue="Medium text">
+		    <EditablePreview />
+		    <EditableInput />
+		</Editable>
+		<Editable DefaultValue="Large text" Size="EditableSize.Lg">
+		    <EditablePreview />
+		    <EditableInput />
+		</Editable>
+		""";
+
+	private static readonly string CodeControlled = """
+		<EditableRootProvider @bind-IsEditing="isEditing"
+		                      @bind-Value="controlledText">
+		    <EditablePreview />
+		    <EditableInput />
+		</EditableRootProvider>
+		""";
+
+	private static readonly ApiElement[] EditableElements =
+	[
+		new ApiElement(
+			Name: "Editable",
+			Description: "Root container that manages edit state, value, and cascades an `EditableContext` to all child components.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "DefaultValue",         "string",                      false, "Initial value in uncontrolled mode. Default: `\"\"`." ),
+				new ApiProperty( "Value",                "string?",                     false, "Controlled value. When non-null, the component is in controlled mode — pair with `ValueChanged` or `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string>",       false, "Fires whenever the value changes. Pair with `Value` for two-way binding." ),
+				new ApiProperty( "Placeholder",          "string",                      false, "Text shown in `EditablePreview` when value is empty. Default: `\"Click to edit...\"`." ),
+				new ApiProperty( "IsDisabled",           "bool",                        false, "Prevents editing. Default: `false`." ),
+				new ApiProperty( "IsPreviewFocusable",   "bool",                        false, "Whether `EditablePreview` is keyboard-focusable and clickable. Default: `true`." ),
+				new ApiProperty( "SubmitOnBlur",         "bool",                        false, "Submits the value when the input loses focus. Default: `true`." ),
+				new ApiProperty( "StartWithEditView",    "bool",                        false, "Starts the component in edit mode. Default: `false`." ),
+				new ApiProperty( "SelectAllOnFocus",     "bool",                        false, "Selects all text when the input gains focus. Default: `true`." ),
+				new ApiProperty( "ActivationMode",       "EditableActivationMode",      false, "Whether a single click or double-click activates edit mode. Default: `EditableActivationMode.Click`." ),
+				new ApiProperty( "Size",                 "EditableSize",                false, "Applies a text-size class to the root. Default: `EditableSize.Md`. Other values: `Sm`, `Lg`." ),
+				new ApiProperty( "OnSubmit",             "EventCallback<string>",       false, "Fires when the user submits the edited value (Enter, blur, or `EditableSubmitTrigger`)." ),
+				new ApiProperty( "OnCancel",             "EventCallback<string>",       false, "Fires when the user cancels editing (Escape or `EditableCancelTrigger`). Receives the previous value." ),
+				new ApiProperty( "OnEdit",               "EventCallback",               false, "Fires when the component enters edit mode." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the root `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Should contain `EditablePreview`, an `EditableInput` or `EditableTextarea`, and optionally an `EditableControl`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the root `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditableRootProvider",
+			Description: "Fully externally-controlled variant of `Editable`. Use when the parent needs to own and observe all edit state.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "IsEditing",            "bool",                        true,  "Whether the component is currently in edit mode. Supports two-way binding via `@bind-IsEditing`." ),
+				new ApiProperty( "IsEditingChanged",     "EventCallback<bool>",         false, "Fires when the editing state should change. Pair with `IsEditing` for two-way binding." ),
+				new ApiProperty( "Value",                "string",                      true,  "The current text value. Supports two-way binding via `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string>",       false, "Fires when the value changes. Pair with `Value` for two-way binding." ),
+				new ApiProperty( "Placeholder",          "string",                      false, "Placeholder text when value is empty. Default: `\"Click to edit...\"`." ),
+				new ApiProperty( "IsDisabled",           "bool",                        false, "Prevents editing. Default: `false`." ),
+				new ApiProperty( "IsPreviewFocusable",   "bool",                        false, "Whether `EditablePreview` is clickable and keyboard-focusable. Default: `true`." ),
+				new ApiProperty( "SubmitOnBlur",         "bool",                        false, "Submits on blur. Default: `true`." ),
+				new ApiProperty( "SelectAllOnFocus",     "bool",                        false, "Selects all text on focus. Default: `true`." ),
+				new ApiProperty( "ActivationMode",       "EditableActivationMode",      false, "Click or double-click activation. Default: `EditableActivationMode.Click`." ),
+				new ApiProperty( "Size",                 "EditableSize",                false, "Text-size variant. Default: `EditableSize.Md`." ),
+				new ApiProperty( "OnSubmit",             "EventCallback<string>",       false, "Fires when submit is requested." ),
+				new ApiProperty( "OnCancel",             "EventCallback<string>",       false, "Fires when cancel is requested. Receives the current value." ),
+				new ApiProperty( "OnEdit",               "EventCallback",               false, "Fires when edit mode is requested." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Body content — `EditablePreview`, input/textarea, optional controls." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the root `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditablePreview",
+			Description: "Read-only display of the current value. Clicking (or double-clicking) it starts edit mode, depending on `ActivationMode`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the preview `<span>`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the `<span>` element." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditableInput",
+			Description: "Single-line text input shown when editing. Submits on Enter, cancels on Escape, and auto-focuses when edit mode starts.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the `<input>` element." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the native `<input>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditableTextarea",
+			Description: "Multi-line textarea shown when editing. Ctrl/Cmd+Enter submits, Escape cancels, plain Enter adds a newline.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the `<textarea>` element." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the native `<textarea>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditableControl",
+			Description: "Flex row wrapper for action buttons (`EditableEditTrigger`, `EditableSubmitTrigger`, `EditableCancelTrigger`).",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Action triggers." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditableEditTrigger",
+			Description: "Ghost button that starts edit mode. Hidden while editing.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Button label. Default: `\"Edit\"`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the `Button`." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditableCancelTrigger",
+			Description: "Ghost button that cancels editing and restores the previous value. Visible only while editing.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Button label. Default: `\"Cancel\"`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the `Button`." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditableSubmitTrigger",
+			Description: "Primary button that commits the edited value. Visible only while editing.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Button label. Default: `\"Save\"`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the `Button`." ),
+			]
+		),
+	];
+}

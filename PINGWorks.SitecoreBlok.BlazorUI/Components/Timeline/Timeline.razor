@@ -1,0 +1,18 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="timeline-root" class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public TimelineSize Size { get; set; } = TimelineSize.Md;
+
+	private string CssClass => CssClassBuilder.Start( "flex flex-col gap-0" )
+											.With( "[&_[data-slot=timeline-content]]:pb-3", Size is TimelineSize.Sm )
+											.With( "[&_[data-slot=timeline-content]]:pb-4", Size is TimelineSize.Md )
+											.With( "[&_[data-slot=timeline-content]]:pb-6", Size is TimelineSize.Lg )
+											.With( ClassName )
+											.Build();
+}

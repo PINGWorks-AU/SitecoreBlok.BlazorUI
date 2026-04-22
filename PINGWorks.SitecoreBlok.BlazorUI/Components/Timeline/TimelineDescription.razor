@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<p data-slot="timeline-description" class="@CssClass">
+	@ChildContent
+</p>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "text-xs text-muted-foreground" )
+											.With( ClassName )
+											.Build();
+}

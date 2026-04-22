@@ -1,0 +1,56 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@implements IAsyncDisposable
+@inject IJSRuntime Js
+
+<div data-slot="resizable-panel-group"
+	 data-panel-group-direction="@DirectionAttr"
+	 class="@CssClass"
+	 @ref="Element"
+	 @attributes="AdditionalAttributes">
+	<CascadingValue Value="@DirectionAttr">
+		@ChildContent
+	</CascadingValue>
+</div>
+
+@code {
+	[Parameter] public ResizableDirection Direction { get; set; } = ResizableDirection.Horizontal;
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private ElementReference Element;
+	private IJSObjectReference? Module;
+
+	internal string DirectionAttr => Direction == ResizableDirection.Vertical ? "vertical" : "horizontal";
+
+	private string CssClass => CssClassBuilder.Start("flex h-full w-full data-[panel-group-direction=vertical]:flex-col")
+											  .With(ClassName)
+											  .Build();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+
+		if (firstRender)
+		{
+			Module = await Js.InvokeAsync<IJSObjectReference>(
+				"import",
+				"./_content/PINGWorks.SitecoreBlok.BlazorUI/Components/Resizable/ResizablePanelGroup.razor.js");
+			await Module.InvokeVoidAsync("init", Element);
+		}
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			if (Module is not null)
+			{
+				await Module.InvokeVoidAsync("dispose", Element);
+				await Module.DisposeAsync();
+			}
+		}
+		catch (JSDisconnectedException) { }
+	}
+}

@@ -1,0 +1,38 @@
+@page "/primitives/scrollarea"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="ScrollArea" Description="Augments native scroll functionality for custom cross-browser styling" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ScrollAreaElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<ScrollArea ClassName=\"h-48 w-full rounded-md border border-border\">\n    <div class=\"p-4 space-y-4\">\n        @for ( var i = 1; i <= 20; i++ )\n        {\n            <p>Item @i</p>\n        }\n    </div>\n</ScrollArea>")">
+			<ScrollArea ClassName="h-48 w-full rounded-md border border-border">
+				<div class="p-4 space-y-4">
+					@for ( var i = 1; i <= 20; i++ )
+					{
+						<p class="text-sm text-muted-foreground">Item @i - Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+					}
+				</div>
+			</ScrollArea>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ScrollAreaElements =
+	[
+		new ApiElement(
+			Name: "ScrollArea",
+			Description: "Wraps a viewport that applies cross-browser custom scrollbar styling. Consumers control the height / width on the outer element via `ClassName`; the inner viewport overflows.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the outer container. Typically used to constrain `height` / `width` so the viewport can overflow." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Scrollable content rendered inside the viewport." ),
+			]
+		),
+	];
+}

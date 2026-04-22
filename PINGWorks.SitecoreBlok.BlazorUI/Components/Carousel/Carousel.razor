@@ -1,0 +1,45 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="this">
+	<div data-slot="carousel" class="@CssClass" role="region" aria-roledescription="carousel" @attributes="AdditionalAttributes">
+		@ChildContent
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public CarouselOrientation Orientation { get; set; } = CarouselOrientation.Horizontal;
+	/// <summary>Slide transition duration in milliseconds.</summary>
+	[Parameter] public int TransitionDuration { get; set; } = 300;
+
+	internal int CurrentIndex { get; private set; }
+	internal int ItemCount { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "relative group/carousel" )
+										.With( ClassName )
+										.Build();
+
+	internal void ScrollTo( int index )
+	{
+		if ( index < 0 || index >= ItemCount ) return;
+		CurrentIndex = index;
+		StateHasChanged();
+	}
+
+	internal void ScrollPrev()
+	{
+		if ( CurrentIndex > 0 )
+			ScrollTo( CurrentIndex - 1 );
+	}
+
+	internal void ScrollNext()
+	{
+		if ( CurrentIndex < ItemCount - 1 )
+			ScrollTo( CurrentIndex + 1 );
+	}
+
+	internal bool CanScrollPrev => CurrentIndex > 0;
+	internal bool CanScrollNext => CurrentIndex < ItemCount - 1;
+}

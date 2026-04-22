@@ -1,0 +1,43 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="slider" class="@CssClass">
+	@* `parity-no-text-pair`: slider track and range are decorative — no text content. *@
+	<div data-slot="slider-track" class="relative grow overflow-hidden rounded-full h-1.5 bg-muted parity-no-text-pair">
+		<div data-slot="slider-range" class="absolute h-full bg-primary rounded-full parity-no-text-pair" style="width:@(Percentage)%"></div>
+	</div>
+	<input type="range" min="@Min" max="@Max" step="@Step" value="@Value" disabled="@Disabled"
+		   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+		   @oninput="OnInput" @attributes="AdditionalAttributes" />
+	<div data-slot="slider-thumb" class="@ThumbCssClass" style="left:@(Percentage)%"></div>
+</div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public double Value { get; set; }
+	[Parameter] public EventCallback<double> ValueChanged { get; set; }
+	[Parameter] public double Min { get; set; } = 0;
+	[Parameter] public double Max { get; set; } = 100;
+	[Parameter] public double Step { get; set; } = 1;
+	[Parameter] public bool Disabled { get; set; }
+
+	private double Percentage => Max > Min ? ( Value - Min ) / ( Max - Min ) * 100 : 0;
+
+	private string CssClass => CssClassBuilder.Start( "relative flex w-full touch-none items-center select-none h-5" )
+										.With( "opacity-50", Disabled )
+										.With( ClassName )
+										.Build();
+
+	private string ThumbCssClass => "absolute block size-4 -translate-x-1/2 rounded-full border border-primary bg-background shadow-sm transition-[color,box-shadow] hover:ring-2 hover:ring-primary pointer-events-none";
+
+	private async Task OnInput( ChangeEventArgs e )
+	{
+		if ( double.TryParse( e.Value?.ToString(), out var val ) )
+		{
+			Value = val;
+
+			if ( ValueChanged.HasDelegate )
+				await ValueChanged.InvokeAsync( Value );
+		}
+	}
+}

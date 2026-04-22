@@ -1,0 +1,62 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@inject IJSRuntime JS
+
+<pre class="@PreCssClass"><code class="@CodeCssClass">@Code</code></pre>
+
+@code {
+	[Parameter, EditorRequired] public required string Code { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public CodeLanguage Language { get; set; } = CodeLanguage.Markup;
+
+	private string LanguageClass => Language switch
+	{
+		CodeLanguage.Markup => "language-markup",
+		CodeLanguage.HTML => "language-html",
+		CodeLanguage.XML => "language-xml",
+		CodeLanguage.SVG => "language-svg",
+		CodeLanguage.MathML => "language-mathml",
+		CodeLanguage.SSML => "language-ssml",
+		CodeLanguage.Atom => "language-atom",
+		CodeLanguage.RSS => "language-rss",
+		CodeLanguage.CSS => "language-css",
+		CodeLanguage.CLike => "language-clike",
+		CodeLanguage.JavaScript => "language-js",
+		CodeLanguage.AspNet => "language-aspnet",
+		CodeLanguage.Bash => "language-bash",
+		CodeLanguage.Shell => "language-shell",
+		CodeLanguage.CSharp => "language-csharp",
+		CodeLanguage.CssExtras => "language-css-extras",
+		CodeLanguage.CSV => "language-csv",
+		CodeLanguage.Diff => "language-diff",
+		CodeLanguage.GraphQL => "language-graphql",
+		CodeLanguage.Handlebars => "language-handlebars",
+		CodeLanguage.Json => "language-json",
+		CodeLanguage.Json5 => "language-json5",
+		CodeLanguage.Less => "language-less",
+		CodeLanguage.Markdown => "language-markdown",
+		CodeLanguage.MarkupTemplating => "language-markup-templating",
+		CodeLanguage.MongoDB => "language-mongodb",
+		CodeLanguage.PlSql => "language-plsql",
+		CodeLanguage.PowerShell => "language-powershell",
+		CodeLanguage.Python => "language-python",
+		CodeLanguage.Razor => "language-razor",
+		CodeLanguage.SQL => "language-sql",
+		CodeLanguage.Sass => "language-sass",
+		CodeLanguage.TypeScript => "language-typescript",
+		CodeLanguage.XmlDoc => "language-xml-doc",
+		CodeLanguage.YAML => "language-yaml",
+		_ => "language-markup"
+	};
+
+	private string PreCssClass => CssClassBuilder.Start( LanguageClass )
+										.With( ClassName )
+										.Build();
+
+	private string CodeCssClass => LanguageClass;
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( firstRender )
+			await JS.InvokeVoidAsync( "Prism.highlightAll" );
+	}
+}

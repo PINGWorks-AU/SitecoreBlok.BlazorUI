@@ -1,0 +1,45 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="menubar-radio-item"
+	 data-state="@( IsChecked ? "checked" : "unchecked" )"
+	 data-disabled="@( Disabled ? "" : null )"
+	 class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+	<span class="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+		@if ( IsChecked )
+		{
+			<svg class="size-2 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+				<circle cx="12" cy="12" r="10" />
+			</svg>
+		}
+	</span>
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] public MenubarMenu? ParentMenu { get; set; }
+	[CascadingParameter] public MenubarSub? ParentSub { get; set; }
+	[CascadingParameter] public MenubarRadioGroup? ParentGroup { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private bool IsChecked => ParentGroup?.Value == Value && Value is not null;
+
+	private string CssClass => CssClassBuilder.Start(
+		"relative flex cursor-default select-none items-center gap-2 rounded-xs py-1.5 pr-2 pl-8 text-sm outline-hidden",
+		"hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+		"data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+		"[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0" )
+											.With( ClassName )
+											.Build();
+
+	private async Task OnClick()
+	{
+		if ( Disabled ) return;
+		if ( ParentGroup is not null ) await ParentGroup.Select( Value );
+		if ( ParentSub is not null ) await ParentSub.Close();
+		if ( ParentMenu is not null ) await ParentMenu.Close();
+	}
+}

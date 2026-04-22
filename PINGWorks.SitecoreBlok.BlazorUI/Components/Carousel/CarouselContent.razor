@@ -1,0 +1,23 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="carousel-content" class="overflow-hidden">
+	<div class="@CssClass" style="@TransformStyle">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[CascadingParameter] public required Carousel Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "flex transition-transform ease-in-out" )
+										.With( "-ml-4", Parent.Orientation is CarouselOrientation.Horizontal )
+										.With( "-mt-4 flex-col", Parent.Orientation is CarouselOrientation.Vertical )
+										.With( ClassName )
+										.Build();
+
+	private string TransformStyle => Parent.Orientation is CarouselOrientation.Horizontal
+		? $"transform:translateX(-{Parent.CurrentIndex * 100}%);transition-duration:{Parent.TransitionDuration}ms"
+		: $"transform:translateY(-{Parent.CurrentIndex * 100}%);transition-duration:{Parent.TransitionDuration}ms";
+}

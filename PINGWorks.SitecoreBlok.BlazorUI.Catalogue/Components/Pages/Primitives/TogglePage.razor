@@ -1,0 +1,62 @@
+@page "/primitives/toggle"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Toggle" Description="A two-state button that can be either on or off" Interactivity="ComponentInteractivity.Interactive" ApiElements="@ToggleElements">
+
+	<DivergenceNote>
+		<p><strong>Missing <code>square</code>/<code>rounded</code> variants, the <code>xs</code> size, and Blok's pressed-state icon swap.</strong> Blok exports three variant shapes (<code>default</code>, <code>square</code>, <code>rounded</code>) and four sizes (<code>xs</code>/<code>sm</code>/<code>md</code>/<code>lg</code>); we ship the <code>default</code> shape only plus <code>sm</code>/<code>md</code>/<code>lg</code>. Blok also ships a helper-driven "icon-swap on pressed" animation (<code>hasTextContent</code>, <code>isFirstChildIcon</code>, <code>extractFirstIcon</code> utility functions replace the child icon with a check mark when pressed) — we don't implement that swap. Basic on/off toggling, styling, and <code>Pressed</code>/<code>PressedChanged</code> binding match Blok.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Toggle Pressed=\"@pressed1\" PressedChanged=\"@(v => pressed1 = v)\">Toggle</Toggle>")">
+			<Toggle Pressed="@Pressed1" PressedChanged="@(v => Pressed1 = v)">Toggle</Toggle>
+		</ComponentExample>
+
+		<ComponentExample Title="Outline variant" Code="@("<Toggle Variant=\"ToggleVariant.Outline\" Pressed=\"@pressed2\" PressedChanged=\"@(v => pressed2 = v)\">Outline</Toggle>")">
+			<Toggle Variant="ToggleVariant.Outline" Pressed="@Pressed2" PressedChanged="@(v => Pressed2 = v)">Outline</Toggle>
+		</ComponentExample>
+
+		<ComponentExample Title="Sizes" Code="@("<Toggle Size=\"ToggleSize.Sm\" Pressed=\"@pressed3\" PressedChanged=\"@(v => pressed3 = v)\">Small</Toggle>\n<Toggle Size=\"ToggleSize.Default\" Pressed=\"@pressed4\" PressedChanged=\"@(v => pressed4 = v)\">Default</Toggle>\n<Toggle Size=\"ToggleSize.Lg\" Pressed=\"@pressed5\" PressedChanged=\"@(v => pressed5 = v)\">Large</Toggle>")">
+			<Toggle Size="ToggleSize.Sm" Pressed="@Pressed3" PressedChanged="@(v => Pressed3 = v)">Small</Toggle>
+			<Toggle Size="ToggleSize.Default" Pressed="@Pressed4" PressedChanged="@(v => Pressed4 = v)">Default</Toggle>
+			<Toggle Size="ToggleSize.Lg" Pressed="@Pressed5" PressedChanged="@(v => Pressed5 = v)">Large</Toggle>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Toggle Disabled>Disabled</Toggle>\n<Toggle Disabled Pressed=\"true\">Disabled On</Toggle>")">
+			<Toggle Disabled>Disabled</Toggle>
+			<Toggle Disabled Pressed="true">Disabled On</Toggle>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool Pressed1;
+	private bool Pressed2;
+	private bool Pressed3;
+	private bool Pressed4;
+	private bool Pressed5;
+
+	private static readonly ApiElement[] ToggleElements =
+	[
+		new ApiElement(
+			Name: "Toggle",
+			Description: "A standalone two-state `<button>` with Blok's variant and size tokens. Use `Pressed`/`PressedChanged` (or `@bind-Pressed`) to drive the on/off state.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Pressed",              "bool",                          false, "Current on/off state. Supports two-way binding via `@bind-Pressed`. Default: `false`." ),
+				new ApiProperty( "PressedChanged",       "EventCallback<bool>",           false, "Fires when the toggle is clicked with the new pressed value." ),
+				new ApiProperty( "Variant",              "ToggleVariant",                 false, "Visual style. Default: `ToggleVariant.Default`. Other value: `Outline`." ),
+				new ApiProperty( "Size",                 "ToggleSize",                    false, "Size token. Default: `ToggleSize.Default`. Other values: `Sm`, `Lg`." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, the toggle is non-interactive and visually muted. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Button contents — typically an icon, short text, or both." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the underlying `<button>`." ),
+			]
+		),
+	];
+}

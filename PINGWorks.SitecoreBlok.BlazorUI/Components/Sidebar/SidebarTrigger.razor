@@ -1,0 +1,40 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon"
+		ClassName="@CssClass"
+		Click="OnClick"
+		AdditionalAttributes="ExtraAttributes">
+	<Icon Svg="@IconSvg.DockLeft" />
+	<span class="sr-only">Toggle Sidebar</span>
+</Button>
+
+@code {
+	[CascadingParameter] public SidebarProvider? Provider { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public EventCallback OnClicked { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "size-7" )
+											.With( ClassName )
+											.Build();
+
+	private Dictionary<string, object> ExtraAttributes
+	{
+		get
+		{
+			var dict = AdditionalAttributes is null
+				? new Dictionary<string, object>()
+				: new Dictionary<string, object>( AdditionalAttributes );
+			dict["data-slot"] = "sidebar-trigger";
+			dict["data-sidebar"] = "trigger";
+			return dict;
+		}
+	}
+
+	private async Task OnClick()
+	{
+		await OnClicked.InvokeAsync();
+		if ( Provider is not null )
+			await Provider.ToggleSidebar();
+	}
+}

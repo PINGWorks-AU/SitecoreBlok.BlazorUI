@@ -1,0 +1,66 @@
+@page "/primitives/stack"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Stack" Description="A layout utility for quickly composing flex or grid containers with configurable gap, padding, max-width, orientation, and border." Interactivity="ComponentInteractivity.Ssr" ApiElements="@StackElements">
+
+	<DivergenceNote>
+		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> Stack is a layout utility component we ship to make composing flex/grid containers ergonomic. It maps to plain Tailwind utility classes — there is no upstream Blok component to track for this.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default (grid)" Code="@("<Stack>\n    <div class=\"bg-muted p-3 rounded\">One</div>\n    <div class=\"bg-muted p-3 rounded\">Two</div>\n    <div class=\"bg-muted p-3 rounded\">Three</div>\n</Stack>")">
+			<Stack>
+				<div class="bg-muted p-3 rounded">One</div>
+				<div class="bg-muted p-3 rounded">Two</div>
+				<div class="bg-muted p-3 rounded">Three</div>
+			</Stack>
+		</ComponentExample>
+
+		<ComponentExample Title="Flex column" Code="@("<Stack Flex>\n    <div class=\"bg-muted p-3 rounded\">First</div>\n    <div class=\"bg-muted p-3 rounded\">Second</div>\n</Stack>")">
+			<Stack Flex>
+				<div class="bg-muted p-3 rounded">First</div>
+				<div class="bg-muted p-3 rounded">Second</div>
+			</Stack>
+		</ComponentExample>
+
+		<ComponentExample Title="Flex row with gap" Code="@("<Stack Flex Row Gap=\"6\">\n    <Button>Save</Button>\n    <Button Variant=\"ButtonVariant.Outline\">Cancel</Button>\n</Stack>")">
+			<Stack Flex Row Gap="6">
+				<Button>Save</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Cancel</Button>
+			</Stack>
+		</ComponentExample>
+
+		<ComponentExample Title="Border and padding" Code="@("<Stack Flex Border Padding=\"5\" Gap=\"3\" Size=\"Size.Md\">\n    <h4 class=\"font-medium\">Card title</h4>\n    <p class=\"text-sm text-muted-foreground\">A bordered, padded stack works well as a quick card scaffold.</p>\n</Stack>")">
+			<Stack Flex Border Padding="5" Gap="3" Size="Size.Md">
+				<h4 class="font-medium">Card title</h4>
+				<p class="text-sm text-muted-foreground">A bordered, padded stack works well as a quick card scaffold.</p>
+			</Stack>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] StackElements =
+	[
+		new ApiElement(
+			Name: "Stack",
+			Description: "Layout helper that renders a single `<div>` styled as grid or flex. Defaults to grid; opt into flex via `Flex` and use `Row` to flip orientation. Gap, padding, max-width and border are all opt-in.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Flex",         "bool",             false, "When true, uses `flex flex-wrap`. When false (default), uses `grid`." ),
+				new ApiProperty( "Row",          "bool",             false, "Only when `Flex` is true. `true` = `flex-row`, `false` (default) = `flex-col`." ),
+				new ApiProperty( "Border",       "bool",             false, "Adds a rounded border around the container. Default: `false`." ),
+				new ApiProperty( "Gap",          "int",              false, "Tailwind gap scale (1–6). Default: `4`." ),
+				new ApiProperty( "Padding",      "int",              false, "Tailwind padding scale (1–6). Default: `2`." ),
+				new ApiProperty( "Size",         "Size",             false, "Max-width token applied as `max-w-*`. Default: `Size.Lg`. Accepts the full `Size` enum (`Xs3`..`Xl8`, `Full`)." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the outer `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "The items laid out inside the stack." ),
+			]
+		),
+	];
+}

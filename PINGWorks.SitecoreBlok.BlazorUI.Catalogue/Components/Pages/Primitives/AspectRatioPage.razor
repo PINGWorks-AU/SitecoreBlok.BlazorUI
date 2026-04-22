@@ -1,0 +1,45 @@
+@page "/primitives/aspectratio"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="AspectRatio" Description="Displays content within a desired ratio" Interactivity="ComponentInteractivity.Ssr" ApiElements="@AspectRatioElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="16:9 ratio" Code="@("<AspectRatio Ratio=\"16.0/9.0\" ClassName=\"bg-muted rounded-md\">\n    <img src=\"...\" style=\"object-fit:cover;width:100%;height:100%\" />\n</AspectRatio>")">
+			<div class="w-96">
+				<AspectRatio Ratio="@(16.0/9.0)" ClassName="bg-muted rounded-md flex items-center justify-center">
+					<span class="text-muted-foreground text-sm">16:9</span>
+				</AspectRatio>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="1:1 ratio (square)" Code="@("<AspectRatio Ratio=\"1\" ClassName=\"bg-muted rounded-md\">\n    <img src=\"...\" style=\"object-fit:cover;width:100%;height:100%\" />\n</AspectRatio>")">
+			<div class="w-48">
+				<AspectRatio Ratio="1" ClassName="bg-muted rounded-md flex items-center justify-center">
+					<span class="text-muted-foreground text-sm">1:1</span>
+				</AspectRatio>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AspectRatioElements =
+	[
+		new ApiElement(
+			Name: "AspectRatio",
+			Description: "Wraps content in a container that holds a fixed width-to-height ratio using the padding-bottom technique. The inner content is absolutely positioned to fill the box.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Ratio",                "double",                        false, "Width divided by height. Default: `1` (square). Use `16.0/9.0` for widescreen, `4.0/3.0` for classic photo, etc." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the inner content container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Content placed inside the ratio box. Commonly an `<img>` with `object-fit: cover`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the outer wrapper." ),
+			]
+		),
+	];
+}

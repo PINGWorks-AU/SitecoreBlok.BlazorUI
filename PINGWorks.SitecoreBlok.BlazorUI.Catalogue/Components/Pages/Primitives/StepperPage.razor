@@ -1,0 +1,69 @@
+@page "/primitives/stepper"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Stepper" Description="Displays a sequence of steps with status indicators" Interactivity="ComponentInteractivity.Ssr" ApiElements="@StepperElements">
+
+	<DivergenceNote>
+		<p>Only minor API differences: (1) we use <code>ActiveStep</code> (an int index) where Blok uses a per-step <code>status: "completed" | "active" | "pending"</code> field — Blok lets you mark individual steps independently; we infer the three states from the index relative to <code>ActiveStep</code>. (2) we don't yet expose a <code>Size</code> parameter (Blok has sm/default/lg); add this when needed.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Horizontal (default)" Code="@("<Stepper Steps=\"@steps\" ActiveStep=\"@activeStep\" />")">
+			<Stepper Steps="@Steps" ActiveStep="@ActiveStep" />
+			<div class="flex gap-2 mt-6">
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Size="ButtonSize.Sm"
+						Disabled="@(ActiveStep <= 0)" Click="@(() => ActiveStep--)">Previous</Button>
+				<Button Size="ButtonSize.Sm"
+						Disabled="@(ActiveStep > Steps.Count - 1)" Click="@(() => ActiveStep++)">Next</Button>
+				<span class="text-sm text-muted-foreground flex items-center ml-2">Step @(ActiveStep + 1) of @Steps.Count</span>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Vertical" Code="@("<Stepper Steps=\"@steps\" ActiveStep=\"1\" Orientation=\"StepperOrientation.Vertical\" />")">
+			<Stepper Steps="@Steps" ActiveStep="1" Orientation="StepperOrientation.Vertical" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private int ActiveStep = 1;
+
+	private List<StepperStep> Steps =
+	[
+		new( "Account", "Create your account" ),
+		new( "Profile", "Set up your profile" ),
+		new( "Review", "Verify your details" ),
+		new( "Complete", "All done" ),
+	];
+
+	private static readonly ApiElement[] StepperElements =
+	[
+		new ApiElement(
+			Name: "Stepper",
+			Description: "Renders a sequence of steps with completed / active / pending circles. Step state is inferred from the item's index relative to `ActiveStep`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Steps",             "List<StepperStep>",      true,  "Ordered list of steps. Each `StepperStep` has a `Label` and optional `Description`." ),
+				new ApiProperty( "ActiveStep",        "int",                    false, "Zero-based index of the current step. Steps before it are `completed`, it is `active`, steps after it are `pending`. Default: `0`." ),
+				new ApiProperty( "ActiveStepChanged", "EventCallback<int>",     false, "Invoked when the active index changes. Use with `@bind-ActiveStep` for two-way binding." ),
+				new ApiProperty( "Orientation",       "StepperOrientation",     false, "Layout direction. Default: `StepperOrientation.Horizontal`. Other value: `Vertical`." ),
+				new ApiProperty( "ClassName",         "string?",                false, "Extra CSS classes appended to the stepper container." ),
+			]
+		),
+		new ApiElement(
+			Name: "StepperStep",
+			Description: "Record describing a single step. Passed via `Stepper.Steps`; not a Blazor component.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Label",       "string",  true,  "Primary label shown next to the circle." ),
+				new ApiProperty( "Description", "string?", false, "Optional secondary line shown beneath the label in muted text." ),
+			]
+		),
+	];
+}

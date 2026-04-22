@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<Version>1.0.0.0</Version>
+	</PropertyGroup>
+
+		<!-- nuGet package properties -->
+	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<EnableDynamicLoading>true</EnableDynamicLoading>
+		<PackageId>PINGWorks.SitecoreBlok.BlazorUI.Icons</PackageId>
+		<Title>PING Works Sitecore Blok Blazor UI Icons</Title>
+		<FileVersion>$(Version)</FileVersion>
+		<AssemblyVersion>$(Version)</AssemblyVersion>
+		<PackageVersion>$(Version)</PackageVersion>
+		<Authors>PING Works</Authors>
+		<Company>PING Works</Company>
+		<Product>PING Works dotBRIDGE</Product>
+		<Copyright>Copyright (c) 2026 - PING Works, Australia</Copyright>
+		<PackageTags>dotnet, sitecore, blok, pingworks, dotbridge</PackageTags>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI</PackageProjectUrl>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Description>PING Works' Blazor UI Kit Icons for working with Sitecore's Marketplace.</Description>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>exclamation-logo.png</PackageIcon>
+		<PackageIconUrl>https://dl.polyglot-app.com/img/exclamation-logo.png</PackageIconUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>
+			v1.0.0
+			Initial release
+		</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="Resources\exclamation-logo.png" Pack="true" PackagePath="/" />
+		<None Include="README.md" Pack="true" PackagePath="/"  />
+		<None Include="..\LICENSE" Pack="true" PackagePath="/" />
+		<None Include="ThirdPartyNotices\**" Pack="true" PackagePath="ThirdPartyNotices" />
+	</ItemGroup>
+
+</Project>

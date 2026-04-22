@@ -1,0 +1,25 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<Separator ClassName="@CssClass" AdditionalAttributes="ExtraAttributes" />
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "mx-2 w-auto bg-sidebar-border" )
+											.With( ClassName )
+											.Build();
+
+	private Dictionary<string, object> ExtraAttributes
+	{
+		get
+		{
+			var dict = AdditionalAttributes is null
+				? new Dictionary<string, object>()
+				: new Dictionary<string, object>( AdditionalAttributes );
+			dict["data-slot"] = "sidebar-separator";
+			dict["data-sidebar"] = "separator";
+			return dict;
+		}
+	}
+}

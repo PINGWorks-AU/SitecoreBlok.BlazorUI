@@ -1,0 +1,203 @@
+@page "/primitives/resizable"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Resizable"
+			   Description="Accessible resizable panel groups and layouts with keyboard support."
+			   Interactivity="ComponentInteractivity.Interactive"
+			   ApiElements="@ResizableElements">
+
+	<DivergenceNote>
+		<p><strong>Blazor-native resize engine — not a <code>react-resizable-panels</code> wrapper.</strong> Blok wraps the <code>react-resizable-panels</code> React library. This port uses a colocated JS module (<code>Resizable.razor.js</code>) that attaches <code>pointerdown</code> / <code>pointermove</code> / <code>keydown</code> handlers to each handle and updates adjacent panel <code>flex-basis</code> values in pixels. The consumer API is identical: same three components, same parameters, same <code>data-slot</code> attributes, same CSS class strings.</p>
+		<p><strong><code>overflow: hidden</code> added to <code>ResizablePanel</code>.</strong> The React library sets this on panels internally. Our port adds it via the default class so content clips correctly when a panel is resized below its content size. Override with <code>ClassName="overflow-auto"</code> when you need a scrollable panel.</p>
+		<p><strong>Keyboard step is 10 px</strong> (Shift+Arrow = 50 px). Home snaps to <code>MinSize</code>, End snaps to <code>MaxSize</code>.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default (horizontal)" Code="@(@"<div class=""h-40 border border-border rounded-lg overflow-hidden"">
+    <ResizablePanelGroup>
+        <ResizablePanel DefaultSize=""50"">
+            <div class=""flex h-full items-center justify-center p-6"">
+                <span class=""font-semibold"">One</span>
+            </div>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel DefaultSize=""50"">
+            <div class=""flex h-full items-center justify-center p-6"">
+                <span class=""font-semibold"">Two</span>
+            </div>
+        </ResizablePanel>
+    </ResizablePanelGroup>
+</div>")">
+			<div class="h-40 border border-border rounded-lg overflow-hidden">
+				<ResizablePanelGroup>
+					<ResizablePanel DefaultSize="50">
+						<div class="flex h-full items-center justify-center p-6">
+							<span class="font-semibold">One</span>
+						</div>
+					</ResizablePanel>
+					<ResizableHandle />
+					<ResizablePanel DefaultSize="50">
+						<div class="flex h-full items-center justify-center p-6">
+							<span class="font-semibold">Two</span>
+						</div>
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With handle icon" Code="@(@"<div class=""h-40 border border-border rounded-lg overflow-hidden"">
+    <ResizablePanelGroup>
+        <ResizablePanel DefaultSize=""25"">
+            <div class=""flex h-full items-center justify-center p-6"">
+                <span class=""font-semibold"">Sidebar</span>
+            </div>
+        </ResizablePanel>
+        <ResizableHandle WithHandle=""true"" />
+        <ResizablePanel DefaultSize=""75"">
+            <div class=""flex h-full items-center justify-center p-6"">
+                <span class=""font-semibold"">Content</span>
+            </div>
+        </ResizablePanel>
+    </ResizablePanelGroup>
+</div>")">
+			<div class="h-40 border border-border rounded-lg overflow-hidden">
+				<ResizablePanelGroup>
+					<ResizablePanel DefaultSize="25">
+						<div class="flex h-full items-center justify-center p-6">
+							<span class="font-semibold">Sidebar</span>
+						</div>
+					</ResizablePanel>
+					<ResizableHandle WithHandle="true" />
+					<ResizablePanel DefaultSize="75">
+						<div class="flex h-full items-center justify-center p-6">
+							<span class="font-semibold">Content</span>
+						</div>
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Vertical" Code="@(@"<div class=""h-64 border border-border rounded-lg overflow-hidden"">
+    <ResizablePanelGroup Direction=""ResizableDirection.Vertical"">
+        <ResizablePanel DefaultSize=""50"">
+            <div class=""flex h-full items-center justify-center p-6"">
+                <span class=""font-semibold"">Top</span>
+            </div>
+        </ResizablePanel>
+        <ResizableHandle WithHandle=""true"" />
+        <ResizablePanel DefaultSize=""50"">
+            <div class=""flex h-full items-center justify-center p-6"">
+                <span class=""font-semibold"">Bottom</span>
+            </div>
+        </ResizablePanel>
+    </ResizablePanelGroup>
+</div>")">
+			<div class="h-64 border border-border rounded-lg overflow-hidden">
+				<ResizablePanelGroup Direction="ResizableDirection.Vertical">
+					<ResizablePanel DefaultSize="50">
+						<div class="flex h-full items-center justify-center p-6">
+							<span class="font-semibold">Top</span>
+						</div>
+					</ResizablePanel>
+					<ResizableHandle WithHandle="true" />
+					<ResizablePanel DefaultSize="50">
+						<div class="flex h-full items-center justify-center p-6">
+							<span class="font-semibold">Bottom</span>
+						</div>
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Three panels" Code="@(@"<div class=""h-40 border border-border rounded-lg overflow-hidden"">
+    <ResizablePanelGroup>
+        <ResizablePanel DefaultSize=""25"" MinSize=""10"">
+            <div class=""flex h-full items-center justify-center p-4"">
+                <span class=""font-semibold text-sm"">Nav</span>
+            </div>
+        </ResizablePanel>
+        <ResizableHandle WithHandle=""true"" />
+        <ResizablePanel DefaultSize=""50"">
+            <div class=""flex h-full items-center justify-center p-4"">
+                <span class=""font-semibold text-sm"">Editor</span>
+            </div>
+        </ResizablePanel>
+        <ResizableHandle WithHandle=""true"" />
+        <ResizablePanel DefaultSize=""25"" MinSize=""10"">
+            <div class=""flex h-full items-center justify-center p-4"">
+                <span class=""font-semibold text-sm"">Preview</span>
+            </div>
+        </ResizablePanel>
+    </ResizablePanelGroup>
+</div>")">
+			<div class="h-40 border border-border rounded-lg overflow-hidden">
+				<ResizablePanelGroup>
+					<ResizablePanel DefaultSize="25" MinSize="10">
+						<div class="flex h-full items-center justify-center p-4">
+							<span class="font-semibold text-sm">Nav</span>
+						</div>
+					</ResizablePanel>
+					<ResizableHandle WithHandle="true" />
+					<ResizablePanel DefaultSize="50">
+						<div class="flex h-full items-center justify-center p-4">
+							<span class="font-semibold text-sm">Editor</span>
+						</div>
+					</ResizablePanel>
+					<ResizableHandle WithHandle="true" />
+					<ResizablePanel DefaultSize="25" MinSize="10">
+						<div class="flex h-full items-center justify-center p-4">
+							<span class="font-semibold text-sm">Preview</span>
+						</div>
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ResizableElements =
+	[
+		new ApiElement(
+			Name: "ResizablePanelGroup",
+			Description: "Root container that owns the resize engine. Sets the layout direction, initialises the JS drag module on first render, and cascades the direction to child `ResizableHandle` components.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Direction",            "ResizableDirection",          false, "Layout axis. Default: `ResizableDirection.Horizontal`. Other value: `Vertical`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the group `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Should contain alternating `ResizablePanel` and `ResizableHandle` children." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the root `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ResizablePanel",
+			Description: "A single resizable content area. Sets an initial `flex-basis` from `DefaultSize` (or grows equally when omitted). Exposes `MinSize` and `MaxSize` constraints read by the drag engine.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "DefaultSize",          "double?",                     false, "Initial size as a percentage of the group (0–100). When omitted the panel shares available space equally. Default: `null`." ),
+				new ApiProperty( "MinSize",              "double",                      false, "Minimum panel size as a percentage of the group. Default: `0`." ),
+				new ApiProperty( "MaxSize",              "double",                      false, "Maximum panel size as a percentage of the group. Default: `100`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the panel `<div>`. Use `overflow-auto` to make the panel scrollable." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Panel content." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the panel `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ResizableHandle",
+			Description: "The drag handle between two adjacent `ResizablePanel` siblings. Focusable — use arrow keys to resize by 10 px (Shift+Arrow = 50 px), Home to snap to the left panel's `MinSize`, End to snap to its `MaxSize`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "WithHandle",           "bool",                        false, "When true, renders a visible grip icon in the centre of the handle. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the handle `<div>`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the handle `<div>`." ),
+			]
+		),
+	];
+}

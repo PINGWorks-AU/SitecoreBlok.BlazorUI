@@ -1,0 +1,81 @@
+@page "/primitives/actionbar"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="ActionBar" Description="A floating bottom bar for bulk actions on selected items" Interactivity="ComponentInteractivity.Interactive" ApiElements="@ActionBarElements">
+
+	<DivergenceNote>
+		<p><strong>Composition-first API instead of Blok's declarative prop arrays.</strong> Blok accepts <code>buttons[]</code> and <code>menuItems[]</code> prop arrays plus a hardcoded set of named callbacks (<code>onPublish</code>, <code>onUnpublish</code>, <code>onDuplicate</code>, <code>onArchive</code>, <code>onDelete</code>). We use <code>ChildContent</code> + <code>Open</code> + <code>SelectedCount</code> + <code>OnCancel</code> and let the consumer compose whatever buttons and menus they need. More flexible, but users migrating a Blok usage will need to flatten their prop arrays into inline <code>&lt;Button&gt;</code> children.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<ActionBar Open=\"@barOpen\" SelectedCount=\"3\" OnCancel=\"() => barOpen = false\">\n    <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Publish</Button>\n    <Button Size=\"ButtonSize.Sm\">Duplicate</Button>\n    <Tooltip>\n        <TooltipTrigger>\n            <DropdownMenu>\n                <DropdownMenuTrigger ClassName=\"hover:bg-neutral-bg rounded-full\">\n                    <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.IconSm\">\n                        <Icon Svg=\"@@IconSvg.DotsHorizontal\" ClassName=\"size-5\" />\n                    </Button>\n                </DropdownMenuTrigger>\n                <DropdownMenuContent>\n                    <DropdownMenuItem>Archive</DropdownMenuItem>\n                    <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\">Delete</DropdownMenuItem>\n                </DropdownMenuContent>\n            </DropdownMenu>\n        </TooltipTrigger>\n        <TooltipContent Side=\"TooltipSide.Top\">More actions</TooltipContent>\n    </Tooltip>\n</ActionBar>")">
+			<div class="flex gap-3">
+				<Button Click="@(() => BarOpen = !BarOpen)">
+					@(BarOpen ? "Hide Action Bar" : "Show Action Bar")
+				</Button>
+			</div>
+
+			<ActionBar Open="@BarOpen" SelectedCount="3" OnCancel="() => BarOpen = false">
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Size="ButtonSize.Sm">
+					<Icon Svg="@IconSvg.CloudUploadOutline" Scale="0.9" ResetClassName /> Publish
+				</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Size="ButtonSize.Sm">
+					<Icon Svg="@IconSvg.CloudOffOutline" Scale="0.9" ResetClassName /> Unpublish
+				</Button>
+				<Button Size="ButtonSize.Sm">
+					<Icon Svg="@IconSvg.ContentCopy" Scale="0.9" ResetClassName /> Duplicate
+				</Button>
+				<Tooltip>
+					<TooltipTrigger>
+						<DropdownMenu>
+							<DropdownMenuTrigger ClassName="hover:bg-neutral-bg rounded-full">
+								<Button Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Neutral" Size="ButtonSize.IconSm">
+									<Icon Svg="@IconSvg.DotsHorizontal" ClassName="size-5" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent>
+								<DropdownMenuGroup>
+									<DropdownMenuItem>
+										<Icon Svg="@IconSvg.ArchiveOutline" ClassName="size-4" /> Archive
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive">
+										<Icon Svg="@IconSvg.TrashCanOutline" ClassName="size-4" /> Delete
+									</DropdownMenuItem>
+								</DropdownMenuGroup>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</TooltipTrigger>
+					<TooltipContent Side="TooltipSide.Top">More actions</TooltipContent>
+				</Tooltip>
+			</ActionBar>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool BarOpen;
+
+	private static readonly ApiElement[] ActionBarElements =
+	[
+		new ApiElement(
+			Name: "ActionBar",
+			Description: "Floating bar fixed to the bottom of the viewport that fades in when `Open` is true. Shows a cancel button, selection count, and a right-aligned slot for consumer-composed action buttons.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Open",                 "bool",                          false, "Controls visibility via opacity and pointer-events (avoids transforms that would break child popovers). Default: `false`." ),
+				new ApiProperty( "OpenChanged",          "EventCallback<bool>",           false, "Fires when `Open` changes. Supports `@bind-Open`." ),
+				new ApiProperty( "SelectedCount",        "int",                           false, "Number shown next to the cancel button (e.g. \"3 selected\"). Default: `0`." ),
+				new ApiProperty( "OnCancel",             "EventCallback",                 false, "Invoked when the left-hand close icon is clicked. Consumer typically sets `Open` to false here." ),
+				new ApiProperty( "Align",                "ActionBarAlign",                false, "Horizontal alignment of the bar within the viewport. Default: `ActionBarAlign.Center`. Other values: `Left`, `Right`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the outer fixed container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Action buttons / menus shown on the right side of the bar." ),
+			]
+		),
+	];
+}

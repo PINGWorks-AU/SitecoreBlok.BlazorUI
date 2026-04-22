@@ -1,0 +1,18 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<thead data-slot="table-header" class="@CssClass">
+	@ChildContent
+</thead>
+
+@code {
+	[CascadingParameter] public Table? ParentTable { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "[&_tr]:border-b [&_tr]:border-border" )
+										// `parity-no-text-pair`: thead has no own text; the <th> children
+										// (TableHead) set text-neutral-fg.
+										.With( "sticky top-0 z-10 bg-background shadow-[0_1px_0_0_var(--border)] parity-no-text-pair", ParentTable?.IsStickyHeader == true )
+										.With( ClassName )
+										.Build();
+}

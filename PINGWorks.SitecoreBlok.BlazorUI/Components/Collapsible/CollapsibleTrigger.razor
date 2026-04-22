@@ -1,0 +1,22 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button type="button" data-slot="collapsible-trigger" data-state="@( Parent.Open ? "open" : "closed" )"
+		class="@CssClass" disabled="@Parent.Disabled" @onclick="Parent.Toggle" @attributes="AdditionalAttributes">
+	@ChildContent
+</button>
+
+@code {
+	[CascadingParameter] public required Collapsible Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	// `text-foreground` is a defensive default — our CSS does NOT load Tailwind
+	// preflight (`@tailwind base` is commented out in globals.css), so a native
+	// `<button>` keeps the user-agent default color and won't inherit from the
+	// page cascade. Without this, trigger labels render dark in dark mode.
+	// Consumers can override via ClassName.
+	private string CssClass => CssClassBuilder.Start( "text-foreground" )
+											.With( ClassName )
+											.Build();
+}

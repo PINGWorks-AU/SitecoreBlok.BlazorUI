@@ -1,0 +1,339 @@
+@page "/primitives/treeview"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="TreeView" Description="A hierarchical list with expansion, selection, checkboxes, search, lazy loading, and item templates." Interactivity="ComponentInteractivity.Interactive" ApiElements="@TreeViewElements">
+
+	<DivergenceNote>
+		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> TreeView fills a real product need (file/asset trees, navigation hierarchies) that Blok does not currently address. The styling follows Blok tokens so it sits naturally alongside the ported primitives.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Basic — single select" Code="@BasicCode">
+			<TreeView TItem="Node"
+					  Items="BasicItems"
+					  GetItemValue="n => n.Id"
+					  GetItemText="n => n.Name"
+					  GetItemChildren="n => n.Children"
+					  SelectionMode="TreeSelectionMode.Single"
+					  DefaultExpandedDepth="1"
+					  AriaLabel="Project files" />
+		</ComponentExample>
+
+		<ComponentExample Title="Icons and badges" Code="@IconsCode">
+			<TreeView TItem="Node"
+					  Items="IconItems"
+					  GetItemValue="n => n.Id"
+					  GetItemText="n => n.Name"
+					  GetItemChildren="n => n.Children"
+					  GetItemIcon="n => n.Icon"
+					  GetItemBadge="n => n.Children?.Count > 0 ? n.Children.Count.ToString() : null"
+					  DefaultExpandAll
+					  AriaLabel="Documents" />
+		</ComponentExample>
+
+		<ComponentExample Title="Checkboxes with cascade" Code="@CheckboxesCode">
+			<TreeView TItem="Node"
+					  Items="CheckboxItems"
+					  GetItemValue="n => n.Id"
+					  GetItemText="n => n.Name"
+					  GetItemChildren="n => n.Children"
+					  Checkable
+					  CascadeChecks
+					  @bind-CheckedValues="Checked"
+					  DefaultExpandAll
+					  AriaLabel="Permissions" />
+
+			<div class="mt-4 text-sm text-muted-foreground">
+				Checked: @string.Join( ", ", Checked.OrderBy( s => s ) )
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Searchable" Code="@SearchCode">
+			<TreeView TItem="Node"
+					  Items="SearchItems"
+					  GetItemValue="n => n.Id"
+					  GetItemText="n => n.Name"
+					  GetItemChildren="n => n.Children"
+					  ShowSearch
+					  SearchPlaceholder="Find a component..."
+					  AriaLabel="Components" />
+		</ComponentExample>
+
+		<ComponentExample Title="Lazy loading on expand" Code="@LazyCode">
+			<TreeView TItem="Node"
+					  Items="LazyItems"
+					  GetItemValue="n => n.Id"
+					  GetItemText="n => n.Name"
+					  GetItemChildren="n => n.Children"
+					  GetItemHasChildren="n => true"
+					  OnLoadChildren="LoadChildrenAsync"
+					  AriaLabel="Lazy data" />
+		</ComponentExample>
+
+		<ComponentExample Title="Custom templates with Expand/Collapse toolbar" Code="@TemplatesCode">
+			<div class="flex items-center gap-2 mb-2">
+				<Button Size="ButtonSize.Sm" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(async () => await TreeRef!.ExpandAllAsync())">Expand all</Button>
+				<Button Size="ButtonSize.Sm" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(async () => await TreeRef!.CollapseAllAsync())">Collapse all</Button>
+			</div>
+
+			<TreeView TItem="Node"
+					  @ref="TreeRef"
+					  Items="TemplatedItems"
+					  GetItemValue="n => n.Id"
+					  GetItemText="n => n.Name"
+					  GetItemChildren="n => n.Children"
+					  ShowConnectorLines
+					  AriaLabel="Pages">
+				<LabelTemplate>
+					<span class="font-medium">@context.Name</span>
+					@if ( !string.IsNullOrEmpty( context.Detail ) )
+					{
+						<span class="text-xs text-muted-foreground ml-2">@context.Detail</span>
+					}
+				</LabelTemplate>
+				<ActionsTemplate>
+					<div class="flex items-center gap-1">
+						<Button Size="ButtonSize.IconXs" Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Neutral" Click="@(() => LastAction = $"Edit {context.Name}")">
+							<Icon Svg="@IconSvg.Information" IconSize="IconSize.Sm" />
+						</Button>
+						<Button Size="ButtonSize.IconXs" Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Danger" Click="@(() => LastAction = $"Delete {context.Name}")">
+							<Icon Svg="@IconSvg.Close" IconSize="IconSize.Sm" />
+						</Button>
+					</div>
+				</ActionsTemplate>
+			</TreeView>
+
+			@if ( !string.IsNullOrEmpty( LastAction ) )
+			{
+				<div class="mt-2 text-sm text-muted-foreground">Last action: @LastAction</div>
+			}
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private class Node
+	{
+		public string Id { get; init; } = "";
+		public string Name { get; init; } = "";
+		public string? Detail { get; init; }
+		public string? Icon { get; init; }
+		public List<Node>? Children { get; set; }
+	}
+
+	private TreeView<Node>? TreeRef;
+	private ISet<string> Checked = new HashSet<string>();
+	private string? LastAction;
+
+	private readonly List<Node> BasicItems =
+	[
+		new() { Id = "src", Name = "src", Children =
+		[
+			new() { Id = "src-app", Name = "App.razor" },
+			new() { Id = "src-components", Name = "Components", Children =
+			[
+				new() { Id = "src-components-button", Name = "Button.razor" },
+				new() { Id = "src-components-input",  Name = "Input.razor" },
+			] },
+		] },
+		new() { Id = "docs", Name = "docs", Children =
+		[
+			new() { Id = "docs-readme", Name = "README.md" },
+		] }
+	];
+
+	private readonly List<Node> IconItems =
+	[
+		new() { Id = "inbox", Name = "Inbox", Icon = IconSvg.Inbox, Children =
+		[
+			new() { Id = "inbox-a", Name = "Hello",          Icon = IconSvg.Email },
+			new() { Id = "inbox-b", Name = "Welcome aboard", Icon = IconSvg.Email },
+		] },
+		new() { Id = "sent",  Name = "Sent", Icon = IconSvg.Send, Children =
+		[
+			new() { Id = "sent-a", Name = "Re: project update", Icon = IconSvg.Email },
+		] },
+		new() { Id = "trash", Name = "Trash", Icon = IconSvg.Delete }
+	];
+
+	private readonly List<Node> CheckboxItems =
+	[
+		new() { Id = "perm-read", Name = "Read", Children =
+		[
+			new() { Id = "perm-read-posts", Name = "Posts" },
+			new() { Id = "perm-read-users", Name = "Users" },
+		] },
+		new() { Id = "perm-write", Name = "Write", Children =
+		[
+			new() { Id = "perm-write-posts", Name = "Posts" },
+			new() { Id = "perm-write-users", Name = "Users" },
+		] }
+	];
+
+	private readonly List<Node> SearchItems =
+	[
+		new() { Id = "layout",  Name = "Layout primitives", Children =
+		[
+			new() { Id = "card", Name = "Card" },
+			new() { Id = "sep",  Name = "Separator" },
+			new() { Id = "stack",Name = "Stack" },
+		] },
+		new() { Id = "input",   Name = "Input primitives", Children =
+		[
+			new() { Id = "checkbox",    Name = "Checkbox" },
+			new() { Id = "select",      Name = "Select" },
+			new() { Id = "searchinput", Name = "SearchInput" },
+		] },
+		new() { Id = "navigate", Name = "Navigation primitives", Children =
+		[
+			new() { Id = "breadcrumb", Name = "Breadcrumb" },
+			new() { Id = "nav",        Name = "NavigationMenu" },
+			new() { Id = "tabs",       Name = "Tabs" },
+		] }
+	];
+
+	private readonly List<Node> LazyItems =
+	[
+		new() { Id = "lazy-1", Name = "Folder A" },
+		new() { Id = "lazy-2", Name = "Folder B" },
+		new() { Id = "lazy-3", Name = "Folder C (fails)" }
+	];
+
+	private readonly List<Node> TemplatedItems =
+	[
+		new() { Id = "home",    Name = "Home",    Detail = "/", Children =
+		[
+			new() { Id = "home-intro", Name = "Intro",    Detail = "section" },
+			new() { Id = "home-cta",   Name = "Call-out", Detail = "section" },
+		] },
+		new() { Id = "pricing", Name = "Pricing", Detail = "/pricing" },
+		new() { Id = "about",   Name = "About",   Detail = "/about" }
+	];
+
+	private async Task<IEnumerable<Node>> LoadChildrenAsync( Node parent )
+	{
+		await Task.Delay( 400 );
+
+		if ( parent.Id == "lazy-3" )
+			throw new InvalidOperationException( "Simulated failure" );
+
+		return
+		[
+			new() { Id = $"{parent.Id}-child-1", Name = "Loaded child 1" },
+			new() { Id = $"{parent.Id}-child-2", Name = "Loaded child 2" }
+		];
+	}
+
+	private const string BasicCode = @"<TreeView TItem=""Node""
+		  Items=""_items""
+		  GetItemValue=""n => n.Id""
+		  GetItemText=""n => n.Name""
+		  GetItemChildren=""n => n.Children""
+		  SelectionMode=""TreeSelectionMode.Single""
+		  DefaultExpandedDepth=""1"" />";
+
+	private const string IconsCode = @"<TreeView TItem=""Node""
+		  Items=""_items""
+		  GetItemValue=""n => n.Id""
+		  GetItemText=""n => n.Name""
+		  GetItemChildren=""n => n.Children""
+		  GetItemIcon=""n => n.Icon""
+		  GetItemBadge=""n => n.Children?.Count > 0 ? n.Children.Count.ToString() : null""
+		  DefaultExpandAll />";
+
+	private const string CheckboxesCode = @"<TreeView TItem=""Node""
+		  Items=""_items""
+		  GetItemValue=""n => n.Id""
+		  GetItemText=""n => n.Name""
+		  GetItemChildren=""n => n.Children""
+		  Checkable CascadeChecks
+		  @bind-CheckedValues=""_checked""
+		  DefaultExpandAll />";
+
+	private const string SearchCode = @"<TreeView TItem=""Node""
+		  Items=""_items""
+		  GetItemValue=""n => n.Id""
+		  GetItemText=""n => n.Name""
+		  GetItemChildren=""n => n.Children""
+		  ShowSearch
+		  SearchPlaceholder=""Find a component..."" />";
+
+	private const string LazyCode = @"<TreeView TItem=""Node""
+		  Items=""_items""
+		  GetItemValue=""n => n.Id""
+		  GetItemText=""n => n.Name""
+		  GetItemChildren=""n => n.Children""
+		  GetItemHasChildren=""n => true""
+		  OnLoadChildren=""LoadChildrenAsync"" />";
+
+	private const string TemplatesCode = @"<TreeView TItem=""Node""
+		  @ref=""_treeRef""
+		  Items=""_items""
+		  GetItemValue=""n => n.Id""
+		  GetItemText=""n => n.Name""
+		  GetItemChildren=""n => n.Children""
+		  ShowConnectorLines>
+	<LabelTemplate>
+		<span class=""font-medium"">@context.Name</span>
+	</LabelTemplate>
+	<ActionsTemplate>
+		<Button Size=""ButtonSize.IconXs"" Variant=""ButtonVariant.Ghost"">
+			<Icon Svg=""@IconSvg.Information"" IconSize=""IconSize.Sm"" />
+		</Button>
+	</ActionsTemplate>
+</TreeView>";
+
+	private static readonly ApiElement[] TreeViewElements =
+	[
+		new ApiElement(
+			Name: "TreeView",
+			Description: "Generic hierarchical list. Supply `Items` plus `GetItemValue`/`GetItemText`/`GetItemChildren` lambdas to project any object graph into the tree; opt into selection, checkboxes, search, and lazy loading via the remaining parameters.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "TItem",                 "type parameter",                      true,  "Item type rendered by the tree. Declared inline (e.g. `TItem=\"Node\"`)." ),
+				new ApiProperty( "Items",                 "IEnumerable<TItem>",                  true,  "Root-level items." ),
+				new ApiProperty( "GetItemValue",          "Func<TItem, string>",                 true,  "Returns the unique string identifier for an item; used for selection, expansion, and checked sets." ),
+				new ApiProperty( "GetItemText",           "Func<TItem, string>?",                false, "Returns the display text. Falls back to `item.ToString()` when null." ),
+				new ApiProperty( "GetItemChildren",       "Func<TItem, IEnumerable<TItem>?>?",   false, "Returns an item's children. Null or empty means leaf." ),
+				new ApiProperty( "GetItemHasChildren",    "Func<TItem, bool>?",                  false, "Overrides leaf detection; use with `OnLoadChildren` to declare expandability before children load." ),
+				new ApiProperty( "GetItemDisabled",       "Func<TItem, bool>?",                  false, "Per-item disabled check. Default: all items enabled." ),
+				new ApiProperty( "GetItemIcon",           "Func<TItem, string?>?",               false, "Per-item `IconSvg` path rendered before the label." ),
+				new ApiProperty( "GetItemBadge",          "Func<TItem, string?>?",               false, "Per-item `Badge` text shown after the label. Null hides the badge." ),
+				new ApiProperty( "ExpandedValues",        "ISet<string>?",                       false, "Controlled set of expanded item values. Use with `ExpandedValuesChanged` for two-way binding." ),
+				new ApiProperty( "ExpandedValuesChanged", "EventCallback<ISet<string>>",         false, "Fires when the expanded set changes." ),
+				new ApiProperty( "DefaultExpandAll",      "bool",                                false, "Seed every expandable node as open on first render. Default: `false`." ),
+				new ApiProperty( "DefaultExpandedDepth",  "int?",                                false, "Seed nodes up to this depth as open on first render. Ignored if `DefaultExpandAll` is set." ),
+				new ApiProperty( "SelectionMode",         "TreeSelectionMode",                   false, "Selection behaviour. Default: `TreeSelectionMode.None`. Other values: `Single`, `Multiple`." ),
+				new ApiProperty( "SelectedValue",         "string?",                             false, "Controlled single selection value. Use with `SelectedValueChanged`." ),
+				new ApiProperty( "SelectedValueChanged",  "EventCallback<string?>",              false, "Fires when the single selection changes." ),
+				new ApiProperty( "SelectedValues",        "ISet<string>?",                       false, "Controlled multi-select set. Use with `SelectedValuesChanged`." ),
+				new ApiProperty( "SelectedValuesChanged", "EventCallback<ISet<string>>",         false, "Fires when the multi-select set changes." ),
+				new ApiProperty( "OnItemSelected",        "EventCallback<TItem>",                false, "Raised whenever a row is clicked, regardless of `SelectionMode`." ),
+				new ApiProperty( "Checkable",             "bool",                                false, "Show a checkbox in front of every row. Default: `false`." ),
+				new ApiProperty( "CascadeChecks",         "bool",                                false, "Toggling a parent toggles all descendants and folds indeterminate state up. Default: `true`." ),
+				new ApiProperty( "CheckedValues",         "ISet<string>?",                       false, "Controlled checked set. Use with `CheckedValuesChanged` or `@bind-CheckedValues`." ),
+				new ApiProperty( "CheckedValuesChanged",  "EventCallback<ISet<string>>",         false, "Fires when the checked set changes." ),
+				new ApiProperty( "OnLoadChildren",        "Func<TItem, Task<IEnumerable<TItem>>>?", false, "Async children provider. Invoked on first expand for nodes with no eager children; failures render a retry row." ),
+				new ApiProperty( "ShowSearch",            "bool",                                false, "Show a `SearchInput` above the tree. Default: `false`." ),
+				new ApiProperty( "SearchPlaceholder",     "string",                              false, "Placeholder for the search input. Default: `\"Search...\"`." ),
+				new ApiProperty( "SearchText",            "string?",                             false, "Controlled search text. Use with `SearchTextChanged`." ),
+				new ApiProperty( "SearchTextChanged",     "EventCallback<string?>",              false, "Fires when the search text changes." ),
+				new ApiProperty( "SearchDebounceMs",      "int",                                 false, "Debounce window on search input in milliseconds. Default: `200`." ),
+				new ApiProperty( "NoResultsTemplate",     "RenderFragment?",                     false, "Custom content for the empty search state. Falls back to a muted \"No matches.\" line." ),
+				new ApiProperty( "ShowIcons",             "bool",                                false, "Globally suppresses per-item icons when false. Default: `true`." ),
+				new ApiProperty( "EnableRowHover",        "bool",                                false, "Apply the hover highlight on rows. Default: `true`." ),
+				new ApiProperty( "ShowConnectorLines",    "bool",                                false, "Draw vertical guide lines between parent and child rows. Default: `false`." ),
+				new ApiProperty( "ClassName",             "string?",                             false, "Extra CSS classes appended to the outer container." ),
+				new ApiProperty( "AriaLabel",             "string?",                             false, "Accessible name applied to the `role=\"tree\"` container." ),
+				new ApiProperty( "LabelTemplate",         "RenderFragment<TItem>?",              false, "Custom label renderer; receives the item as `context`." ),
+				new ApiProperty( "ActionsTemplate",       "RenderFragment<TItem>?",              false, "Per-row action slot revealed on hover; receives the item as `context`." ),
+				new ApiProperty( "EmptyTemplate",         "RenderFragment?",                     false, "Custom content shown when `Items` is empty. Falls back to a muted \"No items.\" line." ),
+			]
+		),
+	];
+}

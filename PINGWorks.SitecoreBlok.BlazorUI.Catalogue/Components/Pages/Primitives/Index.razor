@@ -1,0 +1,72 @@
+@page "/primitives"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@inject MigrationStatusService Migration
+
+<PageTitle>Primitives - Blok Blazor</PageTitle>
+
+<div class="space-y-8 py-4">
+	<div>
+		<h1 class="text-3xl font-bold tracking-tight">Primitives</h1>
+		<p class="text-muted-foreground mt-2 text-base">
+			Reusable Blazor components ported from the Sitecore Blok design system.
+		</p>
+	</div>
+
+	<Separator />
+
+	@foreach ( var group in Grouped )
+	{
+		<div class="space-y-2">
+			<h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">@group.Key</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+				@foreach ( var item in group.Value )
+				{
+					<a href="@($"primitives/{item.Name.ToLowerInvariant()}")" class="group no-underline">
+						<div class="rounded-lg border border-border p-4 bg-background hover:border-primary/50 hover:shadow-sm transition-all">
+							<div class="flex items-center gap-2">
+								<p class="text-sm font-medium text-foreground group-hover:text-primary transition-colors flex-1 truncate">@item.Name</p>
+								@if ( item.Status == ComponentStatus.Improved )
+								{
+									<Badge ColorScheme="BadgeColor.Blue" Size="BadgeSize.Sm">Improved</Badge>
+								}
+								else if ( item.Status == ComponentStatus.Additional )
+								{
+									<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Additional</Badge>
+								}
+							</div>
+							<p class="text-xs text-muted-foreground mt-1 line-clamp-1">@item.Description</p>
+						</div>
+					</a>
+				}
+			</div>
+		</div>
+	}
+</div>
+
+@code {
+	private sealed record PrimitiveEntry( string Name, string Description, ComponentStatus? Status );
+
+	// Cross-reference stub pages (rendered in the Catalogue but not tracked in MIGRATION_STATUS.md).
+	// Keep this list tiny — each entry needs a real page under Primitives/{Name}Page.razor.
+	private static readonly PrimitiveEntry[] Stubs =
+	[
+		new( "Navigation (Side)", "Cross-reference: BlazorUI calls this Sidebar", null ),
+		new( "Navigation (Stack)", "Cross-reference: BlazorUI calls this StackNavigation", null ),
+		new( "Sonner", "Cross-reference: BlazorUI calls this Toaster", null ),
+	];
+
+	private SortedDictionary<string, PrimitiveEntry[]> Grouped => Build();
+
+	private SortedDictionary<string, PrimitiveEntry[]> Build()
+	{
+		var all = Migration.Ported
+			.Select( e => new PrimitiveEntry( e.Name, e.Description, e.Status ) )
+			.Concat( Stubs )
+			.OrderBy( e => e.Name, StringComparer.OrdinalIgnoreCase );
+
+		return new SortedDictionary<string, PrimitiveEntry[]>(
+			all.GroupBy( p => p.Name[ ..1 ].ToUpperInvariant() )
+			   .ToDictionary( g => g.Key, g => g.ToArray() )
+		);
+	}
+}

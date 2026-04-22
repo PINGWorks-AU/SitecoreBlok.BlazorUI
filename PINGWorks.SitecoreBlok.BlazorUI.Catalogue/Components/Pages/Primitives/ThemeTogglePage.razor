@@ -1,0 +1,66 @@
+@page "/primitives/themetoggle"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="ThemeToggle" Description="A one-click light/dark mode switcher. Writes the selected mode to localStorage and applies the dark class to any data-dark-mode-target element. Re-applies the stored preference after Blazor enhanced navigations."
+			   Interactivity="ComponentInteractivity.Interactive" RequiresScripts="true" ApiElements="@ThemeToggleElements">
+
+	<InstallationNote>
+		<ol class="list-decimal pl-5 space-y-1">
+			<li>
+				Register the BlazorUI services in <code class="text-xs bg-muted px-1 py-0.5 rounded">Program.cs</code> — this provides the scoped <code class="text-xs bg-muted px-1 py-0.5 rounded">GlobalTheme</code> state that ThemeToggle binds to:
+				<CodeViewer Code="@("builder.Services.AddSitecoreBlokUI();")" Language="CodeLanguage.CSharp" ClassName="!mt-2" />
+			</li>
+			<li>
+				Place the <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;ThemeToggleStartupScript /&gt;</code> inside <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;head&gt;</code> in <code class="text-xs bg-muted px-1 py-0.5 rounded">App.razor</code>. It runs synchronously before body parse and applies the stored theme to <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;html&gt;</code>, preventing a flash of light content on load:
+				<CodeViewer Code="@("<head>\n    ...\n    <ThemeToggleStartupScript />\n</head>")" Language="CodeLanguage.Razor" ClassName="!mt-2" />
+			</li>
+			<li>
+				Mark the element you want the <code class="text-xs bg-muted px-1 py-0.5 rounded">dark</code> class applied to with <code class="text-xs bg-muted px-1 py-0.5 rounded">data-dark-mode-target</code> — usually the root of your <code class="text-xs bg-muted px-1 py-0.5 rounded">MainLayout</code>:
+				<CodeViewer Code="@("<div data-dark-mode-target class=\"text-foreground\">\n    @Body\n</div>")" Language="CodeLanguage.Razor" ClassName="!mt-2" />
+			</li>
+			<li>Drop <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;ThemeToggle /&gt;</code> into your header or anywhere else you want the switcher to live.</li>
+		</ol>
+	</InstallationNote>
+
+	<DivergenceNote>
+		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> Blok ships a theme toggle as a one-off site-chrome component within their docs site. We package the equivalent here as a reusable BlazorUI primitive that any consumer can drop in.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<ThemeToggle />")">
+			<ThemeToggle />
+		</ComponentExample>
+
+		<ComponentExample Title="How it works" Code="@("<!-- In your layout, wrap the content you want to theme: -->\n<div data-dark-mode-target>\n    <!-- page content -->\n</div>\n\n<!-- Place the toggle once, typically in the header: -->\n<ThemeToggle />")">
+			<div class="space-y-3 text-sm text-muted-foreground">
+				<p>Add the <code>data-dark-mode-target</code> attribute to any container you want the <code>dark</code> class applied to (commonly the root layout element). The toggle writes the user's selection to <code>localStorage.displayMode</code> so it survives reloads.</p>
+				<p>The toggle subscribes to Blazor's <code>enhancedload</code> event and re-applies the stored preference after every enhanced navigation — without this, the server-rendered HTML diff would strip the <code>dark</code> class during client-side route changes.</p>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ThemeToggleElements =
+	[
+		new ApiElement(
+			Name: "ThemeToggle",
+			Description: "A small `Toggle`-based sun/moon switcher that flips the scoped `GlobalTheme` between light and dark, and persists the choice in `localStorage`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName", "string?", false, "Extra CSS classes appended to the underlying `Toggle` button." ),
+			]
+		),
+		new ApiElement(
+			Name: "ThemeToggleStartupScript",
+			Description: "Inline `<script>` that reads `localStorage.displayMode` and applies the `dark` class to `<html>` before the body parses, preventing a flash of light-themed content on first paint. Drop it inside `<head>` once per app.",
+			Depth: 0,
+			Properties: []
+		),
+	];
+}

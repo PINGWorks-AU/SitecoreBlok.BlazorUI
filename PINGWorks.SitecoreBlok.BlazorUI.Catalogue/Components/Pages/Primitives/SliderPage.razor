@@ -1,0 +1,66 @@
+@page "/primitives/slider"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Slider" Description="An input where the user selects a value from within a given range" Interactivity="ComponentInteractivity.Interactive" ApiElements="@SliderElements">
+
+	<DivergenceNote>
+		<p><strong>Single-thumb only — no range/multi-thumb support.</strong> Blok's Radix-based Slider accepts <code>value</code>/<code>defaultValue</code> as an array of numbers, rendering one thumb per array entry for range selection. Ours takes a single <code>double Value</code> with two-way binding. If you need a range, compose two sliders side-by-side with coordinated min/max. No vertical orientation either — Blok supports it via Radix.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Slider @bind-Value=\"sliderValue\" />")">
+			<div class="space-y-4">
+				<Slider @bind-Value="SliderValue" />
+				<p class="text-sm text-muted-foreground">Value: @SliderValue</p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With Value Display" Code="@("<div class=\"flex items-center gap-4\">\n    <Slider @bind-Value=\"displayValue\" ClassName=\"flex-1\" />\n    <Badge>@displayValue%</Badge>\n</div>")">
+			<div class="flex items-center gap-4">
+				<Slider @bind-Value="DisplayValue" ClassName="flex-1" />
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Lg">@DisplayValue%</Badge>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Custom Range" Code="@("<Slider @bind-Value=\"tempValue\" Min=\"-20\" Max=\"50\" Step=\"0.5\" />")">
+			<div class="space-y-4">
+				<Slider @bind-Value="TempValue" Min="-20" Max="50" Step="0.5" />
+				<p class="text-sm text-muted-foreground">Temperature: @(TempValue.ToString("F1"))°C</p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Slider Value=\"30\" Disabled />")">
+			<Slider Value="30" Disabled />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private double SliderValue = 50;
+	private double DisplayValue = 75;
+	private double TempValue = 22;
+
+	private static readonly ApiElement[] SliderElements =
+	[
+		new ApiElement(
+			Name: "Slider",
+			Description: "Single-thumb range input. Pairs a decorative track/range/thumb with a transparent native `<input type=\"range\">` for input handling. Use `@bind-Value` for two-way binding.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",                "double",                        false, "Current value. Default: `0`. Use with `ValueChanged` or `@bind-Value` for two-way binding." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<double>",         false, "Invoked whenever the thumb moves, with the new value." ),
+				new ApiProperty( "Min",                  "double",                        false, "Minimum selectable value. Default: `0`." ),
+				new ApiProperty( "Max",                  "double",                        false, "Maximum selectable value. Default: `100`." ),
+				new ApiProperty( "Step",                 "double",                        false, "Increment between selectable values. Default: `1`." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, the slider is non-interactive and visually muted. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the slider's outer container." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the underlying `<input type=\"range\">`." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,247 @@
+@page "/primitives/stacknavigation"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="StackNavigation" Description="Icon-and-label navigation rail with vertical or horizontal orientation" Interactivity="ComponentInteractivity.Interactive" ApiElements="@StackNavigationElements">
+
+	<DivergenceNote>
+		<p><strong><code>Icon</code> is a <code>RenderFragment</code>, not a string path.</strong> Blok's <code>icon: ReactNode</code> accepts any React element. The Blazor equivalent is <code>RenderFragment</code>, so items take a pre-built content fragment rather than an icon-path string. This lets you compose any inline markup (our <code>Icon</code> component, a custom SVG, a colored dot, an emoji) without a separate integration.</p>
+		<p><strong><code>OnItemClick</code> uses an event-args object with <code>PreventDefault</code>.</strong> Blok's callback returns <code>false</code> to cancel navigation via <code>e.preventDefault()</code>. Blazor's event model runs the C# callback after the browser has already scheduled the navigation, so we instead pass a <code>StackNavigationItemClickedEventArgs</code> whose <code>PreventDefault</code> property your handler can set to <code>true</code>. When the callback is wired, we short-circuit the <code>&lt;a&gt;</code> default via <code>@@onclick:preventDefault</code> and drive the navigation ourselves via <code>NavigationManager</code>, honouring your <code>PreventDefault</code> choice.</p>
+		<p><strong>Active-item detection uses Blazor's <code>NavigationManager</code>.</strong> Blok reads <code>window.location.pathname</code> via a <code>useEffect</code> if no <code>pathname</code> prop is supplied. We inject <code>NavigationManager</code> and compute the current path from its <code>Uri</code> as a fallback. Supply the <code>Pathname</code> parameter explicitly if you'd rather drive highlighting from a router state or a bound property.</p>
+		<p><strong>Thin styled vertical scrollbar; horizontal scroll suppressed; items never clip.</strong> Blok uses <code>overflow-auto</code> on the scrollable body, which both triggers a horizontal scrollbar when a long label ellipsizes AND lets the vertical scrollbar claim 16px off the items' available width — the <code>min-w-14</code> items then clip against it. BlazorUI substitutes <code>overflow-y-auto overflow-x-hidden</code> (no horizontal scroll) and reserves a stable 6px gutter on the body via <code>scrollbar-gutter:stable</code>. A <code>-mr-1.5</code> on the same body extends the scrollable viewport into what was the rail's right padding, so the scrollbar sits at the rail's outer right edge rather than crowding the items. Webkit/Chromium/Edge styling mirrors <code>ScrollArea</code> (<code>bg-border</code> thumb, transparent track, rounded-full thumb, no scrollbar buttons); Firefox uses <code>scrollbar-width:thin</code>.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+	<ComponentExample Title="Vertical (default)" Code="@(@"<StackNavigation Items=""@items"" Pathname=""/home"" />
+
+@code {
+    private List<StackNavigationElement> items =
+    [
+        new StackNavigationItem { Name = ""Home"",     Path = ""/home"",     Icon = Ico(IconSvg.HomeOutline) },
+        new StackNavigationItem { Name = ""Search"",   Path = ""/search"",   Icon = Ico(IconSvg.Magnify) },
+        new StackNavigationItem { Name = ""Docs"",     Path = ""/docs"",     Icon = Ico(IconSvg.FileDocumentOutline) },
+        new StackNavigationDivider(),
+        new StackNavigationItem { Name = ""Settings"", Path = ""/settings"", Icon = Ico(IconSvg.CogOutline) },
+    ];
+
+    private static RenderFragment Ico(string svg) => @@<Icon Svg=""@svg"" Size=""IconSize.Md"" />;
+}")">
+		<div class="flex h-96 border rounded-lg overflow-hidden bg-muted">
+			<StackNavigation Items="@VerticalItems" Pathname="/home" />
+			<div class="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+				Main content
+			</div>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="Primary color scheme with active item" Code="@(@"<StackNavigation Items=""@items"" ColorScheme=""StackNavigationColorScheme.Primary"" Pathname=""/projects"" />")">
+		<div class="flex h-96 border rounded-lg overflow-hidden bg-muted">
+			<StackNavigation Items="@VerticalItems" ColorScheme="StackNavigationColorScheme.Primary" Pathname="/projects" />
+			<div class="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+				Main content (Projects active)
+			</div>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="With badge" Code="@(@"<StackNavigation Items=""@items"" Pathname=""/inbox"" />
+
+@code {
+    private List<StackNavigationElement> items =
+    [
+        new StackNavigationItem { Name = ""Home"",   Path = ""/home"",   Icon = Ico(IconSvg.HomeOutline) },
+        new StackNavigationItem { Name = ""Inbox"",  Path = ""/inbox"",  Icon = Ico(IconSvg.EmailOutline),
+                                  Badge = @@<Badge Size=""BadgeSize.Sm"" ColorScheme=""BadgeColor.Danger"">3</Badge> },
+        new StackNavigationItem { Name = ""Bell"",   Path = ""/alerts"", Icon = Ico(IconSvg.BellOutline),
+                                  Badge = @@<Badge Size=""BadgeSize.Sm"">12</Badge> },
+    ];
+}")">
+		<div class="flex h-80 border rounded-lg overflow-hidden bg-muted">
+			<StackNavigation Items="@BadgeItems" Pathname="/inbox" />
+			<div class="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+				Badges render top-right (vertical orientation only)
+			</div>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="With header and footer" Code="@(@"<StackNavigation Items=""@items"" Pathname=""/home"">
+    <Header>
+        <div class=""w-9 h-9 rounded-md bg-primary text-white flex items-center justify-center font-bold my-2"">B</div>
+    </Header>
+    <Footer>
+        v1.0.0
+    </Footer>
+</StackNavigation>")">
+		<div class="flex h-96 border rounded-lg overflow-hidden bg-muted">
+			<StackNavigation Items="@VerticalItems" Pathname="/home">
+				<Header>
+					<div class="w-9 h-9 rounded-md bg-primary text-white flex items-center justify-center font-bold my-2">B</div>
+				</Header>
+				<Footer>
+					v1.0.0
+				</Footer>
+			</StackNavigation>
+			<div class="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+				Main content
+			</div>
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="Horizontal orientation" Code="@(@"<StackNavigation Items=""@items"" Orientation=""StackNavigationOrientation.Horizontal"" Pathname=""/search"" />")">
+		<div class="border rounded-lg overflow-hidden">
+			<StackNavigation Items="@VerticalItems" Orientation="StackNavigationOrientation.Horizontal" Pathname="/search" />
+		</div>
+	</ComponentExample>
+
+	<ComponentExample Title="OnItemClick callback (intercepts navigation)"
+		Code="@(@"<StackNavigation Items=""@items"" Pathname=""@current"" OnItemClick=""HandleClick"" />
+
+@code {
+    private string current = ""/home"";
+    private string? lastClicked;
+
+    private void HandleClick(StackNavigationItemClickedEventArgs e)
+    {
+        lastClicked = e.Item.Name;
+        current = e.Item.Path;
+        e.PreventDefault = true; // don't actually navigate; update local state instead
+    }
+}")">
+		<div class="flex h-80 border rounded-lg overflow-hidden bg-muted">
+			<StackNavigation Items="@VerticalItems" Pathname="@CurrentPath" OnItemClick="@HandleClick" />
+			<div class="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+				<div class="text-center">
+					<div>Active: <code class="font-mono text-foreground">@CurrentPath</code></div>
+					@if ( LastClicked is not null )
+					{
+						<div class="mt-2">Last clicked: <code class="font-mono text-foreground">@LastClicked</code></div>
+					}
+				</div>
+			</div>
+		</div>
+	</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string CurrentPath = "/home";
+	private string? LastClicked;
+
+	private void HandleClick( StackNavigationItemClickedEventArgs e )
+	{
+		LastClicked = e.Item.Name;
+		CurrentPath = e.Item.Path;
+		e.PreventDefault = true;
+	}
+
+	private static RenderFragment IconFragment( string svg ) => builder =>
+	{
+		builder.OpenComponent<Icon>( 0 );
+		builder.AddAttribute( 1, "Svg", svg );
+		builder.AddAttribute( 2, "Size", IconSize.Md );
+		builder.CloseComponent();
+	};
+
+	private List<StackNavigationElement> VerticalItems =>
+	[
+		new StackNavigationItem { Name = "Home",     Path = "/home",     Icon = IconFragment( IconSvg.HomeOutline ) },
+		new StackNavigationItem { Name = "Search",   Path = "/search",   Icon = IconFragment( IconSvg.Magnify ) },
+		new StackNavigationItem { Name = "Projects", Path = "/projects", Icon = IconFragment( IconSvg.FolderOutline ) },
+		new StackNavigationItem { Name = "Docs",     Path = "/docs",     Icon = IconFragment( IconSvg.FileDocumentOutline ) },
+		new StackNavigationDivider(),
+		new StackNavigationItem { Name = "Team",     Path = "/team",     Icon = IconFragment( IconSvg.AccountGroupOutline ) },
+		new StackNavigationItem { Name = "Settings", Path = "/settings", Icon = IconFragment( IconSvg.CogOutline ) },
+	];
+
+	private List<StackNavigationElement> BadgeItems =>
+	[
+		new StackNavigationItem { Name = "Home",  Path = "/home",   Icon = IconFragment( IconSvg.HomeOutline ) },
+		new StackNavigationItem
+		{
+			Name = "Inbox",
+			Path = "/inbox",
+			Icon = IconFragment( IconSvg.EmailOutline ),
+			Badge = builder =>
+			{
+				builder.OpenComponent<Badge>( 0 );
+				builder.AddAttribute( 1, "Size", BadgeSize.Sm );
+				builder.AddAttribute( 2, "ColorScheme", BadgeColor.Danger );
+				builder.AddAttribute( 3, "ChildContent", (RenderFragment)( b => b.AddContent( 0, "3" ) ) );
+				builder.CloseComponent();
+			}
+		},
+		new StackNavigationItem
+		{
+			Name = "Alerts",
+			Path = "/alerts",
+			Icon = IconFragment( IconSvg.BellOutline ),
+			Badge = builder =>
+			{
+				builder.OpenComponent<Badge>( 0 );
+				builder.AddAttribute( 1, "Size", BadgeSize.Sm );
+				builder.AddAttribute( 2, "ChildContent", (RenderFragment)( b => b.AddContent( 0, "12" ) ) );
+				builder.CloseComponent();
+			}
+		},
+	];
+
+	private static readonly ApiElement[] StackNavigationElements =
+	[
+		new ApiElement(
+			Name: "StackNavigation",
+			Description: "Icon-and-label navigation rail. Renders `StackNavigationItem` entries and `StackNavigationDivider` separators from the `Items` list, supports optional `Header`/`Footer` slots, and highlights the item whose `Path` matches the current URL.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Items",                "List<StackNavigationElement>",                      true,  "The items to render. Each entry is either a `StackNavigationItem` (clickable rail item) or a `StackNavigationDivider`." ),
+				new ApiProperty( "Orientation",          "StackNavigationOrientation",                        false, "Rail orientation. Default: `StackNavigationOrientation.Vertical`. Other value: `Horizontal`." ),
+				new ApiProperty( "ColorScheme",          "StackNavigationColorScheme",                        false, "Active-item colour palette. Default: `StackNavigationColorScheme.Neutral`. Other value: `Primary`." ),
+				new ApiProperty( "Pathname",             "string?",                                           false, "Path to compare against each item's `Path` for active highlighting. When null, falls back to `NavigationManager.Uri`." ),
+				new ApiProperty( "OnItemClick",          "EventCallback<StackNavigationItemClickedEventArgs>", false, "Invoked before navigation. Set `e.PreventDefault = true` to suppress the navigation and keep handling the click yourself." ),
+				new ApiProperty( "Width",                "string",                                            false, "Tailwind width utility applied when vertical. Default: `w-[72px]`." ),
+				new ApiProperty( "Header",               "RenderFragment?",                                   false, "Optional content rendered above the items (vertical orientation only)." ),
+				new ApiProperty( "Footer",               "RenderFragment?",                                   false, "Optional content rendered below the items (vertical orientation only)." ),
+				new ApiProperty( "RenderItem",           "RenderFragment<StackNavigationItem>?",              false, "Overrides the default per-item markup. Receives the item and should render its full row." ),
+				new ApiProperty( "RenderDivider",        "RenderFragment<StackNavigationDivider>?",           false, "Overrides the default divider markup." ),
+				new ApiProperty( "ClassName",            "string?",                                           false, "Extra CSS classes appended to the `<aside>`. Supplying `shadow-none` drops the default `shadow-base`." ),
+				new ApiProperty( "NavClassName",         "string?",                                           false, "Extra CSS classes appended to the inner `<nav>` that wraps the items." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",                       false, "Captured unmatched attributes, forwarded to the `<aside>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "StackNavigationItem",
+			Description: "A clickable rail entry. Record passed into `StackNavigation.Items`; not a Blazor component.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Name",      "string",          true,  "Visible label shown under the icon." ),
+				new ApiProperty( "Path",      "string",          true,  "Target URL. Also used for active-item detection against `Pathname`." ),
+				new ApiProperty( "Icon",      "RenderFragment",  true,  "Icon fragment. Use `Icon` or any inline markup — `RenderFragment` lets you compose freely." ),
+				new ApiProperty( "Badge",     "RenderFragment?", false, "Optional badge rendered at the top-right of the item (vertical orientation only)." ),
+				new ApiProperty( "ClassName", "string?",         false, "Extra CSS classes appended to this item." ),
+			]
+		),
+		new ApiElement(
+			Name: "StackNavigationDivider",
+			Description: "Horizontal (or vertical, when the rail is horizontal) line separator. Record passed into `StackNavigation.Items`; not a Blazor component.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName", "string?", false, "Extra CSS classes appended to the divider element." ),
+			]
+		),
+		new ApiElement(
+			Name: "StackNavigationItemClickedEventArgs",
+			Description: "Payload for `StackNavigation.OnItemClick`. Set `PreventDefault = true` to stop the default navigation.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Item",           "StackNavigationItem", true,  "The item that was clicked." ),
+				new ApiProperty( "Mouse",          "MouseEventArgs",      true,  "The underlying Blazor mouse event." ),
+				new ApiProperty( "PreventDefault", "bool",                false, "Set to `true` in your handler to cancel navigation. Default: `false`." ),
+			]
+		),
+	];
+}

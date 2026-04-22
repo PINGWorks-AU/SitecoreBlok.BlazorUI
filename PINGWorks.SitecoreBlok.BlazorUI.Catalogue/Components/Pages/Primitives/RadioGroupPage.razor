@@ -1,0 +1,70 @@
+@page "/primitives/radiogroup"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="RadioGroup" Description="A set of checkable buttons where only one can be checked at a time" Interactivity="ComponentInteractivity.Interactive" ApiElements="@RadioGroupElements">
+
+	<DivergenceNote>
+		<p><strong>RadioGroupItem wraps the button in a flex row with an optional <code>Label</code> string.</strong> Blok's <code>RadioGroupItem</code> renders only the circular button + indicator and expects consumers to compose an adjacent <code>&lt;label&gt;</code>. We roll the common case (button + label inline) into a single ergonomic helper so Blazor consumers don't repeat the layout boilerplate. The rendered button, its classes, and its <code>data-slot</code> attributes match Blok exactly — the divergence is the outer wrapper and the <code>Label</code> parameter.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<RadioGroup @bind-Value=\"selected\">\n    <RadioGroupItem Value=\"option1\" Label=\"Option One\" />\n    <RadioGroupItem Value=\"option2\" Label=\"Option Two\" />\n    <RadioGroupItem Value=\"option3\" Label=\"Option Three\" />\n</RadioGroup>")">
+			<RadioGroup @bind-Value="Selected">
+				<RadioGroupItem Value="option1" Label="Option One" />
+				<RadioGroupItem Value="option2" Label="Option Two" />
+				<RadioGroupItem Value="option3" Label="Option Three" />
+			</RadioGroup>
+			@if (Selected is not null)
+			{
+				<p class="text-sm text-muted-foreground mt-3">Selected: @Selected</p>
+			}
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<RadioGroup @bind-Value=\"disabledVal\" Disabled>\n    <RadioGroupItem Value=\"a\" Label=\"Alpha\" />\n    <RadioGroupItem Value=\"b\" Label=\"Beta\" />\n    <RadioGroupItem Value=\"c\" Label=\"Gamma\" />\n</RadioGroup>")">
+			<RadioGroup @bind-Value="DisabledVal" Disabled>
+				<RadioGroupItem Value="a" Label="Alpha" />
+				<RadioGroupItem Value="b" Label="Beta" />
+				<RadioGroupItem Value="c" Label="Gamma" />
+			</RadioGroup>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Selected = "option1";
+	private string? DisabledVal = "a";
+
+	private static readonly ApiElement[] RadioGroupElements =
+	[
+		new ApiElement(
+			Name: "RadioGroup",
+			Description: "Root of the radio group. Holds the currently-selected `Value` and cascades itself so each `RadioGroupItem` can report its selection back.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                       false, "The currently-selected item value. Use `@bind-Value` for two-way binding." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Fires when the user selects a different item. Part of the `@bind-Value` pair." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, disables every item in the group. Item-level `Disabled` is unioned with this. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the outer `radiogroup` container." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Should contain one or more `RadioGroupItem` children." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the outer container." ),
+			]
+		),
+		new ApiElement(
+			Name: "RadioGroupItem",
+			Description: "One selectable radio button plus its optional inline `Label`. Clicking the button or the label selects `Value` on the parent `RadioGroup`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string",           true,  "The value this item reports back to the parent `RadioGroup` when selected." ),
+				new ApiProperty( "Label",        "string?",          false, "Inline text label rendered next to the button. Blazor-only convenience — Blok expects consumers to place a separate `<label>`. Default: `null`." ),
+				new ApiProperty( "Disabled",     "bool",             false, "When true, this item cannot be selected even if the parent group is enabled. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the button element." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,47 @@
+@inherits LayoutComponentBase
+
+@* `text-foreground` MUST stay on the data-dark-mode-target wrapper.
+   `.dark` is added to this element by ThemeToggle, which redefines `--color-foreground`
+   for descendants. But CSS variable scoping only flips the COMPUTED color for elements
+   that DIRECTLY use `var(--color-foreground)` — i.e. have `text-foreground` class on
+   themselves. Elements without it inherit the COMPUTED-IN-PARENT-SCOPE value (light
+   mode) and stay dark in dark mode. Putting `text-foreground` here re-resolves the
+   variable in the dark scope, then computed-white cascades to every descendant.
+   Without this class, every inherited-text component renders dark in dark mode. *@
+<div data-dark-mode-target class="text-foreground">
+	<div class="flex h-screen overflow-hidden bg-subtle-bg">
+		<NavMenu />
+
+		<div class="flex-1 flex flex-col min-w-0">
+			<header class="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
+				<div class="flex items-center gap-6 px-8 h-14">
+					<a href="/" class="text-sm font-semibold text-foreground no-underline hover:text-primary transition-colors">Home</a>
+					<nav class="flex items-center gap-4">
+						<a href="/primitives" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Primitives</a>
+						<a href="/graphics/theming" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Theming</a>
+						<a href="/graphics/illustrations" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Illustrations</a>
+						<a href="/graphics/favicons" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Favicons</a>
+						<a href="/graphics/icons" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Icons</a>
+					</nav>
+					<div class="ml-auto flex items-center gap-1">
+						<a href="https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI" target="_blank" rel="noopener noreferrer"
+						   aria-label="View source on GitHub" title="View source on GitHub"
+						   class="inline-flex items-center justify-center h-8 min-w-8 px-1.5 rounded-md text-foreground transition-colors outline-none hover:bg-neutral-bg hover:text-purple-600 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]">
+							<Icon Svg="@IconSvg.Github" ClassName="size-5" />
+						</a>
+						<ThemeToggle @rendermode="InteractiveServer" />
+					</div>
+				</div>
+			</header>
+
+			<main class="flex-1 flex flex-col min-h-0 overflow-hidden">
+				<div class="flex-1 flex flex-col min-h-0 overflow-y-auto px-8 py-8">
+					@Body
+				</div>
+			</main>
+		</div>
+	</div>
+
+	<Popovers @rendermode="InteractiveServer" />
+	<Toaster @rendermode="InteractiveServer" />
+</div>

@@ -1,0 +1,148 @@
+@page "/primitives/sheet"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Sheet" Description="A panel that slides out from the edge of the screen" Interactivity="ComponentInteractivity.Interactive" ApiElements="@SheetElements">
+
+	<DivergenceNote>
+		<p><strong>Trigger collapsed into <code>Open</code> binding; built-in close button.</strong> Blok exports <code>SheetTrigger</code>, <code>SheetClose</code>, and <code>SheetContent</code> as siblings around the root. We collapse trigger and content into <code>&lt;Sheet Open Side&gt;</code> — drive open/close with <code>Open</code>/<code>OpenChanged</code> two-way binding, and the content panel includes a hardcoded close button (matches Blok's default content template). <code>SheetHeader</code>, <code>SheetFooter</code>, <code>SheetTitle</code>, <code>SheetDescription</code>, and <code>SheetClose</code> remain for composition inside the panel. No focus trap, no <kbd>Esc</kbd>-to-close (Blok gets those via Radix).</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Right side (default)" Code="@("<Button Click=\"@(() => rightOpen = true)\">Open Right Sheet</Button>\n<Sheet @bind-Open=\"rightOpen\">\n    <SheetHeader>\n        <SheetTitle>Sheet Title</SheetTitle>\n        <SheetDescription>This is a sheet sliding from the right.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Sheet content goes here. You can put any content inside.</p>\n    </div>\n</Sheet>")">
+			<Button Click="@(() => RightOpen = true)">Open Right Sheet</Button>
+			<Sheet @bind-Open="RightOpen">
+				<SheetHeader>
+					<SheetTitle>Sheet Title</SheetTitle>
+					<SheetDescription>This is a sheet sliding from the right.</SheetDescription>
+				</SheetHeader>
+				<div class="p-4">
+					<p class="text-sm">Sheet content goes here. You can put any content inside.</p>
+				</div>
+			</Sheet>
+		</ComponentExample>
+
+		<ComponentExample Title="Left side" Code="@("<Button Click=\"@(() => leftOpen = true)\">Open Left Sheet</Button>\n<Sheet @bind-Open=\"leftOpen\" Side=\"SheetSide.Left\">\n    <SheetHeader>\n        <SheetTitle>Navigation</SheetTitle>\n        <SheetDescription>Browse through sections.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Navigation content here.</p>\n    </div>\n</Sheet>")">
+			<Button Click="@(() => LeftOpen = true)">Open Left Sheet</Button>
+			<Sheet @bind-Open="LeftOpen" Side="SheetSide.Left">
+				<SheetHeader>
+					<SheetTitle>Navigation</SheetTitle>
+					<SheetDescription>Browse through sections.</SheetDescription>
+				</SheetHeader>
+				<div class="p-4">
+					<p class="text-sm">Navigation content here.</p>
+				</div>
+			</Sheet>
+		</ComponentExample>
+
+		<ComponentExample Title="Top" Code="@("<Button Click=\"@(() => topOpen = true)\">Open Top Sheet</Button>\n<Sheet @bind-Open=\"topOpen\" Side=\"SheetSide.Top\">\n    <SheetHeader>\n        <SheetTitle>Notification</SheetTitle>\n        <SheetDescription>A banner from the top of the screen.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Top sheet content. Useful for notifications or alerts.</p>\n    </div>\n    <SheetFooter>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\"\n                Click=\"@(() => topOpen = false)\">Dismiss</Button>\n    </SheetFooter>\n</Sheet>")">
+			<Button Click="@(() => TopOpen = true)">Open Top Sheet</Button>
+			<Sheet @bind-Open="TopOpen" Side="SheetSide.Top">
+				<SheetHeader>
+					<SheetTitle>Notification</SheetTitle>
+					<SheetDescription>A banner from the top of the screen.</SheetDescription>
+				</SheetHeader>
+				<div class="p-4">
+					<p class="text-sm">Top sheet content. Useful for notifications or alerts.</p>
+				</div>
+				<SheetFooter>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => TopOpen = false)">Dismiss</Button>
+				</SheetFooter>
+			</Sheet>
+		</ComponentExample>
+
+		<ComponentExample Title="Bottom" Code="@("<Button Click=\"@(() => bottomOpen = true)\">Open Bottom Sheet</Button>\n<Sheet @bind-Open=\"bottomOpen\" Side=\"SheetSide.Bottom\">\n    <SheetHeader>\n        <SheetTitle>Actions</SheetTitle>\n        <SheetDescription>Choose an action from below.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4 space-y-2\">\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Neutral\" ClassName=\"w-full justify-start\">Share</Button>\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Neutral\" ClassName=\"w-full justify-start\">Download</Button>\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Danger\" ClassName=\"w-full justify-start\">Delete</Button>\n    </div>\n</Sheet>")">
+			<Button Click="@(() => BottomOpen = true)">Open Bottom Sheet</Button>
+			<Sheet @bind-Open="BottomOpen" Side="SheetSide.Bottom">
+				<SheetHeader>
+					<SheetTitle>Actions</SheetTitle>
+					<SheetDescription>Choose an action from below.</SheetDescription>
+				</SheetHeader>
+				<div class="p-4 space-y-2">
+					<Button Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Neutral" ClassName="w-full justify-start">Share</Button>
+					<Button Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Neutral" ClassName="w-full justify-start">Download</Button>
+					<Button Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Danger" ClassName="w-full justify-start">Delete</Button>
+				</div>
+			</Sheet>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool RightOpen;
+	private bool LeftOpen;
+	private bool TopOpen;
+	private bool BottomOpen;
+
+	private static readonly ApiElement[] SheetElements =
+	[
+		new ApiElement(
+			Name: "Sheet",
+			Description: "Sliding panel anchored to one edge of the viewport. Drives open / close with `Open` + `OpenChanged`, renders its own overlay, and includes a built-in close button.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Open",         "bool",                  false, "Whether the sheet is currently open. Use `@bind-Open` for two-way binding. Default: `false`." ),
+				new ApiProperty( "OpenChanged",  "EventCallback<bool>",   false, "Fires when the sheet is dismissed (overlay click or built-in close). Part of the `@bind-Open` pair." ),
+				new ApiProperty( "Side",         "SheetSide",             false, "Edge to slide from. Default: `SheetSide.Right`. Other values: `Left`, `Top`, `Bottom`." ),
+				new ApiProperty( "ClassName",    "string?",               false, "Extra CSS classes appended to the sheet content container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",       false, "Sheet body. Typically `SheetHeader` + content + optional `SheetFooter`." ),
+			]
+		),
+		new ApiElement(
+			Name: "SheetHeader",
+			Description: "Vertical stack that sits at the top of the sheet. Usually contains `SheetTitle` and `SheetDescription`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the header container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Heading content." ),
+			]
+		),
+		new ApiElement(
+			Name: "SheetTitle",
+			Description: "Semibold heading placed inside the `SheetHeader`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the title container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Title text." ),
+			]
+		),
+		new ApiElement(
+			Name: "SheetDescription",
+			Description: "Muted subheading paragraph placed inside the `SheetHeader`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the description container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Description text." ),
+			]
+		),
+		new ApiElement(
+			Name: "SheetFooter",
+			Description: "Flex row aligned to the right, anchored at the bottom of the sheet. Host for confirmation and cancel actions.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the footer container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Footer content — typically one or more `Button`s." ),
+			]
+		),
+		new ApiElement(
+			Name: "SheetClose",
+			Description: "Optional additional close button you can place anywhere inside the sheet. Note: the sheet already renders a hardcoded close button at the top-right.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked when the close button is clicked. Wire this to set your `Open` flag to `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Button content — typically an icon or label." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<button>`." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,80 @@
+@page "/graphics/illustrations"
+@rendermode InteractiveServer
+@using Icons = PINGWorks.SitecoreBlok.BlazorUI.Icons
+
+<ComponentPage Title="Illustrations" Description="Color and neutral SVG illustrations bundled for offline use. Access via IllustrationSvg.Color.* and IllustrationSvg.Neutral.*.">
+
+	<Table>
+		<TableHeader>
+			<TableRow>
+				<TableHead>Color</TableHead>
+				<TableHead>Neutral</TableHead>
+				<TableHead>Name</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody>
+			@foreach ( var item in Items )
+			{
+				<TableRow>
+					<TableCell>
+						<div class="w-16 h-16 [&>svg]:w-full [&>svg]:h-full">
+							@((MarkupString)item.Color)
+						</div>
+					</TableCell>
+					<TableCell>
+						<div class="w-16 h-16 [&>svg]:w-full [&>svg]:h-full">
+							@((MarkupString)item.Neutral)
+						</div>
+					</TableCell>
+					<TableCell>
+						<code class="text-sm">IllustrationSvg.Color.@item.Name</code>
+					</TableCell>
+				</TableRow>
+			}
+		</TableBody>
+	</Table>
+
+</ComponentPage>
+
+@code {
+	private static readonly (string Name, string Color, string Neutral)[] Items =
+	[
+		("AccountGroup", Icons.IllustrationSvg.Color.AccountGroup, Icons.IllustrationSvg.Neutral.AccountGroup),
+		("Ai", Icons.IllustrationSvg.Color.Ai, Icons.IllustrationSvg.Neutral.Ai),
+		("Alert", Icons.IllustrationSvg.Color.Alert, Icons.IllustrationSvg.Neutral.Alert),
+		("AlertCircle", Icons.IllustrationSvg.Color.AlertCircle, Icons.IllustrationSvg.Neutral.AlertCircle),
+		("BellRing", Icons.IllustrationSvg.Color.BellRing, Icons.IllustrationSvg.Neutral.BellRing),
+		("Bullhorn", Icons.IllustrationSvg.Color.Bullhorn, Icons.IllustrationSvg.Neutral.Bullhorn),
+		("Cactus", Icons.IllustrationSvg.Color.Cactus, Icons.IllustrationSvg.Neutral.Cactus),
+		("Calendar", Icons.IllustrationSvg.Color.Calendar, Icons.IllustrationSvg.Neutral.Calendar),
+		("CheckCircle", Icons.IllustrationSvg.Color.CheckCircle, Icons.IllustrationSvg.Neutral.CheckCircle),
+		("Clipboard", Icons.IllustrationSvg.Color.Clipboard, Icons.IllustrationSvg.Neutral.Clipboard),
+		("CloudArrowUp", Icons.IllustrationSvg.Color.CloudArrowUp, Icons.IllustrationSvg.Neutral.CloudArrowUp),
+		("Compass", Icons.IllustrationSvg.Color.Compass, Icons.IllustrationSvg.Neutral.Compass),
+		("Connection", Icons.IllustrationSvg.Color.Connection, Icons.IllustrationSvg.Neutral.Connection),
+		("Crown", Icons.IllustrationSvg.Color.Crown, Icons.IllustrationSvg.Neutral.Crown),
+		("EmailNewsletter", Icons.IllustrationSvg.Color.EmailNewsletter, Icons.IllustrationSvg.Neutral.EmailNewsletter),
+		("Feather", Icons.IllustrationSvg.Color.Feather, Icons.IllustrationSvg.Neutral.Feather),
+		("FileUpload", Icons.IllustrationSvg.Color.FileUpload, Icons.IllustrationSvg.Neutral.FileUpload),
+		("HelpCircle", Icons.IllustrationSvg.Color.HelpCircle, Icons.IllustrationSvg.Neutral.HelpCircle),
+		("Inbox", Icons.IllustrationSvg.Color.Inbox, Icons.IllustrationSvg.Neutral.Inbox),
+		("KeyChain", Icons.IllustrationSvg.Color.KeyChain, Icons.IllustrationSvg.Neutral.KeyChain),
+		("Lifebuoy", Icons.IllustrationSvg.Color.Lifebuoy, Icons.IllustrationSvg.Neutral.Lifebuoy),
+		("Lightbulb", Icons.IllustrationSvg.Color.Lightbulb, Icons.IllustrationSvg.Neutral.Lightbulb),
+		("Lock", Icons.IllustrationSvg.Color.Lock, Icons.IllustrationSvg.Neutral.Lock),
+		("Magnify", Icons.IllustrationSvg.Color.Magnify, Icons.IllustrationSvg.Neutral.Magnify),
+		("MagnifyClose", Icons.IllustrationSvg.Color.MagnifyClose, Icons.IllustrationSvg.Neutral.MagnifyClose),
+		("MapSearch", Icons.IllustrationSvg.Color.MapSearch, Icons.IllustrationSvg.Neutral.MapSearch),
+		("PartyPopper", Icons.IllustrationSvg.Color.PartyPopper, Icons.IllustrationSvg.Neutral.PartyPopper),
+		("Puzzle", Icons.IllustrationSvg.Color.Puzzle, Icons.IllustrationSvg.Neutral.Puzzle),
+		("RocketLaunch", Icons.IllustrationSvg.Color.RocketLaunch, Icons.IllustrationSvg.Neutral.RocketLaunch),
+		("Routes", Icons.IllustrationSvg.Color.Routes, Icons.IllustrationSvg.Neutral.Routes),
+		("ShieldLock", Icons.IllustrationSvg.Color.ShieldLock, Icons.IllustrationSvg.Neutral.ShieldLock),
+		("Star", Icons.IllustrationSvg.Color.Star, Icons.IllustrationSvg.Neutral.Star),
+		("Stop", Icons.IllustrationSvg.Color.Stop, Icons.IllustrationSvg.Neutral.Stop),
+		("TestTube", Icons.IllustrationSvg.Color.TestTube, Icons.IllustrationSvg.Neutral.TestTube),
+		("ToyBrick", Icons.IllustrationSvg.Color.ToyBrick, Icons.IllustrationSvg.Neutral.ToyBrick),
+		("User", Icons.IllustrationSvg.Color.User, Icons.IllustrationSvg.Neutral.User),
+		("WrenchClock", Icons.IllustrationSvg.Color.WrenchClock, Icons.IllustrationSvg.Neutral.WrenchClock),
+	];
+}

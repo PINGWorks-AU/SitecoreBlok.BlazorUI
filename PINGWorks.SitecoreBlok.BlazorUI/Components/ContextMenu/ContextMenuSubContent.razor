@@ -1,0 +1,49 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@if ( Parent.IsOpen )
+{
+	<div @ref="Ref" data-slot="context-menu-sub-content" class="@CssClass"
+		 style="left:@(Parent.Left)px;top:@(Parent.Top)px;@( Parent.IsPositioned ? null : "visibility:hidden;" )"
+		 @onmouseenter="OnEnter" @onmouseleave="OnLeave">
+		@ChildContent
+	</div>
+}
+
+@code {
+	[CascadingParameter] public required ContextMenuSub Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private ElementReference Ref;
+	private IJSObjectReference? Module;
+
+	private string CssClass => CssClassBuilder.Start( "fixed bg-popover text-popover-foreground z-50 min-w-[8rem] overflow-hidden rounded-md border p-1 shadow-lg" )
+												.With( ClassName )
+												.Build();
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( Parent.IsOpen && !Parent.IsPositioned )
+		{
+			Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
+			var pos = await Module.InvokeAsync<SubmenuPosition>( "SitecoreUI.calcSubmenuPosition", Ref, Parent.TriggerLeft, Parent.TriggerTop, Parent.TriggerRight );
+			await Parent.UpdatePosition( pos.X, pos.Y );
+		}
+	}
+
+	private async Task OnEnter() => await Parent.Open();
+	private async Task OnLeave() => await Parent.Close();
+
+	private record SubmenuPosition( double X, double Y );
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+}

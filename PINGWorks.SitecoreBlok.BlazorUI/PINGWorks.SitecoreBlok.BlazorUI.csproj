@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<Version>1.0.0.0</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
+	<!-- nuGet package properties -->
+	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<EnableDynamicLoading>true</EnableDynamicLoading>
+		<PackageId>PINGWorks.SitecoreBlok.BlazorUI</PackageId>
+		<Title>PING Works Sitecore Blok Blazor UI</Title>
+		<FileVersion>$(Version)</FileVersion>
+		<AssemblyVersion>$(Version)</AssemblyVersion>
+		<PackageVersion>$(Version)</PackageVersion>
+		<Authors>PING Works</Authors>
+		<Company>PING Works</Company>
+		<Product>PING Works dotBRIDGE</Product>
+		<Copyright>Copyright (c) 2026 - PING Works, Australia</Copyright>
+		<PackageTags>dotnet, sitecore, blok, pingworks, dotbridge</PackageTags>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI</PackageProjectUrl>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Description>PING Works' Blazor UI Kit for working with Sitecore's Marketplace. This is an unofficial port of Sitecore Blok UI kit.</Description>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>exclamation-logo.png</PackageIcon>
+		<PackageIconUrl>https://dl.polyglot-app.com/img/exclamation-logo.png</PackageIconUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>
+			v1.0.0
+			Initial release
+		</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="Resources\exclamation-logo.png" Pack="true" PackagePath="/" />
+		<None Include="README.md" Pack="true" PackagePath="/" />
+		<None Include="..\LICENSE" Pack="true" PackagePath="/" />
+		<None Include="ThirdPartyNotices\**" Pack="true" PackagePath="ThirdPartyNotices" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<TailwindCliFileName>tailwindcss-windows-x64.exe</TailwindCliFileName>
+		<TailwindCliPath>$(MSBuildThisFileDirectory)..\$(TailwindCliFileName)</TailwindCliPath>
+		<!-- Override TailwindCliUrl to pin a specific version, e.g. https://github.com/tailwindlabs/tailwindcss/releases/download/v4.1.13/tailwindcss-windows-x64.exe -->
+		<TailwindCliUrl Condition="'$(TailwindCliUrl)' == ''">https://github.com/tailwindlabs/tailwindcss/releases/latest/download/$(TailwindCliFileName)</TailwindCliUrl>
+	</PropertyGroup>
+
+	<Target Name="DownloadTailwindCLI" BeforeTargets="BuildTailwindCSS" Condition="!Exists('$(TailwindCliPath)')">
+		<Message Importance="high" Text="Tailwind CLI not found at $(TailwindCliPath). Downloading from $(TailwindCliUrl)..." />
+		<DownloadFile SourceUrl="$(TailwindCliUrl)" DestinationFolder="$(MSBuildThisFileDirectory).." DestinationFileName="$(TailwindCliFileName)" />
+	</Target>
+
+	<Target Name="BuildTailwindCSS" BeforeTargets="ResolveStaticWebAssetsInputs;Build">
+		<Exec Command="&quot;$(TailwindCliPath)&quot; -i wwwroot/css/blok.css -o wwwroot/css/sitecore-blok.css --minify" WorkingDirectory="$(MSBuildProjectDirectory)" />
+	</Target>
+
+</Project>

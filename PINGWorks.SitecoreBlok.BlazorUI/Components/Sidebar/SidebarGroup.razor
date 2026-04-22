@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="sidebar-group" data-sidebar="group" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "relative flex w-full min-w-0 flex-col gap-2" )
+											.With( ClassName )
+											.Build();
+}

@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<ul data-slot="navigation-menu-list" class="@CssClass">
+	@ChildContent
+</ul>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "group flex flex-1 list-none items-center justify-center gap-1 bg-background text-foreground p-1" )
+										.With( ClassName )
+										.Build();
+}

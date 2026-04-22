@@ -1,0 +1,52 @@
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@inject PageTocRegistry Toc
+@inject NavigationManager Nav
+@implements IDisposable
+
+@if ( Toc.Items.Count > 0 )
+{
+	<nav aria-label="On this page" class="flex w-full min-w-0 flex-col gap-2">
+		<div class="text-xs font-semibold uppercase tracking-wide text-subtle-text">
+			On this page
+		</div>
+		<ul class="flex w-full min-w-0 flex-col gap-1 border-l border-border list-none m-0 p-0">
+			@foreach ( var entry in Toc.Items )
+			{
+				<li class="m-0">
+					<NavigationMenuLink Href="@($"{PagePath}#{entry.Anchor}")"
+										ClassName="@LinkClass( entry.Level )">
+						@entry.Title
+					</NavigationMenuLink>
+				</li>
+			}
+		</ul>
+	</nav>
+}
+
+@code {
+	protected override void OnInitialized()
+	{
+		Toc.OnChange += OnTocChanged;
+	}
+
+	private void OnTocChanged() => InvokeAsync( StateHasChanged );
+
+	public void Dispose()
+	{
+		Toc.OnChange -= OnTocChanged;
+	}
+
+	// `#anchor` alone resolves against <base href="/"> → goes to the home page.
+	// Prefixing the current page's path keeps the fragment click as a same-page scroll.
+	private string PagePath => "/" + Nav.ToBaseRelativePath( Nav.Uri ).Split( '?' )[ 0 ].Split( '#' )[ 0 ];
+
+	// Level 2 (H2) sits flush left and bold; level 3 (H3) indents and uses regular weight.
+	// !px-3 / !pl-6 / !py-1 override NavigationMenuLink's base `p-2` so the link content
+	// aligns with the "On this page" label (both land at 0.75rem from the nav's left edge).
+	private static string LinkClass( int level ) => level switch
+	{
+		2 => "-ml-px border-l border-transparent hover:border-primary !px-3 !py-1 !rounded-none font-semibold",
+		3 => "-ml-px border-l border-transparent hover:border-primary !pl-6 !pr-3 !py-1 !rounded-none font-normal",
+		_ => "-ml-px border-l border-transparent hover:border-primary !px-3 !py-1 !rounded-none font-normal",
+	};
+}

@@ -1,0 +1,198 @@
+@page "/graphics/icons"
+@rendermode InteractiveServer
+@implements IDisposable
+@using System.Reflection
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@using Icons = PINGWorks.SitecoreBlok.BlazorUI.Icons
+
+@inject IconCatalogueService IconCatalogue
+
+<PageTitle>Icons - Blok Blazor</PageTitle>
+
+<div class="flex-1 flex flex-col min-h-0 py-4">
+
+	<div class="max-w-4xl space-y-2">
+		<h1 class="text-3xl font-bold tracking-tight">Icons</h1>
+		<p class="text-muted-foreground mt-2 text-base">Material Design Icons available as SVG paths via the IconSvg class. Use with the Icon component.</p>
+	</div>
+
+	<Separator ClassName="!mt-6" />
+
+	<div class="flex flex-wrap items-center gap-4 pt-4">
+		<div class="max-w-sm w-full">
+			<SearchInput>
+				<SearchInputLeftElement>
+					<Icon Svg="@IconSvg.Magnify" />
+				</SearchInputLeftElement>
+				<SearchInputField Placeholder="Search icons..." Value="@SearchText" ValueChanged="OnSearchChanged" />
+				@if ( !string.IsNullOrEmpty( SearchText ) )
+				{
+					<SearchInputRightElement>
+						<SearchInputClearButton OnClear="OnClear" />
+					</SearchInputRightElement>
+				}
+			</SearchInput>
+		</div>
+
+		<div class="max-w-md w-full">
+			<Combobox Multiple="true"
+					  @bind-Values="SelectedCategories" @bind-Values:after="OnCategoriesChanged"
+					  @bind-InputValue="CategoryFilter" @bind-InputValue:after="OnCategoryFilterChanged">
+				<ComboboxChips>
+					@foreach ( var v in SelectedCategories )
+					{
+						<ComboboxChip Value="@v" @key="v" />
+					}
+					<ComboboxChipsInput Placeholder="@( SelectedCategories.Count == 0 ? "Filter by category..." : null )" />
+				</ComboboxChips>
+				<ComboboxContent>
+					<ComboboxList>
+						@foreach ( var cat in RenderedCategories )
+						{
+							<ComboboxItem Value="@cat.Name" Label="@( $"{cat.Name} ({cat.Count:N0})" )" @key="cat.Name" />
+						}
+					</ComboboxList>
+					<ComboboxEmpty>No categories match.</ComboboxEmpty>
+				</ComboboxContent>
+			</Combobox>
+		</div>
+
+		<p class="text-sm text-muted-foreground ml-auto">
+			Showing @FilteredCount.ToString("N0") of @AllIcons.Count.ToString("N0") icons
+		</p>
+	</div>
+
+	<div class="relative flex-1 min-h-0 mt-4">
+		<div class="absolute inset-0 overflow-y-auto">
+			<Virtualize Items="Rows" Context="row" ItemSize="104" OverscanCount="5">
+				<div class="grid grid-cols-6 gap-2">
+					@foreach ( var icon in row )
+					{
+						<div class="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-default" title="@( $"IconSvg.{icon.Name}" )">
+							<Icon Svg="@icon.Svg" Size="IconSize.Lg" />
+							<span class="text-2xs text-muted-foreground text-center truncate w-full">@icon.Name</span>
+						</div>
+					}
+				</div>
+			</Virtualize>
+		</div>
+	</div>
+
+</div>
+
+@code {
+	// Cap the dropdown size so 3,543 ComboboxItems don't all render at once. Users narrow
+	// further by typing; selected chips resolve their label from LabelCache even after the
+	// category scrolls out of the rendered set.
+	private const int MaxCategoriesInDropdown = 300;
+
+	private static readonly char[] SearchSeparators = [' ', '\t'];
+
+	private record IconEntry( string Name, string Svg, string Mdi, string[] SeeAlso, string[] Categories );
+
+	private List<IconEntry> AllIcons = [];
+	private List<IconEntry[]> Rows = [];
+	private int FilteredCount;
+
+	private string SearchText = "";
+	private List<string> SelectedCategories = [];
+	private string? CategoryFilter;
+
+	private List<IconCatalogueService.IconCategory> RenderedCategories = [];
+
+	private Timer? DebounceTimer;
+
+	protected override void OnInitialized()
+	{
+		AllIcons = typeof( Icons.IconSvg )
+			.GetFields( BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy )
+			.Where( f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof( string ) )
+			.Select( f =>
+			{
+				var name = f.Name;
+				var svg = (string)f.GetRawConstantValue()!;
+				return IconCatalogue.Metadata.TryGetValue( name, out var meta )
+					? new IconEntry( name, svg, meta.Mdi, meta.SeeAlso, meta.Categories )
+					: new IconEntry( name, svg, name, [], [] );
+			} )
+			.OrderBy( i => i.Name )
+			.ToList();
+
+		UpdateRenderedCategories();
+		ApplyFilter();
+	}
+
+	private void OnSearchChanged( string? value )
+	{
+		SearchText = value ?? "";
+		DebounceTimer?.Dispose();
+		DebounceTimer = new Timer(
+			_ => InvokeAsync( () => { ApplyFilter(); StateHasChanged(); } ),
+			null, 350, Timeout.Infinite );
+	}
+
+	private void OnClear()
+	{
+		SearchText = "";
+		DebounceTimer?.Dispose();
+		ApplyFilter();
+	}
+
+	private void OnCategoriesChanged() => ApplyFilter();
+
+	private void OnCategoryFilterChanged() => UpdateRenderedCategories();
+
+	private void UpdateRenderedCategories()
+	{
+		var query = CategoryFilter?.Trim();
+		IEnumerable<IconCatalogueService.IconCategory> source = IconCatalogue.Categories;
+		if ( !string.IsNullOrEmpty( query ) )
+		{
+			source = source.Where( c => c.Name.Contains( query, StringComparison.OrdinalIgnoreCase ) );
+		}
+		RenderedCategories = source
+			.Take( MaxCategoriesInDropdown )
+			.OrderBy( c => c.Name, StringComparer.OrdinalIgnoreCase )
+			.ToList();
+	}
+
+	private void ApplyFilter()
+	{
+		IEnumerable<IconEntry> filtered = AllIcons;
+
+		if ( SelectedCategories.Count > 0 )
+		{
+			var cats = new HashSet<string>( SelectedCategories, StringComparer.OrdinalIgnoreCase );
+			filtered = filtered.Where( i => i.Categories.Any( c => cats.Contains( c ) ) );
+		}
+
+		if ( !string.IsNullOrWhiteSpace( SearchText ) )
+		{
+			var terms = SearchText.Split( SearchSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+			if ( terms.Length > 0 )
+			{
+				filtered = filtered.Where( i => MatchesAnyTerm( i, terms ) );
+			}
+		}
+
+		var list = filtered.ToList();
+		FilteredCount = list.Count;
+		Rows = list.Chunk( 6 ).ToList();
+	}
+
+	private static bool MatchesAnyTerm( IconEntry icon, string[] terms )
+	{
+		foreach ( var term in terms )
+		{
+			if ( icon.Name.Contains( term, StringComparison.OrdinalIgnoreCase ) ) return true;
+			if ( icon.Mdi.Contains( term, StringComparison.OrdinalIgnoreCase ) ) return true;
+			foreach ( var alias in icon.SeeAlso )
+			{
+				if ( alias.Contains( term, StringComparison.OrdinalIgnoreCase ) ) return true;
+			}
+		}
+		return false;
+	}
+
+	public void Dispose() => DebounceTimer?.Dispose();
+}

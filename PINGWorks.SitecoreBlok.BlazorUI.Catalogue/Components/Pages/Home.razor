@@ -1,0 +1,384 @@
+@page "/"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject MigrationStatusService Migration
+
+<PageTitle>Blok Blazor - Component Catalogue</PageTitle>
+
+<div class="space-y-12 py-4">
+
+	<div class="space-y-6">
+		<h1 class="text-4xl font-bold tracking-tight leading-tight">
+			Build better products faster ... but with ASP.NET Blazor!
+		</h1>
+		<p class="text-lg text-muted-foreground max-w-4xl leading-relaxed">
+			This project is a Blazor port of the Sitecore Blok design system - production-ready, idiomatic components
+			for building industry-leading martech applications.
+		</p>
+		<p class="text-lg text-muted-foreground max-w-4xl leading-relaxed">
+			Conscious decisions have been made to replicate the Blok component structures as closely as possible, even when
+			Blazor has the capability through RenderFragment Properties to present a more succinct structure. This is done
+			to aid developers in transfering knowledge between libraries, since Razor and React component syntax is quite
+			similar already. Further, it aids in the use of programatic tools being able to detect and maintain feature
+			parity between the libraries if the structural differences are kept to a minimum.
+		</p>
+		<p class="text-lg text-muted-foreground max-w-4xl leading-relaxed">
+			To this end, you should find the documentation on the <a href="https://blok.sitecore.com/" target="_blank" class="text-primary-500 hover:text-primary-700 transition-colors">
+			official Sitecore Blok library useful for this library</a> also, save for specific divergences you will find noted on each component page
+			in this catalogue site.
+		</p>
+		<div class="flex gap-3 pt-2">
+			<Button Click="@(() => Navigation.NavigateTo("/primitives"))">Browse primitives</Button>
+		</div>
+	</div>
+
+	<Separator />
+
+	<div class="space-y-6">
+		<h2 class="text-xl font-semibold">Prerequisites</h2>
+		<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+			<div class="rounded-lg border border-border p-4 bg-subtle-bg">
+				<p class="font-medium text-sm">.NET 10+</p>
+				<p class="text-xs text-muted-foreground mt-1">Required runtime</p>
+			</div>
+			<div class="rounded-lg border border-border p-4 bg-subtle-bg">
+				<p class="font-medium text-sm">Blazor Server or WASM</p>
+				<p class="text-xs text-muted-foreground mt-1">Interactive render mode</p>
+			</div>
+			<div class="rounded-lg border border-border p-4 bg-subtle-bg">
+				<p class="font-medium text-sm">Tailwind CSS</p>
+				<p class="text-xs text-muted-foreground mt-1">Blok theme included</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="space-y-6">
+		<h2 class="text-xl font-semibold">Setup</h2>
+
+		<div class="space-y-6">
+			<div class="space-y-2">
+				<h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">1. Add the NuGet package</h3>
+				<CodeViewer Code="dotnet add package PINGWorks.SitecoreBlok.BlazorUI" Language="CodeLanguage.Shell" />
+			</div>
+
+			<div class="space-y-2">
+				<h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">2. Register services in Program.cs</h3>
+				<CodeViewer Code="builder.Services.AddSitecoreBlokUI();" Language="CodeLanguage.CSharp" />
+			</div>
+
+			<div class="space-y-2">
+				<h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">3. Add using directives to _Imports.razor</h3>
+				<CodeViewer Language="CodeLanguage.Razor" Code="@("@using PINGWorks.SitecoreBlok.BlazorUI\n@using PINGWorks.SitecoreBlok.BlazorUI.Services")" />
+			</div>
+
+			<div class="space-y-2">
+				<h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">4. Configure App.razor</h3>
+				<p class="text-sm text-muted-foreground">Add the Blok stylesheet and Prism.js (for CodeViewer syntax highlighting) to your <code>App.razor</code>:</p>
+				<CodeViewer Language="CodeLanguage.Markup" Code="@AppRazorSample" />
+			</div>
+
+			<div class="space-y-2">
+				<h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">5. Add service containers to MainLayout.razor</h3>
+				<p class="text-sm text-muted-foreground">
+					Components that use floating UI (such as <code>Select</code>, <code>Popover</code>, and <code>DatePicker</code>) require the
+					<code>&lt;Popovers /&gt;</code> container. Toast notifications require the <code>&lt;Toaster /&gt;</code> container.
+					Place both once in your layout with <code>InteractiveServer</code> render mode.
+				</p>
+				<CodeViewer Language="CodeLanguage.Razor" Code="@LayoutSample" />
+			</div>
+		</div>
+	</div>
+
+	<Separator />
+
+	<div class="space-y-4">
+		<h2 class="text-xl font-semibold">Available Components</h2>
+		<p class="text-sm text-muted-foreground">@AvailableComponents.Length primitives available.</p>
+		<div class="flex flex-wrap gap-2">
+			@foreach ( var name in AvailableComponents )
+			{
+				<a href="@($"primitives/{name.ToLowerInvariant()}")" class="no-underline">
+					<Badge ColorScheme="BadgeColor.Neutral">@name</Badge>
+				</a>
+			}
+		</div>
+	</div>
+
+	<Separator />
+
+	<div class="space-y-4">
+		<h2 class="text-xl font-semibold">Backlog</h2>
+		<p class="text-sm text-muted-foreground">
+			Sitecore Blok primitives not yet ported but on the roadmap. Pick one for <code>/blok migrate</code> next.
+		</p>
+		<div class="flex flex-wrap gap-2">
+			@foreach ( var entry in Migration.Backlog )
+			{
+				<Badge ColorScheme="BadgeColor.Warning">@entry.Name</Badge>
+			}
+		</div>
+	</div>
+
+	<div class="space-y-4">
+		<h2 class="text-xl font-semibold">Won't Do</h2>
+		<p class="text-sm text-muted-foreground">
+			Sitecore Blok primitives deliberately not ported. Each row records the rationale — React-only dependency, native Blazor alternative, or coverage by another primitive.
+		</p>
+		<Table>
+			<TableHeader>
+				<TableRow>
+					<TableHead>Component</TableHead>
+					<TableHead>Reason</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				@foreach ( var entry in Migration.WontDo )
+				{
+					<TableRow>
+						<TableCell>
+							<Badge ColorScheme="BadgeColor.Neutral">@entry.Name</Badge>
+						</TableCell>
+						<TableCell>
+							<div class="whitespace-normal leading-relaxed">@RenderDescription(entry.Description)</div>
+						</TableCell>
+					</TableRow>
+				}
+			</TableBody>
+		</Table>
+	</div>
+
+	<div class="space-y-4">
+		<h2 class="text-xl font-semibold">Known Feature Gaps</h2>
+		<div class="space-y-3 text-sm text-muted-foreground">
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Dropdown / ContextMenu</Badge>
+				<span>No keyboard navigation (arrow keys, Enter, Escape). The Blok source includes full keyboard support via Radix primitives.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Select</Badge>
+				<span>No keyboard navigation or type-ahead search. The Blok source supports these via Radix Select primitives.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Combobox</Badge>
+				<span>Keyboard nav covers Arrow Up/Down, Enter, Escape, and Backspace-to-clear. Blok's <code>@@base-ui/react/combobox</code> also supports Home/End jumps, typeahead buffering, and tap-to-open on pointer-coarse devices &mdash; not yet ported.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Dialog / Sheet / AlertDialog</Badge>
+				<span>No Escape key to close. No focus trapping within the modal. The Blok source provides both via Radix Dialog primitives.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Dialog / Sheet / AlertDialog sub-components</Badge>
+				<span>Trigger, Portal, Overlay, and (for Dialog/Sheet) Content sub-components are collapsed into the root component with built-in overlay and close button. Blok exports them as separate siblings so consumers can swap portals or layer overlays manually.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">DropdownMenu items</Badge>
+				<span>No <code>DropdownMenuCheckboxItem</code>, <code>DropdownMenuRadioGroup</code>, <code>DropdownMenuRadioItem</code>, or <code>DropdownMenuPortal</code>. Consumers roll their own toggle state on top of <code>DropdownMenuItem</code>.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">NavigationMenu</Badge>
+				<span>No <code>NavigationMenuViewport</code> (shared popup) or <code>NavigationMenuIndicator</code> (arrow/caret). Trigger/Content are named RenderFragment slots inside <code>NavigationMenuItem</code> rather than sibling sub-components.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">InputGroup</Badge>
+				<span>No <code>InputGroupButton</code> or <code>InputGroupTextarea</code> sub-components. Nest a plain <code>&lt;Button&gt;</code> inside <code>&lt;InputGroupAddon&gt;</code> for the button case.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Tooltip</Badge>
+				<span>CSS hover-based with no configurable show/hide delay. The Blok source supports delay control via Radix Tooltip.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Carousel</Badge>
+				<span>No touch/swipe support, autoplay, or plugin API. The Blok source wraps Embla Carousel; we roll our own with <code>CurrentIndex</code>/<code>TransitionDuration</code> only.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Slider</Badge>
+				<span>Uses a styled native range input. No multi-thumb (range) support or vertical orientation. The Blok source uses Radix Slider with array <code>value</code>/<code>defaultValue</code>.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Popover positioning</Badge>
+				<span>Popovers always appear below the trigger. The Blok source supports configurable <code>side</code> (top, bottom, left, right) and <code>align</code> via Radix Popover.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Popover composition</Badge>
+				<span>Imperative <code>PopoverService</code> API instead of Blok's declarative <code>&lt;Popover&gt;&lt;PopoverTrigger/&gt;&lt;PopoverContent/&gt;&lt;/Popover&gt;</code> composition. Idiomatic for Blazor but a migration hurdle for Blok users.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">CircularProgress</Badge>
+				<span>No indeterminate mode, no size presets (<code>xs</code>/<code>sm</code>/<code>md</code>/<code>lg</code>/<code>xl</code>), no <code>thickness</code> or <code>min</code> props. Blok's Chakra-based version exposes all of these.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Toggle</Badge>
+				<span>No <code>square</code> or <code>rounded</code> shape variants, no <code>xs</code> size, and no pressed-state icon swap (Blok replaces the child icon with a check mark when pressed).</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Calendar / DatePicker</Badge>
+				<span>Hand-rolled calendar implementation — no <code>react-day-picker</code> compat surface. Props like <code>captionLayout</code>, <code>formatters</code>, <code>buttonVariant</code>, and the <code>components</code> override don't exist.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">ActionBar API shape</Badge>
+				<span>Composition-first (<code>ChildContent</code> slot) instead of Blok's declarative <code>buttons[]</code> / <code>menuItems[]</code> prop arrays with hardcoded publish/duplicate/archive/delete callbacks.</span>
+			</div>
+		</div>
+	</div>
+
+	<Separator />
+
+	<div class="space-y-4">
+		<h2 class="text-xl font-semibold">Additions Beyond Blok</h2>
+		<p class="text-sm text-muted-foreground">
+			Components and features in this library that are not present in the Sitecore Blok design system.
+		</p>
+		<div class="space-y-3 text-sm text-muted-foreground">
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">CodeViewer</Badge>
+				<span>Syntax-highlighted code block component with Prism.js support for 6+ languages. Not present in Blok.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">CopyableToken post-click feedback</Badge>
+				<span>After the token is copied the tooltip swaps to a configurable confirmation (<code>CopiedMessage</code>, default <code>"Copied"</code>) for 1s before auto-dismissing. Adds <code>CopyMessage</code> for the pre-click label and a <code>Clicked</code> <code>EventCallback&lt;string&gt;</code> for reacting to the copy. Blok renders a static <code>Copy to clipboard</code> tooltip with no post-click state or callback.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Card.HoverElevation</Badge>
+				<span>Opt-in hover shadow effect via a separate <code>HoverElevation</code> parameter. Blok bakes hover effects into the elevation variants; ours separates them for more control.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">ErrorState Variants</Badge>
+				<span>Pre-built HTTP status code variants (400, 401, 403, 404, 500, 503) with default titles, descriptions, and colour illustrations. Blok provides the same but our enum-driven approach is more ergonomic for Blazor.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Toaster.Content</Badge>
+				<span>Toast messages accept a <code>RenderFragment</code> body for custom action content (buttons, links). Blok's Sonner wrapper has a simpler action label API.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">IllustrationSvg</Badge>
+				<span>Inline SVG illustration constants in <code>Color</code> and <code>Neutral</code> variants. Blok serves these from a CDN; ours are bundled for offline use.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Tabs.OnTabChanged</Badge>
+				<span>Dedicated event callback that fires only when the active tab changes (separate from the two-way binding <code>ValueChanged</code>). Not present in Blok's Radix-based Tabs.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Carousel.TransitionDuration</Badge>
+				<span>User-configurable slide transition speed in milliseconds. Blok's Embla-based carousel does not expose this directly.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Stack</Badge>
+				<span>A layout utility component for quickly composing flex or grid layouts with configurable gap, padding, max-width, orientation, and border. Supports both row and column flex modes. Not present in Blok.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Calendar.NumberOfMonths</Badge>
+				<span>Multi-month calendar display with per-panel month/year dropdowns and automatic range-end scrolling. Blok supports this via react-day-picker; our implementation is pure Blazor.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">DatePicker Range Mode</Badge>
+				<span>DatePicker supports both single date and range selection modes with <code>RangeStart</code>/<code>RangeEnd</code> binding and multi-month popup. Blok has this as a separate component; ours unifies both modes.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Dialog Viewport Widths</Badge>
+				<span>Dialog sizes use viewport-relative widths (25%/50%/75%/95%) with minimum pixel floors. Blok uses fixed max-width classes.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Text</Badge>
+				<span>A simple text paragraph component with pre-applied muted, centered, small styling. Useful for descriptions and helper text. Not present in Blok.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">ThemeToggle</Badge>
+				<span>A one-click light/dark mode switcher. Writes the selected mode to <code>localStorage</code> and applies the <code>dark</code> class to any <code>data-dark-mode-target</code> element. Re-applies the stored preference after Blazor enhanced navigations so the theme survives client-side route changes. Not present in Blok.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">TreeView</Badge>
+				<span>A generic <code>TreeView&lt;TItem&gt;</code> for hierarchical data with single/multi selection, cascading checkboxes with indeterminate parents, debounced search with match highlighting and ancestor auto-expansion, lazy loading on expand, label/actions templates, and expand-all/collapse-all APIs. Takes inspiration from BlazorBlueprint's TreeView but styled with BlazorUI tokens. Not present in Blok.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Icon wrapper + IconSvg + extras</Badge>
+				<span>Blazor-side <code>&lt;Icon Svg="@@IconSvg.X" /&gt;</code> wrapper around Material Design Icon paths. Blok consumers import individual paths from <code>@@mdi/js</code> and render with <code>@@mdi/react</code> directly. Our <code>IconSvg</code> static class bundles 300+ common paths; the companion <code>PINGWorks.SitecoreBlok.BlazorUI.Icons</code> package ships 7,500+. Additional Blazor-specific parameters: <code>Scale</code> (glyph scale without changing the container box), <code>AiGradient</code> (purple-to-red gradient fill), <code>ViewBox</code>, and <code>ResetClassName</code> (opt out of layout defaults for direct SVG embedding).</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Button shortcuts</Badge>
+				<span><code>Title</code> (string label), <code>StartIconSvg</code>/<code>EndIconSvg</code> (pass an <code>IconSvg</code> path and the icon + spacing render automatically), <code>Click</code>, and an explicit <code>Disabled</code> parameter. All additive — Blok-style <code>ChildContent</code> composition still works.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Checkbox ergonomic helpers</Badge>
+				<span><code>Label</code>, <code>Description</code>, and <code>Enhanced</code> (wraps the control in a bordered card) parameters for the common checkbox-with-text pattern. Plus <code>Indeterminate</code> and <code>DefaultChecked</code>. Blok's primitive is bare — compose your own label sibling for bare usage.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">RadioGroupItem.Label</Badge>
+				<span>Inline <code>Label</code> string parameter rolls the button + label layout into a single component. Blok's Item returns just the circular button and expects an adjacent <code>&lt;label&gt;</code> — our helper keeps the call site tidy.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">CircularProgress.ShowLabel</Badge>
+				<span>Opt-in percentage label rendered in the centre of the ring. Blok's Chakra-based version has no equivalent out of the box — consumers overlay text themselves.</span>
+			</div>
+			<div class="flex items-start gap-2">
+				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">ActionBar composition</Badge>
+				<span>Single <code>ChildContent</code> slot instead of Blok's <code>buttons[]</code>/<code>menuItems[]</code> prop arrays. Fewer API surfaces, more flexible — any <code>&lt;Button&gt;</code>, <code>&lt;Tooltip&gt;</code>, or <code>&lt;DropdownMenu&gt;</code> composition works inline.</span>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+@code {
+	[Inject] private NavigationManager Navigation { get; set; } = default!;
+
+	private const string AppRazorSample = """
+			<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				...
+				@* Blok design system stylesheet *@
+				<link rel="stylesheet" href="@Assets["_content/PINGWorks.SitecoreBlok.BlazorUI/css/sitecore-blok.css"]" />
+
+				@* Prism.js for CodeViewer syntax highlighting *@
+				<link rel="stylesheet" href="@Assets["_content/PINGWorks.SitecoreBlok.BlazorUI/vendor/prism/prism.css"]" />
+				...
+			</head>
+			<body>
+				<Routes />
+				...
+				@* Prism.js (required for CodeViewer component) *@
+				<script src="@Assets["_content/PINGWorks.SitecoreBlok.BlazorUI/vendor/prism/prism.js"]"></script>
+				<script src="@Assets["_framework/blazor.web.js"]"></script>
+			</body>
+			</html>
+			""";
+
+	private const string LayoutSample = """
+			@inherits LayoutComponentBase
+
+			<div>
+				@* Your header, sidebar, etc. *@
+
+				<main>
+					@Body
+				</main>
+			</div>
+
+			@* Place service containers once, with InteractiveServer render mode *@
+			<Popovers @rendermode="InteractiveServer" />
+			<Toaster @rendermode="InteractiveServer" />
+			""";
+
+	// Cross-reference stub pages (rendered in the Catalogue but not tracked in MIGRATION_STATUS.md).
+	// Keep this list tiny — each entry needs a real page under Primitives/{Name}Page.razor.
+	private static readonly string[] Stubs = [ "Navigation (Side)", "Navigation (Stack)", "Sonner" ];
+
+	private static MarkupString RenderDescription(string text)
+	{
+		var encoded = System.Net.WebUtility.HtmlEncode(text);
+		var html = System.Text.RegularExpressions.Regex.Replace(encoded, @"`([^`]+)`", "<code>$1</code>");
+		return (MarkupString)html;
+	}
+
+	private string[] AvailableComponents =>
+		Migration.Ported.Select( e => e.Name )
+			.Concat( Stubs )
+			.OrderBy( n => n, StringComparer.OrdinalIgnoreCase )
+			.ToArray();
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( firstRender )
+			await JS.InvokeVoidAsync( "Prism.highlightAll" );
+	}
+}

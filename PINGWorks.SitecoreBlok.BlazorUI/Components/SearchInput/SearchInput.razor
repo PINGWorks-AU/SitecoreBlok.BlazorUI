@@ -1,0 +1,19 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="search-input" role="group" class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"relative flex w-full items-center rounded-md border border-input transition-[color,box-shadow] outline-none",
+		"h-10 min-w-0",
+		"bg-white dark:bg-input/30",
+		"has-[[data-slot=search-input-control]:focus-visible]:border-2 has-[[data-slot=search-input-control]:focus-visible]:border-primary",
+		"has-[[data-slot=search-input-control][aria-invalid=true]]:ring-destructive/20 has-[[data-slot=search-input-control][aria-invalid=true]]:border-destructive dark:has-[[data-slot=search-input-control][aria-invalid=true]]:ring-destructive/40")
+										.With(ClassName)
+										.Build();
+}

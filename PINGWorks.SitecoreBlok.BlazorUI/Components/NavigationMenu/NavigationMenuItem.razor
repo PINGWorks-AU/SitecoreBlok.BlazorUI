@@ -1,0 +1,54 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IDisposable
+
+<li @ref="LiRef" data-slot="navigation-menu-item" class="@CssClass"
+	@onmouseenter="OnHover" @onmouseleave="OnLeave">
+	<CascadingValue Name="NavigationMenuItemOpen" Value="@IsOpen">
+		@Trigger
+	</CascadingValue>
+</li>
+
+@code {
+	[Parameter] public RenderFragment? Trigger { get; set; }
+	[Parameter] public RenderFragment? Content { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	[CascadingParameter] private NavigationMenu? Nav { get; set; }
+
+	private readonly string Id = Guid.NewGuid().ToString("N")[..8];
+	private ElementReference LiRef;
+	private Action? NavHandler;
+
+	private bool IsOpen => Nav?.ActiveId == Id;
+
+	private string CssClass => CssClassBuilder.Start("relative")
+		.With(ClassName)
+		.Build();
+
+	protected override void OnInitialized()
+	{
+		NavHandler = () => InvokeAsync(StateHasChanged);
+		if (Nav is not null) Nav.StateChanged += NavHandler;
+	}
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		if (firstRender)
+			Nav?.Register(new NavigationMenu.NavEntry { Id = Id, Content = Content });
+	}
+
+	private async Task OnHover()
+	{
+		if (Nav is not null)
+			await Nav.SetActive(Id, LiRef);
+	}
+
+	private void OnLeave() => Nav?.StartClose(Id);
+
+	public void Dispose()
+	{
+		if (NavHandler is not null && Nav is not null)
+			Nav.StateChanged -= NavHandler;
+		Nav?.Unregister(Id);
+	}
+}

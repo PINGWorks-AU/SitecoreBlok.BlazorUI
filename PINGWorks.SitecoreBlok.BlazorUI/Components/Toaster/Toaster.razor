@@ -1,0 +1,119 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@implements IDisposable
+@inject ToastService Toasts
+
+<div data-slot="toaster" class="@CssClass">
+	@foreach ( var toast in Active )
+	{
+		<div data-slot="toast" class="@ToastCssClass( toast )" @key="toast.Id"
+			 @onclick="() => OnToastClick( toast )">
+
+			@if ( toast.Closable )
+			{
+				<button type="button"
+						class="absolute top-2 right-2 inline-flex items-center justify-center size-5 rounded-sm opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
+						@onclick="() => Dismiss( toast )" @onclick:stopPropagation>
+					<Icon Svg="@IconSvg.Close" Scale="0.65" ResetClassName />
+				</button>
+			}
+
+			<div class="flex-1 min-w-0 @( toast.Closable ? "pr-4" : "" )">
+				@if ( toast.Title is not null )
+				{
+					<p class="text-sm font-semibold">@toast.Title</p>
+				}
+				@if ( toast.Description is not null )
+				{
+					<p class="text-sm opacity-80 mt-0.5">@toast.Description</p>
+				}
+				@if ( toast.Content is not null )
+				{
+					<div class="mt-2" @onclick:stopPropagation>
+						@toast.Content
+					</div>
+				}
+			</div>
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public ToastPosition Position { get; set; } = ToastPosition.BottomRight;
+
+	private List<ToastItem> Active = [];
+
+	protected override void OnInitialized()
+	{
+		Toasts.OnShow += Show;
+		Toasts.OnDismiss += DismissItem;
+	}
+
+	private async Task Show( ToastItem item )
+	{
+		Active.Add( item );
+		await InvokeAsync( StateHasChanged );
+
+		if ( item.Duration > 0 )
+		{
+			_ = Task.Run( async () =>
+			{
+				await Task.Delay( item.Duration );
+
+				if ( Active.Remove( item ) )
+					await InvokeAsync( StateHasChanged );
+			} );
+		}
+	}
+
+	private async Task DismissItem( ToastItem item )
+	{
+		Active.Remove( item );
+		await InvokeAsync( StateHasChanged );
+	}
+
+	private void OnToastClick( ToastItem item )
+	{
+		if ( !item.Closable )
+			item.OnClick?.Invoke();
+	}
+
+	private async Task Dismiss( ToastItem item )
+	{
+		await Toasts.Dismiss( item );
+	}
+
+	private string CssClass => CssClassBuilder.Start( "fixed z-50 flex flex-col gap-2 w-80" )
+										.With( "bottom-4 right-4", Position is ToastPosition.BottomRight )
+										.With( "bottom-4 left-4", Position is ToastPosition.BottomLeft )
+										.With( "top-4 right-4", Position is ToastPosition.TopRight )
+										.With( "top-4 left-4", Position is ToastPosition.TopLeft )
+										.With( "bottom-4 left-1/2 -translate-x-1/2", Position is ToastPosition.BottomCenter )
+										.With( "top-4 left-1/2 -translate-x-1/2", Position is ToastPosition.TopCenter )
+										.Build();
+
+	private string ToastCssClass( ToastItem toast )
+	{
+		var slideIn = Position switch
+		{
+			ToastPosition.BottomRight or ToastPosition.TopRight => "animate-in slide-in-from-right fade-in-0 duration-300",
+			ToastPosition.BottomLeft or ToastPosition.TopLeft => "animate-in slide-in-from-left fade-in-0 duration-300",
+			_ => "animate-in slide-in-from-bottom fade-in-0 duration-300"
+		};
+
+		return CssClassBuilder.Start(
+			"relative flex items-start gap-3 rounded-lg border px-4 py-3 shadow-lg", slideIn )
+										.With( "bg-background border-border text-foreground", toast.Variant is ToastVariant.Default )
+										.With( "bg-success-bg border-success-bg text-success-fg", toast.Variant is ToastVariant.Success )
+										.With( "bg-danger-bg border-danger-bg text-danger-fg", toast.Variant is ToastVariant.Error )
+										.With( "bg-warning-bg border-warning-bg text-warning-fg", toast.Variant is ToastVariant.Warning )
+										.With( "bg-primary-bg border-primary-bg text-primary-fg", toast.Variant is ToastVariant.Info )
+										.Build();
+	}
+
+	public void Dispose()
+	{
+		Toasts.OnShow -= Show;
+		Toasts.OnDismiss -= DismissItem;
+	}
+}

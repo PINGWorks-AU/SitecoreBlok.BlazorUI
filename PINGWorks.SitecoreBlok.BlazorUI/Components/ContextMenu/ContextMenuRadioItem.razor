@@ -1,0 +1,39 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="context-menu-radio-item"
+	 role="menuitemradio"
+	 aria-checked="@( ParentRadioGroup?.Value == Value )"
+	 class="@CssClass"
+	 @onclick="HandleClick">
+	<span class="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+		@if ( ParentRadioGroup?.Value == Value )
+		{
+			<Icon Svg="@IconSvg.Circle" ClassName="size-[0.7rem]" />
+		}
+	</span>
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] public ContextMenuRadioGroup? ParentRadioGroup { get; set; }
+	[CascadingParameter] public ContextMenu? ParentContextMenu { get; set; }
+	[CascadingParameter] public ContextMenuSub? ParentSub { get; set; }
+
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter, EditorRequired] public required string Value { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	private string CssClass => CssClassBuilder.Start(
+		"relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none hover:bg-neutral-bg hover:text-foreground",
+		"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-neutral-fg [&_svg:not([class*='size-'])]:size-[0.7rem]" )
+												.With( "pointer-events-none opacity-50", Disabled )
+												.With( ClassName )
+												.Build();
+
+	private async Task HandleClick()
+	{
+		if ( Disabled || ParentRadioGroup is null ) return;
+		await ParentRadioGroup.Select( Value );
+	}
+}

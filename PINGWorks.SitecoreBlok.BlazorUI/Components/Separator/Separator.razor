@@ -1,0 +1,13 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-orientation="@( Orientation.ToString().ToLower() )" role="none" data-slot="separator-root" class="@CssClass" @attributes="AdditionalAttributes"></div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public SeparatorDirection Orientation { get; set; } = SeparatorDirection.Horizontal;
+
+	private string CssClass => CssClassBuilder.Start( "shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=vertical]:h-full data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px" )
+										.With( ClassName )
+										.Build();
+}

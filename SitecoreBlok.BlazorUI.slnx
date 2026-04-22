@@ -1,0 +1,46 @@
+<Solution>
+	<Folder Name="/.claude/">
+		<File Path=".claude/install-skills.ps1" />
+		<File Path=".claude/install-skills.sh" />
+		<File Path=".claude/README.md" />
+	</Folder>
+	<Folder Name="/.claude/skills/" />
+	<Folder Name="/.claude/skills/blok-migration/">
+		<File Path=".claude/skills/blok-migration/SKILL.md" />
+	</Folder>
+	<Folder Name="/.github/">
+		<File Path=".github/PR_TEMPLATE.md" />
+	</Folder>
+	<Folder Name="/.github/DISCUSSION_TEMPLATE/">
+		<File Path=".github/DISCUSSION_TEMPLATE/design-feedback.yml" />
+		<File Path=".github/DISCUSSION_TEMPLATE/feature-request.yml" />
+		<File Path=".github/DISCUSSION_TEMPLATE/general-qa.yml" />
+		<File Path=".github/DISCUSSION_TEMPLATE/help.yml" />
+		<File Path=".github/DISCUSSION_TEMPLATE/ideas.yml" />
+	</Folder>
+	<Folder Name="/.github/ISSUE_TEMPLATE/">
+		<File Path=".github/ISSUE_TEMPLATE/bug_report.yml" />
+		<File Path=".github/ISSUE_TEMPLATE/component_request.yml" />
+		<File Path=".github/ISSUE_TEMPLATE/config.yml" />
+		<File Path=".github/ISSUE_TEMPLATE/documentation.yml" />
+		<File Path=".github/ISSUE_TEMPLATE/feature_request.yml" />
+		<File Path=".github/ISSUE_TEMPLATE/general_issue.yml" />
+		<File Path=".github/ISSUE_TEMPLATE/installation_help.yml" />
+		<File Path=".github/ISSUE_TEMPLATE/theme_customization.yml" />
+	</Folder>
+	<Folder Name="/Solution Items/">
+		<File Path=".editorconfig" />
+		<File Path=".gitattributes" />
+		<File Path=".gitignore" />
+		<File Path=".mcp.json" />
+		<File Path="CODE_OF_CONDUCT.md" />
+		<File Path="CONTRIBUTING.md" />
+		<File Path="LICENSE" />
+		<File Path="MIGRATION_STATUS.md" />
+		<File Path="README.md" />
+		<File Path="theme.md" />
+	</Folder>
+	<Project Path="PINGWorks.SitecoreBlok.BlazorUI.Catalogue/PINGWorks.SitecoreBlok.BlazorUI.Catalogue.csproj" />
+	<Project Path="PINGWorks.SitecoreBlok.BlazorUI.Icons/PINGWorks.SitecoreBlok.BlazorUI.Icons.csproj" />
+	<Project Path="PINGWorks.SitecoreBlok.BlazorUI/PINGWorks.SitecoreBlok.BlazorUI.csproj" />
+</Solution>

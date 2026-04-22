@@ -1,0 +1,53 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="dialog" data-state="@( Open ? "open" : "closed" )" class="@( Open ? "" : "pointer-events-none" )">
+	<div data-slot="dialog-overlay" class="@OverlayCssClass" @onclick="OnOverlayClick"></div>
+	<div data-slot="dialog-content" class="@ContentCssClass">
+		@ChildContent
+		<button type="button" data-slot="dialog-close"
+				class="absolute top-2.5 right-4 min-w-0 opacity-70 transition-opacity hover:opacity-100 inline-flex items-center justify-center size-8 rounded-full cursor-pointer hover:bg-neutral-bg"
+				@onclick="Close">
+			<Icon Svg="@IconSvg.Close" Scale="0.9" ResetClassName />
+			<span class="sr-only">Close</span>
+		</button>
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Open { get; set; }
+	[Parameter] public EventCallback<bool> OpenChanged { get; set; }
+	[Parameter] public DialogSize Size { get; set; } = DialogSize.Md;
+
+	private string OverlayCssClass => CssClassBuilder.Start( "fixed inset-0 z-50 transition-opacity duration-200" )
+										.With( "bg-black/50 opacity-100", Open )
+										.With( "opacity-0", !Open )
+										.Build();
+
+	// `text-foreground` is explicit so the dialog text follows light/dark token
+	// flips. Blok's source omits it and relies on body-level inheritance, but
+	// the cascade does not reliably reach the fixed-positioned content in our
+	// Catalogue render path. Removing this regresses dark-mode text contrast.
+	private string ContentCssClass => CssClassBuilder.Start(
+		"bg-background text-foreground fixed top-[50%] left-[50%] z-50 grid translate-x-[-50%] translate-y-[-50%] gap-4 shadow-lg duration-200 transition-all" )
+										.With( "rounded-lg px-7 py-5", Size is not DialogSize.Full )
+										.With( "scale-100 opacity-100", Open )
+										.With( "scale-95 opacity-0", !Open )
+										.With( "w-[25vw] min-w-[20rem]", Size is DialogSize.Sm )
+										.With( "w-[50vw] min-w-[24rem]", Size is DialogSize.Md )
+										.With( "w-[75vw] min-w-[28rem]", Size is DialogSize.Lg )
+										.With( "w-[95vw]", Size is DialogSize.Xl )
+										.With( "w-screen h-screen max-w-none max-h-none rounded-none p-0", Size is DialogSize.Full )
+										.With( ClassName )
+										.Build();
+
+	private async Task Close()
+	{
+		Open = false;
+		if ( OpenChanged.HasDelegate )
+			await OpenChanged.InvokeAsync( false );
+	}
+
+	private async Task OnOverlayClick() => await Close();
+}

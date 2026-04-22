@@ -1,0 +1,105 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<CascadingValue Value="Context">
+	<div data-slot="editable" class="@CssClass" @attributes="AdditionalAttributes">
+		@ChildContent
+	</div>
+</CascadingValue>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	[Parameter] public EditableSize Size { get; set; } = EditableSize.Md;
+	[Parameter] public string DefaultValue { get; set; } = "";
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string> ValueChanged { get; set; }
+	[Parameter] public string Placeholder { get; set; } = "Click to edit...";
+	[Parameter] public bool IsDisabled { get; set; }
+	[Parameter] public bool IsPreviewFocusable { get; set; } = true;
+	[Parameter] public bool SubmitOnBlur { get; set; } = true;
+	[Parameter] public bool StartWithEditView { get; set; }
+	[Parameter] public bool SelectAllOnFocus { get; set; } = true;
+	[Parameter] public EditableActivationMode ActivationMode { get; set; } = EditableActivationMode.Click;
+	[Parameter] public EventCallback<string> OnSubmit { get; set; }
+	[Parameter] public EventCallback<string> OnCancel { get; set; }
+	[Parameter] public EventCallback OnEdit { get; set; }
+
+	private EditableContext Context { get; set; } = new();
+	private bool IsControlled => Value is not null;
+	private string InternalValue { get; set; } = "";
+	private string PreviousValue { get; set; } = "";
+
+	protected override void OnInitialized()
+	{
+		InternalValue = DefaultValue;
+		PreviousValue = DefaultValue;
+		Context.IsEditing = StartWithEditView;
+		SyncContext();
+	}
+
+	protected override void OnParametersSet() => SyncContext();
+
+	private void SyncContext()
+	{
+		Context.Value = IsControlled ? Value! : InternalValue;
+		Context.Placeholder = Placeholder;
+		Context.IsDisabled = IsDisabled;
+		Context.IsPreviewFocusable = IsPreviewFocusable;
+		Context.SubmitOnBlur = SubmitOnBlur;
+		Context.SelectAllOnFocus = SelectAllOnFocus;
+		Context.ActivationMode = ActivationMode;
+		Context.StartEditAsync = StartEditAsync;
+		Context.CancelEditAsync = CancelEditAsync;
+		Context.SubmitEditAsync = SubmitEditAsync;
+		Context.HandleChangeAsync = HandleChangeAsync;
+	}
+
+	private async Task StartEditAsync()
+	{
+		if (IsDisabled) return;
+		PreviousValue = IsControlled ? Value! : InternalValue;
+		Context.IsEditing = true;
+		if (OnEdit.HasDelegate) await OnEdit.InvokeAsync();
+		StateHasChanged();
+	}
+
+	private async Task CancelEditAsync()
+	{
+		if (IsControlled)
+		{
+			if (ValueChanged.HasDelegate) await ValueChanged.InvokeAsync(PreviousValue);
+		}
+		else
+		{
+			InternalValue = PreviousValue;
+			Context.Value = PreviousValue;
+		}
+		Context.IsEditing = false;
+		if (OnCancel.HasDelegate) await OnCancel.InvokeAsync(PreviousValue);
+		StateHasChanged();
+	}
+
+	private async Task SubmitEditAsync()
+	{
+		var current = IsControlled ? Value! : InternalValue;
+		Context.IsEditing = false;
+		if (OnSubmit.HasDelegate) await OnSubmit.InvokeAsync(current);
+		StateHasChanged();
+	}
+
+	private async Task HandleChangeAsync(string value)
+	{
+		if (!IsControlled) { InternalValue = value; Context.Value = value; }
+		if (ValueChanged.HasDelegate) await ValueChanged.InvokeAsync(value);
+		StateHasChanged();
+	}
+
+	private string CssClass => CssClassBuilder.Start("inline-flex flex-col gap-1")
+		.With("text-sm", Size is EditableSize.Sm)
+		.With("text-md", Size is EditableSize.Md)
+		.With("text-lg", Size is EditableSize.Lg)
+		.With(ClassName)
+		.Build();
+}

@@ -1,0 +1,32 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if ( !string.IsNullOrEmpty( Src ) && Parent.ImageStatus is not AvatarImageStatus.Errored )
+{
+	<img data-slot="avatar-image" class="@CssClass" src="@Src" alt="@Alt"
+		 @onload="OnLoad" @onerror="OnError" @attributes="AdditionalAttributes" />
+}
+
+@code {
+	[CascadingParameter] public required Avatar Parent { get; set; }
+
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	[Parameter] public string? Src { get; set; }
+	[Parameter] public string? Alt { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		if ( !string.IsNullOrEmpty( Src ) && Parent.ImageStatus is AvatarImageStatus.Idle )
+			await Parent.SetImageStatus( AvatarImageStatus.Loading );
+	}
+
+	private string CssClass => CssClassBuilder.Start( "aspect-square size-full" )
+											.With( ClassName )
+											.Build();
+
+	private async Task OnLoad() => await Parent.SetImageStatus( AvatarImageStatus.Loaded );
+	private async Task OnError() => await Parent.SetImageStatus( AvatarImageStatus.Errored );
+}

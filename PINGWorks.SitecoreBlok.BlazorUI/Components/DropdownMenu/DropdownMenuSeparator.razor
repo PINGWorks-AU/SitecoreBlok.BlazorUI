@@ -1,0 +1,11 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="dropdown-menu-separator" class="@CssClass"></div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "bg-border -mx-1 my-1 h-px" )
+										.With( ClassName )
+										.Build();
+}

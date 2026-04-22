@@ -1,0 +1,22 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="carousel-item" role="group" aria-roledescription="slide" class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] public required Carousel Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	protected override void OnInitialized()
+	{
+		Parent.ItemCount++;
+	}
+
+	private string CssClass => CssClassBuilder.Start( "min-w-0 shrink-0 grow-0 basis-full" )
+										.With( "pl-4", Parent.Orientation is CarouselOrientation.Horizontal )
+										.With( "pt-4", Parent.Orientation is CarouselOrientation.Vertical )
+										.With( ClassName )
+										.Build();
+}

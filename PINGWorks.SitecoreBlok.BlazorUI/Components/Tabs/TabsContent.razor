@@ -1,0 +1,22 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if (IsActive)
+{
+	<div data-slot="tabs-content" role="tabpanel" class="@CssClass">
+		@ChildContent
+	</div>
+}
+
+@code {
+	[CascadingParameter] public required Tabs Parent { get; set; }
+
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter, EditorRequired] public required string Value { get; set; }
+
+	private bool IsActive => Parent.Value == Value;
+
+	private string CssClass => CssClassBuilder.Start("flex-1 outline-none")
+										.With(ClassName)
+										.Build();
+}

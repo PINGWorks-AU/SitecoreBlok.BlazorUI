@@ -1,0 +1,25 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<input data-slot="input-group-control" type="@Type" value="@Value" placeholder="@Placeholder" disabled="@Disabled"
+	   class="@CssClass" @oninput="OnInput" @attributes="AdditionalAttributes" />
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+	[Parameter] public string Type { get; set; } = "text";
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+	[Parameter] public string? Placeholder { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	private string CssClass => CssClassBuilder.Start("flex-1 rounded-none border-0 bg-transparent shadow-none outline-none text-base md:text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-0 dark:bg-transparent px-3 py-1")
+										.With(ClassName)
+										.Build();
+
+	private async Task OnInput(ChangeEventArgs e)
+	{
+		Value = e.Value?.ToString();
+		if (ValueChanged.HasDelegate)
+			await ValueChanged.InvokeAsync(Value);
+	}
+}

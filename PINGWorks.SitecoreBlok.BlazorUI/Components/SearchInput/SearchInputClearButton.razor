@@ -1,0 +1,16 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.IconXs" ColorScheme="ButtonColor.Neutral"
+		Click="OnClear" ClassName="@CssClass" Title="@AriaLabel">
+	<Icon Svg="@IconSvg.Close" Scale="0.75" />
+</Button>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public EventCallback OnClear { get; set; }
+	[Parameter] public string AriaLabel { get; set; } = "Clear search";
+
+	private string CssClass => CssClassBuilder.Start("text-muted-foreground hover:text-foreground hover:bg-neutral-bg-active")
+										.With(ClassName)
+										.Build();
+}

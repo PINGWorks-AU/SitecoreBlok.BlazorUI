@@ -1,0 +1,35 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div @ref="Ref" data-slot="menubar-sub-trigger"
+	 data-inset="@( Inset ? "" : null )"
+	 data-state="@( ParentSub.IsOpen ? "open" : "closed" )"
+	 class="@CssClass"
+	 @onmouseenter="OnEnter" @onmouseleave="OnLeave">
+	@ChildContent
+	<Icon Svg="@IconSvg.ChevronRight" ClassName="ml-auto size-4" />
+</div>
+
+@code {
+	[CascadingParameter] public required MenubarSub ParentSub { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Inset { get; set; }
+
+	private ElementReference Ref;
+
+	private string CssClass => CssClassBuilder.Start(
+		"flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden",
+		"hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+		"data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[inset]:pl-8" )
+											.With( ClassName )
+											.Build();
+
+	protected override void OnAfterRender( bool firstRender )
+	{
+		if ( firstRender )
+			ParentSub.RegisterTriggerRef( Ref );
+	}
+
+	private async Task OnEnter() => await ParentSub.Open();
+	private async Task OnLeave() => await ParentSub.Close();
+}

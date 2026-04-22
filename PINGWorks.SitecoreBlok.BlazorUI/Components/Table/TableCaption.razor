@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<caption data-slot="table-caption" class="@CssClass">
+	@ChildContent
+</caption>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start("text-muted-foreground mt-4 text-sm")
+										.With(ClassName)
+										.Build();
+}

@@ -1,0 +1,16 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="tabs-list" role="tablist" class="@CssClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public TabsVariant Variant { get; set; } = TabsVariant.Line;
+
+	private string CssClass => CssClassBuilder.Start( "flex h-9 w-full items-center" )
+										.With( "border-b-2 border-border", Variant is not TabsVariant.SoftRounded )
+										.With( ClassName )
+										.Build();
+}

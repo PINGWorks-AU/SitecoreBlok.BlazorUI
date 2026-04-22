@@ -1,0 +1,38 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@implements IDisposable
+
+<div role="group" data-slot="select-group" aria-disabled="@( IsDisabled ? "true" : "false" )" data-disabled="@( IsDisabled ? "" : null )">
+	<CascadingValue Value="this" IsFixed>
+		@ChildContent
+	</CascadingValue>
+</div>
+
+@code {
+	[CascadingParameter] public Select? ParentSelect { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	private readonly List<ComponentBase> Items = [];
+
+	internal bool IsDisabled => Disabled || ( ParentSelect?.Disabled ?? false );
+
+	internal void Register( ComponentBase item )
+	{
+		if ( !Items.Contains( item ) && item is SelectItem )
+			Items.Add( item );
+	}
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		if ( ParentSelect is not null )
+			ParentSelect.Register( this );
+	}
+
+	public void Dispose()
+	{
+		ParentSelect?.Unregister( this );
+	}
+}

@@ -1,0 +1,12 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* `parity-no-text-pair`: separator is decorative — no text content. *@
+<div data-slot="select-separator" class="@CssClass"></div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "bg-border pointer-events-none -mx-1 my-1 h-px parity-no-text-pair" )
+											.With( ClassName )
+											.Build();
+}

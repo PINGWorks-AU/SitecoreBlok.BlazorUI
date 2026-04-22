@@ -1,0 +1,128 @@
+@page "/primitives/breadcrumb"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Breadcrumb" Description="Displays the path to the current resource using a hierarchy of links" Interactivity="ComponentInteractivity.Ssr" ApiElements="@BreadcrumbElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Breadcrumb>\n    <BreadcrumbList>\n        <BreadcrumbItem>\n            <BreadcrumbLink Href=\"#\">Home</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n            <BreadcrumbLink Href=\"#\">Components</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n            <BreadcrumbPage>Breadcrumb</BreadcrumbPage>\n        </BreadcrumbItem>\n    </BreadcrumbList>\n</Breadcrumb>")">
+			<Breadcrumb>
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink Href="#">Home</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink Href="#">Components</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
+		</ComponentExample>
+
+		<ComponentExample Title="With ellipsis" Code="@("<Breadcrumb>\n    <BreadcrumbList>\n        <BreadcrumbItem>\n            <BreadcrumbLink Href=\"#\">Home</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n            <BreadcrumbEllipsis />\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n            <BreadcrumbLink Href=\"#\">Settings</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n            <BreadcrumbPage>Profile</BreadcrumbPage>\n        </BreadcrumbItem>\n    </BreadcrumbList>\n</Breadcrumb>")">
+			<Breadcrumb>
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink Href="#">Home</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbEllipsis />
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink Href="#">Settings</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>Profile</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] BreadcrumbElements =
+	[
+		new ApiElement(
+			Name: "Breadcrumb",
+			Description: "Outer `<nav aria-label=\"breadcrumb\">` wrapper. Wraps a `BreadcrumbList` and (usually) one or more `BreadcrumbItem` + `BreadcrumbSeparator` pairs.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Should contain a single `BreadcrumbList`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<nav>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "BreadcrumbList",
+			Description: "The `<ol>` that holds `BreadcrumbItem`s and `BreadcrumbSeparator`s. Renders muted-foreground text with flex wrapping.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the `<ol>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Alternating `BreadcrumbItem` and `BreadcrumbSeparator` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "BreadcrumbItem",
+			Description: "A single `<li>` in the breadcrumb chain. Holds a `BreadcrumbLink`, `BreadcrumbPage`, or `BreadcrumbEllipsis`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the `<li>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Usually a single `BreadcrumbLink`, `BreadcrumbPage`, or `BreadcrumbEllipsis`." ),
+			]
+		),
+		new ApiElement(
+			Name: "BreadcrumbLink",
+			Description: "Hyperlink to a parent section. Renders as an `<a>` with the muted-foreground → foreground hover transition.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Href",                 "string?",                       false, "Target URL." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<a>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Link label." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<a>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "BreadcrumbPage",
+			Description: "Non-interactive label for the current page. Rendered with `aria-current=\"page\"` and full foreground text, so it stands out from the muted links.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the `<span>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Current page label." ),
+			]
+		),
+		new ApiElement(
+			Name: "BreadcrumbEllipsis",
+			Description: "Placeholder `<span>` with a `…` (horizontal dots) icon. Used to collapse a long chain.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the ellipsis `<span>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "BreadcrumbSeparator",
+			Description: "Visual separator between items. Renders a custom icon via `ChildContent` or falls back to a `/` glyph.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the separator `<li>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Optional custom separator glyph. Default is a `/` character." ),
+			]
+		),
+	];
+}

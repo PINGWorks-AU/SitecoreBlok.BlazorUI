@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<span data-slot="pagination-ellipsis" aria-hidden="true" class="@CssClass">
+	<Icon Svg="@IconSvg.DotsHorizontal" Scale="0.6" ResetClassName />
+	<span class="sr-only">More pages</span>
+</span>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "text-neutral-fg flex size-9 items-center justify-center" )
+											.With( ClassName )
+											.Build();
+}

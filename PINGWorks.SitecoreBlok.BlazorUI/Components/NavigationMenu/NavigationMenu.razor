@@ -1,0 +1,137 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<nav @ref="NavRef" data-slot="navigation-menu" class="@CssClass" @attributes="AdditionalAttributes">
+	<CascadingValue Value="this" IsFixed="false">
+		@ChildContent
+	</CascadingValue>
+	@if (Viewport && IsOpen)
+	{
+		<div class="fixed isolate z-50 flex"
+			 style="left:@ViewportLeftStr;top:@NavBottomStr;transition:left 200ms ease-out;"
+			 @onmouseenter="CancelClose" @onmouseleave="@(() => StartClose(null))">
+			<div data-slot="navigation-menu-viewport"
+				 data-state="@(ActiveId != null ? "open" : "closed")"
+				 class="origin-top bg-popover text-popover-foreground relative mt-1.5 overflow-hidden rounded-md border shadow data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 duration-200">
+				<div class="relative">
+					@foreach (var item in Items)
+					{
+						bool active = item.Id == ActiveId;
+						<div class="@(active ? "relative opacity-100 pointer-events-auto" : "absolute inset-0 opacity-0 pointer-events-none") transition-opacity duration-150">
+							@item.Content
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	}
+</nav>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Viewport { get; set; } = true;
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	// Children (NavigationMenuIndicator) subscribe to re-render when active state changes.
+	internal event Action? StateChanged;
+
+	private readonly List<NavEntry> Items = [];
+	private bool IsOpen;
+	private double ViewportLeft;
+	private double NavBottom;
+	private double TriggerAbsoluteCenterX;
+	private ElementReference NavRef;
+	private IJSObjectReference? Module;
+	private CancellationTokenSource? CloseCts;
+
+	internal string? ActiveId;
+	internal string TriggerCenterXStr =>
+		TriggerAbsoluteCenterX.ToString("F0", System.Globalization.CultureInfo.InvariantCulture);
+
+	internal string NavBottomStr =>
+		NavBottom.ToString("F0", System.Globalization.CultureInfo.InvariantCulture) + "px";
+
+	private string ViewportLeftStr =>
+		ViewportLeft.ToString("F0", System.Globalization.CultureInfo.InvariantCulture) + "px";
+
+	private string CssClass => CssClassBuilder.Start("group/navigation-menu relative flex max-w-max flex-1 items-center justify-center")
+		.With(ClassName)
+		.Build();
+
+	internal void Register(NavEntry entry) => Items.Add(entry);
+
+	internal void Unregister(string id) => Items.RemoveAll(e => e.Id == id);
+
+	internal async Task SetActive(string id, ElementReference liRef)
+	{
+		CloseCts?.Cancel();
+
+		var entry = Items.FirstOrDefault(i => i.Id == id);
+		if (entry is null || entry.Content is null)
+		{
+			StartClose(null);
+			return;
+		}
+
+		ActiveId = id;
+		IsOpen = true;
+
+		Module ??= await JS.InvokeAsync<IJSObjectReference>("import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js");
+		var trig = await Module.InvokeAsync<ElementRect>("SitecoreUI.getElementBounds", liRef);
+		var nav = await Module.InvokeAsync<ElementRect>("SitecoreUI.getElementBounds", NavRef);
+		ViewportLeft = trig.Left;
+		NavBottom = nav.Top + nav.Height;
+		TriggerAbsoluteCenterX = trig.Left + trig.Width / 2.0;
+
+		StateChanged?.Invoke();
+		await InvokeAsync(StateHasChanged);
+	}
+
+	internal void StartClose(string? id)
+	{
+		if (id is not null && ActiveId != id) return;
+
+		CloseCts?.Cancel();
+		CloseCts = new CancellationTokenSource();
+		var token = CloseCts.Token;
+
+		_ = Task.Run((Func<Task>)(async () =>
+		{
+			try
+			{
+				await Task.Delay(150, token);
+				if (!token.IsCancellationRequested)
+				{
+					this.ActiveId = null;
+					StateChanged?.Invoke();
+					await InvokeAsync(StateHasChanged);
+					// Hold viewport in DOM during close animation (200ms zoom-out).
+					await Task.Delay(200, token);
+					IsOpen = false;
+					await InvokeAsync(StateHasChanged);
+				}
+			}
+			catch (TaskCanceledException) { }
+		}), token);
+	}
+
+	internal void CancelClose() => CloseCts?.Cancel();
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			CloseCts?.Cancel();
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+
+	internal sealed class NavEntry
+	{
+		public required string Id { get; init; }
+		public RenderFragment? Content { get; set; }
+	}
+}

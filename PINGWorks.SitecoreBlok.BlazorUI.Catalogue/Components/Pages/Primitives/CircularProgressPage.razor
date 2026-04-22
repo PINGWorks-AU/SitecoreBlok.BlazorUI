@@ -1,0 +1,50 @@
+@page "/primitives/circularprogress"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="CircularProgress" Description="Displays a circular progress indicator" Interactivity="ComponentInteractivity.Ssr" ApiElements="@CircularProgressElements">
+
+	<DivergenceNote>
+		<p><strong>Reduced API compared to Blok's Chakra wrapper.</strong> Blok's <code>CircularProgress</code> (from Chakra) supports <code>isIndeterminate</code> / <code>variant="indeterminate"</code>, size presets (<code>xs</code>/<code>sm</code>/<code>md</code>/<code>lg</code>/<code>xl</code>), <code>thickness</code>, <code>min</code>, and <code>capIsRound</code>. We currently expose only <code>Value</code> (0–<code>Max</code>), <code>Max</code>, <code>StrokeWidth</code>, and <code>ShowLabel</code>. Indeterminate mode and size presets are not yet implemented. Additive: <code>ShowLabel</code> (pre-styled percentage label in the centre) which Blok lacks.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default (50%)" Code="@("<CircularProgress Value=\"50\" />")">
+			<CircularProgress Value="50" />
+		</ComponentExample>
+
+		<ComponentExample Title="With label" Code="@("<CircularProgress Value=\"75\" ShowLabel />")">
+			<CircularProgress Value="75" ShowLabel />
+		</ComponentExample>
+
+		<ComponentExample Title="Zero" Code="@("<CircularProgress Value=\"0\" ShowLabel />")">
+			<CircularProgress Value="0" ShowLabel />
+		</ComponentExample>
+
+		<ComponentExample Title="Complete" Code="@("<CircularProgress Value=\"100\" ShowLabel />")">
+			<CircularProgress Value="100" ShowLabel />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] CircularProgressElements =
+	[
+		new ApiElement(
+			Name: "CircularProgress",
+			Description: "Renders a circular SVG progress arc that tracks `Value` against `Max`. Optionally shows a centred percentage label via `ShowLabel`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",       "int",      false, "Current progress value. Interpreted as a portion of `Max`. Default: `0`." ),
+				new ApiProperty( "Max",         "int",      false, "Upper bound for `Value`. Default: `100`." ),
+				new ApiProperty( "ShowLabel",   "bool",     false, "When true, renders the rounded percentage inside the circle. Default: `false`." ),
+				new ApiProperty( "StrokeWidth", "int",      false, "Thickness of the SVG stroke. Default: `3`." ),
+				new ApiProperty( "ClassName",   "string?",  false, "Extra CSS classes appended to the outer wrapper." ),
+			]
+		),
+	];
+}

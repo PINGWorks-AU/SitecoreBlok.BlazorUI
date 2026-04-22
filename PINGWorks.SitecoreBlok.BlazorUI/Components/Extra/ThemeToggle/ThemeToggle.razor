@@ -1,0 +1,61 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@implements IAsyncDisposable
+@inject GlobalTheme Theme
+@inject IJSRuntime Js
+
+<Toggle Pressed="@IsDark" PressedChanged="OnToggle" Size="ToggleSize.Sm" ClassName="@ClassName" aria-label="Toggle theme" title="@TitleText">
+	<Icon Svg="@IconPath" />
+</Toggle>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+
+	private bool IsDark => Theme.DisplayMode == DisplayMode.Dark;
+	private string IconPath => IsDark ? IconSvg.WhiteBalanceSunny : IconSvg.MoonWaxingCrescent;
+	private string TitleText => IsDark ? "Switch to light mode" : "Switch to dark mode";
+
+	private IJSObjectReference? Module;
+
+	protected override void OnInitialized()
+		=> Theme.DisplayModeChanged += OnThemeChanged;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+
+		if ( Module is null )
+			Module = await Js.InvokeAsync<IJSObjectReference>( "import", "./_content/PINGWorks.SitecoreBlok.BlazorUI/Components/Extra/ThemeToggle/ThemeToggle.razor.js" );
+
+		if ( firstRender )
+		{
+			var stored = await Module.InvokeAsync<bool?>( "getStoredDisplayMode" );
+			if ( stored is { } isDark )
+			{
+				var storedMode = isDark ? DisplayMode.Dark : DisplayMode.Light;
+				if ( Theme.DisplayMode != storedMode )
+					Theme.DisplayMode = storedMode;
+				await Module.InvokeVoidAsync( "setDisplayMode", isDark );
+			}
+		}
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			Theme.DisplayModeChanged -= OnThemeChanged;
+			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
+		}
+		catch (JSDisconnectedException) { }
+	}
+
+	private void OnThemeChanged()
+		=> InvokeAsync( StateHasChanged );
+
+	private async Task OnToggle( bool pressed )
+	{
+		Theme.DisplayMode = pressed ? DisplayMode.Dark : DisplayMode.Light;
+		await (Module?.InvokeVoidAsync("setDisplayMode", pressed) ?? ValueTask.CompletedTask);
+	}
+}

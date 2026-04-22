@@ -1,0 +1,27 @@
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<div class="mt-8">
+	<h3 id="@Anchor" class="text-xl font-semibold tracking-tight text-foreground scroll-mt-20 font-mono">
+		@Element.Name
+	</h3>
+	<p class="text-muted-foreground mt-1 text-sm">
+		<DescriptionRenderer Description="@Element.Description" KnownElements="@KnownElements" />
+	</p>
+	<ApiPropertiesTable Properties="@Element.Properties" KnownElements="@KnownElements" />
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required ApiElement Element { get; set; }
+	[Parameter] public ApiElement[]? KnownElements { get; set; }
+
+	// Cascaded from ApiSection so this element's H3 is registered under the API section,
+	// not globally — preserves markup order in the ToC.
+	[CascadingParameter] public TocSection? ParentTocSection { get; set; }
+
+	private string Anchor => PageTocRegistry.Slugify( Element.Name );
+
+	protected override void OnInitialized()
+	{
+		ParentTocSection?.AddChild( Element.Name, Anchor );
+	}
+}

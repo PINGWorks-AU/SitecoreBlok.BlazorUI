@@ -1,0 +1,198 @@
+@page "/primitives/dialog"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Dialog" Description="A modal dialog that interrupts the user" Interactivity="ComponentInteractivity.Interactive" ApiElements="@DialogElements">
+
+	<DivergenceNote>
+		<p><strong>Trigger and Portal collapsed; built-in top-right close button.</strong> Blok exports <code>DialogTrigger</code>, <code>DialogPortal</code>, and <code>DialogClose</code> as separate components and renders no close button implicitly. Ours collapses trigger + portal into the root (open/close with <code>Open</code>/<code>OpenChanged</code> two-way binding), and the content area includes a hardcoded top-right ✕ button (matching Blok's default content template — verified against Blok source). <code>DialogHeader</code>, <code>DialogFooter</code>, <code>DialogTitle</code>, <code>DialogDescription</code>, and <code>DialogClose</code> remain as separate components for composition inside the content. No focus trap and no <kbd>Esc</kbd>-to-close.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Button Click=\"@(() => dialogOpen = true)\">Open Dialog</Button>\n<Dialog @bind-Open=\"dialogOpen\">\n    <DialogHeader>\n        <DialogTitle>Edit profile</DialogTitle>\n        <DialogDescription>Make changes to your profile here.</DialogDescription>\n    </DialogHeader>\n    <div class=\"py-4\">\n        <Input Placeholder=\"Enter your name\" />\n    </div>\n    <DialogFooter>\n        <Button Variant=\"ButtonVariant.Outline\" Click=\"...\">Cancel</Button>\n        <Button Click=\"...\">Save changes</Button>\n    </DialogFooter>\n</Dialog>")">
+			<Button Click="@(() => DialogOpen = true)">Open Dialog</Button>
+			<Dialog @bind-Open="DialogOpen">
+				<DialogHeader>
+					<DialogTitle>Edit profile</DialogTitle>
+					<DialogDescription>Make changes to your profile here.</DialogDescription>
+				</DialogHeader>
+				<div class="py-4">
+					<Input Placeholder="Enter your name" />
+				</div>
+				<DialogFooter>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral"
+							Click="@(() => DialogOpen = false)">Cancel</Button>
+					<Button Click="@(() => DialogOpen = false)">Save changes</Button>
+				</DialogFooter>
+			</Dialog>
+		</ComponentExample>
+
+		<ComponentExample Title="Sizes" Code="@("<Dialog Size=\"DialogSize.Sm\">...</Dialog>\n<Dialog Size=\"DialogSize.Lg\">...</Dialog>\n<Dialog Size=\"DialogSize.Xl\">...</Dialog>")">
+			<div class="flex gap-3">
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogSm = true)">Small</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogMd = true)">Medium</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogLg = true)">Large</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogXl = true)">Extra Large</Button>
+			</div>
+			<Dialog @bind-Open="SizeDialogSm" Size="DialogSize.Sm">
+				<DialogHeader>
+					<DialogTitle>Small Dialog</DialogTitle>
+					<DialogDescription>A compact dialog for simple confirmations.</DialogDescription>
+				</DialogHeader>
+				<DialogFooter>
+					<Button Click="@(() => SizeDialogSm = false)">OK</Button>
+				</DialogFooter>
+			</Dialog>
+			<Dialog @bind-Open="SizeDialogMd" Size="DialogSize.Md">
+				<DialogHeader>
+					<DialogTitle>Medium Dialog</DialogTitle>
+					<DialogDescription>The default size, suitable for forms and standard content.</DialogDescription>
+				</DialogHeader>
+				<div class="py-4">
+					<p class="text-sm text-muted-foreground">This dialog uses <code>DialogSize.Md</code> at 50% viewport width.</p>
+				</div>
+				<DialogFooter>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogMd = false)">Close</Button>
+				</DialogFooter>
+			</Dialog>
+			<Dialog @bind-Open="SizeDialogLg" Size="DialogSize.Lg">
+				<DialogHeader>
+					<DialogTitle>Large Dialog</DialogTitle>
+					<DialogDescription>More room for detailed content and forms.</DialogDescription>
+				</DialogHeader>
+				<div class="py-4">
+					<p class="text-sm text-muted-foreground">This dialog uses <code>DialogSize.Lg</code> for a wider layout.</p>
+				</div>
+				<DialogFooter>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogLg = false)">Close</Button>
+				</DialogFooter>
+			</Dialog>
+			<Dialog @bind-Open="SizeDialogXl" Size="DialogSize.Xl">
+				<DialogHeader>
+					<DialogTitle>Extra Large Dialog</DialogTitle>
+					<DialogDescription>Suitable for data tables, previews, or multi-column layouts.</DialogDescription>
+				</DialogHeader>
+				<div class="py-4">
+					<p class="text-sm text-muted-foreground">This dialog uses <code>DialogSize.Xl</code> for maximum content width.</p>
+				</div>
+				<DialogFooter>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogXl = false)">Close</Button>
+				</DialogFooter>
+			</Dialog>
+		</ComponentExample>
+
+		<ComponentExample Title="Scrollable with Sticky Footer" Code="@("<Dialog @bind-Open=\"scrollDialogOpen\" Size=\"DialogSize.Lg\">\n    <DialogHeader>\n        <DialogTitle>Terms of Service</DialogTitle>\n        <DialogDescription>Please read and accept the terms.</DialogDescription>\n    </DialogHeader>\n    <div class=\"max-h-64 overflow-y-auto border rounded-md p-4 text-sm\">\n        <!-- Long content here -->\n    </div>\n    <DialogFooter>\n        <Button>I Accept</Button>\n    </DialogFooter>\n</Dialog>")">
+			<Button Click="@(() => ScrollDialogOpen = true)">Open Scrollable Dialog</Button>
+			<Dialog @bind-Open="ScrollDialogOpen" Size="DialogSize.Md">
+				<DialogHeader>
+					<DialogTitle>Terms of Service</DialogTitle>
+					<DialogDescription>Please read and accept the terms below.</DialogDescription>
+				</DialogHeader>
+				<div class="max-h-64 overflow-y-auto border border-border rounded-md p-4 text-sm text-muted-foreground space-y-3">
+					<h4 class="font-semibold text-foreground">1. Acceptance of Terms</h4>
+					<p>By accessing and using this service, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+					<h4 class="font-semibold text-foreground">2. Use License</h4>
+					<p>Permission is granted to temporarily download one copy of the materials on this website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.</p>
+					<p>Under this license you may not: modify or copy the materials; use the materials for any commercial purpose; attempt to decompile or reverse engineer any software contained on the website; remove any copyright or other proprietary notations from the materials; or transfer the materials to another person.</p>
+					<h4 class="font-semibold text-foreground">3. Disclaimer</h4>
+					<p>The materials on this website are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property.</p>
+					<h4 class="font-semibold text-foreground">4. Limitations</h4>
+					<p>In no event shall the company or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on the website.</p>
+					<h4 class="font-semibold text-foreground">5. Accuracy of Materials</h4>
+					<p>The materials appearing on the website could include technical, typographical, or photographic errors. We do not warrant that any of the materials on the website are accurate, complete, or current.</p>
+					<h4 class="font-semibold text-foreground">6. Links</h4>
+					<p>We have not reviewed all of the sites linked to this website and are not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement. Use of any such linked website is at the user's own risk.</p>
+					<h4 class="font-semibold text-foreground">7. Modifications</h4>
+					<p>We may revise these terms of service at any time without notice. By using this website you are agreeing to be bound by the then current version of these terms of service.</p>
+					<h4 class="font-semibold text-foreground">8. Governing Law</h4>
+					<p>These terms and conditions are governed by and construed in accordance with the laws and you irrevocably submit to the exclusive jurisdiction of the courts in that location.</p>
+				</div>
+				<DialogFooter>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral"
+							Click="@(() => ScrollDialogOpen = false)">Decline</Button>
+					<Button Click="@(() => ScrollDialogOpen = false)">I Accept</Button>
+				</DialogFooter>
+			</Dialog>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool DialogOpen;
+	private bool SizeDialogSm;
+	private bool SizeDialogMd;
+	private bool SizeDialogLg;
+	private bool SizeDialogXl;
+	private bool ScrollDialogOpen;
+
+	private static readonly ApiElement[] DialogElements =
+	[
+		new ApiElement(
+			Name: "Dialog",
+			Description: "Modal container with a full-viewport overlay and a centred content surface. Open/close is driven by `Open`/`OpenChanged`; the content also renders a built-in top-right ✕ close button.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Open",         "bool",                  false, "Whether the dialog is visible. Supports two-way binding via `@bind-Open`. Default: `false`." ),
+				new ApiProperty( "OpenChanged",  "EventCallback<bool>",   false, "Fires when the dialog is dismissed via the overlay or the built-in ✕ button." ),
+				new ApiProperty( "Size",         "DialogSize",            false, "Content width. Default: `DialogSize.Md` (50vw). Other values: `Sm`, `Lg`, `Xl`, `Full`." ),
+				new ApiProperty( "ClassName",    "string?",               false, "Extra CSS classes appended to the content surface." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",       false, "Dialog body — typically `DialogHeader`, form controls, and `DialogFooter`." ),
+			]
+		),
+		new ApiElement(
+			Name: "DialogHeader",
+			Description: "Vertical stack of heading rows at the top of a `Dialog`. Centres text on mobile and left-aligns on `sm:` and up.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the header container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Usually a `DialogTitle` followed by a `DialogDescription`." ),
+			]
+		),
+		new ApiElement(
+			Name: "DialogTitle",
+			Description: "Prominent heading inside a `DialogHeader`. Rendered at `text-lg` with semibold weight.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the title `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Title text or inline markup." ),
+			]
+		),
+		new ApiElement(
+			Name: "DialogDescription",
+			Description: "Supporting copy placed under the `DialogTitle`. Rendered at `text-sm` in the muted foreground colour.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the description `<div>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Description content." ),
+			]
+		),
+		new ApiElement(
+			Name: "DialogFooter",
+			Description: "Action row anchored to the bottom of a `Dialog`. Stacks vertically on mobile (reversed) and lays out horizontally from `sm:` up with right-aligned buttons.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the footer container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Action buttons for the dialog." ),
+			]
+		),
+		new ApiElement(
+			Name: "DialogClose",
+			Description: "Optional explicit close button for use inside dialog content. Fires `Click` — wire it up to set your `Open` binding to `false`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Click",        "EventCallback",   false, "Invoked when the button is clicked." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<button>`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Button label." ),
+			]
+		),
+	];
+}

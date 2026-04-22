@@ -1,0 +1,21 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<li data-slot="breadcrumb-separator" role="presentation" aria-hidden="true" class="@CssClass">
+	@if (ChildContent is not null)
+	{
+		@ChildContent
+	}
+	else
+	{
+		<span class="text-muted-foreground">/</span>
+	}
+</li>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start("[&>svg]:size-3.5")
+										.With(ClassName)
+										.Build();
+}

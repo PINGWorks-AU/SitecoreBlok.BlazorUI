@@ -1,0 +1,26 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* IMPORTANT — do not revert to `max-height` or `@if` conditional rendering.
+   The `grid-template-rows: 0fr → 1fr` transition gives a smooth, content-size-aware
+   open/close animation without any JS measurement. Widely supported: Chrome 117+,
+   Firefox 121+, Safari 16.4+. Older browsers simply toggle instantly without animating.
+   `text-foreground` ensures the content text remains legible after dark-mode flips. *@
+<div data-slot="accordion-content" data-state="@( Parent.IsOpen ? "open" : "closed" )"
+	 class="overflow-hidden text-foreground"
+	 style="display: grid; grid-template-rows: @( Parent.IsOpen ? "1fr" : "0fr" ); transition: grid-template-rows 200ms ease-out;">
+	<div class="min-h-0 overflow-hidden">
+		<div class="@InnerClass">
+			@ChildContent
+		</div>
+	</div>
+</div>
+
+@code {
+	[CascadingParameter] public required AccordionItem Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string InnerClass => CssClassBuilder.Start( "text-md px-2 py-2 pt-0 pb-4" )
+											.With( ClassName )
+											.Build();
+}

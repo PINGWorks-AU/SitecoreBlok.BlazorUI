@@ -1,0 +1,27 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<a data-slot="sidebar-menu-sub-button" data-sidebar="menu-sub-button"
+		data-size="@SizeAttr" data-active="@(IsActive.ToString().ToLowerInvariant())"
+		class="@CssClass" href="@Href" @attributes="AdditionalAttributes">
+	@ChildContent
+</a>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? Href { get; set; }
+	[Parameter] public bool IsActive { get; set; }
+	[Parameter] public SidebarMenuSubButtonSize Size { get; set; } = SidebarMenuSubButtonSize.Md;
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string SizeAttr => Size is SidebarMenuSubButtonSize.Sm ? "sm" : "md";
+
+	private string CssClass => CssClassBuilder.Start(
+		"flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground ring-sidebar-ring outline-hidden hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
+		"data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+		"group-data-[collapsible=icon]:hidden" )
+		.With( "text-xs", Size is SidebarMenuSubButtonSize.Sm )
+		.With( "text-sm", Size is SidebarMenuSubButtonSize.Md )
+		.With( ClassName )
+		.Build();
+}

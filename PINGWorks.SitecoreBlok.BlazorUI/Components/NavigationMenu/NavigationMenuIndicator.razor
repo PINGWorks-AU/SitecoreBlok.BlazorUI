@@ -1,0 +1,29 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IDisposable
+
+@if (Nav?.ActiveId != null)
+{
+	<div data-slot="navigation-menu-indicator"
+		 class="pointer-events-none fixed z-[1] flex h-1.5 items-end justify-center overflow-hidden transition-[left] duration-200"
+		 style="left:@(Nav.TriggerCenterXStr)px;top:@(Nav.NavBottomStr);transform:translateX(-50%);">
+		<div class="bg-border relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md parity-no-text-pair"></div>
+	</div>
+}
+
+@code {
+	[CascadingParameter] private NavigationMenu? Nav { get; set; }
+
+	private Action? Handler;
+
+	protected override void OnInitialized()
+	{
+		Handler = () => InvokeAsync(StateHasChanged);
+		if (Nav is not null) Nav.StateChanged += Handler;
+	}
+
+	public void Dispose()
+	{
+		if (Handler is not null && Nav is not null)
+			Nav.StateChanged -= Handler;
+	}
+}

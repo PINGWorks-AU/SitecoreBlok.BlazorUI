@@ -1,0 +1,9 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* Blok renders via a Radix portal to document.body. Blazor uses fixed positioning
+   natively, so no portal DOM is needed — this is a passthrough wrapper for API parity. *@
+@ChildContent
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,40 @@
+@page "/graphics/theming/border-radius"
+@rendermode InteractiveServer
+
+<ComponentPage Title="Border radius" Description="Radius variants from sharp corners to fully rounded.">
+
+	<div class="pt-2 pb-4">
+		<a href="/graphics/theming" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">&larr; Theming</a>
+	</div>
+
+	<Table Size="TableSize.Sm">
+		<TableHeader>
+			<TableRow>
+				<TableHead>Class</TableHead>
+				<TableHead>Preview</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody>
+			@foreach (var r in Radii)
+			{
+				<TableRow>
+					<TableCell>
+						<code class="font-medium text-sm">@r</code>
+					</TableCell>
+					<TableCell>
+						<div class="w-16 h-16 border-2 border-primary bg-primary/10 @r"></div>
+					</TableCell>
+				</TableRow>
+			}
+		</TableBody>
+	</Table>
+
+</ComponentPage>
+
+@code {
+	private static readonly string[] Radii =
+	[
+		"rounded-none", "rounded-sm", "rounded", "rounded-md",
+		"rounded-lg", "rounded-xl", "rounded-2xl", "rounded-full",
+	];
+}

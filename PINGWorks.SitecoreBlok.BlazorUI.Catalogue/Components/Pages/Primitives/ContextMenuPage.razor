@@ -1,0 +1,334 @@
+@page "/primitives/contextmenu"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="ContextMenu"
+			   Description="A menu that appears on right-click, providing contextual actions for the target element."
+			   Interactivity="ComponentInteractivity.Interactive"
+			   ApiElements="@ContextMenuElements">
+
+	<DivergenceNote>
+		<p><strong>No Radix portal or state-driven animations.</strong> Blok wraps Radix UI primitives that portal content to <code>document.body</code> and animate via Radix state attributes. In Blazor the content is fixed-positioned in the render tree — no portal is needed, and animate-out requires keeping the element in DOM which we don't do. <code>ContextMenuPortal</code> is a no-op passthrough for API parity.</p>
+		<p><strong>Hover-driven submenus instead of focus-driven.</strong> Blok's <code>ContextMenuSubTrigger</code> opens the sub-menu via Radix keyboard focus management. Blazor uses <code>@@onmouseenter</code> / <code>@@onmouseleave</code> instead — equivalent visual result, different trigger mechanism.</p>
+		<p><strong>CheckboxItem keeps the menu open.</strong> Blok/Radix CheckboxItems toggle state without closing the menu. This implementation matches that behaviour — click outside (the backdrop) to dismiss.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<ContextMenu>\n    <ContextMenuTrigger>\n        <div class=\"border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground\">\n            Right-click here\n        </div>\n    </ContextMenuTrigger>\n    <ContextMenuContent>\n        <ContextMenuLabel>Actions</ContextMenuLabel>\n        <ContextMenuItem>Cut</ContextMenuItem>\n        <ContextMenuItem>Copy</ContextMenuItem>\n        <ContextMenuItem>Paste</ContextMenuItem>\n        <ContextMenuSeparator />\n        <ContextMenuItem Variant=\"ContextMenuItemVariant.Destructive\">Delete</ContextMenuItem>\n    </ContextMenuContent>\n</ContextMenu>")">
+			<ContextMenu>
+				<ContextMenuTrigger>
+					<div class="border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground">
+						Right-click here
+					</div>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuLabel>Actions</ContextMenuLabel>
+					<ContextMenuItem>Cut</ContextMenuItem>
+					<ContextMenuItem>Copy</ContextMenuItem>
+					<ContextMenuItem>Paste</ContextMenuItem>
+					<ContextMenuSeparator />
+					<ContextMenuItem Variant="ContextMenuItemVariant.Destructive">Delete</ContextMenuItem>
+				</ContextMenuContent>
+			</ContextMenu>
+		</ComponentExample>
+
+		<ComponentExample Title="With Shortcut"
+			Code="@("<ContextMenu>\n    <ContextMenuTrigger>\n        <div class=\"border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground\">\n            Right-click here\n        </div>\n    </ContextMenuTrigger>\n    <ContextMenuContent>\n        <ContextMenuItem>\n            Back <ContextMenuShortcut>⌘[</ContextMenuShortcut>\n        </ContextMenuItem>\n        <ContextMenuItem>\n            Forward <ContextMenuShortcut>⌘]</ContextMenuShortcut>\n        </ContextMenuItem>\n        <ContextMenuItem>\n            Reload <ContextMenuShortcut>⌘R</ContextMenuShortcut>\n        </ContextMenuItem>\n        <ContextMenuSeparator />\n        <ContextMenuItem Disabled=\"true\">\n            Save Page As… <ContextMenuShortcut>⌘S</ContextMenuShortcut>\n        </ContextMenuItem>\n    </ContextMenuContent>\n</ContextMenu>")">
+			<ContextMenu>
+				<ContextMenuTrigger>
+					<div class="border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground">
+						Right-click here
+					</div>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuItem>
+						Back <ContextMenuShortcut>⌘[</ContextMenuShortcut>
+					</ContextMenuItem>
+					<ContextMenuItem>
+						Forward <ContextMenuShortcut>⌘]</ContextMenuShortcut>
+					</ContextMenuItem>
+					<ContextMenuItem>
+						Reload <ContextMenuShortcut>⌘R</ContextMenuShortcut>
+					</ContextMenuItem>
+					<ContextMenuSeparator />
+					<ContextMenuItem Disabled="true">
+						Save Page As… <ContextMenuShortcut>⌘S</ContextMenuShortcut>
+					</ContextMenuItem>
+				</ContextMenuContent>
+			</ContextMenu>
+		</ComponentExample>
+
+		<ComponentExample Title="With Submenu"
+			Code="@("<ContextMenu>\n    <ContextMenuTrigger>\n        <div class=\"border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground\">\n            Right-click here\n        </div>\n    </ContextMenuTrigger>\n    <ContextMenuContent>\n        <ContextMenuItem>Back</ContextMenuItem>\n        <ContextMenuItem>Forward</ContextMenuItem>\n        <ContextMenuItem>Reload</ContextMenuItem>\n        <ContextMenuSeparator />\n        <ContextMenuSub>\n            <ContextMenuSubTrigger>Share</ContextMenuSubTrigger>\n            <ContextMenuSubContent>\n                <ContextMenuItem>Email</ContextMenuItem>\n                <ContextMenuItem>Slack</ContextMenuItem>\n                <ContextMenuItem>Teams</ContextMenuItem>\n            </ContextMenuSubContent>\n        </ContextMenuSub>\n        <ContextMenuSub>\n            <ContextMenuSubTrigger>More Tools</ContextMenuSubTrigger>\n            <ContextMenuSubContent>\n                <ContextMenuItem>View Source</ContextMenuItem>\n                <ContextMenuItem>Inspect</ContextMenuItem>\n            </ContextMenuSubContent>\n        </ContextMenuSub>\n        <ContextMenuSeparator />\n        <ContextMenuItem Variant=\"ContextMenuItemVariant.Destructive\">Clear Data</ContextMenuItem>\n    </ContextMenuContent>\n</ContextMenu>")">
+			<ContextMenu>
+				<ContextMenuTrigger>
+					<div class="border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground">
+						Right-click here
+					</div>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuItem>Back</ContextMenuItem>
+					<ContextMenuItem>Forward</ContextMenuItem>
+					<ContextMenuItem>Reload</ContextMenuItem>
+					<ContextMenuSeparator />
+					<ContextMenuSub>
+						<ContextMenuSubTrigger>Share</ContextMenuSubTrigger>
+						<ContextMenuSubContent>
+							<ContextMenuItem>Email</ContextMenuItem>
+							<ContextMenuItem>Slack</ContextMenuItem>
+							<ContextMenuItem>Teams</ContextMenuItem>
+						</ContextMenuSubContent>
+					</ContextMenuSub>
+					<ContextMenuSub>
+						<ContextMenuSubTrigger>More Tools</ContextMenuSubTrigger>
+						<ContextMenuSubContent>
+							<ContextMenuItem>View Source</ContextMenuItem>
+							<ContextMenuItem>Inspect</ContextMenuItem>
+						</ContextMenuSubContent>
+					</ContextMenuSub>
+					<ContextMenuSeparator />
+					<ContextMenuItem Variant="ContextMenuItemVariant.Destructive">Clear Data</ContextMenuItem>
+				</ContextMenuContent>
+			</ContextMenu>
+		</ComponentExample>
+
+		<ComponentExample Title="With Checkbox Items"
+			Code="@("<ContextMenu>\n    <ContextMenuTrigger>\n        <div class=\"border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground\">\n            Right-click here\n        </div>\n    </ContextMenuTrigger>\n    <ContextMenuContent>\n        <ContextMenuLabel>Appearance</ContextMenuLabel>\n        <ContextMenuSeparator />\n        <ContextMenuCheckboxItem @bind-Checked=\"ShowStatusBar\">Show Status Bar</ContextMenuCheckboxItem>\n        <ContextMenuCheckboxItem @bind-Checked=\"ShowActivityBar\">Show Activity Bar</ContextMenuCheckboxItem>\n        <ContextMenuCheckboxItem @bind-Checked=\"ShowPanel\">Show Panel</ContextMenuCheckboxItem>\n    </ContextMenuContent>\n</ContextMenu>")">
+			<ContextMenu>
+				<ContextMenuTrigger>
+					<div class="border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground">
+						Right-click here
+					</div>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuLabel>Appearance</ContextMenuLabel>
+					<ContextMenuSeparator />
+					<ContextMenuCheckboxItem @bind-Checked="ShowStatusBar">Show Status Bar</ContextMenuCheckboxItem>
+					<ContextMenuCheckboxItem @bind-Checked="ShowActivityBar">Show Activity Bar</ContextMenuCheckboxItem>
+					<ContextMenuCheckboxItem @bind-Checked="ShowPanel">Show Panel</ContextMenuCheckboxItem>
+				</ContextMenuContent>
+			</ContextMenu>
+		</ComponentExample>
+
+		<ComponentExample Title="With Radio Items"
+			Code="@("<ContextMenu>\n    <ContextMenuTrigger>\n        <div class=\"border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground\">\n            Right-click here\n        </div>\n    </ContextMenuTrigger>\n    <ContextMenuContent>\n        <ContextMenuLabel>Panel Position</ContextMenuLabel>\n        <ContextMenuSeparator />\n        <ContextMenuRadioGroup @bind-Value=\"PanelPosition\">\n            <ContextMenuRadioItem Value=\"top\">Top</ContextMenuRadioItem>\n            <ContextMenuRadioItem Value=\"bottom\">Bottom</ContextMenuRadioItem>\n            <ContextMenuRadioItem Value=\"right\">Right</ContextMenuRadioItem>\n        </ContextMenuRadioGroup>\n    </ContextMenuContent>\n</ContextMenu>")">
+			<ContextMenu>
+				<ContextMenuTrigger>
+					<div class="border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground">
+						Right-click here
+					</div>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuLabel>Panel Position</ContextMenuLabel>
+					<ContextMenuSeparator />
+					<ContextMenuRadioGroup @bind-Value="PanelPosition">
+						<ContextMenuRadioItem Value="top">Top</ContextMenuRadioItem>
+						<ContextMenuRadioItem Value="bottom">Bottom</ContextMenuRadioItem>
+						<ContextMenuRadioItem Value="right">Right</ContextMenuRadioItem>
+					</ContextMenuRadioGroup>
+				</ContextMenuContent>
+			</ContextMenu>
+		</ComponentExample>
+
+		<ComponentExample Title="With Groups"
+			Code="@("<ContextMenu>\n    <ContextMenuTrigger>\n        <div class=\"border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground\">\n            Right-click here\n        </div>\n    </ContextMenuTrigger>\n    <ContextMenuContent>\n        <ContextMenuGroup>\n            <ContextMenuLabel>Edit</ContextMenuLabel>\n            <ContextMenuItem>Cut <ContextMenuShortcut>⌘X</ContextMenuShortcut></ContextMenuItem>\n            <ContextMenuItem>Copy <ContextMenuShortcut>⌘C</ContextMenuShortcut></ContextMenuItem>\n            <ContextMenuItem>Paste <ContextMenuShortcut>⌘V</ContextMenuShortcut></ContextMenuItem>\n        </ContextMenuGroup>\n        <ContextMenuSeparator />\n        <ContextMenuGroup>\n            <ContextMenuLabel>View</ContextMenuLabel>\n            <ContextMenuItem>Zoom In</ContextMenuItem>\n            <ContextMenuItem>Zoom Out</ContextMenuItem>\n            <ContextMenuItem>Reset Zoom</ContextMenuItem>\n        </ContextMenuGroup>\n    </ContextMenuContent>\n</ContextMenu>")">
+			<ContextMenu>
+				<ContextMenuTrigger>
+					<div class="border border-dashed border-border rounded-lg p-12 text-center text-sm text-muted-foreground">
+						Right-click here
+					</div>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuGroup>
+						<ContextMenuLabel>Edit</ContextMenuLabel>
+						<ContextMenuItem>Cut <ContextMenuShortcut>⌘X</ContextMenuShortcut></ContextMenuItem>
+						<ContextMenuItem>Copy <ContextMenuShortcut>⌘C</ContextMenuShortcut></ContextMenuItem>
+						<ContextMenuItem>Paste <ContextMenuShortcut>⌘V</ContextMenuShortcut></ContextMenuItem>
+					</ContextMenuGroup>
+					<ContextMenuSeparator />
+					<ContextMenuGroup>
+						<ContextMenuLabel>View</ContextMenuLabel>
+						<ContextMenuItem>Zoom In</ContextMenuItem>
+						<ContextMenuItem>Zoom Out</ContextMenuItem>
+						<ContextMenuItem>Reset Zoom</ContextMenuItem>
+					</ContextMenuGroup>
+				</ContextMenuContent>
+			</ContextMenu>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool ShowStatusBar { get; set; } = true;
+	private bool ShowActivityBar { get; set; }
+	private bool ShowPanel { get; set; } = true;
+	private string? PanelPosition { get; set; } = "bottom";
+
+	private static readonly ApiElement[] ContextMenuElements =
+	[
+		new ApiElement(
+			Name: "ContextMenu",
+			Description: "Root state container. Tracks whether the menu is open and the mouse-origin `(X, Y)` coordinate so `ContextMenuContent` can render at the cursor.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain one `ContextMenuTrigger` and one `ContextMenuContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuTrigger",
+			Description: "Right-click catcher. Captures `contextmenu` events, cancels the browser default, and calls `ContextMenu.OpenAt(clientX, clientY)`.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes on the trigger wrapper `<div>`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "The target region users right-click to open the menu." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes, forwarded to the trigger wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuContent",
+			Description: "Positioned menu surface. Renders fixed at the cursor `(X, Y)` when the parent is open, with a full-viewport backdrop that closes the menu on outside click.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes on the menu surface." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Menu items — `ContextMenuItem`, `ContextMenuLabel`, `ContextMenuSeparator`, `ContextMenuSub`, etc." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuItem",
+			Description: "A single actionable menu entry. Closes the entire menu chain (including any open `ContextMenuSub`) on click.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Click",     "EventCallback",           false, "Invoked before the menu closes." ),
+				new ApiProperty( "Variant",   "ContextMenuItemVariant",  false, "Visual style. Default: `ContextMenuItemVariant.Default`. Use `Destructive` for danger actions." ),
+				new ApiProperty( "Inset",     "bool",                    false, "Adds `pl-8` left padding to align with items that have an icon or indicator. Default: `false`." ),
+				new ApiProperty( "Disabled",  "bool",                    false, "Suppresses click and dims the item. Default: `false`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",      false, "Item label, optionally followed by a `ContextMenuShortcut`." ),
+				new ApiProperty( "ClassName", "string?",                 false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuCheckboxItem",
+			Description: "A toggle menu entry with a check indicator. The menu stays open after toggling so multiple items can be changed in one gesture.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Checked",        "bool",              false, "Whether the item is checked. Supports `@bind-Checked`. Default: `false`." ),
+				new ApiProperty( "CheckedChanged", "EventCallback<bool>", false, "Raised when the user toggles the item." ),
+				new ApiProperty( "Disabled",       "bool",              false, "Suppresses click and dims the item. Default: `false`." ),
+				new ApiProperty( "ChildContent",   "RenderFragment?",   false, "Item label." ),
+				new ApiProperty( "ClassName",      "string?",           false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuRadioGroup",
+			Description: "Wraps a set of `ContextMenuRadioItem` components, sharing the selected `Value` via cascade. Supports `@bind-Value` for two-way binding.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string?",              false, "The currently selected item value. Supports `@bind-Value`." ),
+				new ApiProperty( "ValueChanged", "EventCallback<string?>", false, "Raised when the user selects a radio item." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",      false, "Should contain `ContextMenuRadioItem` components." ),
+				new ApiProperty( "ClassName",    "string?",              false, "Extra CSS classes on the group `<div>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuRadioItem",
+			Description: "A single-select menu entry. Renders a filled circle indicator when its `Value` matches the parent `ContextMenuRadioGroup.Value`.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string",            true,  "The value this item represents. Required — compared with the parent radio group's selected value." ),
+				new ApiProperty( "Disabled",     "bool",              false, "Suppresses click and dims the item. Default: `false`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",   false, "Item label." ),
+				new ApiProperty( "ClassName",    "string?",           false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuLabel",
+			Description: "A non-interactive heading inside a menu section or group. Renders in `text-muted-foreground` with `font-semibold uppercase`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Inset",        "bool",            false, "Adds `pl-8` to align with inset items. Default: `false`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Label text." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuSeparator",
+			Description: "A horizontal rule that visually separates menu sections.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ClassName", "string?", false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuShortcut",
+			Description: "Keyboard shortcut hint rendered at the trailing edge of a `ContextMenuItem`. Styled in `text-muted-foreground text-xs tracking-widest`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Shortcut text, e.g. `⌘K` or `Ctrl+S`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuGroup",
+			Description: "A semantic grouping wrapper (`role=\"group\"`) with no visual chrome. Useful for wrapping a `ContextMenuLabel` and its items.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Label and items for this group." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuSub",
+			Description: "Sub-menu state holder. Uses JS to compute the trigger's bounds so `ContextMenuSubContent` can appear to the right of `ContextMenuSubTrigger`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Should contain one `ContextMenuSubTrigger` and one `ContextMenuSubContent`." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuSubTrigger",
+			Description: "The item inside a `ContextMenuSub` that opens the sub-menu on hover. Renders a chevron-right icon at the trailing edge.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "Inset",        "bool",            false, "Adds `pl-8` left padding. Default: `false`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Trigger label." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuSubContent",
+			Description: "The popup panel that appears to the right of `ContextMenuSubTrigger` when the sub-menu is open.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Sub-menu items." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes." ),
+			]
+		),
+		new ApiElement(
+			Name: "ContextMenuPortal",
+			Description: "No-op passthrough provided for API parity with Blok. Blok renders via a Radix portal to `document.body`; Blazor uses `position:fixed` natively.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Passed through directly." ),
+			]
+		),
+	];
+}

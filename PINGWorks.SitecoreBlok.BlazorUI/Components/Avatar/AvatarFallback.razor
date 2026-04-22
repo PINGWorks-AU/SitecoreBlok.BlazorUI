@@ -1,0 +1,20 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if ( Parent.ImageStatus is AvatarImageStatus.Idle or AvatarImageStatus.Errored )
+{
+	<span data-slot="avatar-fallback" class="@CssClass" @attributes="AdditionalAttributes">
+		@ChildContent
+	</span>
+}
+
+@code {
+	[CascadingParameter] public required Avatar Parent { get; set; }
+
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "bg-muted flex size-full items-center justify-center rounded-full text-xs font-medium text-foreground" )
+											.With( ClassName )
+											.Build();
+}

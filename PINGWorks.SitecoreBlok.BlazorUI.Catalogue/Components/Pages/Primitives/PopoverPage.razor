@@ -1,0 +1,62 @@
+@page "/primitives/popover"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Popover" Description="Displays rich content in a portal, triggered by a button" Interactivity="ComponentInteractivity.Interactive" ApiElements="@PopoverElements">
+
+	<InstallationNote>
+		<ol class="list-decimal pl-5 space-y-1">
+			<li>
+				Register the BlazorUI services in <code class="text-xs bg-muted px-1 py-0.5 rounded">Program.cs</code>:
+				<CodeViewer Code="@("builder.Services.AddSitecoreBlokUI();")" Language="CodeLanguage.CSharp" ClassName="!mt-2" />
+			</li>
+			<li>
+				Place a single <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Popovers /&gt;</code> container in your root layout (e.g. <code class="text-xs bg-muted px-1 py-0.5 rounded">MainLayout.razor</code>) so floating content has a host to render into:
+				<CodeViewer Code="@("<Popovers @rendermode=\"InteractiveServer\" />")" Language="CodeLanguage.Razor" ClassName="!mt-2" />
+			</li>
+			<li>Inject <code class="text-xs bg-muted px-1 py-0.5 rounded">PopoverService</code> wherever you need to show or hide a popover.</li>
+		</ol>
+	</InstallationNote>
+
+	<DivergenceNote>
+		<p><strong>Imperative <code>PopoverService</code> API instead of Blok's declarative <code>&lt;PopoverTrigger&gt;</code>/<code>&lt;PopoverContent&gt;</code> composition.</strong> Blok composes <code>&lt;Popover&gt;&lt;PopoverTrigger&gt;&lt;/PopoverTrigger&gt;&lt;PopoverContent&gt;…&lt;/PopoverContent&gt;&lt;/Popover&gt;</code>; we require you to place a single <code>&lt;Popovers /&gt;</code> root container in your layout, declare the popover content with <code>&lt;Popover Id="…"&gt;</code>, inject <code>PopoverService</code>, and call <code>Pops.Show(id, anchor)</code> / <code>Pops.Hide(id)</code> from your trigger. This matches the way Blazor apps idiomatically manage floating UI and avoids portal-allocation races across interactive-server boundaries. Positioning is below the anchor element only — Blok's <code>side</code> and <code>align</code> props are not yet exposed.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Usage" Code="@("@inject PopoverService Pops\n\n@* 1. Place the Popovers container once in your layout *@\n<Popovers />\n\n@* 2. Define a trigger and popover pair *@\n<button @ref=\"anchor\" @onclick=\"Toggle\">Open Popover</button>\n\n<Popover Id=\"my-popover\" OnClose=\"Close\">\n    <div class=\"p-4\">\n        <p>Popover content here.</p>\n    </div>\n</Popover>\n\n@code {\n    private ElementReference? anchor;\n    private bool isOpen;\n\n    private async Task Toggle()\n    {\n        if (isOpen)\n        {\n            await Pops.Hide(\"my-popover\");\n            isOpen = false;\n        }\n        else\n        {\n            await Pops.Show(\"my-popover\", anchor);\n            isOpen = true;\n        }\n    }\n\n    private void Close() => isOpen = false;\n}")">
+			<div class="text-sm text-muted-foreground space-y-2">
+				<p>Popover requires <code class="text-xs bg-muted px-1 py-0.5 rounded">PopoverService</code> injection and the <code class="text-xs bg-muted px-1 py-0.5 rounded">Popovers</code> container component in your layout.</p>
+				<p>See the code example for the full integration pattern.</p>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] PopoverElements =
+	[
+		new ApiElement(
+			Name: "Popover",
+			Description: "Declares a popover by `Id`. Renders no markup itself — `PopoverService` snapshots its `ChildContent` and hands it to the global `Popovers` host when `Show(id, anchor)` is called.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Id",                     "string",           true,  "Unique identifier used by `PopoverService.Show` / `PopoverService.Hide` to target this popover." ),
+				new ApiProperty( "Overlay",                "bool",             false, "When true, renders a dimmed backdrop behind the popover. Default: `false`." ),
+				new ApiProperty( "CloseOnBackgroundClick", "bool",             false, "When true, clicking the overlay dismisses the popover. Default: `true`." ),
+				new ApiProperty( "OnClose",                "EventCallback",    false, "Invoked after the popover is hidden, regardless of whether it was closed via `PopoverService.Hide` or the overlay click." ),
+				new ApiProperty( "ClassName",              "string?",          false, "Extra CSS classes appended to the popover's outer wrapper when it is rendered inside `Popovers`." ),
+				new ApiProperty( "ChildContent",           "RenderFragment?",  false, "Popover body content." ),
+			]
+		),
+		new ApiElement(
+			Name: "Popovers",
+			Description: "Global host container that renders every active `Popover`. Place exactly one instance at the root of your layout so floating content has a portal to inject into.",
+			Depth: 0,
+			Properties: []
+		),
+	];
+}

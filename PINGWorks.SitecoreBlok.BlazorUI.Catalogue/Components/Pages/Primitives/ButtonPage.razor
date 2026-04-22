@@ -1,0 +1,92 @@
+@page "/primitives/button"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Button" Description="Displays a button or a component that looks like a button" Interactivity="ComponentInteractivity.Interactive" ApiElements="@ButtonElements">
+
+	<DivergenceNote>
+		<p><strong>Additive convenience parameters on top of Blok's pass-through API.</strong> Blok's <code>Button</code> is a thin wrapper that forwards props to a native <code>&lt;button&gt;</code>; content, icons, and events come through <code>children</code> and spread props. We add explicit <code>Title</code> (string label, saves wrapping text in <code>&lt;Button&gt;plain text&lt;/Button&gt;</code>), <code>StartIconSvg</code>/<code>EndIconSvg</code> (pass an <code>IconSvg.X</code> path and we render the icon + spacing for you), <code>Click</code> (<code>EventCallback</code>), and an explicit <code>Disabled</code> parameter. Blok-style composition with <code>ChildContent</code> still works; the additive parameters are opt-in.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Button>Click me</Button>")">
+			<Button>Click me</Button>
+		</ComponentExample>
+
+		<ComponentExample Title="Variants" Code="@("<Button Variant=\"ButtonVariant.Default\">Default</Button>\n<Button Variant=\"ButtonVariant.Outline\">Outline</Button>\n<Button Variant=\"ButtonVariant.Ghost\">Ghost</Button>\n<Button Variant=\"ButtonVariant.Link\">Link</Button>")">
+			<Button Variant="ButtonVariant.Default">Default</Button>
+			<Button Variant="ButtonVariant.Outline">Outline</Button>
+			<Button Variant="ButtonVariant.Ghost">Ghost</Button>
+			<Button Variant="ButtonVariant.Link">Link</Button>
+		</ComponentExample>
+
+		<ComponentExample Title="Sizes" Code="@("<Button Size=\"ButtonSize.Xs\">Extra Small</Button>\n<Button Size=\"ButtonSize.Sm\">Small</Button>\n<Button Size=\"ButtonSize.Default\">Default</Button>\n<Button Size=\"ButtonSize.Lg\">Large</Button>\n<Button Size=\"ButtonSize.Icon\">+</Button>")">
+			<Button Size="ButtonSize.Xs">Extra Small</Button>
+			<Button Size="ButtonSize.Sm">Small</Button>
+			<Button Size="ButtonSize.Default">Default</Button>
+			<Button Size="ButtonSize.Lg">Large</Button>
+			<Button Size="ButtonSize.Icon">+</Button>
+		</ComponentExample>
+
+		<ComponentExample Title="Color Schemes" Code="@("<Button ColorScheme=\"ButtonColor.Primary\">Primary</Button>\n<Button ColorScheme=\"ButtonColor.Danger\">Danger</Button>\n<Button ColorScheme=\"ButtonColor.Success\">Success</Button>\n<Button ColorScheme=\"ButtonColor.Neutral\">Neutral</Button>")">
+			<Button ColorScheme="ButtonColor.Primary">Primary</Button>
+			<Button ColorScheme="ButtonColor.Danger">Danger</Button>
+			<Button ColorScheme="ButtonColor.Success">Success</Button>
+			<Button ColorScheme="ButtonColor.Neutral">Neutral</Button>
+		</ComponentExample>
+
+		<ComponentExample Title="Icon only" Code="@("<Button Size=\"ButtonSize.Icon\"><Icon Svg=\"@@IconSvg.Plus\" /></Button>\n<Button Size=\"ButtonSize.IconSm\" Variant=\"ButtonVariant.Outline\"><Icon Svg=\"@@IconSvg.Pencil\" /></Button>\n<Button Size=\"ButtonSize.IconXs\" Variant=\"ButtonVariant.Ghost\"><Icon Svg=\"@@IconSvg.Close\" /></Button>")">
+			<Button Size="ButtonSize.IconLg"><Icon Svg="@IconSvg.Plus" /></Button>
+			<Button Size="ButtonSize.Icon"><Icon Svg="@IconSvg.Plus" /></Button>
+			<Button Size="ButtonSize.IconSm" Variant="ButtonVariant.Outline"><Icon Svg="@IconSvg.Pencil" /></Button>
+			<Button Size="ButtonSize.IconXs" Variant="ButtonVariant.Ghost"><Icon Svg="@IconSvg.Close" /></Button>
+		</ComponentExample>
+
+		<ComponentExample Title="Icon with text" Code="@("<Button><Icon Svg=\"@@IconSvg.Plus\" /> Create</Button>\n<Button Variant=\"ButtonVariant.Outline\">Save <Icon Svg=\"@@IconSvg.ContentSave\" /></Button>\n<Button Variant=\"ButtonVariant.Ghost\"><Icon Svg=\"@@IconSvg.TrashCanOutline\" /> Delete</Button>")">
+			<Button><Icon Svg="@IconSvg.Plus" /> Create</Button>
+			<Button Variant="ButtonVariant.Outline">Save <Icon Svg="@IconSvg.ContentSave" /></Button>
+			<Button Variant="ButtonVariant.Ghost"><Icon Svg="@IconSvg.TrashCanOutline" /> Delete</Button>
+		</ComponentExample>
+
+		<ComponentExample Title="Loading" Code="@("<Button Disabled=\"true\"><Spinner ClassName=\"size-4\" /> Loading\u2026</Button>\n<Button Variant=\"ButtonVariant.Outline\" Disabled=\"true\"><Spinner ClassName=\"size-4\" /> Saving\u2026</Button>")">
+			<Button Disabled="true"><Spinner ClassName="size-4" /> Loading…</Button>
+			<Button Variant="ButtonVariant.Outline" Disabled="true"><Spinner ClassName="size-4" /> Saving…</Button>
+			<Button ColorScheme="ButtonColor.Danger" Disabled="true"><Spinner ClassName="size-4" /> Deleting…</Button>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<Button Disabled=\"true\">Default</Button>\n<Button Variant=\"ButtonVariant.Outline\" Disabled=\"true\">Outline</Button>\n<Button Variant=\"ButtonVariant.Ghost\" Disabled=\"true\">Ghost</Button>\n<Button Variant=\"ButtonVariant.Link\" Disabled=\"true\">Link</Button>")">
+			<Button Disabled="true">Default</Button>
+			<Button Variant="ButtonVariant.Outline" Disabled="true">Outline</Button>
+			<Button Variant="ButtonVariant.Ghost" Disabled="true">Ghost</Button>
+			<Button Variant="ButtonVariant.Link" Disabled="true">Link</Button>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ButtonElements =
+	[
+		new ApiElement(
+			Name: "Button",
+			Description: "Renders a native `<button>` with Blok's variant/size/color system. Accepts `ChildContent` for full composition, or the `Title` + icon convenience parameters for simple labelled buttons.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Variant",              "ButtonVariant",                 false, "Visual style. Default: `ButtonVariant.Default`. Other values: `Outline`, `Ghost`, `Link`." ),
+				new ApiProperty( "ColorScheme",          "ButtonColor?",                  false, "Colour palette. When null, resolves to `Primary` for `Default`/`Link` variants and `Neutral` for `Outline`/`Ghost`." ),
+				new ApiProperty( "Size",                 "ButtonSize",                    false, "Size token. Default: `ButtonSize.Default`. Other values: `Xs`, `Sm`, `Lg`, `Icon`, `IconLg`, `IconSm`, `IconXs`." ),
+				new ApiProperty( "Title",                "string?",                       false, "Convenience text label. Use instead of wrapping a plain string in `ChildContent`. Ignored when `ChildContent` is supplied." ),
+				new ApiProperty( "StartIconSvg",         "string?",                       false, "`IconSvg` path to render before the label. Only used when `ChildContent` is not supplied." ),
+				new ApiProperty( "EndIconSvg",           "string?",                       false, "`IconSvg` path to render after the label. Only used when `ChildContent` is not supplied." ),
+				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked when the button is clicked. Additional to Blok." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, the button is non-interactive and visually muted. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button's class attribute." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Contents of the button. When supplied, overrides `Title` and the icon convenience parameters." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the underlying `<button>`." ),
+			]
+		),
+	];
+}

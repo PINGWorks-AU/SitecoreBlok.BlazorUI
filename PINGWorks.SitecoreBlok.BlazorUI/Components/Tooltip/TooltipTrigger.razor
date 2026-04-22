@@ -1,0 +1,21 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<span data-slot="tooltip-trigger" class="@CssClass"
+	  @onpointerdown="OnPointerDown" @onpointerleave="OnPointerLeave"
+	  @attributes="AdditionalAttributes">
+	@ChildContent
+</span>
+
+@code {
+	[CascadingParameter] public Tooltip? Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "inline-flex" )
+											.With( ClassName )
+											.Build();
+
+	private async Task OnPointerDown() { if ( Parent is not null ) await Parent.Suppress(); }
+	private async Task OnPointerLeave() { if ( Parent is not null ) await Parent.Resume(); }
+}

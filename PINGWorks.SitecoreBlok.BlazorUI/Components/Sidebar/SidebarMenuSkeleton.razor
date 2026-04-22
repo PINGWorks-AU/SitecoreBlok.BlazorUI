@@ -1,0 +1,28 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="sidebar-menu-skeleton" data-sidebar="menu-skeleton" class="@CssClass" @attributes="AdditionalAttributes">
+	@if ( ShowIcon )
+	{
+		<Skeleton ClassName="size-4 rounded-md" data-sidebar="menu-skeleton-icon" />
+	}
+	<Skeleton ClassName="h-4 max-w-(--skeleton-width) flex-1" data-sidebar="menu-skeleton-text" style="@Style" />
+</div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool ShowIcon { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private int Width { get; set; }
+
+	private string Style => $"--skeleton-width:{Width}%;";
+
+	private string CssClass => CssClassBuilder.Start( "flex h-8 items-center gap-2 rounded-md px-2" )
+											.With( ClassName )
+											.Build();
+
+	protected override void OnInitialized()
+	{
+		Width = Random.Shared.Next( 50, 90 );
+	}
+}

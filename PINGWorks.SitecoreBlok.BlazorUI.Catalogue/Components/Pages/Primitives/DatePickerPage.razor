@@ -1,0 +1,96 @@
+@page "/primitives/datepicker"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="DatePicker" Description="A date picker input with calendar popup" Interactivity="ComponentInteractivity.Interactive" ApiElements="@DatePickerElements">
+
+	<InstallationNote>
+		<p>DatePicker's calendar opens through the shared Popover infrastructure, so the same setup applies:</p>
+		<ol class="list-decimal pl-5 space-y-1">
+			<li>
+				Register the BlazorUI services in <code class="text-xs bg-muted px-1 py-0.5 rounded">Program.cs</code>:
+				<CodeViewer Code="@("builder.Services.AddSitecoreBlokUI();")" Language="CodeLanguage.CSharp" ClassName="!mt-2" />
+			</li>
+			<li>
+				Place a single <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Popovers /&gt;</code> container in your root layout:
+				<CodeViewer Code="@("<Popovers @rendermode=\"InteractiveServer\" />")" Language="CodeLanguage.Razor" ClassName="!mt-2" />
+			</li>
+		</ol>
+	</InstallationNote>
+
+	<DivergenceNote>
+		<p><strong>Single unified component covering both single-date and range-date modes.</strong> Blok exports <code>DatePickerSimple</code> and <code>DatePickerWithRange</code> as two separate components with <code>dateFormat</code>, <code>locale</code>, <code>rangeSeparator</code>, and <code>calendarProps</code>. Ours is one <code>&lt;DatePicker&gt;</code>: bind <code>Value</code> for single-date mode, or bind <code>RangeStart</code> + <code>RangeEnd</code> to switch it into range mode. Configure display with <code>Format</code> (string). The multi-month calendar popup comes for free from our <code>Calendar</code> component.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<DatePicker @bind-Value=\"selectedDate\" />")">
+			<div class="space-y-4">
+				<DatePicker @bind-Value="SelectedDate" />
+				@if ( SelectedDate is not null )
+				{
+					<p class="text-sm text-muted-foreground">Selected: @SelectedDate.Value.ToShortDateString()</p>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With Custom Placeholder" Code="@("<DatePicker @bind-Value=\"placeholderDate\" Placeholder=\"Choose a date...\" />")">
+			<div class="space-y-4">
+				<DatePicker @bind-Value="PlaceholderDate" Placeholder="Choose a date..." />
+				@if ( PlaceholderDate is not null )
+				{
+					<p class="text-sm text-muted-foreground">Selected: @PlaceholderDate.Value.ToShortDateString()</p>
+				}
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Date Range" Code="@("<DatePicker @bind-RangeStart=\"rangeStart\" @bind-RangeEnd=\"rangeEnd\"\n            NumberOfMonths=\"2\" Placeholder=\"Pick a date range\" />")">
+			<div class="space-y-4">
+				<DatePicker @bind-RangeStart="RangeStart" @bind-RangeEnd="RangeEnd"
+							NumberOfMonths="2" Placeholder="Pick a date range" />
+				@if ( RangeStart.HasValue && RangeEnd.HasValue )
+				{
+					<p class="text-sm text-muted-foreground">
+						@RangeStart.Value.ToString("d MMM yyyy") — @RangeEnd.Value.ToString("d MMM yyyy")
+						(@( ( RangeEnd.Value - RangeStart.Value ).Days ) days)
+					</p>
+				}
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private DateTime? SelectedDate;
+	private DateTime? PlaceholderDate;
+	private DateTime? RangeStart;
+	private DateTime? RangeEnd;
+
+	private static readonly ApiElement[] DatePickerElements =
+	[
+		new ApiElement(
+			Name: "DatePicker",
+			Description: "Button-styled input that opens a `Calendar` popover. Acts as a single-date picker when `Value`/`ValueChanged` are bound, or as a range picker when `RangeStart`/`RangeEnd` are bound.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",             "DateTime?",                 false, "Selected date in single-date mode. Supports two-way binding via `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",      "EventCallback<DateTime?>",  false, "Fires when the user picks a date in single-date mode." ),
+				new ApiProperty( "RangeStart",        "DateTime?",                 false, "Start date in range mode. Supports two-way binding via `@bind-RangeStart`." ),
+				new ApiProperty( "RangeStartChanged", "EventCallback<DateTime?>",  false, "Fires when the range start changes. Binding it (or `RangeEndChanged`) switches the picker into range mode." ),
+				new ApiProperty( "RangeEnd",          "DateTime?",                 false, "End date in range mode. Supports two-way binding via `@bind-RangeEnd`." ),
+				new ApiProperty( "RangeEndChanged",   "EventCallback<DateTime?>",  false, "Fires when the range end changes. Closes the popup when a non-null end date is picked." ),
+				new ApiProperty( "MinDate",           "DateTime?",                 false, "Earliest selectable date. Passed through to the inner `Calendar`." ),
+				new ApiProperty( "MaxDate",           "DateTime?",                 false, "Latest selectable date. Passed through to the inner `Calendar`." ),
+				new ApiProperty( "Placeholder",       "string",                    false, "Button text shown when no date is selected. Default: `\"Pick a date\"`." ),
+				new ApiProperty( "Format",            "string",                    false, "`DateTime.ToString` format used for the button label. Default: `\"d MMM yyyy\"`." ),
+				new ApiProperty( "NumberOfMonths",    "int",                       false, "Number of months shown side-by-side in the calendar popup. Default: `1`. Use `2` for a typical range picker." ),
+				new ApiProperty( "Disabled",          "bool",                      false, "When true, the button is non-interactive. Default: `false`." ),
+				new ApiProperty( "AriaLabels",        "DatePickerAriaLabels?",     false, "Optional ARIA overrides for chrome outside the calendar grid. Set `PopoverTrigger` to customise the trigger button's `aria-label`; when omitted the `Placeholder` is used." ),
+				new ApiProperty( "ClassName",         "string?",                   false, "Extra CSS classes appended to the trigger button." ),
+			]
+		),
+	];
+}

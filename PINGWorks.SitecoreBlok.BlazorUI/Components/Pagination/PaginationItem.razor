@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<li data-slot="pagination-item" class="@CssClass">
+	@ChildContent
+</li>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "" )
+											.With( ClassName )
+											.Build();
+}

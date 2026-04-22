@@ -1,0 +1,42 @@
+@page "/primitives/emptystate"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="EmptyState" Description="Placeholder for empty content areas" Interactivity="ComponentInteractivity.Ssr" ApiElements="@EmptyStateElements">
+
+	<DivergenceNote>
+		<p><strong>Structurally aligned with Blok's <code>EmptyStates</code>.</strong> Both are single components that take string title/description and a ChildContent (Blok: <code>actions</code> ReactNode) slot for action buttons. Differences: (1) we use the singular name <code>EmptyState</code>; (2) we use <code>IconPath</code> with our local <code>IconSvg.*</code> constants instead of Blok's <code>imageSrc</code> URL pointing to Sitecore Content Hub assets; (3) Blok ships variant-driven copy/imagery defaults (<code>no-search-results</code>, <code>nothing-created</code>, <code>error</code>) which we do not — supply your own copy and icon.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<EmptyState IconPath=\"@IconSvg.FileDocument\"\n            Title=\"No documents\"\n            Description=\"You haven't created any documents yet. Get started by creating your first one.\">\n    <Button>Create document</Button>\n</EmptyState>")">
+			<EmptyState IconPath="@IconSvg.FileDocument"
+						Title="No documents"
+						Description="You haven't created any documents yet. Get started by creating your first one.">
+				<Button>Create document</Button>
+			</EmptyState>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] EmptyStateElements =
+	[
+		new ApiElement(
+			Name: "EmptyState",
+			Description: "Centred placeholder block with an optional icon, heading, supporting copy, and action slot. Each piece renders only when its parameter is supplied.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "IconPath",     "string?",         false, "`IconSvg` path rendered above the title at `size-12` in muted foreground. Omit for text-only empty states." ),
+				new ApiProperty( "Title",        "string?",         false, "Heading text shown under the icon." ),
+				new ApiProperty( "Description",  "string?",         false, "Supporting copy shown under the title, rendered at `text-sm` in muted foreground." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the outer container." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Action slot rendered below the description — typically a `Button` or group of buttons." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,43 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<button data-slot="toggle" type="button" aria-pressed="@( Pressed ? "true" : "false" )"
+		data-state="@( Pressed ? "on" : "off" )" disabled="@Disabled" class="@CssClass"
+		@onclick="OnToggle" @attributes="AdditionalAttributes">
+	@ChildContent
+</button>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	[Parameter] public bool Pressed { get; set; }
+	[Parameter] public EventCallback<bool> PressedChanged { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public ToggleVariant Variant { get; set; } = ToggleVariant.Default;
+	[Parameter] public ToggleSize Size { get; set; } = ToggleSize.Default;
+
+	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors outline-none cursor-pointer",
+		"hover:bg-neutral-bg hover:text-muted-foreground",
+		"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+		"disabled:pointer-events-none disabled:opacity-50",
+		"data-[state=on]:bg-primary-bg data-[state=on]:text-primary-fg",
+		"[&_svg]:pointer-events-none [&_svg]:shrink-0" )
+										.With( "bg-transparent", Variant is ToggleVariant.Default )
+										.With( "border border-input bg-transparent", Variant is ToggleVariant.Outline )
+										.With( "h-9 min-w-9 px-2", Size is ToggleSize.Default )
+										.With( "h-8 min-w-8 px-1.5", Size is ToggleSize.Sm )
+										.With( "h-11 min-w-11 px-3", Size is ToggleSize.Lg )
+										.With( ClassName )
+										.Build();
+
+	private async Task OnToggle()
+	{
+		if ( Disabled ) return;
+
+		Pressed = !Pressed;
+
+		if ( PressedChanged.HasDelegate )
+			await PressedChanged.InvokeAsync( Pressed );
+	}
+}

@@ -1,0 +1,12 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="menubar-separator" class="@CssClass"></div>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+
+	// bg-border is a decorative rule with no text content — parity-no-text-pair suppresses Check 4.
+	private string CssClass => CssClassBuilder.Start( "-mx-1 my-1 h-px bg-border parity-no-text-pair" )
+											.With( ClassName )
+											.Build();
+}

@@ -1,0 +1,43 @@
+@page "/primitives/text"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Text" Description="A simple paragraph component with pre-applied muted, centred, small styling. Useful for descriptions and helper text." Interactivity="ComponentInteractivity.Ssr" ApiElements="@TextElements">
+
+	<DivergenceNote>
+		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> Text is a small typography helper for repeated muted-helper-text use cases — there is no upstream Blok component to track for this.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<Text>A short helper sentence beneath a section heading.</Text>")">
+			<Text>A short helper sentence beneath a section heading.</Text>
+		</ComponentExample>
+
+		<ComponentExample Title="With custom ClassName" Code="@("<Text ClassName=\"text-left\">Override the centring via ClassName when you need left-aligned helper text.</Text>")">
+			<Text ClassName="text-left">Override the centring via ClassName when you need left-aligned helper text.</Text>
+		</ComponentExample>
+
+		<ComponentExample Title="Longer content" Code="@("<Text>Text sits under a heading to explain a concept or describe an action. It uses the muted-foreground token so it recedes next to the primary content.</Text>")">
+			<Text>Text sits under a heading to explain a concept or describe an action. It uses the muted-foreground token so it recedes next to the primary content.</Text>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] TextElements =
+	[
+		new ApiElement(
+			Name: "Text",
+			Description: "Renders a `<p>` pre-styled as centred, small, muted helper text. Use `ClassName` to override alignment or weight.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<p>`. Use to override the default `text-center text-sm text-muted-foreground`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "The paragraph's content." ),
+			]
+		),
+	];
+}

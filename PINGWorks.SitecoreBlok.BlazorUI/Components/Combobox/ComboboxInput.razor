@@ -1,0 +1,116 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<InputGroup @ref="Group" ClassName="@CssClass">
+	@* Display rule:
+	   - If the user has typed something into the filter (`InputValue` is non-null/non-empty),
+	     show that typed text regardless of open/closed state.
+	   - Otherwise show the selected item's Label so the user always sees their choice —
+	     including while the dropdown is open.
+	   - If neither applies, render empty so the `placeholder` attribute kicks in. *@
+	<input data-slot="input-group-control" type="text" class="@InputCssClass"
+		   value="@DisplayedInputValue"
+		   placeholder="@Placeholder"
+		   disabled="@IsDisabled"
+		   name="@Name"
+		   aria-expanded="@( Parent.IsOpen ? "true" : "false" )"
+		   data-placeholder="@( string.IsNullOrEmpty( DisplayedInputValue ) )"
+		   @oninput="OnInput"
+		   @onfocus="OnFocus"
+		   @onkeydown="Parent.HandleKeyDown"
+		   @attributes="AdditionalAttributes" />
+	<InputGroupAddon Align="InputGroupAlign.InlineEnd">
+		@if ( ShowTrigger && !HasClearVisible )
+		{
+			<button type="button" data-slot="input-group-button"
+					class="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent focus-visible:outline-none"
+					disabled="@IsDisabled"
+					@onclick="() => Parent.Toggle()">
+				<Icon Svg="@IconSvg.ChevronDown" Scale="0.9"
+					ClassName="text-muted-foreground pointer-events-none"
+					data-slot="combobox-trigger-icon" />
+			</button>
+		}
+		@if ( HasClearVisible )
+		{
+			<button type="button" data-slot="combobox-clear"
+					class="opacity-50 hover:opacity-100 focus-visible:outline-none"
+					disabled="@IsDisabled"
+					@onclick="() => Parent.ClearValue()">
+				<Icon Svg="@IconSvg.Close" Scale="0.9"
+					ClassName="pointer-events-none" />
+			</button>
+		}
+	</InputGroupAddon>
+	@ChildContent
+</InputGroup>
+
+@code {
+	[CascadingParameter] public required Combobox Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? Placeholder { get; set; }
+	[Parameter] public bool ShowTrigger { get; set; } = true;
+	[Parameter] public bool ShowClear { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public string? Name { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private InputGroup? Group;
+
+	private bool IsDisabled => Disabled || Parent.Disabled;
+
+	// Filter text wins if the user has typed anything (even an empty string, meaning
+	// they explicitly backspaced the field clear). Only when InputValue is actually null
+	// (never typed into this session) do we fall back to the selected label. This lets a
+	// consumer clear a selection by backspacing all the way to empty.
+	// Chips mode keeps filter-only display because chips show the selected labels separately.
+	private string? DisplayedInputValue
+	{
+		get
+		{
+			if ( Parent.InputValue is not null ) return Parent.InputValue;
+			return Parent.Multiple ? null : Parent.GetDisplayLabel();
+		}
+	}
+
+	private bool HasClearVisible
+	{
+		get
+		{
+			if ( !ShowClear ) return false;
+			if ( Parent.Multiple ) return Parent.Values.Count > 0;
+			return !string.IsNullOrEmpty( Parent.Value ) || !string.IsNullOrEmpty( Parent.InputValue );
+		}
+	}
+
+	private string CssClass => CssClassBuilder.Start(
+		"w-fit min-w-[8rem] shadow-none bg-background dark:bg-input/30 font-semibold text-neutral-fg",
+		"data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground",
+		"has-[[data-slot=input-group-control]:focus-visible]:border-2 has-[[data-slot=input-group-control]:focus-visible]:ring-0",
+		"has-[button:focus-visible]:border-2 has-[button:focus-visible]:ring-0" )
+									.With( ClassName )
+									.Build();
+
+	private string InputCssClass => CssClassBuilder.Start(
+		"flex-1 rounded-none border-0 bg-transparent shadow-none outline-none text-base md:text-sm",
+		"placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-0 dark:bg-transparent px-3 py-1" )
+										.Build();
+
+	protected override void OnAfterRender( bool firstRender )
+	{
+		if ( firstRender && Group is not null )
+			Parent.RegisterAnchor( Group.ElementRef );
+	}
+
+	private async Task OnInput( ChangeEventArgs e )
+	{
+		var text = e.Value?.ToString();
+		await Parent.SetInputValue( text );
+	}
+
+	private async Task OnFocus()
+	{
+		if ( !Parent.IsOpen && !IsDisabled )
+			await Parent.Open();
+	}
+}

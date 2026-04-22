@@ -1,0 +1,31 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div @ref="Ref" data-slot="dropdown-menu-sub-trigger" class="@CssClass"
+	 @onmouseenter="OnEnter" @onmouseleave="OnLeave">
+	@ChildContent
+	<Icon Svg="@IconSvg.ChevronRight" ClassName="ml-auto size-3.5 text-muted-foreground" />
+</div>
+
+@code {
+	[CascadingParameter] public required DropdownMenuSub Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private ElementReference Ref;
+
+	private string CssClass => CssClassBuilder.Start(
+		"relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-foreground outline-hidden select-none hover:bg-neutral-bg",
+		"[&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-neutral-fg" )
+											.With( "bg-neutral-bg", Parent.IsOpen )
+											.With( ClassName )
+											.Build();
+
+	protected override void OnAfterRender( bool firstRender )
+	{
+		if ( firstRender )
+			Parent.RegisterTriggerRef( Ref );
+	}
+
+	private async Task OnEnter() => await Parent.Open();
+	private async Task OnLeave() => await Parent.Close();
+}

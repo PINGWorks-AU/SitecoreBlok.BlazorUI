@@ -1,0 +1,39 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="tooltip-content" role="tooltip" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+	<span class="@ArrowCssClass"></span>
+</div>
+
+@code {
+	[CascadingParameter] public Tooltip? Parent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public TooltipSide Side { get; set; } = TooltipSide.Bottom;
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	// `text-white` is literal (not `text-inverse-text`) because the tooltip
+	// surface is hardcoded `bg-gray-700` in BOTH modes — it does not flip.
+	// `text-inverse-text` resolves to a near-black token in dark mode (correct
+	// for components on bright surfaces like bg-primary), which would render
+	// invisible black-on-dark-grey text inside the tooltip. Always-white is
+	// the only safe choice for an always-dark surface. Do not revert.
+	private string CssClass => CssClassBuilder.Start(
+		"text-white absolute z-50 w-max rounded-md bg-gray-700 px-3 py-1.5 text-xs text-balance",
+		"opacity-0 pointer-events-none transition-opacity duration-150",
+		"group-hover/tooltip:opacity-100 group-hover/tooltip:pointer-events-auto" )
+											.With( "!opacity-0 !pointer-events-none", Parent?.IsSuppressed ?? false )
+										.With( "top-full left-1/2 -translate-x-1/2 mt-2", Side is TooltipSide.Bottom )
+										.With( "bottom-full left-1/2 -translate-x-1/2 mb-2", Side is TooltipSide.Top )
+										.With( "right-full top-1/2 -translate-y-1/2 mr-2", Side is TooltipSide.Left )
+										.With( "left-full top-1/2 -translate-y-1/2 ml-2", Side is TooltipSide.Right )
+										.With( ClassName )
+										.Build();
+
+	private string ArrowCssClass => CssClassBuilder.Start( "absolute size-2.5 rotate-45 rounded-[2px] bg-gray-700" )
+										.With( "bottom-full left-1/2 -translate-x-1/2 translate-y-1/2", Side is TooltipSide.Bottom )
+										.With( "top-full left-1/2 -translate-x-1/2 -translate-y-1/2", Side is TooltipSide.Top )
+										.With( "left-full top-1/2 -translate-y-1/2 -translate-x-1/2", Side is TooltipSide.Left )
+										.With( "right-full top-1/2 -translate-y-1/2 translate-x-1/2", Side is TooltipSide.Right )
+										.Build();
+}
