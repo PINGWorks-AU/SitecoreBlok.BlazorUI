@@ -12,7 +12,7 @@ PINGWorks.SitecoreBlok.BlazorUI is a Blazor Razor Class Library that provides pr
 The library includes:
 
 - **Design Tokens** — Colors, typography, spacing, shadows, and border radius via Tailwind CSS custom properties
-- **Components** — 40+ primitive components (buttons, cards, dialogs, form fields, tables, and more)
+- **Components** — 60+ primitive components (buttons, cards, dialogs, form fields, tables, and more)
 - **Theming** — Light and dark mode support via semantic CSS tokens
 - **Icons** — 300+ Material Design Icons available as static SVG path constants
 - **Catalogue** — A companion Blazor web app for browsing and previewing all components
@@ -42,20 +42,36 @@ services or scripts. Be sure to review the catalogue for up-to-date information.
 ├── LICENSE                                        # Apache 2.0
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
+├── MIGRATION_STATUS.md                            # Per-component port status vs Blok
+├── theme.md                                       # Tailwind v4 theme reference
+├── tailwindcss-windows-x64.exe                    # Downloaded on build (gitignored)
 │
-├── PINGWorks.SitecoreBlok.BlazorUI/        # Component library (RCL)
+├── .claude/                                       # Claude Code skills + install scripts
+├── .github/                                       # Issue / discussion / PR templates
+├── docs/
+│   └── ui-parity-audit.md                         # UI parity audit notes
+├── tools/
+│   ├── verify-ui-parity.ps1                       # Parity harness
+│   └── build-icon-metadata.ps1
+│
+├── PINGWorks.SitecoreBlok.BlazorUI/               # Component library (RCL, NuGet)
 │   ├── Components/                                # All .razor components
-│   ├── Services/                                  # PopoverService, etc.
-│   ├── Ioc/                                       # DI extensions
-│   ├── ThirdPartyNotices/                         # Blok, shadcn, Tailwind licenses
+│   ├── Services/                                  # PopoverService, ToastService, GlobalTheme
+│   ├── Ioc/                                       # DI extensions (AddSitecoreBlokUI)
+│   ├── ThirdPartyNotices/                         # Blok, shadcn, Tailwind, PrismJS, Geist
 │   ├── wwwroot/
 │   │   ├── css/blok/                              # Tailwind theme + tokens
 │   │   └── js/                                    # JS interop modules
 │   ├── Enums.cs                                   # All variant/size/color enums
 │   ├── CssClassBuilder.cs                         # Fluent CSS class utility
-│   └── IconSvg.cs                                 # Static SVG path constants
+│   └── IconSvg.cs                                 # Curated ~300 SVG path constants
 │
-└── PINGWorks.SitecoreBlok.BlazorUI.Catalogue/  # Catalogue web app
+├── PINGWorks.SitecoreBlok.BlazorUI.Icons/         # Companion icon package (NuGet)
+│   ├── IconSvg.cs                                 # Full ~7,500-icon set
+│   ├── IllustrationSvg.cs
+│   └── FaviconSvg.cs
+│
+└── PINGWorks.SitecoreBlok.BlazorUI.Catalogue/     # Catalogue web app
     ├── Components/
     │   ├── Layout/                                # MainLayout, NavMenu
     │   ├── Pages/Primitives/                      # Per-component demo pages
@@ -68,7 +84,7 @@ services or scripts. Be sure to review the catalogue for up-to-date information.
 ### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download) or later
-- Tailwind CSS CLI (included in the repo as `tailwindcss-windows-x64.exe`)
+- Tailwind CSS CLI — downloaded automatically to the repo root on first build by the `DownloadTailwindCLI` MSBuild target. Pin a specific version with `-p:TailwindCliUrl=https://github.com/tailwindlabs/tailwindcss/releases/download/<tag>/tailwindcss-windows-x64.exe`.
 
 ### Installation
 

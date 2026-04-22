@@ -6,7 +6,7 @@ Idiomatic Blazor components ported from the [Sitecore Blok](https://blok.sitecor
 
 ## Highlights
 
-- **40+ primitives** — buttons, cards, dialogs, dropdowns, form fields, tables, tabs, toasts, and more
+- **60+ primitives** — buttons, cards, dialogs, dropdowns, form fields, tables, tabs, toasts, and more
 - **Composable** — sub-components (`CardHeader`, `CardContent`, `CardFooter`, …) compose freely, matching the shadcn model Blok is built on
 - **Idiomatic Blazor** — `[Parameter]`, `EventCallback`, `CascadingValue`, `RenderFragment`; no thin React-over-Blazor wrappers
 - **Type-safe variants** — enum-driven sizes, colours, and styles with full IntelliSense

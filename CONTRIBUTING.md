@@ -21,20 +21,18 @@ All contributors are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md
 
 1. **Fork** the repository on GitHub: [https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/fork](https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/fork)
 2. **Clone your fork** locally: `git clone https://github.com/YOUR-USERNAME/SitecoreBlok.BlazorUI.git`
-3. **Create a branch** from `develop` for your changes (e.g. `feature/add-tooltip` or `fix/button-hover`).
-4. **Install prerequisites** — .NET 10 SDK, Tailwind CSS CLI (included in the repo as `tailwindcss-windows-x64.exe`).
+3. **Create a branch** from `main` for your changes (e.g. `feature/add-tooltip` or `fix/button-hover`).
+4. **Install prerequisites** — [.NET 10 SDK](https://dotnet.microsoft.com/download). The Tailwind CSS CLI is downloaded automatically to the repo root on first build (`DownloadTailwindCLI` MSBuild target); no manual install required.
 5. **Make your changes** following the established component patterns (see below).
 6. **Build** the solution to verify there are no errors: `dotnet build` from the solution root.
 7. **Test visually** by running the Catalogue project and verifying your component renders correctly.
-8. **Push to your fork** and **submit a Pull Request** to the `develop` branch of the main repository with a clear description of your changes.
+8. **Push to your fork** and **submit a Pull Request** against `main` with a clear description of your changes.
 
 ### Deployment Flow
 
-1. [Pull request](https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/pulls) submitted targeting the `develop` branch
+1. [Pull request](https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/pulls) submitted targeting `main`
 2. Code review by a maintainer
-3. Merge to `develop` for integration testing
-4. QA verification via the Catalogue site
-5. Merge to `main` for release
+3. Merge to `main` after approval; releases are cut from `main`
 
 ## Component Patterns
 

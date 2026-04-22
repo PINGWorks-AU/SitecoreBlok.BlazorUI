@@ -2,16 +2,18 @@
 
 Tracking document for the component-by-component UI-parity audit against the Blok source (https://github.com/Sitecore/blok/tree/main/src) and the Blok live site (https://blok.sitecore.com/primitives).
 
-**Automated verification:** `pwsh ./tools/verify-ui-parity.ps1` runs four checks on every component and produces `docs/ui-parity-report.md`. Integrated into the `blok-migration` skill — runs on every component migration / update.
+**Automated verification:** `pwsh ./tools/verify-ui-parity.ps1` runs six checks on every Razor file under the component library and writes a transient `docs/ui-parity-report.md` summarising findings for that run. The report file is a build artifact — not tracked in git — and is overwritten on each run. Integrated into the `blok-migration` skill — runs on every component migration / update.
 
-Last automated harness run (133 components): **35 Check 3 drift findings remain (pre-existing, pending judgement). Checks 1, 2, 4 clean.**
+Last automated harness run (133 Razor files across primitives and their sub-components, covering 63 top-level Blok primitives — see [MIGRATION_STATUS.md](../MIGRATION_STATUS.md) for the authoritative per-primitive tally): **35 Check 3 drift findings remain (pre-existing, pending judgement). Checks 1, 2, 4, 5, 6 clean.**
 
-## The four automated checks
+## The six automated checks
 
 1. **Compiled-utility coverage** — every Tailwind class referenced in Razor exists in the compiled CSS (`sitecore-blok.css`). Catches misspelled or deprecated utility names.
 2. **Runtime-composed class detection** — flags `$"bg-{color}"`-style interpolations Tailwind's scanner cannot see.
 3. **Blok class-string drift** (opt-in) — fetches Blok source and diffs class strings.
 4. **Surface background without paired text token** — flags any class string that sets a theme-aware surface bg (`bg-background`, `bg-card`, `bg-popover`, `bg-muted`, `bg-accent`, `bg-primary`, `bg-secondary`, `bg-destructive`) without an explicit `text-*` token in the same string. Cascade-only foreground silently breaks for fixed-positioned and portal-rendered content (Dialog, AlertDialog, Sheet, Toast). Decorative surfaces (slider tracks, progress fills, indicator dots) and wrappers whose cells set their own text suppress the check with the marker `parity-no-text-pair`.
+5. **Fixed-shade bg paired with flipping text token** — flags fixed-shade backgrounds (`bg-gray-700`, `bg-zinc-900`, `bg-black`, etc.) combined with a flipping text token (`text-foreground`, `text-inverse-text`, `text-{thing}-fg`). Because fixed shades don't change between modes but flipping text tokens do, contrast disappears in one mode and text becomes invisible. Tooltip is the canonical case.
+6. **Token light/dark symmetry** — flags any `--color-{name}` defined in `colors.css` as `var(--color-blackAlpha-N)` (or `whiteAlpha-N`) that isn't redefined in `globals.css`'s `.dark { }` block. Without the dark override, subtle alpha shades render invisibly against the dark page background (Skeleton's `bg-neutral-50` was the trigger).
 
 ## Status legend
 

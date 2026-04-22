@@ -6,11 +6,12 @@ Claude Code assets that ship with this repo.
 .claude/
 ├── install-skills.ps1    # Install skills into ~/.claude/skills/ on Windows / PowerShell 7+
 ├── install-skills.sh     # Install skills into ~/.claude/skills/ on macOS / Linux
-├── settings.local.json   # Local Claude Code settings (permissions, etc.) — personal, not installed
 └── skills/
     └── blok-migration/   # Component migration, update, audit & UI parity verification skill
         └── SKILL.md
 ```
+
+> Claude Code also reads a per-project `.claude/settings.local.json` for personal preferences (permissions, model overrides, etc.) if you create one. That file is gitignored and is not shipped by this repo or installed by the scripts below — create it locally if you need it.
 
 ## Installing the skills
 
