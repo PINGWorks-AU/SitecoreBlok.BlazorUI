@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<StaticWebResources Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\wwwroot\**\*.*" />
+	</ItemGroup>
+
+	<Target Name="_CopyStaticWebResources" BeforeTargets="BeforeBuild">
+		<Copy SourceFiles="@(StaticWebResources)"
+			  DestinationFolder="$(MSBuildProjectDirectory)\wwwroot\%(RecursiveDir)"
+			  Condition="!Exists('$(MSBuildProjectDirectory)\wwwroot\%(RecursiveDir)%(Filename)%(Extension)')"
+			  />
+	</Target>
+</Project>

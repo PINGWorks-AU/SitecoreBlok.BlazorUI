@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
-		<Version>1.0.0.0</Version>
+		<Version>1.1.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -41,10 +41,21 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes>
+			v1.1.0
+			⭐ Include Tailwind source theme files to allow use of the theme in consuming sites
+			🐛 Remove unused references to Geist font
+
 			v1.0.0
 			Initial release
 		</PackageReleaseNotes>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="Resources\PINGWorks.SitecoreBlok.BlazorUI.targets" Pack="true" PackagePath="build\PINGWorks.SitecoreBlok.BlazorUI.targets" />
+		<None Include="Resources\wwwroot\blok.css" Pack="true" PackagePath="contentFiles\any\any\wwwroot\css\blok;content\wwwroot\css\blok" />
+		<None Include="Resources\wwwroot\colors.css" Pack="true" PackagePath="contentFiles\any\any\wwwroot\css\blok;content\wwwroot\css\blok" />
+		<None Include="Resources\wwwroot\tw-animate.css" Pack="true" PackagePath="contentFiles\any\any\wwwroot\css\blok;content\wwwroot\css\blok" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="Resources\exclamation-logo.png" Pack="true" PackagePath="/" />
