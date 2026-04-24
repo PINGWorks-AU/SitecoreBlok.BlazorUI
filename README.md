@@ -58,7 +58,7 @@ services or scripts. Be sure to review the catalogue for up-to-date information.
 │   ├── Components/                                # All .razor components
 │   ├── Services/                                  # PopoverService, ToastService, GlobalTheme
 │   ├── Ioc/                                       # DI extensions (AddSitecoreBlokUI)
-│   ├── ThirdPartyNotices/                         # Blok, shadcn, Tailwind, PrismJS, Geist
+│   ├── ThirdPartyNotices/                         # Blok, shadcn, Tailwind, PrismJS
 │   ├── wwwroot/
 │   │   ├── css/blok/                              # Tailwind theme + tokens
 │   │   └── js/                                    # JS interop modules
