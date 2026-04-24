@@ -1,0 +1,167 @@
+﻿@page "/graphics/tailwind"
+@rendermode InteractiveServer
+
+<ComponentPage Title="Using Tailwind" Description="How to use tailwind in your projects.">
+
+	<div class="space-y-6">
+		<div class="space-y-2">
+			<p class="text-sm text-muted-foreground">
+				The Blok Blazor library uses the Tailwind CLI at build-time to build Sitecore's Tailwind theme and trim out unused classes. This makes for an
+				optimised CSS dependency, but it makes it harder for you to use Blok's Tailwind theme in your own project as the source classes have often been
+				optimised away.
+			</p>
+		</div>
+
+		<div class="space-y-2">
+			<p class="text-sm text-muted-foreground">
+				When you install the nuGet package <code class="text-blue-500 font-bold">PINGWorks.SitecoreBlok.BlazorUI</code> the package will copy the source CSS theme for Blok into your
+				<code>wwwroot/css/blok</code> folder. If you are not using Tailwind for your own project you do not need to do anything with these files - delete
+				them if you prefer. If you do want to extend the Blok Tailwind theme system into your project follow these steps.
+			</p>
+		</div>
+
+		<div class="space-y-2">
+			<h3 class="mt-2 text-m font-semibold text-muted-foreground uppercase tracking-wide">1. Setup Tailwind CLI to run on build</h3>
+			<p class="text-sm text-muted-foreground">In your <code>Project.csproj</code> file add the following sections to the end:</p>
+			<CodeViewer Code="@CsProjSetup" Language="CodeLanguage.XML" />
+			<p class="text-sm text-muted-foreground">
+				This will download the CLI from GitHub automatically if it's not already in the root of your solution, and will run it when building.
+				The CLI will use your app.css as an entry-point and will produce an app.min.css that we are going to wire into your App.razor.
+			</p>
+		</div>
+
+		<div class="space-y-2">
+			<h3 class="mt-2 text-m font-semibold text-muted-foreground uppercase tracking-wide">2. Exclude Tailwind CLI from your repo</h3>
+			<p class="text-sm text-muted-foreground">You don't want to check in a +100MB exe into your source control. Open <code>.gitignore</code> at the root of your repo and add this to the end:</p>
+			<CodeViewer Code="tailwindcss-windows-x64.exe" Language="CodeLanguage.Shell" />
+		</div>
+
+		<div class="space-y-2">
+			<h3 class="mt-2 text-m font-semibold text-muted-foreground uppercase tracking-wide">3. Configure your <code>app.css</code> for Tailwind</h3>
+			<p class="text-sm text-muted-foreground">The Blazor project templates include the <code>wwwroot/app.css</code> with a few styles. Add the following to the start of the file:</p>
+			<CodeViewer Code="@AppCssBasic" Language="CodeLanguage.CSS" />
+
+			<p class="text-sm text-muted-foreground mt-2">Blok uses the 'Inter' font by default, which must be loaded separately from Google fonts for licensing reasons:</p>
+			<CodeViewer Code="@AppCssWithFont" Language="CodeLanguage.CSS" />
+
+			<p class="text-sm text-muted-foreground mt-2">
+				In either case above, the <code>@@source</code> instruction tells Tailwind where it should scan for CSS classes. <b>Note</b> that since the CLI scans the source
+				files at design time, it is not possible to composite CSS classes using string interpolation or other combination techniques. All CSS styles that you want
+				to use from Tailwind must appear in the source files verbatim.
+			</p>
+		</div>
+
+		<div class="space-y-2">
+			<h3 class="mt-2 text-m font-semibold text-muted-foreground uppercase tracking-wide">4. Update <code>App.razor</code></h3>
+			<p class="text-sm text-muted-foreground">The sample below shows the amended code including the use of the 'Inter' font, but if you are not using this you can omit the Google references.</p>
+			<CodeViewer Code="@AppRazor" Language="CodeLanguage.Razor" />
+		</div>
+	</div>
+
+	<div class="mt-2 space-y-6">
+
+		<h2 class="text-l font-semibold text-muted-foreground uppercase tracking-wide">Hot Reload Support</h2>
+
+		<div class="space-y-2">
+			<p class="text-sm text-muted-foreground">
+				The CLI tool runs at build time against the source files to produce its output, but this does not work for hot reload as there is no msbuild <code>build</code> target run.
+				Instead, we can spawn Tailwind CLI in watch mode when we're debugging.
+			</p>
+			<p class="text-sm text-muted-foreground">
+				First we need to add a nuget package to our project <code class="text-blue-500 font-bold">Meziantou.Framework.Win32.Jobs</code> - this is a thin wrapper around Win32 Job objects. We need this to ensure the
+				Tailwind watch is shut down when our debugging session ends, and since the VS Debugger uses a SIGKILL we need some O/S support to tidy up.
+			</p>
+			<p class="text-sm text-muted-foreground">
+				Next we need to make a little update to <code>Program.cs</code>:
+			</p>
+			<CodeViewer Code="@ProgramCs" Language="CodeLanguage.CSharp" />
+			<p class="text-sm text-muted-foreground">
+				Use a conditional compilation <code>pragma</code> to inject a block that only runs when we're in Debug mode. This first enrols the web server process in a Windows O/S Job, which will
+				ensure child processes are cleaned up if the parent is killed. Then we start the Tailwind CLI in watch mode, so every change updates our <code>app.min.css</code>. There is also a little
+				tracing so output and errors are written to the Console window, but these are optional.
+			</p>
+		</div>
+	</div>
+
+
+</ComponentPage>
+
+@code {
+
+	private const string CsProjSetup = """
+				...
+				<PropertyGroup>
+					<TailwindCliFileName>tailwindcss-windows-x64.exe</TailwindCliFileName>
+					<TailwindCliPath>$(MSBuildThisFileDirectory)..\$(TailwindCliFileName)</TailwindCliPath>
+					<TailwindCliUrl Condition="'$(TailwindCliUrl)' == ''">https://github.com/tailwindlabs/tailwindcss/releases/latest/download/$(TailwindCliFileName)</TailwindCliUrl>
+				</PropertyGroup>
+
+				<Target Name="DownloadTailwindCLI" BeforeTargets="BuildTailwindCSS" Condition="!Exists('$(TailwindCliPath)')">
+					<Message Importance="high" Text="Tailwind CLI not found at $(TailwindCliPath). Downloading from $(TailwindCliUrl)..." />
+					<DownloadFile SourceUrl="$(TailwindCliUrl)" DestinationFolder="$(MSBuildThisFileDirectory).." DestinationFileName="$(TailwindCliFileName)" />
+				</Target>
+
+				<Target Name="BuildTailwindCSS" BeforeTargets="ResolveStaticWebAssetsInputs;Build">
+					<Exec Command="&quot;$(TailwindCliPath)&quot; -i wwwroot/app.css -o wwwroot/app.min.css --minify" WorkingDirectory="$(MSBuildProjectDirectory)" />
+				</Target>
+			</Project>
+			""";
+
+	private const string AppCssBasic = """
+			@import './blok/blok.css';
+			@source '../Components';
+			""";
+
+	private const string AppCssWithFont = """
+			@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=block');
+			@import './blok/blok.css';
+			@source '../Components';
+			@theme {
+				--default-font-family: 'Inter', 'Segoe UI', system-ui
+			}
+			""";
+
+	private const string AppRazor = """
+			...
+			<head>
+				...
+				<ResourcePreloader />
+				<!-- omit these if not using the Inter font -->
+				<link rel="preconnect" href="https://fonts.googleapis.com">
+				<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+				<!-- load the base Blok styles from the library -->
+				<link rel="stylesheet" href="@Assets["_content/PINGWorks.SitecoreBlok.BlazorUI/css/sitecore-blok.css"]" />
+				<!-- load the styles for your project -->
+				<link rel="stylesheet" href="@Assets["app.min.css"]" />
+				<link rel="stylesheet" href="@Assets["MyProject.styles.css"]" />
+				<ImportMap />
+				...
+			""";
+
+	private const string ProgramCs = """
+			#if DEBUG
+
+			// ensure proper task cleanup during debugging sessions
+			using var job = new JobObject();
+			job.SetLimits( new() { Flags = JobObjectLimitFlags.KillOnJobClose } );
+			job.AssignProcess( Process.GetCurrentProcess() );
+
+			// spawn the CLI in watch mode
+			using var p = Process.Start( new ProcessStartInfo {
+				FileName = "..\\tailwindcss-windows-x64.exe",
+				Arguments = "-i ./wwwroot/app.css -o ./wwwroot/app.min.css --watch",
+				WorkingDirectory = Path.Combine( app.Environment.WebRootPath, ".." ),
+				UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true
+			} )!;
+
+			// optional - attach tracing to the console
+			p.OutputDataReceived += ( _, e ) => { if ( e.Data is not null ) Console.WriteLine( $"TW watch: {e.Data}" ); };
+			p.ErrorDataReceived += ( _, e ) => { if ( e.Data is not null ) Console.Error.WriteLine( $"TW watch: {e.Data}" ); };
+			p.BeginOutputReadLine();
+			p.BeginErrorReadLine();
+
+			#endif
+
+			await app.RunAsync();
+			""";
+}
