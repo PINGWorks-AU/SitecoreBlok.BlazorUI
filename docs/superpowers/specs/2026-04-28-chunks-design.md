@@ -132,6 +132,25 @@ The expected helpers (one file each, under `Components/Chunks/Shared/`):
 
 A helper without consumers in the v1 implementation is not added until a second consumer exists — this prevents speculative helpers.
 
+**5.13. Wrapper-styling parameters absorb slot-content boilerplate.** When a Chunk wraps slot content in styled containers, the container's common visual concerns are exposed as declarative parameters on the Chunk rather than requiring the consumer to add Tailwind classes inside the slot. **Universal naming and defaults:**
+
+- `bool Borders` (default `true`) — toggles `border-*` classes on the chunk's region wrappers (e.g. `border-b` on header bands, `border-r` on left rails, `border-l` on right asides).
+- `bool Gutters` (default `true`) — toggles internal padding on each region wrapper. Each chunk decides what padding/gap to apply when on (typically `p-4` or `px-6 gap-4` for header rows). When off, no padding; consumer styles inside the slot.
+- `Alignment HeaderAlignment` (default `Alignment.Center`) — flex `items-*` on header content rows. Use the shared `Alignment` enum (Start/Center/End/Stretch).
+- Per-region width (where applicable): `<Region>Width: Size` mapped via `SizeClasses.Width` (e.g. `SidebarWidth`, `AsideWidth`, `ListWidth`).
+- Per-region background fill: bare `BgFilled` for single-region chunks, `<Region>BgFilled` for multi-region (e.g. `SidebarBgFilled`, `HeaderBgFilled`, `AsideBgFilled`, `ListBgFilled`). Toggles `bg-background` (or the chunk-specific equivalent like `bg-background/95 backdrop-blur` for sticky header bands).
+
+**Important sub-rules:**
+- **Vertical-sizing classes (`h-14`, `min-h-12`, etc.) belong on the `Gutters` branch, not the baseline.** Baking fixed heights into the wrapper class creates unexpected spacing when consumers turn Gutters off.
+- **Never combine `flex-row-reverse` with CSS `order` properties** — they cancel out. Use `flex-row` + `PlacementClasses.AsideOrder(Placement)` (which emits `order-first`/`order-last`/`hidden`).
+- **Catalogue example slot content should never repeat what a chunk parameter could express.** Per-chunk audit during implementation: any Tailwind class inside a slot's `<div class="...">` that represents a *layout decision* (vs. a one-off content style) becomes a typed chunk parameter.
+
+The pattern doesn't apply to chunks with no chunk-owned region wrappers (DialogShell, BlankShell), or those whose wrappers are owned by an underlying primitive (SheetShell — Sheet primitive owns padding alignment).
+
+**5.14. Primitives reference tab on every Catalogue example.** `<ComponentExample>` exposes a third tab — `Primitives` — alongside Preview and Code. Catalogue authors populate it via the `Primitives="..."` parameter with the equivalent first-principles markup (raw HTML + Blok primitives + Tailwind) — what the consumer would write WITHOUT the chunk. This gives consumers a copy-paste starting point when they need to vary one aspect of the chunk's behaviour. The Primitives tab content stays as raw HTML/Tailwind even when the Code tab uses higher-level helpers like `<Text>` — the whole point is to show the underlying composition. Apply to every example on every Chunk catalogue page.
+
+**5.15. Catalogue pages always declare `@rendermode InteractiveServer`.** Regardless of the chunk's `Interactivity` flag (which documents the *consumer's* requirement when using the chunk in their own apps), the catalogue page itself uses interactive primitives — the `Tabs` inside `<ComponentExample>` for the Preview/Code/Primitives switcher requires interactive mode. Every catalogue page declares `@rendermode InteractiveServer` at the top.
+
 ## 6. Folder layout
 
 ```
@@ -367,6 +386,10 @@ For `WizardShell` specifically: if the wizard's orchestration state is just `int
 - `Catalogue/Components/Shared/ComponentPage.razor` — should be expressible via `PageShell` + `PageHeader` + `PageContent` + `ContentSection`.
 
 If a Chunk is missing for any of these reductions, the roster is wrong and must be amended.
+
+**10.7. The `<Text>` Extra component is the typography escape-hatch.** During the wrapper-styling refactor, `Components/Extra/Text/Text.razor` was extended into a flexible typography + container helper that absorbs the `<div class="bg-background border border-border rounded-lg p-6 text-center"><p class="text-sm">…</p></div>`-style boilerplate that previously littered Catalogue example slot content. API: `Kind` (TextKind enum: P/Span/Div/H1–H6, default P), `Size`, `Alignment`, `Bold`, `SemiBold`, `Italic`, `Muted`, `Padding` (int 0–12), `Margin` (int 0–8), `Border`, `Rounded`, `FullWidth`, `FullHeight`, `BgFilled`, `ClassName`. `TextKind` enum lives at `Components/Extra/Text/TextKind.cs`. **Catalogue example slot content uses `<Text>` instead of raw `<p>`/`<span>`/`<h*>`/`<div class="p-* …">`** — the `Primitives="..."` tab still shows the raw HTML so consumers see the underlying composition.
+
+**10.8. Idiomatic `IComponentRenderMode?` parameter values.** When a chunk has an `InteractiveRenderMode` parameter that the consumer fills in, the canonical value is `RenderMode.InteractiveServer` (the static field on `Microsoft.AspNetCore.Components.Web.RenderMode`) — NOT `new InteractiveServerRenderMode()`. Same for `RenderMode.InteractiveAuto` and `RenderMode.InteractiveWebAssembly`. Document this in every chunk's catalogue page that exposes such a parameter.
 
 ## 11. Risks
 

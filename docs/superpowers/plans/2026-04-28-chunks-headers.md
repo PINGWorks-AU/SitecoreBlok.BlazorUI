@@ -8,15 +8,50 @@
 
 **Spec reference:** `docs/superpowers/specs/2026-04-28-chunks-design.md`. Headers roster is §7.2; conventions are §5.1–§5.12.
 
-**Status:** Plan 2 of 7. Plan 1 (Foundations + Layouts) is complete and committed. This plan adds 7 chunks; subsequent plans cover Navigation, Content, Forms, Data, Marketplace.
+**Status:** Plan 2 of 7. Plan 1 (Foundations + Layouts) is complete and committed, plus an in-flight wrapper-styling refactor (see `~/.claude/plans/robust-scribbling-sonnet.md`) that established the §5.13/§5.14/§5.15 conventions below. This plan adds 7 chunks; subsequent plans cover Navigation, Content, Forms, Data, Marketplace.
 
-**Workflow conventions (carry-over from Plan 1):**
+**Workflow conventions (carry-over from Plan 1 + new patterns from the wrapper-styling refactor):**
+
+*Workflow:*
 - Subagents do NOT commit and do NOT stage. Leave changes unstaged for the user to review and commit at their cadence.
-- C# style: tabs for indentation; PascalCase for all class members; expression bodies with `=>` on a new line; spaces inside parens; method/constructor argument lists on one line unless >8 args.
-- Catalogue pages always declare `Interactivity="ComponentInteractivity.Ssr|Interactive"` (this is documentation for the chunk's *consumer* requirement).
-- **Catalogue pages always declare `@rendermode InteractiveServer` at the top regardless of the chunk's `Interactivity` flag.** This is a separate concern: the catalogue page itself uses interactive primitives (the `Tabs` inside `<ComponentExample>` for the Preview/Code switcher), so the page must be interactive even when the chunk it documents is SSR-safe.
-- Catalogue page `Code="..."` strings must contain the full markup (no `...` abbreviations).
-- Each chunk's catalogue page must define `private static readonly ApiElement[] {Chunk}Elements = [ … ]` and pass it via `ApiElements="@…Elements"` to `<ComponentPage>`.
+
+*C# style (per `feedback_csharp_style.md` memory):*
+- Tabs for indentation; PascalCase for all class members; expression bodies with `=>` on a new line; spaces inside parens; method/constructor argument lists on one line unless >8 args.
+
+*Catalogue pages (always):*
+- Declare `@rendermode InteractiveServer` at the top regardless of the chunk's `Interactivity` flag — the `Tabs` primitive inside `<ComponentExample>` (Preview/Code/Primitives switcher) requires interactive mode.
+- Declare `Interactivity="ComponentInteractivity.Ssr|Interactive"` on `<ComponentPage>` — this documents the *consumer's* requirement when using the chunk in their own apps.
+- `Code="..."` strings contain the full markup (no `...` abbreviations).
+- Every `<ComponentExample>` must author a `Primitives="..."` value showing the equivalent first-principles markup (raw HTML + Blok primitives) — per spec §5.14. The Primitives tab stays as raw HTML even when the Code tab uses `<Text>` etc.
+- Define `private static readonly ApiElement[] {Chunk}Elements = [ … ]` and pass it via `ApiElements="@…Elements"` to `<ComponentPage>`.
+- Slot content uses `<Text>` instead of raw `<p>`/`<span>`/`<h*>`/`<div class="p-* …">` typography. Buttons stay as `<button>`.
+
+*Wrapper-styling parameters (spec §5.13 — apply where structurally meaningful):*
+- `bool Borders` (default `true`) — toggles `border-*` Tailwind on the chunk's region wrappers.
+- `bool Gutters` (default `true`) — toggles internal padding (`p-4` baseline; the chunk decides what padding/gap to apply when on).
+- `Alignment HeaderAlignment` (default `Alignment.Center`) — flex `items-*` on header content rows.
+- Per-region width: `<Region>Width: Size` (mapped via `SizeClasses.Width`).
+- Per-region fill: bare `BgFilled` for single-region chunks, `<Region>BgFilled` for multi-region (e.g. `HeaderBgFilled`).
+- **`h-14` and other vertical-sizing classes are conditional on `Gutters`** — don't bake fixed heights into the baseline class string.
+- **Never combine `flex-row-reverse` with CSS `order` properties** (they cancel out). Use `flex-row` + `PlacementClasses.AsideOrder(Placement)` instead.
+
+*Helpers available (already implemented in the wrapper-styling refactor):*
+- `AlignmentClasses.Items(Alignment) → "items-*"`.
+- `SizeClasses.Width(Size) → "w-*"` and `SizeClasses.MaxWidth(Size) → "max-w-*"`.
+- `OrientationClasses.Flex/Divide`, `PlacementClasses.AsideOrder/ShowAside`, `PositionClasses.ToSheetSide`.
+- New helpers needed for this plan: `ToneClasses` (Tone → Tailwind colour classes), `DensityClasses` (Density → padding/gap/height classes).
+
+*`Text` component (in `Components/Extra/Text/`) is now powerful:*
+- `Kind` (TextKind: P/Span/Div/H1–H6) — the rendered HTML element.
+- `Size` (Size enum) — maps to `text-xs`..`text-8xl` via inlined switch.
+- `Alignment` (Alignment enum) — `text-start/center/end/justify`.
+- Bool flags: `Bold`, `SemiBold`, `Italic`, `Muted`, `Border`, `Rounded`, `FullWidth`, `FullHeight`, `BgFilled`.
+- `Padding` and `Margin` are nullable ints (Tailwind p-{0..12} / m-{0..8}).
+- `ClassName` for escape-hatch passthrough.
+
+*`InteractiveRenderMode` parameter pattern:*
+- Chunks that mount interactive primitives (e.g. AnnouncementBar with a dismiss button) should expose `IComponentRenderMode? InteractiveRenderMode` and forward to those primitives. Default null (inherits from consumer's surrounding context).
+- Idiomatic consumer value: `RenderMode.InteractiveServer` (static field) — NOT `new InteractiveServerRenderMode()`.
 
 ---
 
@@ -223,12 +258,12 @@ Each task implements ONE chunk + its catalogue page together (same TDD pairing a
 	[Parameter] public RenderFragment? Actions { get; set; }
 
 	[Parameter] public bool Sticky { get; set; } = true;
-	[Parameter] public bool Bordered { get; set; } = true;
+	[Parameter] public bool Borders { get; set; } = true;
 
 	private string HeaderClass
 		=> CssClassBuilder.Start( "z-40 bg-background/95 backdrop-blur" )
 			.With( "sticky top-0", Sticky )
-			.With( "border-b border-border", Bordered )
+			.With( "border-b border-border", Borders )
 			.Build();
 }
 ```
@@ -276,7 +311,7 @@ Each task implements ONE chunk + its catalogue page together (same TDD pairing a
 				new ApiProperty( "Nav",      "RenderFragment?",  false, "Top-level navigation slot. Typically holds a row of `<a>`/`<NavLink>` elements." ),
 				new ApiProperty( "Actions",  "RenderFragment?",  false, "Right-aligned slot for sign-in / theme-toggle / settings buttons." ),
 				new ApiProperty( "Sticky",   "bool",             false, "When `true` (default), the header sticks to the top of the scrolling viewport. Set to `false` for headers that scroll with content." ),
-				new ApiProperty( "Bordered", "bool",             false, "When `true` (default), renders a 1px bottom border. Set to `false` for borderless headers." ),
+				new ApiProperty( "Borders", "bool",             false, "When `true` (default), renders a 1px bottom border. Set to `false` for borderless headers." ),
 			]
 		),
 	];
@@ -576,11 +611,11 @@ Build full solution. Expect Build succeeded, 0 warnings, 0 errors.
 
 @code {
 	[Parameter] public RenderFragment? ChildContent { get; set; }
-	[Parameter] public bool Bordered { get; set; } = true;
+	[Parameter] public bool Borders { get; set; } = true;
 
 	private string SubHeaderClass
 		=> CssClassBuilder.Start( "bg-subtle-bg" )
-			.With( "border-b border-border", Bordered )
+			.With( "border-b border-border", Borders )
 			.Build();
 }
 ```
@@ -621,7 +656,7 @@ Build full solution. Expect Build succeeded, 0 warnings, 0 errors.
 			Properties:
 			[
 				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Strip content. Free-form — typically text + badges + dividers." ),
-				new ApiProperty( "Bordered",     "bool",             false, "When `true` (default), renders a 1px bottom border." ),
+				new ApiProperty( "Borders",     "bool",             false, "When `true` (default), renders a 1px bottom border." ),
 			]
 		),
 	];
@@ -673,14 +708,14 @@ Build full solution. Expect Build succeeded, 0 warnings, 0 errors.
 	[Parameter] public RenderFragment? End { get; set; }
 
 	[Parameter] public Density Density { get; set; } = Density.Comfortable;
-	[Parameter] public bool Bordered { get; set; } = false;
+	[Parameter] public bool Borders { get; set; } = false;
 
 	private string ToolbarClass
 		=> CssClassBuilder.Start( "flex items-center w-full" )
 			.With( DensityClasses.Padding( Density ) )
 			.With( DensityClasses.Height( Density ) )
 			.With( DensityClasses.Gap( Density ) )
-			.With( "border border-border rounded-md bg-background", Bordered )
+			.With( "border border-border rounded-md bg-background", Borders )
 			.Build();
 
 	private string InnerGapClass
@@ -699,8 +734,8 @@ Build full solution. Expect Build succeeded, 0 warnings, 0 errors.
 
 	<ExamplesSection>
 
-		<ComponentExample Title="Comfortable (default)" Code="@("<Toolbar Bordered=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Filter</Button>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Sort</Button>\n    </Start>\n    <End>\n        <Button Size=\"ButtonSize.Sm\">New item</Button>\n    </End>\n</Toolbar>")">
-			<Toolbar Bordered="true">
+		<ComponentExample Title="Comfortable (default)" Code="@("<Toolbar Borders=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Filter</Button>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Sort</Button>\n    </Start>\n    <End>\n        <Button Size=\"ButtonSize.Sm\">New item</Button>\n    </End>\n</Toolbar>")">
+			<Toolbar Borders="true">
 				<Start>
 					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Filter</Button>
 					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Sort</Button>
@@ -711,8 +746,8 @@ Build full solution. Expect Build succeeded, 0 warnings, 0 errors.
 			</Toolbar>
 		</ComponentExample>
 
-		<ComponentExample Title="Compact density" Code="@("<Toolbar Density=\"Density.Compact\" Bordered=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Xs\">Refresh</Button>\n    </Start>\n    <End>\n        <span class=\"text-xs text-muted-foreground\">12 items</span>\n    </End>\n</Toolbar>")">
-			<Toolbar Density="Density.Compact" Bordered="true">
+		<ComponentExample Title="Compact density" Code="@("<Toolbar Density=\"Density.Compact\" Borders=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Xs\">Refresh</Button>\n    </Start>\n    <End>\n        <span class=\"text-xs text-muted-foreground\">12 items</span>\n    </End>\n</Toolbar>")">
+			<Toolbar Density="Density.Compact" Borders="true">
 				<Start>
 					<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Xs">Refresh</Button>
 				</Start>
@@ -722,8 +757,8 @@ Build full solution. Expect Build succeeded, 0 warnings, 0 errors.
 			</Toolbar>
 		</ComponentExample>
 
-		<ComponentExample Title="With center" Code="@("<Toolbar Bordered=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Back</Button>\n    </Start>\n    <Center>\n        <span class=\"text-sm font-semibold\">Page title</span>\n    </Center>\n    <End>\n        <Button Size=\"ButtonSize.Sm\">Save</Button>\n    </End>\n</Toolbar>")">
-			<Toolbar Bordered="true">
+		<ComponentExample Title="With center" Code="@("<Toolbar Borders=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Back</Button>\n    </Start>\n    <Center>\n        <span class=\"text-sm font-semibold\">Page title</span>\n    </Center>\n    <End>\n        <Button Size=\"ButtonSize.Sm\">Save</Button>\n    </End>\n</Toolbar>")">
+			<Toolbar Borders="true">
 				<Start>
 					<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Back</Button>
 				</Start>
@@ -753,7 +788,7 @@ Build full solution. Expect Build succeeded, 0 warnings, 0 errors.
 				new ApiProperty( "Center",   "RenderFragment?",  false, "Centred slot. Optional — when null, a spacer fills the middle. Typically a title or step indicator." ),
 				new ApiProperty( "End",      "RenderFragment?",  false, "Right-aligned slot. Typically the primary action button." ),
 				new ApiProperty( "Density",  "Density",          false, "Vertical rhythm. Default: `Density.Comfortable`. Other value: `Compact` (smaller padding, gap, height). Shared `Density` enum per spec §5.10." ),
-				new ApiProperty( "Bordered", "bool",             false, "When `true`, renders a border + rounded background. Default: `false` (use this for in-context toolbars; `true` for free-standing ones)." ),
+				new ApiProperty( "Borders", "bool",             false, "When `true`, renders a border + rounded background. Default: `false` (use this for in-context toolbars; `true` for free-standing ones)." ),
 			]
 		),
 	];
@@ -908,13 +943,67 @@ Stop the dev server.
 
 ---
 
+## Per-chunk parameter additions (apply to each chunk task before implementing)
+
+The drafted chunk code earlier in this plan was written before the wrapper-styling refactor. Apply these deltas to each chunk's `@code` block + razor markup before generating the chunk:
+
+### AppHeader (Task 5)
+- Already has `Sticky` and `Borders` (renamed from `Bordered`). Add `bool Gutters = true`, `Alignment HeaderAlignment = Alignment.Center`, `bool BgFilled = true` (replaces hard-coded `bg-background/95 backdrop-blur` — apply only when BgFilled).
+- Roll `flex items-center gap-6 px-6 h-14` into computed `HeaderRowClass` with `h-14 px-6 gap-4` conditional on Gutters; `items-*` from HeaderAlignment; baseline `flex`.
+- Catalogue example: drop the `Brand`/`Nav`/`Actions` slot Tailwind, use `<Text>` for any inline labels.
+
+### AppBrand (Task 6)
+- Skip wrapper-styling params (single inline element, not a region wrapper). Keep `Name`, `Href`, `Version`, `Logo` as-is.
+- Catalogue: still add `Primitives="..."` to every example.
+
+### PageHeader (Task 7)
+- Add `bool Borders = true` (controls bottom-border under the title row), `bool Gutters = true` (controls vertical padding `pb-6` and the actions-row gap), `Alignment HeaderAlignment = Alignment.Center`.
+- Replace inline `flex items-start gap-4` and `pb-6 border-b border-border` with computed classes.
+
+### SectionHeader (Task 8)
+- Add `bool Borders = true`, `bool Gutters = true`, `Alignment HeaderAlignment = Alignment.Center`.
+- Same conditional pattern as PageHeader, smaller magnitudes (e.g. `pb-3` instead of `pb-6`).
+
+### SubHeader (Task 9)
+- Already has `Bordered` (rename to `Borders`). Add `bool Gutters = true` (controls inner `px-6 py-2`), `bool BgFilled = true` (controls `bg-subtle-bg`).
+
+### Toolbar (Task 10)
+- Already has `Density` (Comfortable/Compact) which provides padding/gap/height via `DensityClasses`, AND `Borders` (renamed from `Bordered`). Decision: **keep `Density` for granularity, drop the redundant `bool Gutters` from this chunk** — Density is the more expressive control here. Document this in the chunk's @* *@ doc comment.
+- Add `bool BgFilled = false` (default false — Toolbar typically doesn't have its own bg unless `Borders=true`).
+- `Alignment` doesn't apply (toolbar is a horizontal row).
+
+### AnnouncementBar (Task 11)
+- Already has `Tone`, `Dismissible`, `OnDismiss`. Add `bool Borders = true` (controls `border-b`), `bool Gutters = true` (controls `px-4 py-2`).
+- Don't add `BgFilled` — the tonal background IS the chunk's defining visual.
+
+### All catalogue pages (Tasks 5–11)
+- `@rendermode InteractiveServer` at top.
+- Every `<ComponentExample>` has `Code="..."` and `Primitives="..."`.
+- Slot content uses `<Text>` not raw HTML where applicable (e.g. labels, subtitles).
+- Add a second example per chunk that demonstrates Borders/Gutters off variants where the chunk supports them.
+
 ## Acceptance criteria
 
 - [ ] `Tone` and `Density` enums added to `Components/Chunks/Enums.cs`.
 - [ ] `ToneClasses.cs` and `DensityClasses.cs` created under `Components/Chunks/Shared/`.
-- [ ] All 7 Headers chunks exist under `Components/Chunks/Headers/` and build cleanly.
-- [ ] All 7 catalogue pages exist under `Catalogue/Components/Pages/Chunks/Headers/` with explicit `Interactivity` declarations and ApiElements.
+- [ ] All 7 Headers chunks exist under `Components/Chunks/Headers/` and build cleanly. Each chunk has the wrapper-styling params per the per-chunk delta section above (defaults: `Borders=true`, `Gutters=true`, `HeaderAlignment=Center` where applicable).
+- [ ] No chunk uses `Bordered`; all use `Borders` consistently.
+- [ ] All 7 catalogue pages exist under `Catalogue/Components/Pages/Chunks/Headers/` with explicit `Interactivity` declarations, `@rendermode InteractiveServer`, ApiElements, AND `Primitives="..."` content on every example.
+- [ ] Catalogue example slot content uses `<Text>` — no raw `<p class="...">`/`<span class="font-...">` etc. left.
 - [ ] `ChunksManifest.cs` lists all 7 Headers entries.
 - [ ] `dotnet build` from repo root: 0 warnings, 0 errors.
-- [ ] All 7 Headers pages return HTTP 200 on curl.
+- [ ] All 7 Headers pages return HTTP 200 on curl. Chrome-verify each one: Preview renders, Code tab shows the new `<Text>`-based markup, Primitives tab shows the equivalent first-principles HTML.
 - [ ] No commits made by subagents — all changes left unstaged for the user.
+
+---
+
+## Session-restart notes (next session pick-up)
+
+When resuming in a new session, recap:
+
+1. Read this plan, plus `~/.claude/plans/robust-scribbling-sonnet.md` (progress section at top) for the conventions established in the prior session.
+2. Read `docs/superpowers/specs/2026-04-28-chunks-design.md` for spec conventions §5.1–§5.12 (already in spec) and the new conventions §5.13/§5.14/§5.15 (NOT yet in spec — added to spec at start of new session if not done).
+3. Inspect the current state of the 8 Layout chunks under `Components/Chunks/Layouts/` — they are the canonical pattern. Mimic `AppShell.razor`, `PageShell.razor`, `SplitShell.razor` shape exactly.
+4. Inspect the canonical catalogue page `Catalogue/Components/Pages/Chunks/Layouts/AppShellPage.razor` for the catalogue-page pattern (3 tabs, ApiElements, slot content using `<Text>`).
+5. Check `feedback_csharp_style.md` memory before generating any C#.
+6. The user reviews/commits each task — leave changes unstaged.
