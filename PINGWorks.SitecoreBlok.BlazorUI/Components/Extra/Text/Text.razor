@@ -1,14 +1,143 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-<p class="@CssClass">
-	@ChildContent
-</p>
+@*
+	Text — flexible typography + container helper.
+	Renders ChildContent inside a chosen HTML element (Kind) with declarative
+	parameters for font size, weight/style, alignment, padding, margin, border,
+	rounding, full-width, background fill, and muted-foreground colour. Designed
+	to absorb the `<div class="bg-background border border-border rounded-lg p-6 text-center"><p class="text-sm">…</p></div>`
+	style of slot-content boilerplate that previously littered Catalogue examples.
+
+	Examples:
+		<Text>Plain p, default Md size</Text>
+		<Text Kind="TextKind.H1" Size="Size.Xl3" Bold>Heading</Text>
+		<Text Kind="TextKind.Span" Size="Size.Sm" Muted>Subtle inline text</Text>
+		<Text Kind="TextKind.P" Size="Size.Sm" Alignment="Alignment.Center" Padding="6" FullWidth Border Rounded BgFilled>
+			Centered content (Md)
+		</Text>
+*@
+
+@if ( Kind is TextKind.Span )
+{
+	<span class="@CssClass">@ChildContent</span>
+}
+else if ( Kind is TextKind.Div )
+{
+	<div class="@CssClass">@ChildContent</div>
+}
+else if ( Kind is TextKind.H1 )
+{
+	<h1 class="@CssClass">@ChildContent</h1>
+}
+else if ( Kind is TextKind.H2 )
+{
+	<h2 class="@CssClass">@ChildContent</h2>
+}
+else if ( Kind is TextKind.H3 )
+{
+	<h3 class="@CssClass">@ChildContent</h3>
+}
+else if ( Kind is TextKind.H4 )
+{
+	<h4 class="@CssClass">@ChildContent</h4>
+}
+else if ( Kind is TextKind.H5 )
+{
+	<h5 class="@CssClass">@ChildContent</h5>
+}
+else if ( Kind is TextKind.H6 )
+{
+	<h6 class="@CssClass">@ChildContent</h6>
+}
+else
+{
+	<p class="@CssClass">@ChildContent</p>
+}
 
 @code {
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 
-	private string CssClass => CssClassBuilder.Start( "text-center text-sm text-muted-foreground" )
-											.With( ClassName )
-											.Build();
+	[Parameter] public TextKind Kind { get; set; } = TextKind.P;
+	[Parameter] public Size Size { get; set; } = Size.Md;
+	[Parameter] public Alignment Alignment { get; set; } = Alignment.Start;
+
+	[Parameter] public bool Bold { get; set; }
+	[Parameter] public bool SemiBold { get; set; }
+	[Parameter] public bool Italic { get; set; }
+	[Parameter] public bool Muted { get; set; }
+
+	// Padding / Margin take a Tailwind spacing-scale int (0..12 typical).
+	// Null means "no class added"; the consumer can layer their own via ClassName.
+	[Parameter] public int? Padding { get; set; }
+	[Parameter] public int? Margin { get; set; }
+
+	[Parameter] public bool Border { get; set; }
+	[Parameter] public bool Rounded { get; set; }
+	[Parameter] public bool FullWidth { get; set; }
+	[Parameter] public bool FullHeight { get; set; }
+	[Parameter] public bool BgFilled { get; set; }
+
+	private string CssClass
+		=> CssClassBuilder.Start()
+			// Font size
+			.With( "text-3xs", Size is Size.Xs3 )
+			.With( "text-2xs", Size is Size.Xs2 )
+			.With( "text-xs",  Size is Size.Xs )
+			.With( "text-sm",  Size is Size.Sm )
+			.With( "text-base", Size is Size.Md or Size.Default )
+			.With( "text-lg",  Size is Size.Lg )
+			.With( "text-xl",  Size is Size.Xl )
+			.With( "text-2xl", Size is Size.Xl2 )
+			.With( "text-3xl", Size is Size.Xl3 )
+			.With( "text-4xl", Size is Size.Xl4 )
+			.With( "text-5xl", Size is Size.Xl5 )
+			.With( "text-6xl", Size is Size.Xl6 )
+			.With( "text-7xl", Size is Size.Xl7 )
+			.With( "text-8xl", Size is Size.Xl8 )
+
+			// Alignment
+			.With( "text-start",   Alignment is Alignment.Start )
+			.With( "text-center",  Alignment is Alignment.Center )
+			.With( "text-end",     Alignment is Alignment.End )
+			.With( "text-justify", Alignment is Alignment.Stretch )
+
+			// Weight / style / colour
+			.With( "font-bold", Bold )
+			.With( "font-semibold", SemiBold && !Bold )
+			.With( "italic", Italic )
+			.With( "text-muted-foreground", Muted )
+
+			// Padding (Tailwind spacing scale)
+			.With( "p-0",  Padding is 0 )
+			.With( "p-1",  Padding is 1 )
+			.With( "p-2",  Padding is 2 )
+			.With( "p-3",  Padding is 3 )
+			.With( "p-4",  Padding is 4 )
+			.With( "p-5",  Padding is 5 )
+			.With( "p-6",  Padding is 6 )
+			.With( "p-7",  Padding is 7 )
+			.With( "p-8",  Padding is 8 )
+			.With( "p-10", Padding is 10 )
+			.With( "p-12", Padding is 12 )
+
+			// Margin
+			.With( "m-0",  Margin is 0 )
+			.With( "m-1",  Margin is 1 )
+			.With( "m-2",  Margin is 2 )
+			.With( "m-3",  Margin is 3 )
+			.With( "m-4",  Margin is 4 )
+			.With( "m-5",  Margin is 5 )
+			.With( "m-6",  Margin is 6 )
+			.With( "m-8",  Margin is 8 )
+
+			// Border / radius / sizing / fill
+			.With( "border border-border", Border )
+			.With( "rounded-lg", Rounded )
+			.With( "w-full", FullWidth )
+			.With( "h-full", FullHeight )
+			.With( "bg-background", BgFilled )
+
+			.With( ClassName )
+			.Build();
 }

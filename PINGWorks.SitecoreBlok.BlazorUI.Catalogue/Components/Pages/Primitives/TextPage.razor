@@ -2,24 +2,46 @@
 @using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
 @rendermode InteractiveServer
 
-<ComponentPage Title="Text" Description="A simple paragraph component with pre-applied muted, centred, small styling. Useful for descriptions and helper text." Interactivity="ComponentInteractivity.Ssr" ApiElements="@TextElements">
+<ComponentPage Title="Text" Description="Flexible typography + container helper. Renders content inside any HTML element kind with declarative size, weight, alignment, padding, margin, border, and fill parameters." Interactivity="ComponentInteractivity.Ssr" ApiElements="@TextElements">
 
 	<DivergenceNote>
-		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> Text is a small typography helper for repeated muted-helper-text use cases — there is no upstream Blok component to track for this.</p>
+		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> Text exists to absorb the recurring <code>&lt;div class="bg-background border border-border rounded-lg p-6 text-center"&gt;&lt;p class="text-sm"&gt;…&lt;/p&gt;&lt;/div&gt;</code> Tailwind-in-markup boilerplate that otherwise litters Catalogue examples and consumer apps.</p>
 	</DivergenceNote>
 
 	<ExamplesSection>
 
-		<ComponentExample Title="Default" Code="@("<Text>A short helper sentence beneath a section heading.</Text>")">
-			<Text>A short helper sentence beneath a section heading.</Text>
+		<ComponentExample Title="Default — `<p>` at Md size"
+			Code="@("<Text>A short helper sentence.</Text>")">
+			<Text>A short helper sentence.</Text>
 		</ComponentExample>
 
-		<ComponentExample Title="With custom ClassName" Code="@("<Text ClassName=\"text-left\">Override the centring via ClassName when you need left-aligned helper text.</Text>")">
-			<Text ClassName="text-left">Override the centring via ClassName when you need left-aligned helper text.</Text>
+		<ComponentExample Title="Sizes"
+			Code="@("<Text Size=\"Size.Xs\">Xs (text-xs)</Text>\n<Text Size=\"Size.Sm\">Sm (text-sm)</Text>\n<Text Size=\"Size.Md\">Md (text-base)</Text>\n<Text Size=\"Size.Lg\">Lg (text-lg)</Text>\n<Text Size=\"Size.Xl2\" Bold>Xl2 (text-2xl) Bold</Text>")">
+			<Text Size="Size.Xs">Xs (text-xs)</Text>
+			<Text Size="Size.Sm">Sm (text-sm)</Text>
+			<Text Size="Size.Md">Md (text-base)</Text>
+			<Text Size="Size.Lg">Lg (text-lg)</Text>
+			<Text Size="Size.Xl2" Bold>Xl2 (text-2xl) Bold</Text>
 		</ComponentExample>
 
-		<ComponentExample Title="Longer content" Code="@("<Text>Text sits under a heading to explain a concept or describe an action. It uses the muted-foreground token so it recedes next to the primary content.</Text>")">
-			<Text>Text sits under a heading to explain a concept or describe an action. It uses the muted-foreground token so it recedes next to the primary content.</Text>
+		<ComponentExample Title="Headings via Kind"
+			Code="@("<Text Kind=\"TextKind.H1\" Size=\"Size.Xl3\" Bold>Heading 1</Text>\n<Text Kind=\"TextKind.H2\" Size=\"Size.Xl2\" SemiBold>Heading 2</Text>\n<Text Kind=\"TextKind.H3\" Size=\"Size.Xl\" SemiBold>Heading 3</Text>\n<Text Kind=\"TextKind.Span\" Size=\"Size.Sm\" Muted>Inline span, muted</Text>")">
+			<Text Kind="TextKind.H1" Size="Size.Xl3" Bold>Heading 1</Text>
+			<Text Kind="TextKind.H2" Size="Size.Xl2" SemiBold>Heading 2</Text>
+			<Text Kind="TextKind.H3" Size="Size.Xl" SemiBold>Heading 3</Text>
+			<Text Kind="TextKind.Span" Size="Size.Sm" Muted>Inline span, muted</Text>
+		</ComponentExample>
+
+		<ComponentExample Title="Container preset — bordered card"
+			Code="@("<Text Kind=\"TextKind.Div\"\n      Size=\"Size.Sm\"\n      Alignment=\"Alignment.Center\"\n      Padding=\"6\"\n      FullWidth\n      Border\n      Rounded\n      BgFilled>\n    Centered card-style block (replaces a div+p Tailwind boilerplate).\n</Text>")">
+			<Text Kind="TextKind.Div" Size="Size.Sm" Alignment="Alignment.Center" Padding="6" FullWidth Border Rounded BgFilled>
+				Centered card-style block (replaces a div+p Tailwind boilerplate).
+			</Text>
+		</ComponentExample>
+
+		<ComponentExample Title="Italic + muted"
+			Code="@("<Text Italic Muted>An italic, muted aside.</Text>")">
+			<Text Italic Muted>An italic, muted aside.</Text>
 		</ComponentExample>
 
 	</ExamplesSection>
@@ -31,12 +53,26 @@
 	[
 		new ApiElement(
 			Name: "Text",
-			Description: "Renders a `<p>` pre-styled as centred, small, muted helper text. Use `ClassName` to override alignment or weight.",
+			Description: "Renders ChildContent inside the HTML element specified by `Kind` (default `<p>`) with declarative typography and container parameters. Designed to absorb recurring `<div class=\"...\">+<p class=\"...\">` boilerplate.",
 			Depth: 0,
 			Properties:
 			[
-				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<p>`. Use to override the default `text-center text-sm text-muted-foreground`." ),
-				new ApiProperty( "ChildContent", "RenderFragment?", false, "The paragraph's content." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "The text or markup to render." ),
+				new ApiProperty( "Kind",         "TextKind",        false, "HTML element kind. Default: `TextKind.P`. Other values: `Span`, `Div`, `H1`, `H2`, `H3`, `H4`, `H5`, `H6`." ),
+				new ApiProperty( "Size",         "Size",            false, "Font size. Default: `Size.Md` (`text-base`). Maps `Xs` → `text-xs`, `Sm` → `text-sm`, `Md` → `text-base`, `Lg` → `text-lg`, `Xl` → `text-xl`, `Xl2..Xl8` → `text-2xl..text-8xl`." ),
+				new ApiProperty( "Alignment",    "Alignment",       false, "Text alignment. Default: `Alignment.Start`. Maps `Start` → `text-start`, `Center` → `text-center`, `End` → `text-end`, `Stretch` → `text-justify`." ),
+				new ApiProperty( "Bold",         "bool",            false, "Toggles `font-bold`. Default: `false`. Wins over `SemiBold` if both are set." ),
+				new ApiProperty( "SemiBold",     "bool",            false, "Toggles `font-semibold`. Default: `false`. Ignored if `Bold` is also `true`." ),
+				new ApiProperty( "Italic",       "bool",            false, "Toggles `italic`. Default: `false`." ),
+				new ApiProperty( "Muted",        "bool",            false, "Toggles `text-muted-foreground`. Default: `false`." ),
+				new ApiProperty( "Padding",      "int?",            false, "Tailwind spacing-scale padding (`p-{value}`). Supported values: 0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12. Null (default) adds no padding class." ),
+				new ApiProperty( "Margin",       "int?",            false, "Tailwind spacing-scale margin (`m-{value}`). Supported values: 0, 1, 2, 3, 4, 5, 6, 8. Null (default) adds no margin class." ),
+				new ApiProperty( "Border",       "bool",            false, "Toggles `border border-border`. Default: `false`." ),
+				new ApiProperty( "Rounded",      "bool",            false, "Toggles `rounded-lg`. Default: `false`." ),
+				new ApiProperty( "FullWidth",    "bool",            false, "Toggles `w-full`. Default: `false`." ),
+				new ApiProperty( "FullHeight",   "bool",            false, "Toggles `h-full`. Default: `false`. Useful for filling resizable pane wrappers and other height-constrained slots." ),
+				new ApiProperty( "BgFilled",     "bool",            false, "Toggles `bg-background`. Default: `false`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended after the computed classes. Use to override or extend." ),
 			]
 		),
 	];
