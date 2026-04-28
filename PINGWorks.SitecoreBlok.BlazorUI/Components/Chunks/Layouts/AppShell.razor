@@ -1,0 +1,115 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	AppShell — outermost shell for a top-level Blazor app.
+	Provides the dark-mode wrapper, ambient flex layout, and mounts the global
+	Popovers and Toaster primitives with the consumer-supplied render mode.
+
+	Slots: Header, Sidebar, Content, Footer (RenderFragment? per spec §5.1).
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders            (default true) toggles border-b on Header, border-r on Sidebar, border-t on Footer.
+		- Gutters            (default true) toggles padding inside each region wrapper:
+		                          * Sidebar: p-4
+		                          * Header content row: px-6 gap-4
+		                          * Content (main scrollable area): p-4
+		                          * Footer: p-4
+		- HeaderAlignment    (default Center) flex items-* on the Header content row.
+		- SidebarWidth       (default Md ~ w-56) Size enum mapped via SizeClasses.Width.
+		- SidebarBgFilled    (default true) toggles bg-background on the Sidebar wrapper.
+		- HeaderBgFilled     (default true) toggles bg-background/95 + backdrop-blur on the Header band.
+*@
+
+<div data-dark-mode-target class="text-foreground">
+	<div class="flex h-screen overflow-hidden bg-subtle-bg">
+		@if ( Sidebar is not null )
+		{
+			<aside class="@SidebarClass">
+				@Sidebar
+			</aside>
+		}
+
+		<div class="flex-1 flex flex-col min-w-0">
+			@if ( Header is not null )
+			{
+				<header class="@HeaderClass">
+					<div class="@HeaderRowClass">
+						@Header
+					</div>
+				</header>
+			}
+
+			<main class="flex-1 flex flex-col min-h-0 overflow-hidden">
+				<div class="@ContentClass">
+					@if ( Content is not null )
+					{
+						@Content
+					}
+				</div>
+			</main>
+
+			@if ( Footer is not null )
+			{
+				<footer class="@FooterClass">
+					@Footer
+				</footer>
+			}
+		</div>
+	</div>
+
+	<Popovers @rendermode="InteractiveRenderMode" />
+	<Toaster @rendermode="InteractiveRenderMode" />
+</div>
+
+@code {
+	[Parameter] public RenderFragment? Header { get; set; }
+	[Parameter] public RenderFragment? Sidebar { get; set; }
+	[Parameter] public RenderFragment? Content { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+
+	/// <summary>
+	/// Render mode applied to the internally-mounted Popovers and Toaster primitives.
+	/// Consumers pass typically <c>RenderMode.InteractiveServer</c> or
+	/// <c>RenderMode.InteractiveAuto</c>. Default null inherits from the surrounding
+	/// host context — fails fast if the host isn't already interactive (desired).
+	/// </summary>
+	[Parameter] public IComponentRenderMode? InteractiveRenderMode { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public Alignment HeaderAlignment { get; set; } = Alignment.Center;
+	[Parameter] public Size SidebarWidth { get; set; } = Size.Md;
+	[Parameter] public bool SidebarBgFilled { get; set; } = true;
+	[Parameter] public bool HeaderBgFilled { get; set; } = true;
+
+	private string SidebarClass
+		=> CssClassBuilder.Start( "shrink-0 h-full overflow-y-auto" )
+			.With( SizeClasses.Width( SidebarWidth ) )
+			.With( "border-r border-border", Borders )
+			.With( "bg-background", SidebarBgFilled )
+			.With( "p-4", Gutters )
+			.Build();
+
+	private string HeaderClass
+		=> CssClassBuilder.Start( "sticky top-0 z-40" )
+			.With( "border-b border-border", Borders )
+			.With( "bg-background/95 backdrop-blur", HeaderBgFilled )
+			.Build();
+
+	private string HeaderRowClass
+		=> CssClassBuilder.Start( "flex" )
+			.With( AlignmentClasses.Items( HeaderAlignment ) )
+			.With( "h-14 px-6 gap-4", Gutters )
+			.Build();
+
+	private string ContentClass
+		=> CssClassBuilder.Start( "flex-1 flex flex-col min-h-0 overflow-y-auto" )
+			.With( "p-4", Gutters )
+			.Build();
+
+	private string FooterClass
+		=> CssClassBuilder.Start( "bg-background" )
+			.With( "border-t border-border", Borders )
+			.With( "p-4", Gutters )
+			.Build();
+}

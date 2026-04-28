@@ -1,0 +1,39 @@
+@page "/chunks/blank-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="BlankShell" Description="No-chrome envelope; sets background and font only" Interactivity="ComponentInteractivity.Ssr" ApiElements="@BlankShellElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<BlankShell>\n    <Text Kind=\"TextKind.Div\" Padding=\"4\">\n        <Text Kind=\"TextKind.H3\" Size=\"Size.Lg\" SemiBold>Marketing band</Text>\n        <Text Size=\"Size.Sm\" Muted>No header, no nav, no chrome. Just the background and font.</Text>\n    </Text>\n</BlankShell>")"
+			Primitives="@("<div class=\"bg-subtle-bg text-foreground min-h-full w-full\">\n    <div class=\"p-4\">\n        <h3 class=\"text-lg font-semibold\">Marketing band</h3>\n        <p class=\"text-sm text-muted-foreground\">No header, no nav, no chrome. Just the background and font.</p>\n    </div>\n</div>")">
+			<div class="h-48 border rounded-lg overflow-hidden">
+				<BlankShell>
+					<Text Kind="TextKind.Div" Padding="4">
+						<Text Kind="TextKind.H3" Size="Size.Lg" SemiBold>Marketing band</Text>
+						<Text Size="Size.Sm" Muted>No header, no nav, no chrome. Just the background and font.</Text>
+					</Text>
+				</BlankShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] BlankShellElements =
+	[
+		new ApiElement(
+			Name: "BlankShell",
+			Description: "No-chrome envelope. Sets only the Blok background (`bg-subtle-bg`) and inherits the font from the document root. Useful for print pages, login pre-shells, full-bleed marketing pages, or anywhere you want Blok's theme tokens without any structural chrome.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "The content to render inside the envelope." ),
+			]
+		),
+	];
+}

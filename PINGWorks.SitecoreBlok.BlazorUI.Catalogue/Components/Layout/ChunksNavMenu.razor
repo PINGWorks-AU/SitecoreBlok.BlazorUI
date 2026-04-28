@@ -1,0 +1,29 @@
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<nav class="w-60 shrink-0 border-r border-border bg-background h-screen sticky top-0 overflow-y-auto">
+	<div class="px-4 h-14 flex items-center border-b border-border">
+		<a href="/" class="text-base font-bold text-foreground no-underline tracking-tight">Blok Blazor</a>
+	</div>
+
+	<div class="px-3 py-4 space-y-1">
+		<NavLink href="/" class="flex items-center rounded-md px-3 py-1.5 text-sm hover:bg-neutral-bg no-underline text-foreground" Match="NavLinkMatch.All">
+			Home
+		</NavLink>
+		<NavLink href="/chunks" class="flex items-center rounded-md px-3 py-1.5 text-sm hover:bg-neutral-bg no-underline text-foreground" Match="NavLinkMatch.All">
+			All chunks
+		</NavLink>
+
+		@foreach ( var family in ChunksManifest.Families )
+		{
+			<div class="space-y-0.5 pt-3">
+				<div class="px-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">@family</div>
+				@foreach ( var entry in ChunksManifest.ByFamily( family ) )
+				{
+					<NavLink href="@($"chunks/{entry.Slug}")" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-neutral-bg no-underline text-foreground/70 hover:text-foreground transition-colors" ActiveClass="bg-primary-bg text-primary-fg font-semibold">
+						<span class="flex-1 truncate">@entry.Name</span>
+					</NavLink>
+				}
+			</div>
+		}
+	</div>
+</nav>

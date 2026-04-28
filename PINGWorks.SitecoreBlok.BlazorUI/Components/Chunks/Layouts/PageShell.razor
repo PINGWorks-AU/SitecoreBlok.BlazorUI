@@ -1,0 +1,99 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	PageShell — in-app page envelope. Sits inside AppShell.Content.
+	Slots: Header, Body, Aside, Footer (RenderFragment? per spec §5.1).
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders            (default true)  toggles border-b on Header, border-l/r on Aside (per AsidePlacement), border-t on Footer.
+		- Gutters            (default false) toggles p-4 inside Header / Body / Aside / Footer wrappers; px-6 on Header content row.
+		- HeaderAlignment    (default Center) flex items-* on the Header content row.
+		- AsideWidth         (default Sm     ~ w-48) Size enum mapped via SizeClasses.Width.
+		- AsideFilled        (default true)  toggles bg-background on the Aside wrapper.
+		- AsidePlacement     (default Right) where the Aside slot renders. None hides it.
+*@
+
+<div class="flex flex-col h-full min-h-0">
+	@if ( Header is not null )
+	{
+		<div class="@HeaderClass">
+			<div class="@HeaderRowClass">
+				@Header
+			</div>
+		</div>
+	}
+
+	<div class="flex flex-row flex-1 min-h-0">
+		<div class="@BodyClass">
+			@if ( Body is not null )
+			{
+				@Body
+			}
+		</div>
+
+		@if ( PlacementClasses.ShowAside( AsidePlacement ) && Aside is not null )
+		{
+			<aside class="@AsideClass">
+				@Aside
+			</aside>
+		}
+	</div>
+
+	@if ( Footer is not null )
+	{
+		<div class="@FooterClass">
+			@Footer
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public RenderFragment? Header { get; set; }
+	[Parameter] public RenderFragment? Body { get; set; }
+	[Parameter] public RenderFragment? Aside { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+
+	[Parameter] public Placement AsidePlacement { get; set; } = Placement.Right;
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public Alignment HeaderAlignment { get; set; } = Alignment.Center;
+	[Parameter] public Size AsideWidth { get; set; } = Size.Sm;
+	[Parameter] public bool AsideBgFilled { get; set; } = true;
+
+	private string HeaderClass
+		=> CssClassBuilder.Start( "flex-shrink-0" )
+			.With( "border-b border-border", Borders )
+			.Build();
+
+	private string HeaderRowClass
+		=> CssClassBuilder.Start( "flex" )
+			.With( AlignmentClasses.Items( HeaderAlignment ) )
+			.With( "p-4", Gutters )
+			.Build();
+
+	private string BodyClass
+		=> CssClassBuilder.Start( "flex-1 min-w-0 overflow-y-auto" )
+			.With( "p-4", Gutters )
+			.Build();
+
+	// Body comes before Aside in markup. PlacementClasses.AsideOrder applies
+	// `order-first` (Left) or `order-last` (Right) on the Aside to position it.
+	// We use plain `flex-row` and rely on the CSS `order` property — combining
+	// `flex-row-reverse` with `order-*` cancels out and silently produces the
+	// wrong layout, which is what bit us before.
+	private string AsideClass
+		=> CssClassBuilder.Start( "shrink-0 h-full overflow-y-auto" )
+			.With( SizeClasses.Width( AsideWidth ) )
+			.With( PlacementClasses.AsideOrder( AsidePlacement ) )
+			.With( "bg-background", AsideBgFilled )
+			.With( "border-l border-border", Borders && AsidePlacement is Placement.Right )
+			.With( "border-r border-border", Borders && AsidePlacement is Placement.Left )
+			.With( "p-4", Gutters )
+			.Build();
+
+	private string FooterClass
+		=> CssClassBuilder.Start( "flex-shrink-0" )
+			.With( "border-t border-border", Borders )
+			.With( "p-4", Gutters )
+			.Build();
+}

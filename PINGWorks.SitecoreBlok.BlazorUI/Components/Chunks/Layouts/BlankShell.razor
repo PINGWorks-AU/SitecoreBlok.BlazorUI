@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	BlankShell — no-chrome envelope. Sets only the background and inherits the font.
+	Useful for print, login pre-shells, full-bleed marketing pages.
+*@
+
+<div class="bg-subtle-bg text-foreground min-h-full w-full">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

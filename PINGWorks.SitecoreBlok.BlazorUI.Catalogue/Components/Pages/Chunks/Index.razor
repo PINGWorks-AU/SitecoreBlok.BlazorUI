@@ -1,0 +1,35 @@
+@page "/chunks"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<PageTitle>Chunks - Blok Blazor</PageTitle>
+
+<div class="space-y-8 py-4">
+	<div>
+		<h1 class="text-3xl font-bold tracking-tight">Chunks</h1>
+		<p class="text-muted-foreground mt-2 text-base">
+			Opinionated compositions of Primitives. Solve the most common page and panel layouts with literal Tailwind already arranged.
+		</p>
+	</div>
+
+	<Separator />
+
+	@foreach ( var family in ChunksManifest.Families )
+	{
+		<div class="space-y-2">
+			<h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">@family</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+				@foreach ( var entry in ChunksManifest.ByFamily( family ) )
+				{
+					<a href="@($"chunks/{entry.Slug}")" class="group no-underline">
+						<div class="rounded-lg border border-border p-4 bg-background hover:border-primary/50 hover:shadow-sm transition-all">
+							<div class="flex items-center gap-2">
+								<p class="text-sm font-medium text-foreground group-hover:text-primary transition-colors flex-1 truncate">@entry.Name</p>
+							</div>
+							<p class="text-xs text-muted-foreground mt-1 line-clamp-2">@entry.Description</p>
+						</div>
+					</a>
+				}
+			</div>
+		</div>
+	}
+</div>

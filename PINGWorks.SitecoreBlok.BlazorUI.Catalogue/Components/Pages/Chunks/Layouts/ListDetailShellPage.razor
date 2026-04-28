@@ -1,0 +1,87 @@
+@page "/chunks/list-detail-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="ListDetailShell" Description="Opinionated split layout for list-on-left / detail-on-right with selection state" Interactivity="ComponentInteractivity.Interactive" ApiElements="@ListDetailShellElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With selection"
+			Code="@("<ListDetailShell TId=\"string\" SelectedId=\"@Selected\" SelectedIdChanged=\"v => Selected = v\">\n    <List>\n        @foreach ( var item in Items )\n        {\n            <button type=\"button\" @onclick=\"() => Selected = item\" class=\"w-full text-left px-4 py-2 text-sm hover:bg-neutral-bg\">\n                @item\n            </button>\n        }\n    </List>\n    <Detail>\n        <Text Size=\"Size.Sm\" Muted>Selected:</Text>\n        <Text Size=\"Size.Lg\" SemiBold>@Selected</Text>\n    </Detail>\n    <Empty>\n        <Text Alignment=\"Alignment.Center\" Muted>Pick an item to see details.</Text>\n    </Empty>\n</ListDetailShell>")"
+			Primitives="@("<div class=\"flex h-full w-full divide-x divide-border\">\n    <div class=\"flex-shrink-0 overflow-auto w-56 bg-background\">\n        <button class=\"w-full text-left px-4 py-2 text-sm hover:bg-neutral-bg\">Alpha</button>\n        <button class=\"w-full text-left px-4 py-2 text-sm hover:bg-neutral-bg\">Bravo</button>\n    </div>\n    <div class=\"flex-1 min-w-0 overflow-auto\">\n        <!-- Detail or Empty renders here -->\n        <div class=\"p-6 text-center text-muted-foreground\">Pick an item to see details.</div>\n    </div>\n</div>")">
+			<div class="h-80 border rounded-lg overflow-hidden">
+				<ListDetailShell TId="string" SelectedId="@Selected" SelectedIdChanged="v => Selected = v">
+					<List>
+						@foreach ( var item in Items )
+						{
+							<button type="button" @onclick="() => Selected = item" class="@( Selected == item ? "bg-primary-bg text-primary-fg" : "" ) w-full text-left px-4 py-2 text-sm hover:bg-neutral-bg">
+								@item
+							</button>
+						}
+					</List>
+					<Detail>
+						<Text Size="Size.Sm" Muted>Selected:</Text>
+						<Text Size="Size.Lg" SemiBold>@Selected</Text>
+					</Detail>
+					<Empty>
+						<Text Alignment="Alignment.Center" Muted>Pick an item to see details.</Text>
+					</Empty>
+				</ListDetailShell>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="No borders, wide list, gutters on"
+			Code="@("<ListDetailShell TId=\"string\" SelectedId=\"@Selected\" SelectedIdChanged=\"v => Selected = v\"\n               Borders=\"false\" ListWidth=\"Size.Lg\">\n    <List>\n        @foreach ( var item in Items )\n        {\n            <button type=\"button\" @onclick=\"() => Selected = item\" class=\"w-full text-left px-4 py-2 text-sm hover:bg-neutral-bg\">\n                @item\n            </button>\n        }\n    </List>\n    <Detail>\n        <Text Size=\"Size.Sm\" Muted>Selected:</Text>\n        <Text Size=\"Size.Lg\" SemiBold>@Selected</Text>\n    </Detail>\n    <Empty>\n        <Text Alignment=\"Alignment.Center\" Muted>Pick an item to see details.</Text>\n    </Empty>\n</ListDetailShell>")"
+			Primitives="@("<div class=\"flex h-full w-full\">\n    <div class=\"flex-shrink-0 overflow-auto w-72 bg-background\">\n        <button class=\"w-full text-left px-4 py-2 text-sm hover:bg-neutral-bg\">Alpha</button>\n        <button class=\"w-full text-left px-4 py-2 text-sm hover:bg-neutral-bg\">Bravo</button>\n    </div>\n    <div class=\"flex-1 min-w-0 overflow-auto p-4\">\n        <!-- Detail or Empty renders here -->\n        <p class=\"text-center text-muted-foreground\">Pick an item to see details.</p>\n    </div>\n</div>")">
+			<div class="h-80 border rounded-lg overflow-hidden">
+				<ListDetailShell TId="string" SelectedId="@Selected2" SelectedIdChanged="v => Selected2 = v"
+				                 Borders="false" ListWidth="Size.Lg">
+					<List>
+						@foreach ( var item in Items )
+						{
+							<button type="button" @onclick="() => Selected2 = item" class="@( Selected2 == item ? "bg-primary-bg text-primary-fg" : "" ) w-full text-left px-4 py-2 text-sm hover:bg-neutral-bg">
+								@item
+							</button>
+						}
+					</List>
+					<Detail>
+						<Text Size="Size.Sm" Muted>Selected:</Text>
+						<Text Size="Size.Lg" SemiBold>@Selected2</Text>
+					</Detail>
+					<Empty>
+						<Text Alignment="Alignment.Center" Muted>Pick an item to see details.</Text>
+					</Empty>
+				</ListDetailShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Selected = null;
+	private string? Selected2 = null;
+	private string[] Items = [ "Alpha", "Bravo", "Charlie", "Delta" ];
+
+	private static readonly ApiElement[] ListDetailShellElements =
+	[
+		new ApiElement(
+			Name: "ListDetailShell",
+			Description: "Opinionated split layout: list on the left, detail on the right. Selection state is exposed through `SelectedId` / `SelectedIdChanged` so consumers can two-way bind. When `SelectedId` is null (or `default(TId)` for value types), the `Empty` slot renders instead of the `Detail` slot. Generic on `TId` — pass `TId=\"string\"` (or any type) at the call site. Value-type consumers should use a nullable wrapper (e.g. `TId=\"int?\"`) to avoid `default(int) == 0` colliding with a legitimate selection of `0`. Wrapper-styling per spec §5.13: the chunk owns list-pane width/fill and the optional divider line.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "List",              "RenderFragment?",       false, "Left-pane list slot. The chunk owns the pane width (`ListWidth`), fill (`ListBgFilled`), and divider (`Borders`) — put only list-item markup here." ),
+				new ApiProperty( "Detail",            "RenderFragment?",       false, "Right-pane detail slot. Renders when `SelectedId` is non-null/non-default." ),
+				new ApiProperty( "Empty",             "RenderFragment?",       false, "Right-pane fallback. Renders when `SelectedId` is null/default. Use for prompts like \"Pick an item to see details.\"" ),
+				new ApiProperty( "SelectedId",        "TId?",                  false, "The currently-selected id. Two-way bindable via `SelectedIdChanged`." ),
+				new ApiProperty( "SelectedIdChanged", "EventCallback<TId?>",   false, "Fires when the selection changes. Pair with `SelectedId` for two-way binding." ),
+				new ApiProperty( "Borders",           "bool",                  false, "Toggles the `divide-x divide-border` line between the list and detail panes. Default: `true`." ),
+				new ApiProperty( "Gutters",           "bool",                  false, "Toggles `p-4` on the Detail/Empty wrapper, giving the right pane breathing room without needing wrapper divs in slot content. Default: `true`." ),
+				new ApiProperty( "ListWidth",         "Size",                  false, "Width of the list pane via the shared `Size` enum (mapped through `SizeClasses.Width`). Default: `Size.Md` (`w-56`). Common values: `Sm` (`w-48`), `Lg` (`w-72`)." ),
+				new ApiProperty( "ListBgFilled",        "bool",                  false, "Toggles `bg-background` on the list pane wrapper. Default: `true`." ),
+			]
+		),
+	];
+}

@@ -7,3 +7,4 @@ namespace PINGWorks.SitecoreBlok.BlazorUI;
 public enum Position { Top, Right, Bottom, Left }
 public enum Orientation { Horizontal, Vertical }
 public enum Placement { Left, Right, None }
+public enum Alignment { Start, Center, End, Stretch }

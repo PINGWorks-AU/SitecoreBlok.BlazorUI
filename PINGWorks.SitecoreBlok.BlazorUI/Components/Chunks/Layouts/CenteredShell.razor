@@ -1,0 +1,32 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	CenteredShell — single centered column for auth, error, or empty-app states.
+	MaxWidth uses the existing shared Size enum.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Gutters (default true) toggles p-4 on the outer wrapper, giving the column breathing
+		  room from the viewport edge. Set false to remove all outer padding.
+*@
+
+<div class="@OuterClass">
+	<div class="@ColumnClass">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public Size MaxWidth { get; set; } = Size.Md;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private string OuterClass
+		=> CssClassBuilder.Start( "flex items-center justify-center w-full h-full" )
+			.With( "p-4", Gutters )
+			.Build();
+
+	private string ColumnClass
+		=> CssClassBuilder.Start( "w-full" )
+			.With( SizeClasses.MaxWidth( MaxWidth ) )
+			.Build();
+}

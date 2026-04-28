@@ -1,0 +1,73 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@typeparam TId
+
+@*
+	ListDetailShell — opinionated split layout: list on left, detail on right.
+	Selection state is exposed through SelectedId / SelectedIdChanged so consumers can two-way bind.
+	When SelectedId is null/default, the Empty slot renders instead of the Detail slot.
+
+	Per spec §10.2 — orchestration state here is a single primitive (TId), so a parameter pair
+	(SelectedId, SelectedIdChanged) is sufficient — no CascadingValue or service required.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders        (default true) toggles divide-x divide-border between list and detail panes.
+		- Gutters        (default true) toggles p-4 on the Detail/Empty wrapper.
+		- ListWidth      (default Md ~ w-56) width of the List pane, mapped via SizeClasses.Width.
+		- ListBgFilled   (default true) toggles bg-background on the List wrapper.
+*@
+
+<div class="@RootClass">
+	<div class="@ListClass">
+		@if ( List is not null )
+		{
+			@List
+		}
+	</div>
+
+	<div class="@DetailClass">
+		@if ( IsEmpty && Empty is not null )
+		{
+			@Empty
+		}
+		else if ( !IsEmpty && Detail is not null )
+		{
+			@Detail
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? List { get; set; }
+	[Parameter] public RenderFragment? Detail { get; set; }
+	[Parameter] public RenderFragment? Empty { get; set; }
+
+	[Parameter] public TId? SelectedId { get; set; }
+	[Parameter] public EventCallback<TId?> SelectedIdChanged { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public Size ListWidth { get; set; } = Size.Md;
+	[Parameter] public bool ListBgFilled { get; set; } = true;
+
+	// Reference-type TId: null short-circuits the comparer.
+	// Value-type TId: the comparer treats default(T) (e.g. 0 for int) as empty, which is a
+	// known limitation — consumers selecting a literal "0" should specify TId="int?" instead.
+	private bool IsEmpty
+		=> SelectedId is null || EqualityComparer<TId>.Default.Equals( SelectedId, default! );
+
+	private string RootClass
+		=> CssClassBuilder.Start( "flex h-full w-full" )
+			.With( OrientationClasses.Divide( Orientation.Horizontal ), Borders )
+			.Build();
+
+	private string ListClass
+		=> CssClassBuilder.Start( "flex-shrink-0 overflow-auto" )
+			.With( SizeClasses.Width( ListWidth ) )
+			.With( "bg-background", ListBgFilled )
+			.Build();
+
+	private string DetailClass
+		=> CssClassBuilder.Start( "flex-1 min-w-0 overflow-auto" )
+			.With( "p-4", Gutters )
+			.Build();
+}

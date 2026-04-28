@@ -1,0 +1,88 @@
+@page "/chunks/centered-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="CenteredShell" Description="Single centered column for auth, error, or empty-app states" Interactivity="ComponentInteractivity.Ssr" ApiElements="@CenteredShellElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Md width (default)"
+			Code="@("<CenteredShell MaxWidth=\"Size.Md\">\n    <Text Kind=\"TextKind.Div\" Size=\"Size.Sm\" Alignment=\"Alignment.Center\" Padding=\"6\" FullWidth Border Rounded BgFilled>\n        Centered content (Md)\n    </Text>\n</CenteredShell>")"
+			Primitives="@("<div class=\"flex items-center justify-center w-full h-full p-4\">\n    <div class=\"w-full max-w-md\">\n        <div class=\"bg-background border border-border rounded-lg p-6 text-center\">\n            <p class=\"text-sm\">Centered content (Md)</p>\n        </div>\n    </div>\n</div>")">
+			<div class="h-64 border rounded-lg bg-subtle-bg">
+				<CenteredShell MaxWidth="Size.Md">
+					<Text Kind="TextKind.Div" Size="Size.Sm" Alignment="Alignment.Center" Padding="6" FullWidth Border Rounded BgFilled>
+						Centered content (Md)
+					</Text>
+				</CenteredShell>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Sm width"
+			Code="@("<CenteredShell MaxWidth=\"Size.Sm\">\n    <Text Kind=\"TextKind.Div\" Size=\"Size.Sm\" Alignment=\"Alignment.Center\" Padding=\"6\" FullWidth Border Rounded BgFilled>\n        Centered content (Sm)\n    </Text>\n</CenteredShell>")"
+			Primitives="@("<div class=\"flex items-center justify-center w-full h-full p-4\">\n    <div class=\"w-full max-w-sm\">\n        <div class=\"bg-background border border-border rounded-lg p-6 text-center\">\n            <p class=\"text-sm\">Centered content (Sm)</p>\n        </div>\n    </div>\n</div>")">
+			<div class="h-64 border rounded-lg bg-subtle-bg">
+				<CenteredShell MaxWidth="Size.Sm">
+					<Text Kind="TextKind.Div" Size="Size.Sm" Alignment="Alignment.Center" Padding="6" FullWidth Border Rounded BgFilled>
+						Centered content (Sm)
+					</Text>
+				</CenteredShell>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Lg width"
+			Code="@("<CenteredShell MaxWidth=\"Size.Lg\">\n    <Text Kind=\"TextKind.Div\" Size=\"Size.Sm\" Alignment=\"Alignment.Center\" Padding=\"6\" FullWidth Border Rounded BgFilled>\n        Centered content (Lg)\n    </Text>\n</CenteredShell>")"
+			Primitives="@("<div class=\"flex items-center justify-center w-full h-full p-4\">\n    <div class=\"w-full max-w-lg\">\n        <div class=\"bg-background border border-border rounded-lg p-6 text-center\">\n            <p class=\"text-sm\">Centered content (Lg)</p>\n        </div>\n    </div>\n</div>")">
+			<div class="h-64 border rounded-lg bg-subtle-bg">
+				<CenteredShell MaxWidth="Size.Lg">
+					<Text Kind="TextKind.Div" Size="Size.Sm" Alignment="Alignment.Center" Padding="6" FullWidth Border Rounded BgFilled>
+						Centered content (Lg)
+					</Text>
+				</CenteredShell>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Full width, no gutters — edge-to-edge"
+			Code="@("<CenteredShell MaxWidth=\"Size.Full\" Gutters=\"false\">\n    <Text Kind=\"TextKind.Div\" Size=\"Size.Sm\" Alignment=\"Alignment.Center\" Padding=\"6\" FullWidth Border Rounded BgFilled>\n        Edge-to-edge content (no outer padding, no max-width cap)\n    </Text>\n</CenteredShell>")"
+			Primitives="@("<div class=\"flex items-center justify-center w-full h-full\">\n    <div class=\"w-full max-w-full\">\n        <div class=\"bg-background border border-border rounded-lg p-6 text-center\">\n            <p class=\"text-sm\">Edge-to-edge content (no outer padding, no max-width cap)</p>\n        </div>\n    </div>\n</div>")">
+			<div class="h-64 border rounded-lg bg-subtle-bg">
+				<CenteredShell MaxWidth="Size.Full" Gutters="false">
+					<Text Kind="TextKind.Div" Size="Size.Sm" Alignment="Alignment.Center" Padding="6" FullWidth Border Rounded BgFilled>
+						Edge-to-edge content (no outer padding, no max-width cap)
+					</Text>
+				</CenteredShell>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Full width, with gutters — column inset from edges"
+			Code="@("<CenteredShell MaxWidth=\"Size.Full\">\n    <Text Kind=\"TextKind.Div\" Size=\"Size.Sm\" Alignment=\"Alignment.Center\" Padding=\"6\" FullWidth Border Rounded BgFilled>\n        Same Full width, but Gutters=true (default) adds p-4 around the column\n    </Text>\n</CenteredShell>")"
+			Primitives="@("<div class=\"flex items-center justify-center w-full h-full p-4\">\n    <div class=\"w-full max-w-full\">\n        <div class=\"bg-background border border-border rounded-lg p-6 text-center\">\n            <p class=\"text-sm\">Same Full width, but Gutters=true (default) adds p-4 around the column</p>\n        </div>\n    </div>\n</div>")">
+			<div class="h-64 border rounded-lg bg-subtle-bg">
+				<CenteredShell MaxWidth="Size.Full">
+					<Text Kind="TextKind.Div" Size="Size.Sm" Alignment="Alignment.Center" Padding="6" FullWidth Border Rounded BgFilled>
+						Same Full width, but Gutters=true (default) adds p-4 around the column
+					</Text>
+				</CenteredShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] CenteredShellElements =
+	[
+		new ApiElement(
+			Name: "CenteredShell",
+			Description: "Centres its `ChildContent` horizontally and vertically inside its parent. Caps the column width via the shared `Size` enum so content reads at a comfortable line length on wide viewports. Useful for login screens, full-page error states, marketing-style empty pages, or any single-column layout that should not stretch edge-to-edge. Wrapper-styling per spec §5.13: outer padding is controlled by `Gutters` so consumers do not need an extra wrapping div.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "The content to centre and width-cap." ),
+				new ApiProperty( "MaxWidth",     "Size",             false, "Column width cap. Default: `Size.Md` (`max-w-md`, ~28 rem). Other values: `Xs3`, `Xs2`, `Xs`, `Sm`, `Lg`, `Xl`, `Xl2`–`Xl8`, `Full`. Mapped through `SizeClasses.MaxWidth`." ),
+				new ApiProperty( "Gutters",      "bool",             false, "Toggles `p-4` on the outer centering wrapper, giving the column breathing room from the viewport edge. Default: `true`. Set `false` when the parent already provides padding or when you need edge-to-edge centering." ),
+			]
+		),
+	];
+}

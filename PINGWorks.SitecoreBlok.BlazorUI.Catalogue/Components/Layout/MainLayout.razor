@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject NavigationManager Nav
 
 @* `text-foreground` MUST stay on the data-dark-mode-target wrapper.
    `.dark` is added to this element by ThemeToggle, which redefines `--color-foreground`
@@ -10,19 +11,27 @@
    Without this class, every inherited-text component renders dark in dark mode. *@
 <div data-dark-mode-target class="text-foreground">
 	<div class="flex h-screen overflow-hidden bg-subtle-bg">
-		<NavMenu />
+		@if ( Nav.ToBaseRelativePath( Nav.Uri ).StartsWith( "chunks", StringComparison.OrdinalIgnoreCase ) )
+		{
+			<ChunksNavMenu />
+		}
+		else
+		{
+			<NavMenu />
+		}
 
 		<div class="flex-1 flex flex-col min-w-0">
 			<header class="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
 				<div class="flex items-center gap-6 px-8 h-14">
 					<a href="/" class="text-sm font-semibold text-foreground no-underline hover:text-primary transition-colors">Home</a>
 					<nav class="flex items-center gap-4">
-						<a href="/primitives" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Primitives</a>
-						<a href="/graphics/theming" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Theming</a>
-						<a href="/graphics/illustrations" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Illustrations</a>
-						<a href="/graphics/favicons" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Favicons</a>
-						<a href="/graphics/icons" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Icons</a>
-						<a href="/graphics/tailwind" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors">Using Tailwind</a>
+						<NavLink href="/primitives" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors" ActiveClass="!text-primary">Primitives</NavLink>
+						<NavLink href="/chunks" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors" ActiveClass="!text-primary">Chunks</NavLink>
+						<NavLink href="/graphics/theming" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors" ActiveClass="!text-primary">Theming</NavLink>
+						<NavLink href="/graphics/illustrations" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors" ActiveClass="!text-primary">Illustrations</NavLink>
+						<NavLink href="/graphics/favicons" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors" ActiveClass="!text-primary">Favicons</NavLink>
+						<NavLink href="/graphics/icons" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors" ActiveClass="!text-primary">Icons</NavLink>
+						<NavLink href="/graphics/tailwind" class="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors" ActiveClass="!text-primary">Using Tailwind</NavLink>
 					</nav>
 					<div class="ml-auto flex items-center gap-1">
 						<a href="https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI" target="_blank" rel="noopener noreferrer"

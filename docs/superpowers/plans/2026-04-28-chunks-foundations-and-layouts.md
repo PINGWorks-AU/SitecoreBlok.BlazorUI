@@ -233,7 +233,7 @@ git commit -m "chunks: add PlacementClasses helper"
 - [ ] **Step 1: Create the file with this exact content**
 
 ```csharp
-using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services;
+using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Components.Shared;
 
 namespace PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services;
 
@@ -496,9 +496,9 @@ git commit -m "chunks: wire Chunks top-nav link and route-aware left-nav"
 
 	<ExamplesSection>
 
-		<ComponentExample Title="Default" Code="@("<AppShell InteractiveRenderMode=\"@(new InteractiveServerRenderMode())\">\n    <Header>...</Header>\n    <Sidebar>...</Sidebar>\n    <Content>...</Content>\n</AppShell>")">
+		<ComponentExample Title="Default" Code="@("<AppShell InteractiveRenderMode=\"RenderMode.InteractiveServer\">\n    <Header>...</Header>\n    <Sidebar>...</Sidebar>\n    <Content>...</Content>\n</AppShell>")">
 			<div class="h-96 border rounded-lg overflow-hidden">
-				<AppShell InteractiveRenderMode="@(new InteractiveServerRenderMode())">
+				<AppShell InteractiveRenderMode="RenderMode.InteractiveServer">
 					<Header>
 						<div class="flex items-center gap-4 px-4 h-12 border-b border-border bg-background">
 							<span class="font-semibold">Header slot</span>
@@ -593,8 +593,8 @@ Expected: build FAILS with errors mentioning `AppShell` (component not found) an
 
 	/// <summary>
 	/// Render mode applied to the internally-mounted Popovers and Toaster primitives.
-	/// Consumers pass typically <c>new InteractiveServerRenderMode()</c> or
-	/// <c>new InteractiveAutoRenderMode()</c>. Default null inherits from the surrounding
+	/// Consumers pass typically <c>RenderMode.InteractiveServer</c> or
+	/// <c>RenderMode.InteractiveAuto</c>. Default null inherits from the surrounding
 	/// host context — fails fast if the host isn't already interactive (desired).
 	/// </summary>
 	[Parameter] public IComponentRenderMode? InteractiveRenderMode { get; set; }
@@ -742,14 +742,16 @@ Expected: build FAILS with `PageShell` not found.
 
 	[Parameter] public Placement AsidePlacement { get; set; } = Placement.Right;
 
-	private string BodyRowClass => CssClassBuilder.Start( "flex flex-1 min-h-0" )
-		.With( "flex-row", AsidePlacement is Placement.Right )
-		.With( "flex-row-reverse", AsidePlacement is Placement.Left )
-		.Build();
+	private string BodyRowClass
+		=> CssClassBuilder.Start( "flex flex-1 min-h-0" )
+			.With( "flex-row", AsidePlacement is Placement.Right )
+			.With( "flex-row-reverse", AsidePlacement is Placement.Left )
+			.Build();
 
-	private string AsideClass => CssClassBuilder.Start( "flex-shrink-0" )
-		.With( PlacementClasses.AsideOrder( AsidePlacement ) )
-		.Build();
+	private string AsideClass
+		=> CssClassBuilder.Start( "flex-shrink-0" )
+			.With( PlacementClasses.AsideOrder( AsidePlacement ) )
+			.Build();
 }
 ```
 
@@ -848,22 +850,23 @@ git commit -m "chunks: implement Layouts/PageShell with AsidePlacement"
 	[Parameter] public Size MaxWidth { get; set; } = Size.Md;
 
 	// Tailwind requires literal class strings; hard-code each branch.
-	private string ColumnClass => CssClassBuilder.Start( "w-full" )
-		.With( "max-w-3xs", MaxWidth is Size.Xs3 )
-		.With( "max-w-2xs", MaxWidth is Size.Xs2 )
-		.With( "max-w-xs",  MaxWidth is Size.Xs )
-		.With( "max-w-sm",  MaxWidth is Size.Sm )
-		.With( "max-w-md",  MaxWidth is Size.Md or Size.Default )
-		.With( "max-w-lg",  MaxWidth is Size.Lg )
-		.With( "max-w-xl",  MaxWidth is Size.Xl )
-		.With( "max-w-2xl", MaxWidth is Size.Xl2 )
-		.With( "max-w-3xl", MaxWidth is Size.Xl3 )
-		.With( "max-w-4xl", MaxWidth is Size.Xl4 )
-		.With( "max-w-5xl", MaxWidth is Size.Xl5 )
-		.With( "max-w-6xl", MaxWidth is Size.Xl6 )
-		.With( "max-w-7xl", MaxWidth is Size.Xl7 )
-		.With( "max-w-full", MaxWidth is Size.Full )
-		.Build();
+	private string ColumnClass
+		=> CssClassBuilder.Start( "w-full" )
+			.With( "max-w-3xs", MaxWidth is Size.Xs3 )
+			.With( "max-w-2xs", MaxWidth is Size.Xs2 )
+			.With( "max-w-xs",  MaxWidth is Size.Xs )
+			.With( "max-w-sm",  MaxWidth is Size.Sm )
+			.With( "max-w-md",  MaxWidth is Size.Md or Size.Default )
+			.With( "max-w-lg",  MaxWidth is Size.Lg )
+			.With( "max-w-xl",  MaxWidth is Size.Xl )
+			.With( "max-w-2xl", MaxWidth is Size.Xl2 )
+			.With( "max-w-3xl", MaxWidth is Size.Xl3 )
+			.With( "max-w-4xl", MaxWidth is Size.Xl4 )
+			.With( "max-w-5xl", MaxWidth is Size.Xl5 )
+			.With( "max-w-6xl", MaxWidth is Size.Xl6 )
+				.With( "max-w-7xl", MaxWidth is Size.Xl7 )
+			.With( "max-w-full", MaxWidth is Size.Full )
+			.Build();
 }
 ```
 
@@ -974,10 +977,11 @@ else
 	[Parameter] public bool IsResizable { get; set; } = false;
 	[Parameter] public double Ratio { get; set; } = 0.5;
 
-	private string RootClass => CssClassBuilder.Start( "flex h-full w-full" )
-		.With( OrientationClasses.Flex( Direction ) )
-		.With( OrientationClasses.Divide( Direction ) )
-		.Build();
+	private string RootClass
+		=> CssClassBuilder.Start( "flex h-full w-full" )
+			.With( OrientationClasses.Flex( Direction ) )
+			.With( OrientationClasses.Divide( Direction ) )
+			.Build();
 }
 ```
 

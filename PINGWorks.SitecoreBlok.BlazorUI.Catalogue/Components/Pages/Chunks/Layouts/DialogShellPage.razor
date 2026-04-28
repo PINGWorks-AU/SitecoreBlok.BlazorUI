@@ -1,0 +1,48 @@
+@page "/chunks/dialog-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="DialogShell" Description="Opinionated wrapper around the Dialog primitive — hides the 5-component composition" Interactivity="ComponentInteractivity.Interactive" ApiElements="@DialogShellElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<Button Click=\"() => Open = true\">Open dialog</Button>\n<DialogShell Open=\"Open\" OpenChanged=\"v => Open = v\" Title=\"Confirm action\" Description=\"Are you sure you want to proceed?\">\n    <Body>\n        <Text Size=\"Size.Sm\">This will affect 12 items.</Text>\n    </Body>\n    <Actions>\n        <Button Variant=\"ButtonVariant.Ghost\" Click=\"() => Open = false\">Cancel</Button>\n        <Button Click=\"() => Open = false\">Confirm</Button>\n    </Actions>\n</DialogShell>\n\n@code {\n    private bool Open = false;\n}")"
+			Primitives="@("<Button Click=\"() => Open = true\">Open dialog</Button>\n<Dialog Open=\"Open\" OpenChanged=\"v => Open = v\">\n    <DialogHeader>\n        <DialogTitle>Confirm action</DialogTitle>\n        <DialogDescription>Are you sure you want to proceed?</DialogDescription>\n    </DialogHeader>\n    <p class=\"text-sm\">This will affect 12 items.</p>\n    <DialogFooter>\n        <Button Variant=\"ButtonVariant.Ghost\" Click=\"() => Open = false\">Cancel</Button>\n        <Button Click=\"() => Open = false\">Confirm</Button>\n    </DialogFooter>\n</Dialog>\n\n@code {\n    private bool Open = false;\n}")">
+			<Button Click="() => Open = true">Open dialog</Button>
+			<DialogShell Open="Open" OpenChanged="v => Open = v" Title="Confirm action" Description="Are you sure you want to proceed?">
+				<Body>
+					<Text Size="Size.Sm">This will affect 12 items.</Text>
+				</Body>
+				<Actions>
+					<Button Variant="ButtonVariant.Ghost" Click="() => Open = false">Cancel</Button>
+					<Button Click="() => Open = false">Confirm</Button>
+				</Actions>
+			</DialogShell>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool Open = false;
+
+	private static readonly ApiElement[] DialogShellElements =
+	[
+		new ApiElement(
+			Name: "DialogShell",
+			Description: "Opinionated wrapper around the `Dialog` primitive. Hides the 5-component composition (`Dialog`/`DialogHeader`/`DialogTitle`/`DialogDescription`/`DialogFooter`) behind text props for the title/description and named slots for the body and actions. The primitive Dialog has no `DialogContent` wrapper — DialogShell renders the `Body` slot directly between header and footer as a sibling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string?",              false, "Dialog title text. Renders inside `<DialogTitle>` when set. Omitted from the rendered DOM when null/empty." ),
+				new ApiProperty( "Description", "string?",              false, "Dialog description text. Renders inside `<DialogDescription>` when set. Omitted when null/empty." ),
+				new ApiProperty( "Body",        "RenderFragment?",      false, "Main dialog content slot. Renders directly between header and footer (no wrapper). Strict-shape slot per spec §5.1." ),
+				new ApiProperty( "Actions",     "RenderFragment?",      false, "Footer action slot. Renders inside `<DialogFooter>`. Typically two `Button`s (Cancel + Confirm). Strict-shape slot." ),
+				new ApiProperty( "Open",        "bool",                 false, "Open state. Two-way bindable via `OpenChanged`." ),
+				new ApiProperty( "OpenChanged", "EventCallback<bool>",  false, "Fires when the dialog requests to close (overlay click, close button, or Escape). Pair with `Open` for two-way binding." ),
+			]
+		),
+	];
+}

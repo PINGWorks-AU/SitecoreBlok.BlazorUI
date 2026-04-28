@@ -14,6 +14,10 @@
 				{
 					<TabsTrigger Value="code" Variant="TabsVariant.Line">Code</TabsTrigger>
 				}
+				@if ( !string.IsNullOrEmpty( Primitives ) )
+				{
+					<TabsTrigger Value="primitives" Variant="TabsVariant.Line">Primitives</TabsTrigger>
+				}
 			</TabsList>
 
 			<TabsContent Value="preview">
@@ -31,6 +35,13 @@
 					<CodeViewer Code="@Code" ClassName="!rounded-none !m-0" />
 				</TabsContent>
 			}
+
+			@if ( !string.IsNullOrEmpty( Primitives ) )
+			{
+				<TabsContent Value="primitives">
+					<CodeViewer Code="@Primitives" ClassName="!rounded-none !m-0" />
+				</TabsContent>
+			}
 		</Tabs>
 	</div>
 </div>
@@ -38,6 +49,13 @@
 @code {
 	[Parameter] public string? Title { get; set; }
 	[Parameter] public string? Code { get; set; }
+
+	// Equivalent first-principles markup using only Blok Primitives — the code a
+	// consumer would write WITHOUT the chunk this example demonstrates. When set,
+	// renders an extra "Primitives" tab next to "Code". Useful as a copy/paste
+	// starting point for consumers who want to vary one aspect of the chunk.
+	[Parameter] public string? Primitives { get; set; }
+
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	// Extra classes for the preview wrapper. Use `!`-prefixed Tailwind utilities to
 	// override the defaults (e.g. `!p-12` for extra padding around tooltip-bearing samples).

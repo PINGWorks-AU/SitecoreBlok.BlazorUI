@@ -1,0 +1,47 @@
+@page "/chunks/sheet-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="SheetShell" Description="Edge-sliding panel; wraps the Sheet primitive. Side uses the shared Position enum." Interactivity="ComponentInteractivity.Interactive" ApiElements="@SheetShellElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="From the right"
+			Code="@("<Button Click=\"() => Open = true\">Open from right</Button>\n<SheetShell Open=\"Open\" OpenChanged=\"v => Open = v\" Side=\"Position.Right\">\n    <Header>\n        <Text Kind=\"TextKind.H3\" Size=\"Size.Lg\" SemiBold>Filters</Text>\n    </Header>\n    <Body>\n        <Text Size=\"Size.Sm\">Sheet body content.</Text>\n    </Body>\n    <Actions>\n        <Button Variant=\"ButtonVariant.Ghost\" Click=\"() => Open = false\">Cancel</Button>\n        <Button Click=\"() => Open = false\">Apply</Button>\n    </Actions>\n</SheetShell>\n\n@code {\n    private bool Open = false;\n}")"
+			Primitives="@("<Button Click=\"() => Open = true\">Open from right</Button>\n<Sheet Open=\"Open\" OpenChanged=\"v => Open = v\" Side=\"SheetSide.Right\">\n    <SheetHeader>\n        <h3 class=\"text-lg font-semibold\">Filters</h3>\n    </SheetHeader>\n    <div class=\"flex-1 min-h-0 overflow-y-auto px-4\">\n        <p class=\"text-sm\">Sheet body content.</p>\n    </div>\n    <SheetFooter>\n        <Button Variant=\"ButtonVariant.Ghost\" Click=\"() => Open = false\">Cancel</Button>\n        <Button Click=\"() => Open = false\">Apply</Button>\n    </SheetFooter>\n</Sheet>\n\n@code {\n    private bool Open = false;\n}")">
+			<Button Click="() => Open = true">Open from right</Button>
+			<SheetShell Open="Open" OpenChanged="v => Open = v" Side="Position.Right">
+				<Header><Text Kind="TextKind.H3" Size="Size.Lg" SemiBold>Filters</Text></Header>
+				<Body><Text Size="Size.Sm">Sheet body content.</Text></Body>
+				<Actions>
+					<Button Variant="ButtonVariant.Ghost" Click="() => Open = false">Cancel</Button>
+					<Button Click="() => Open = false">Apply</Button>
+				</Actions>
+			</SheetShell>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool Open = false;
+
+	private static readonly ApiElement[] SheetShellElements =
+	[
+		new ApiElement(
+			Name: "SheetShell",
+			Description: "Edge-sliding panel wrapper around the `Sheet` primitive. Translates the shared `Position` enum to the primitive's `SheetSide` via the internal `PositionClasses.ToSheetSide` helper. The Body slot is wrapped in a `flex-1 min-h-0 overflow-y-auto px-4` div so consumer content aligns horizontally with the SheetHeader/SheetFooter padding (p-4) and long content scrolls within the panel rather than pushing the footer offscreen.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Header",      "RenderFragment?",      false, "Top of the sheet. Renders inside `<SheetHeader>` (which has `p-4`). Strict-shape slot per spec §5.1." ),
+				new ApiProperty( "Body",        "RenderFragment?",      false, "Main scrollable content. Wrapped in a padded flex-filling div (`flex-1 min-h-0 overflow-y-auto px-4`) so content aligns with the header/footer padding. Strict-shape slot." ),
+				new ApiProperty( "Actions",     "RenderFragment?",      false, "Bottom action row. Renders inside `<SheetFooter>` (`p-4 justify-end`). Typically two `Button`s. Strict-shape slot." ),
+				new ApiProperty( "Side",        "Position",             false, "Edge the sheet slides in from. Default: `Position.Right`. Other values: `Top`, `Bottom`, `Left`. Translated internally to the primitive's `SheetSide` enum. Shared `Position` enum per spec §5.10." ),
+				new ApiProperty( "Open",        "bool",                 false, "Open state. Two-way bindable via `OpenChanged`." ),
+				new ApiProperty( "OpenChanged", "EventCallback<bool>",  false, "Fires when the sheet requests to close. Pair with `Open` for two-way binding." ),
+			]
+		),
+	];
+}

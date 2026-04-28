@@ -1,0 +1,60 @@
+@page "/chunks/app-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="AppShell" Description="Outer dark-mode + popover/toaster mount; the chrome a top-level Blazor app sits inside" Interactivity="ComponentInteractivity.Interactive" ApiElements="@AppShellElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<AppShell InteractiveRenderMode=\"RenderMode.InteractiveServer\">\n    <Header>\n        <Text Kind=\"TextKind.Span\" SemiBold>Header slot</Text>\n    </Header>\n    <Sidebar>\n        <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\">Sidebar slot</Text>\n    </Sidebar>\n    <Content>\n        Content slot\n    </Content>\n</AppShell>")"
+			Primitives="@("<div data-dark-mode-target class=\"text-foreground\">\n    <div class=\"flex h-screen overflow-hidden bg-subtle-bg\">\n        <aside class=\"w-56 shrink-0 h-full overflow-y-auto border-r border-border bg-background p-4\">\n            <span class=\"text-sm\">Sidebar slot</span>\n        </aside>\n        <div class=\"flex-1 flex flex-col min-w-0\">\n            <header class=\"sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur\">\n                <div class=\"flex items-center h-14 px-6 gap-4\">\n                    <span class=\"font-semibold\">Header slot</span>\n                </div>\n            </header>\n            <main class=\"flex-1 flex flex-col min-h-0 overflow-hidden\">\n                <div class=\"flex-1 flex flex-col min-h-0 overflow-y-auto p-4\">\n                    Content slot\n                </div>\n            </main>\n        </div>\n    </div>\n    <Popovers @rendermode=\"RenderMode.InteractiveServer\" />\n    <Toaster @rendermode=\"RenderMode.InteractiveServer\" />\n</div>")">
+			<div class="h-96 border rounded-lg overflow-hidden">
+				<AppShell InteractiveRenderMode="RenderMode.InteractiveServer">
+					<Header><Text Kind="TextKind.Span" SemiBold>Header slot</Text></Header>
+					<Sidebar><Text Kind="TextKind.Span" Size="Size.Sm">Sidebar slot</Text></Sidebar>
+					<Content>Content slot</Content>
+				</AppShell>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Gutters off, no borders, narrow sidebar"
+			Code="@("<AppShell InteractiveRenderMode=\"RenderMode.InteractiveServer\"\n          Borders=\"false\"\n          Gutters=\"false\"\n          SidebarWidth=\"Size.Sm\">\n    <Header>\n        <Text Kind=\"TextKind.Span\" SemiBold>Header</Text>\n    </Header>\n    <Sidebar>\n        <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\">Narrow sidebar</Text>\n    </Sidebar>\n    <Content>\n        Content (consumer styles inside the slot when Gutters=false)\n    </Content>\n</AppShell>")"
+			Primitives="@("<div data-dark-mode-target class=\"text-foreground\">\n    <div class=\"flex h-screen overflow-hidden bg-subtle-bg\">\n        <aside class=\"w-48 shrink-0 h-full overflow-y-auto bg-background\">\n            <span class=\"text-sm\">Narrow sidebar</span>\n        </aside>\n        <div class=\"flex-1 flex flex-col min-w-0\">\n            <header class=\"sticky top-0 z-40 bg-background/95 backdrop-blur\">\n                <div class=\"flex items-center h-14\">\n                    <span class=\"font-semibold\">Header</span>\n                </div>\n            </header>\n            <main class=\"flex-1 flex flex-col min-h-0 overflow-hidden\">\n                <div class=\"flex-1 flex flex-col min-h-0 overflow-y-auto\">\n                    Content (consumer styles inside the slot when Gutters=false)\n                </div>\n            </main>\n        </div>\n    </div>\n    <Popovers @rendermode=\"RenderMode.InteractiveServer\" />\n    <Toaster @rendermode=\"RenderMode.InteractiveServer\" />\n</div>")">
+			<div class="h-96 border rounded-lg overflow-hidden">
+				<AppShell InteractiveRenderMode="RenderMode.InteractiveServer" Borders="false" Gutters="false" SidebarWidth="Size.Sm">
+					<Header><Text Kind="TextKind.Span" SemiBold>Header</Text></Header>
+					<Sidebar><Text Kind="TextKind.Span" Size="Size.Sm">Narrow sidebar</Text></Sidebar>
+					<Content>Content (consumer styles inside the slot when Gutters=false)</Content>
+				</AppShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AppShellElements =
+	[
+		new ApiElement(
+			Name: "AppShell",
+			Description: "Outermost shell for a top-level Blazor app. Provides the `data-dark-mode-target` wrapper, the ambient flex layout, and mounts the global `Popovers` and `Toaster` primitives once with the consumer-supplied render mode. Consumers do **not** add `Popovers`/`Toaster` separately — `AppShell` owns them. Wrapper-styling per spec §5.13: chunks absorb common layout decisions (borders, padding, alignment, widths) so consumers don't write Tailwind in slot content.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Header",                "RenderFragment?",         false, "Sticky top bar slot. Renders inside a `<header>` whose styling (border, blur, alignment) is controlled by `Borders`, `HeaderBgFilled`, `HeaderAlignment`, `Gutters`. Strict-shape slot per §5.1." ),
+				new ApiProperty( "Sidebar",               "RenderFragment?",         false, "Left rail slot. Renders inside an `<aside>` whose width / border / fill / padding is controlled by `SidebarWidth`, `Borders`, `SidebarBgFilled`, `Gutters`. Strict-shape slot." ),
+				new ApiProperty( "Content",               "RenderFragment?",         false, "Main scrollable content slot. `flex-1 min-h-0 overflow-y-auto` baseline; padding via `Gutters`." ),
+				new ApiProperty( "Footer",                "RenderFragment?",         false, "Bottom band slot. Border / fill / padding controlled by `Borders` and `Gutters`." ),
+				new ApiProperty( "InteractiveRenderMode", "IComponentRenderMode?",   false, "Render mode applied to the internally-mounted `Popovers` and `Toaster`. Default: `null` (inherits from consumer's surrounding context)." ),
+				new ApiProperty( "Borders",               "bool",                    false, "Toggles `border-b` on Header, `border-r` on Sidebar, `border-t` on Footer. Default: `true`." ),
+				new ApiProperty( "Gutters",               "bool",                    false, "Toggles internal padding: Sidebar/Content/Footer get `p-4`; Header content row gets `px-6 gap-4`. Default: `true`." ),
+				new ApiProperty( "HeaderAlignment",       "Alignment",               false, "Flex `items-*` value on the Header content row. Default: `Alignment.Center`. Other values: `Start`, `End`, `Stretch`. Shared `Alignment` enum per §5.10." ),
+				new ApiProperty( "SidebarWidth",          "Size",                    false, "Sidebar width via the shared `Size` enum (mapped through `SizeClasses.Width`). Default: `Size.Md` (`w-56`). Common values: `Sm` (`w-48`), `Md` (`w-56`), `Lg` (`w-72`)." ),
+				new ApiProperty( "SidebarBgFilled",       "bool",                    false, "Toggles `bg-background` on the Sidebar wrapper. Default: `true`." ),
+				new ApiProperty( "HeaderBgFilled",        "bool",                    false, "Toggles `bg-background/95 backdrop-blur` on the Header band. Default: `true`." ),
+			]
+		),
+	];
+}

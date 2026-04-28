@@ -1,0 +1,45 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	SheetShell — edge-sliding panel wrapper. Translates the shared Position enum
+	to the primitive's SheetSide via PositionClasses.ToSheetSide.
+
+	The primitive Sheet has no `SheetContent` wrapper — body content goes directly
+	between header and footer as a sibling. We wrap the Body slot in a padded,
+	flex-filling div so consumer content aligns horizontally with the SheetHeader
+	(p-4) and SheetFooter (p-4), and so long content scrolls within the panel
+	rather than pushing the footer offscreen.
+*@
+
+<Sheet Open="@Open" OpenChanged="@OpenChanged" Side="@PositionClasses.ToSheetSide( Side )">
+	@if ( Header is not null )
+	{
+		<SheetHeader>
+			@Header
+		</SheetHeader>
+	}
+
+	@if ( Body is not null )
+	{
+		<div class="flex-1 min-h-0 overflow-y-auto px-4">
+			@Body
+		</div>
+	}
+
+	@if ( Actions is not null )
+	{
+		<SheetFooter>
+			@Actions
+		</SheetFooter>
+	}
+</Sheet>
+
+@code {
+	[Parameter] public RenderFragment? Header { get; set; }
+	[Parameter] public RenderFragment? Body { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
+
+	[Parameter] public Position Side { get; set; } = Position.Right;
+	[Parameter] public bool Open { get; set; }
+	[Parameter] public EventCallback<bool> OpenChanged { get; set; }
+}

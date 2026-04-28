@@ -121,3 +121,16 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 - **Won't Do rationale summary** — Chart (React chart lib; Blazor alternatives exist), Command (cmdk; composable from existing primitives), DnD (@dnd-kit React-only; different Blazor idiom), Drawer (covered by Sheet), Form (native Blazor EditForm supersedes react-hook-form). Re-evaluate only if a business need forces the question.
 - **Backlog items** are legitimate ports with no blocking rationale — prioritisation only. Pick the next one for `/blok migrate` based on consumer demand.
 - **Excluded internal Blok files** (not tracked as primitives): `inputOtp.tsx` (typo-duplicate of `input-otp.tsx`), `select-react.tsx` (alternate implementation of `select`).
+
+---
+
+## Chunks coverage notes (v1 — Foundations + Layouts)
+
+Chunks are tracked as "Extras" — no rows in the table above (per Chunks design spec §5.9).
+Coverage check (spec §10.6) confirms that with Plan 1 complete, the Catalogue's MainLayout, NavMenu, and ComponentPage can be expressed using:
+
+- `MainLayout.razor` → `AppShell` + (Header content via slot — `AppHeader` arrives in Plan 2/Headers).
+- `NavMenu.razor` → blocked on `AppSidebar` (Plan 3/Navigation).
+- `ComponentPage.razor` → `PageShell` + Header content (PageHeader arrives in Plan 2/Headers) + ContentSection body (arrives in Plan 5/Content).
+
+Plan 1 alone does not unblock the full refactor — that requires Headers (Plan 2), Navigation (Plan 3), and Content (Plan 5). The refactor itself remains out of scope per spec §3.
