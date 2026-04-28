@@ -65,18 +65,18 @@ These twelve rules apply to every Chunk and are non-negotiable across the family
 
 **5.9. Chunks are "Extras" — no upstream tracking, but downstream-impact-aware.** Chunks have no row in `MIGRATION_STATUS.md`, no Last SHA, and never trigger their own drift-check. **However**, when the `/blok` audit detects an upstream API change in a Primitive (e.g. a parameter renamed, a slot removed, a Razor signature broken), the skill must additionally identify every Chunk that consumes that Primitive (a recursive search across `Components/Chunks/**/*.razor` for the Primitive's tag name) and flag those Chunks for review in the same audit report. Chunks are downstream consumers of Primitives; a Primitive's API shift is a Chunk's potential breakage. The skill never edits Chunks autonomously — it only surfaces them for the implementer's attention. All required services register through the existing `AddSitecoreBlokUI()` extension method; no separate registration entry points.
 
-**5.10. Standardised enums across Chunks.** Where multiple Chunks accept the same kind of variant — tone, sizing, density, columns, direction, trend, side — they reference a single shared enum type. Where an existing enum in `Enums.cs` already fits a Chunk's concept, the Chunk reuses it. New shared enums are added to `Enums.cs` only when no existing enum fits and the concept appears in two or more Chunks. **This rule applies only to Chunks; existing Primitive enums are untouched and not consolidated.** When a Chunk wraps a Primitive that has its own per-Primitive enum (`AlertVariant`, `BadgeColor`, `IconColorScheme`, `ButtonColor`, etc.), the Chunk either surfaces the Primitive enum directly or — if the Chunk is exposing a higher-level concept like `Tone` — translates internally; it does not create a parallel duplicate enum on the Chunk's API. The canonical Chunk-shared enums are:
+**5.10. Standardised enums across Chunks.** Where multiple Chunks accept the same kind of variant — tone, sizing, density, columns, direction, trend, side — they reference a single shared enum type. Where an existing enum in the project-root `Enums.cs` already fits a Chunk's concept (e.g. `Size`), the Chunk reuses it without modification. **All new Chunks-shared enums live in a separate file at `Components/Chunks/Enums.cs`** — the project-root `Enums.cs` stays canonical to Blok primitives, with no Chunks-side additions. Both files share the `PINGWorks.SitecoreBlok.BlazorUI` namespace, so consumer code resolves either file's enums identically. **This rule applies only to Chunks; existing Primitive enums are untouched and not consolidated.** When a Chunk wraps a Primitive that has its own per-Primitive enum (`AlertVariant`, `BadgeColor`, `IconColorScheme`, `ButtonColor`, etc.), the Chunk either surfaces the Primitive enum directly or — if the Chunk is exposing a higher-level concept like `Tone` — translates internally; it does not create a parallel duplicate enum on the Chunk's API. The canonical Chunk-shared enums are:
 
 | Enum | Status | Used by |
 |---|---|---|
-| `Size` | existing (reuse) | `Container.MaxWidth`, `CenteredShell.MaxWidth`, any `Gap`/sizing prop |
-| `Position` *(new)* | add to `Enums.cs` — `{ Top, Right, Bottom, Left }` | `SheetShell.Side` (translates internally to the primitive's `SheetSide`); future `TooltipShell`, `PopoverShell`, `DropdownMenuShell` if added later |
-| `Orientation` *(new)* | add to `Enums.cs` — `{ Horizontal, Vertical }` | `SplitShell.Direction`, `MetricGroup.Direction` |
-| `Tone` *(new)* | add to `Enums.cs` — `{ Info, Success, Warning, Danger, Neutral }` | `Callout.Tone`, `AnnouncementBar.Tone`, `ConfirmDialog.Tone` |
-| `Density` *(new)* | add to `Enums.cs` — `{ Comfortable, Compact }` | `Toolbar.Density`, `DataToolbar.Density` |
-| `Trend` *(new)* | add to `Enums.cs` — `{ Up, Down, Neutral }` | `KpiTile.Trend`, `StatCard.Trend` |
-| `Columns` *(new)* | add to `Enums.cs` — `{ One, Two, Three, Four }` | `CardGrid.Columns`, `FormGrid.Columns` |
-| `Placement` *(new)* | add to `Enums.cs` — `{ Left, Right, None }` (and any others as needed) | `PageShell.AsidePlacement` |
+| `Size` | existing (reuse — lives in project-root `Enums.cs`) | `Container.MaxWidth`, `CenteredShell.MaxWidth`, any `Gap`/sizing prop |
+| `Position` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Top, Right, Bottom, Left }` | `SheetShell.Side` (translates internally to the primitive's `SheetSide`); future `TooltipShell`, `PopoverShell`, `DropdownMenuShell` if added later |
+| `Orientation` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Horizontal, Vertical }` | `SplitShell.Direction`, `MetricGroup.Direction` |
+| `Tone` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Info, Success, Warning, Danger, Neutral }` | `Callout.Tone`, `AnnouncementBar.Tone`, `ConfirmDialog.Tone` |
+| `Density` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Comfortable, Compact }` | `Toolbar.Density`, `DataToolbar.Density` |
+| `Trend` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Up, Down, Neutral }` | `KpiTile.Trend`, `StatCard.Trend` |
+| `Columns` *(new)* | add to `Components/Chunks/Enums.cs` — `{ One, Two, Three, Four }` | `CardGrid.Columns`, `FormGrid.Columns` |
+| `Placement` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Left, Right, None }` (and any others as needed) | `PageShell.AsidePlacement` |
 
 **5.11. Required-state error styling on `*Field` chunks.** Every `*Field` chunk tracks an internal `Touched` state. A field becomes Touched after a focus-then-blur cycle on its wrapped control — i.e. after the user has actually interacted with the field. Once Touched, if `Required` is `true` and the bound value is empty, the field renders in error styling regardless of any consumer-supplied `Error` parameter. The consumer-supplied `Error` is OR-combined with this internal computation, so external validation (server-side errors, custom rules) still forces error styling without disturbing the touched-tracking. Each `*Field` exposes `EventCallback<bool> ErrorChanged` so consumers can observe the computed error state (e.g. to disable a Submit button or render a message panel elsewhere). "Empty" is defined per control type:
 
@@ -138,6 +138,7 @@ A helper without consumers in the v1 implementation is not added until a second 
 PINGWorks.SitecoreBlok.BlazorUI/
 └── Components/
     └── Chunks/
+        ├── Enums.cs                        ← Chunks-shared enums (§5.10) — kept separate from project-root Enums.cs
         ├── Shared/                         ← per-shared-enum helper classes (§5.12)
         │   ├── ToneClasses.cs
         │   ├── TrendClasses.cs

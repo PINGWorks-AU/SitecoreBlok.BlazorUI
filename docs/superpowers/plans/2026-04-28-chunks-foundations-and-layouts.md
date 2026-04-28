@@ -17,7 +17,7 @@
 ## File Structure
 
 **Library (`PINGWorks.SitecoreBlok.BlazorUI/`)**
-- Modify: `Enums.cs` — add `Position`, `Orientation`, `Placement` enums.
+- Create: `Components/Chunks/Enums.cs` — Chunks-shared enums (`Position`, `Orientation`, `Placement`). Kept separate from the project-root `Enums.cs` so the latter stays canonical to Blok primitives (per spec §5.10). Same namespace as the rest of the library.
 - Create: `Components/Chunks/Shared/PositionClasses.cs` — internal helper for `Position` → `SheetSide` translation + Tailwind class lookups.
 - Create: `Components/Chunks/Shared/OrientationClasses.cs` — internal helper for flex/divide directions.
 - Create: `Components/Chunks/Shared/PlacementClasses.cs` — internal helper for left/right/none aside placement.
@@ -53,7 +53,7 @@
 
 **Catalogue smoke run:** `dotnet run --project PINGWorks.SitecoreBlok.BlazorUI.Catalogue/PINGWorks.SitecoreBlok.BlazorUI.Catalogue.csproj` then navigate in a browser to the URL specified in each task. Each chunk's Catalogue page must render without exceptions and visually match the spec description.
 
-**Commit style:** one commit per task, following the existing repo style (e.g. `30de7ee Typo fix and version boost`, `42e9ca4 adjust CSP to use https`). Use prefix `chunks: ` to make the work easy to find later.
+**Commit style — REVISED MID-PLAN:** subagents must **NOT commit** and must **NOT stage** (`git add`) their changes. The user reviews each task's working-tree diff manually, decides on fixes, and stages/commits at their own cadence. **Wherever a task below shows a `git add` / `git commit` step, treat it as superseded by this rule** — replace those steps with "Leave changes unstaged for the user to review." (Tasks below have not all been edited individually; this convention overrides them.) Build verification is still required; only the commit/stage step is removed.
 
 **Tabs vs spaces:** the existing codebase uses **tabs** for indentation in `.razor` and `.cs` files. Match that.
 
@@ -61,17 +61,20 @@
 
 ## Phase 1 — Foundations
 
-### Task 1: Add `Position`, `Orientation`, `Placement` enums to `Enums.cs`
+### Task 1: Create `Components/Chunks/Enums.cs` with `Position`, `Orientation`, `Placement` enums
 
 **Files:**
-- Modify: `PINGWorks.SitecoreBlok.BlazorUI/Enums.cs` (append at the bottom under a new "Chunks" section banner)
+- Create: `PINGWorks.SitecoreBlok.BlazorUI/Components/Chunks/Enums.cs` — new file. Same namespace (`PINGWorks.SitecoreBlok.BlazorUI`) as the project-root `Enums.cs`, but kept separate to keep the project-root file canonical to Blok primitives (per spec §5.10).
 
-- [ ] **Step 1: Open `Enums.cs` and append the three new enums**
-
-Append this block at the end of the file, after the last existing section:
+- [ ] **Step 1: Create the file with this exact content**
 
 ```csharp
-// Chunks (shared) ******************************************************************************************
+namespace PINGWorks.SitecoreBlok.BlazorUI;
+
+// Chunks-shared enums. Lives separately from the project-root Enums.cs so the
+// latter stays canonical to Blok primitives. Both files share this namespace,
+// so consumer code resolves either file's enums identically.
+
 public enum Position { Top, Right, Bottom, Left }
 public enum Orientation { Horizontal, Vertical }
 public enum Placement { Left, Right, None }
@@ -82,12 +85,7 @@ public enum Placement { Left, Right, None }
 Run: `dotnet build PINGWorks.SitecoreBlok.BlazorUI/PINGWorks.SitecoreBlok.BlazorUI.csproj`
 Expected: `Build succeeded` exit code 0.
 
-- [ ] **Step 3: Commit**
-
-```bash
-git add PINGWorks.SitecoreBlok.BlazorUI/Enums.cs
-git commit -m "chunks: add Position, Orientation, Placement shared enums"
-```
+- [ ] **Step 3: Leave changes UNSTAGED** (per workflow change — do NOT commit, do NOT stage). The user reviews and commits each task themselves.
 
 ---
 
