@@ -1,5 +1,6 @@
 @using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
 @inject MigrationStatusService Migration
+@rendermode InteractiveServer
 
 <nav class="w-60 shrink-0 border-r border-border bg-background h-screen sticky top-0 overflow-y-auto">
 	<div class="px-4 h-14 flex items-center border-b border-border">
@@ -14,8 +15,14 @@
 			All primitives
 		</NavLink>
 
+		<div class="pt-2">
+			<input type="search" placeholder="Filter primitives…" value="@Filter"
+			       @oninput="OnFilterInput"
+			       class="w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+		</div>
+
 		<div class="space-y-0.5 pt-3">
-			@foreach ( var entry in NavEntries )
+			@foreach ( var entry in FilteredEntries )
 			{
 				<NavLink href="@($"primitives/{entry.Name.ToLowerInvariant()}")" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-neutral-bg no-underline text-foreground/70 hover:text-foreground transition-colors" ActiveClass="bg-primary-bg text-primary-fg font-semibold">
 					<span class="flex-1 truncate">@entry.Name</span>
@@ -29,26 +36,49 @@
 					}
 				</NavLink>
 			}
+			@if ( FilteredEntries.Length == 0 )
+			{
+				<div class="px-3 py-2 text-xs text-muted-foreground">No matches</div>
+			}
 		</div>
 	</div>
 </nav>
 
 @code {
-	private sealed record NavEntry( string Name, ComponentStatus? Status );
+	private sealed record NavEntry( string Name, ComponentStatus? Status, string Description );
+
+	private string Filter = string.Empty;
 
 	// Cross-reference stub pages (rendered in the Catalogue but not tracked in MIGRATION_STATUS.md).
 	// Keep this list tiny — each entry needs a real page under Primitives/{Name}Page.razor.
 	private static readonly NavEntry[] Stubs =
 	[
-		new( "Navigation (Side)", null ),
-		new( "Navigation (Stack)", null ),
-		new( "Sonner", null ),
+		new( "Navigation (Side)", null, string.Empty ),
+		new( "Navigation (Stack)", null, string.Empty ),
+		new( "Sonner", null, string.Empty ),
 	];
 
 	private NavEntry[] NavEntries =>
 		Migration.Ported
-			.Select( e => new NavEntry( e.Name, e.Status ) )
+			.Select( e => new NavEntry( e.Name, e.Status, e.Description ) )
 			.Concat( Stubs )
 			.OrderBy( e => e.Name, StringComparer.OrdinalIgnoreCase )
 			.ToArray();
+
+	private NavEntry[] FilteredEntries =>
+		string.IsNullOrWhiteSpace( Filter )
+			? NavEntries
+			: NavEntries.Where( Matches ).ToArray();
+
+	private bool Matches( NavEntry entry )
+	{
+		var f = Filter.Trim();
+		return entry.Name.Contains( f, StringComparison.OrdinalIgnoreCase )
+			|| entry.Description.Contains( f, StringComparison.OrdinalIgnoreCase );
+	}
+
+	private void OnFilterInput( ChangeEventArgs e )
+	{
+		Filter = e.Value?.ToString() ?? string.Empty;
+	}
 }
