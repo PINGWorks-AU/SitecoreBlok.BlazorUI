@@ -16,7 +16,7 @@
 		@foreach ( var family in ChunksManifest.Families )
 		{
 			<div class="space-y-0.5 pt-3">
-				<div class="px-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">@family</div>
+				<div class="px-3 pb-1 text-xs font-bold text-foreground uppercase tracking-wide">@family</div>
 				@foreach ( var entry in ChunksManifest.ByFamily( family ) )
 				{
 					<NavLink href="@($"chunks/{entry.Slug}")" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-neutral-bg no-underline text-foreground/70 hover:text-foreground transition-colors" ActiveClass="bg-primary-bg text-primary-fg font-semibold">

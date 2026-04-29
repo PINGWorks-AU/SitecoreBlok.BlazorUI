@@ -12,7 +12,8 @@ PINGWorks.SitecoreBlok.BlazorUI is a Blazor Razor Class Library that provides pr
 The library includes:
 
 - **Design Tokens** — Colors, typography, spacing, shadows, and border radius via Tailwind CSS custom properties
-- **Components** — 60+ primitive components (buttons, cards, dialogs, form fields, tables, and more)
+- **Primitives** — 60+ primitive components (buttons, cards, dialogs, form fields, tables, and more), one-to-one with the upstream Blok library
+- **Chunks** — 85 opinionated compositions of Primitives across 7 families (Layouts, Headers, Navigation, Content, Forms, Data, Marketplace) — page envelopes, shells, headers, nav patterns, KPI tiles, full-page state views, form fields with Touched-tracking, data-table pages, and Sitecore Marketplace extension-point shells, all built on top of Primitives.
 - **Theming** — Light and dark mode support via semantic CSS tokens
 - **Icons** — 300+ Material Design Icons available as static SVG path constants
 - **Catalogue** — A companion Blazor web app for browsing and previewing all components
@@ -56,6 +57,13 @@ services or scripts. Be sure to review the catalogue for up-to-date information.
 │
 ├── PINGWorks.SitecoreBlok.BlazorUI/               # Component library (RCL, NuGet)
 │   ├── Components/                                # All .razor components
+│   │   ├── <PrimitiveName>/                       # One folder per Blok primitive (Button, Card, Dialog, …)
+│   │   ├── Chunks/                                # Higher-level compositions of primitives
+│   │   │   ├── Enums.cs                           # Chunks-shared enums (Tone, Density, Trend, Columns, …)
+│   │   │   ├── Shared/                            # CSS-class helpers (ToneClasses, TrendClasses, SizeClasses, …)
+│   │   │   ├── Layouts/  Headers/  Navigation/    # 7 chunk families
+│   │   │   └── Content/  Forms/  Data/  Marketplace/
+│   │   └── Extra/                                 # Catalogue-extra components (Text, ThemeToggle, …)
 │   ├── Services/                                  # PopoverService, ToastService, GlobalTheme
 │   ├── Ioc/                                       # DI extensions (AddSitecoreBlokUI)
 │   ├── ThirdPartyNotices/                         # Blok, shadcn, Tailwind, PrismJS
@@ -74,8 +82,10 @@ services or scripts. Be sure to review the catalogue for up-to-date information.
 └── PINGWorks.SitecoreBlok.BlazorUI.Catalogue/     # Catalogue web app
     ├── Components/
     │   ├── Layout/                                # MainLayout, NavMenu
-    │   ├── Pages/Primitives/                      # Per-component demo pages
-    │   └── Shared/                                # ComponentPage, ComponentExample
+    │   ├── Pages/
+    │   │   ├── Primitives/                        # Per-primitive demo pages
+    │   │   └── Chunks/                            # Per-chunk demo pages, grouped by family
+    │   └── Shared/                                # ComponentPage, ComponentExample, DivergenceNote, HostContextNote
     └── wwwroot/                                   # Catalogue-specific assets
 ```
 
@@ -174,6 +184,49 @@ dotnet run
     </DialogFooter>
 </Dialog>
 ```
+
+### Chunks — composed page patterns
+
+Chunks are higher-level compositions of Primitives that absorb the Tailwind class arrangements you'd otherwise write by hand. Examples:
+
+```razor
+@* App-shell envelope: dark-mode wrapper, popover/toaster mount, header/sidebar/content/footer slots *@
+<AppShell InteractiveRenderMode="@RenderMode.InteractiveServer">
+    <Header>
+        <AppBrand Name="My App" Version="v1.0" />
+    </Header>
+    <Sidebar>
+        <NavList>
+            <NavListItem Href="/" IconSvg="@IconSvg.Information" Label="Dashboard" Active="true" />
+            <NavListItem Href="/sites" IconSvg="@IconSvg.Information" Label="Sites" />
+        </NavList>
+    </Sidebar>
+    <Content>
+        <PageHeader Title="Sites" Description="All sites in this project.">
+            <Actions>
+                <Button>New site</Button>
+            </Actions>
+        </PageHeader>
+        @* … *@
+    </Content>
+</AppShell>
+
+@* Form field with built-in Touched-tracking and required-empty error styling *@
+<TextField Label="Email" Type="TextField.TextFieldType.Email"
+           Value="@email" ValueChanged="@(v => email = v)"
+           Required="true" HelpText="We'll never share your email." />
+
+@* Tonal callout, KPI tile, and confirm dialog *@
+<Callout Title="Heads up" Tone="Tone.Warning" IconSvg="@IconSvg.AlertCircle">
+    Saving will overwrite your current draft.
+</Callout>
+<KpiTile Label="Monthly users" Value="12,480" Delta="+8.4% vs last month" Trend="Trend.Up" />
+<ConfirmDialog Title="Delete item?" Message="This action cannot be undone."
+               Tone="Tone.Danger" Open="@confirmOpen"
+               OpenChanged="@(v => confirmOpen = v)" OnConfirm="HandleDelete" />
+```
+
+The full chunk roster (85 chunks across Layouts, Headers, Navigation, Content, Forms, Data, Marketplace) is browsable at `/chunks` in the Catalogue.
 
 ## AI Assisted Component Migration
 

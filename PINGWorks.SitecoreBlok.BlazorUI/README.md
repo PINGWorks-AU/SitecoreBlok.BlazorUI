@@ -6,7 +6,8 @@ Idiomatic Blazor components ported from the [Sitecore Blok](https://blok.sitecor
 
 ## Highlights
 
-- **60+ primitives** — buttons, cards, dialogs, dropdowns, form fields, tables, tabs, toasts, and more
+- **60+ primitives** — buttons, cards, dialogs, dropdowns, form fields, tables, tabs, toasts, and more — one-to-one with the upstream Blok library
+- **85 chunks** — opinionated compositions of primitives across 7 families (Layouts, Headers, Navigation, Content, Forms, Data, Marketplace): page envelopes, shells, headers, nav patterns, KPI tiles, full-page state views, form fields with built-in Touched-tracking, data-table pages, and Sitecore Marketplace extension-point shells
 - **Composable** — sub-components (`CardHeader`, `CardContent`, `CardFooter`, …) compose freely, matching the shadcn model Blok is built on
 - **Idiomatic Blazor** — `[Parameter]`, `EventCallback`, `CascadingValue`, `RenderFragment`; no thin React-over-Blazor wrappers
 - **Type-safe variants** — enum-driven sizes, colours, and styles with full IntelliSense
@@ -92,7 +93,43 @@ This registers the scoped services the library needs (`PopoverService`, `ToastSe
 </Dialog>
 ```
 
-A live, browsable Catalogue of every component (with source for each variant) ships in the project repository.
+### Chunks — composed page patterns
+
+Chunks are higher-level compositions of primitives. They package the recurring Tailwind class arrangements, structural slots, and primitive choices you'd otherwise repeat. A few examples:
+
+```razor
+@* Sticky app header with brand, nav, and right-aligned actions *@
+<AppHeader>
+    <Brand>
+        <AppBrand Name="My App" Version="v1.0" />
+    </Brand>
+    <Nav>
+        <a href="/sites">Sites</a>
+        <a href="/docs">Docs</a>
+    </Nav>
+    <Actions>
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Sign in</Button>
+    </Actions>
+</AppHeader>
+
+@* Form field with built-in Touched-tracking and required-empty error styling *@
+<TextField Label="Email" Type="TextField.TextFieldType.Email"
+           Value="@email" ValueChanged="@(v => email = v)"
+           Required="true" HelpText="We'll never share your email." />
+
+@* Tonal callout, KPI tile, and confirm dialog *@
+<Callout Title="Heads up" Tone="Tone.Warning" IconSvg="@IconSvg.AlertCircle">
+    Saving will overwrite your current draft.
+</Callout>
+<KpiTile Label="Monthly users" Value="12,480" Delta="+8.4% vs last month" Trend="Trend.Up" />
+<ConfirmDialog Title="Delete item?" Message="This action cannot be undone."
+               Tone="Tone.Danger" Open="@confirmOpen"
+               OpenChanged="@(v => confirmOpen = v)" OnConfirm="HandleDelete" />
+```
+
+The full chunk roster (Layouts, Headers, Navigation, Content, Forms, Data, Marketplace) is browsable at `/chunks` in the Catalogue.
+
+A live, browsable Catalogue of every primitive and chunk (with source for each variant) ships in the project repository.
 
 ## Theming
 

@@ -1,5 +1,6 @@
 @page "/"
 @rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
 @inject IJSRuntime JS
 @inject MigrationStatusService Migration
 
@@ -28,7 +29,28 @@
 			in this catalogue site.
 		</p>
 		<div class="flex gap-3 pt-2">
-			<Button Click="@(() => Navigation.NavigateTo("/primitives"))">Browse primitives</Button>
+			<Button Click="@(() => Navigation.NavigateTo("/primitives"))">Browse Primitives</Button>
+		</div>
+	</div>
+
+	<Separator />
+
+	<div class="space-y-6">
+		<h2 class="text-2xl font-bold tracking-tight">Introducing Chunks — composed page patterns</h2>
+		<p class="text-base text-muted-foreground max-w-4xl leading-relaxed">
+			Chunks are opinionated compositions of one or more primitives. They package the recurring layout, spacing, and
+			primitive choices that consumers would otherwise repeat — page envelopes, sticky headers, sidebars, KPI tiles,
+			full-page state views, form fields with built-in error tracking, data-table pages, and shells for the Sitecore
+			Marketplace extension points. Chunks know about layout and primitive choice; they never carry domain knowledge.
+		</p>
+		<p class="text-base text-muted-foreground max-w-4xl leading-relaxed">
+			Use a chunk when you want the well-spaced, accessible composition without writing the Tailwind classes by hand.
+			Drop down to primitives whenever you need to vary one specific aspect of the chunk's behaviour — the catalogue's
+			<em>Primitives</em> tab on every chunk example shows the equivalent first-principles markup so you have a
+			copy-paste starting point.
+		</p>
+		<div class="flex gap-3 pt-2">
+			<Button Click="@(() => Navigation.NavigateTo("/chunks"))">Browse Chunks</Button>
 		</div>
 	</div>
 
@@ -92,7 +114,7 @@
 	<Separator />
 
 	<div class="space-y-4">
-		<h2 class="text-xl font-semibold">Available Components</h2>
+		<h2 class="text-xl font-semibold">Available Primitives</h2>
 		<p class="text-sm text-muted-foreground">@AvailableComponents.Length primitives available.</p>
 		<div class="flex flex-wrap gap-2">
 			@foreach ( var name in AvailableComponents )
@@ -100,6 +122,27 @@
 				<a href="@($"primitives/{name.ToLowerInvariant()}")" class="no-underline">
 					<Badge ColorScheme="BadgeColor.Neutral">@name</Badge>
 				</a>
+			}
+		</div>
+	</div>
+
+	<div class="space-y-4">
+		<h2 class="text-xl font-semibold">Available Chunks</h2>
+		<p class="text-sm text-muted-foreground">@ChunksManifest.All.Length chunks across @ChunksManifest.Families.Count() families.</p>
+		<div class="space-y-3">
+			@foreach ( var family in ChunksManifest.Families )
+			{
+				<div class="space-y-2">
+					<h3 class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">@family</h3>
+					<div class="flex flex-wrap gap-2">
+						@foreach ( var entry in ChunksManifest.ByFamily( family ) )
+						{
+							<a href="@($"chunks/{entry.Slug}")" class="no-underline">
+								<Badge ColorScheme="BadgeColor.Neutral">@entry.Name</Badge>
+							</a>
+						}
+					</div>
+				</div>
 			}
 		</div>
 	</div>

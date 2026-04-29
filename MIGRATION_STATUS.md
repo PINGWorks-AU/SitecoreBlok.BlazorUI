@@ -126,11 +126,4 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 
 ## Chunks coverage notes (v1 — Foundations + Layouts)
 
-Chunks are tracked as "Extras" — no rows in the table above (per Chunks design spec §5.9).
-Coverage check (spec §10.6) confirms that with Plan 1 complete, the Catalogue's MainLayout, NavMenu, and ComponentPage can be expressed using:
-
-- `MainLayout.razor` → `AppShell` + (Header content via slot — `AppHeader` arrives in Plan 2/Headers).
-- `NavMenu.razor` → blocked on `AppSidebar` (Plan 3/Navigation).
-- `ComponentPage.razor` → `PageShell` + Header content (PageHeader arrives in Plan 2/Headers) + ContentSection body (arrives in Plan 5/Content).
-
-Plan 1 alone does not unblock the full refactor — that requires Headers (Plan 2), Navigation (Plan 3), and Content (Plan 5). The refactor itself remains out of scope per spec §3.
+Chunks are tracked as "Extras" — no rows in the table above.

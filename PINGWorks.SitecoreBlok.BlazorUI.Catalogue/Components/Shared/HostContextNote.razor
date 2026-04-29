@@ -1,0 +1,20 @@
+@* Use at the top of a Catalogue Marketplace shell page to describe the
+   XMC / Cloud Portal host environment the shell targets. Documents what
+   surrounding chrome looks like, what dimensions are imposed by the host,
+   and what behaviour the consumer is responsible for (e.g. postMessage
+   SDK initialisation). Mirrors the visual treatment of DivergenceNote
+   but with an info-tone palette to signal "informational, not a warning". *@
+
+<div class="border-l-4 border-info-500 pl-4 py-3 mb-6 bg-info-bg/30 rounded-r-md text-foreground">
+	<h4 class="font-semibold text-info-fg mb-2 flex items-center gap-2">
+		<Icon Svg="@IconSvg.Information" ClassName="size-5" />
+		Host context
+	</h4>
+	<div class="text-sm space-y-2">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required RenderFragment ChildContent { get; set; }
+}
