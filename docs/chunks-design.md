@@ -3,7 +3,7 @@
 **Date:** 2026-04-28
 **Owner:** Richard Hauer (PING Works)
 **Library:** `PINGWorks.SitecoreBlok.BlazorUI`
-**Status:** Approved for implementation planning
+**Status:** Implemented. The roster, conventions, and as-built decisions below match what is in the codebase. Sections marked with **As-built note** capture decisions that were made or refined during implementation; they are the source of truth (the spec was updated rather than left aspirational).
 
 ## 1. Purpose
 
@@ -31,17 +31,19 @@ The name "Chunk" was chosen deliberately to avoid collision with Sitecore's "Blo
 
 ## 4. Scope summary
 
-**84 Chunks across 7 families**, all under `PINGWorks.SitecoreBlok.BlazorUI/Components/Chunks/<Family>/`. The seven families:
+**85 Chunks across 7 families**, all under `PINGWorks.SitecoreBlok.BlazorUI/Components/Chunks/<Family>/`. The seven families:
 
 | Family | Count | Purpose |
 |---|---|---|
 | Layouts | 8 | Outer page envelopes and shell wrappers around Dialog/Sheet. |
 | Headers | 7 | Sticky bars, page/section headers, brand, toolbar, announcements. |
 | Navigation | 9 | Nav lists, sidebars, rails, breadcrumbs, tab bars, account menus, back links. |
-| Content | 19 | Sections, containers, KPI tiles, hero/callout, full-page state views, skeletons. |
+| Content | 20 | Sections, containers, KPI tiles, hero/callout, full-page state views, skeletons. |
 | Forms | 25 | Form shell + section + grid + actions, plus per-field-type wrappers and login/confirm dialogs. |
 | Data | 11 | Data-table page, toolbar, pagination, detail/settings pages, list/result patterns. |
 | Marketplace | 5 | Shells for all five Sitecore Marketplace extension points. |
+
+**As-built note (count change):** the original spec listed Content at 19. The Card-composition decision (see §10.9) added a 20th Content chunk, `ElevatedCard`, which wraps the `Card` primitive and exposes its `CardStyle` / `CardElevation` / `HoverElevation` / `CardPadding` enum API directly — a deliberate companion to the bool-flag wrapper-styling pattern used by the other card-shaped chunks. Total roster is now 85.
 
 ## 5. API conventions
 
@@ -77,17 +79,31 @@ These twelve rules apply to every Chunk and are non-negotiable across the family
 | `Trend` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Up, Down, Neutral }` | `KpiTile.Trend`, `StatCard.Trend` |
 | `Columns` *(new)* | add to `Components/Chunks/Enums.cs` — `{ One, Two, Three, Four }` | `CardGrid.Columns`, `FormGrid.Columns` |
 | `Placement` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Left, Right, None }` (and any others as needed) | `PageShell.AsidePlacement` |
+| `Alignment` *(new)* | add to `Components/Chunks/Enums.cs` — `{ Start, Center, End, Stretch }` | every chunk's `HeaderAlignment` parameter — see §5.13 |
 
 **5.11. Required-state error styling on `*Field` chunks.** Every `*Field` chunk tracks an internal `Touched` state. A field becomes Touched after a focus-then-blur cycle on its wrapped control — i.e. after the user has actually interacted with the field. Once Touched, if `Required` is `true` and the bound value is empty, the field renders in error styling regardless of any consumer-supplied `Error` parameter. The consumer-supplied `Error` is OR-combined with this internal computation, so external validation (server-side errors, custom rules) still forces error styling without disturbing the touched-tracking. Each `*Field` exposes `EventCallback<bool> ErrorChanged` so consumers can observe the computed error state (e.g. to disable a Submit button or render a message panel elsewhere). "Empty" is defined per control type:
 
 - `TextField` / `PasswordField` / `TextAreaField` / `SearchField`: bound `Value` is null, empty, or whitespace
 - `SelectField` / `ComboboxField` / `RadioGroupField`: bound `Value` is null / unset
-- `CheckboxField` / `SwitchField` / `ToggleField`: bound `Checked` is `false`
+- `CheckboxField` / `SwitchField` / `ToggleField`: bound `Value` (`bool`) is `false`
 - `ToggleGroupField`: no option selected
 - `DateField` / `TimeField`: bound `Value` is `null`
-- `SliderField`: `Required` is a no-op (slider always has a value)
+- `SliderField`: `Required` is a no-op (slider always has a value); `IsEmpty` is overridden to always return `false`
 
 The `Touched` reset (e.g. on form reset) is the consumer's responsibility — they pass a key/parameter to force the Chunk to re-mount, or use a future explicit `Reset()` API if one is added.
+
+**As-built note (FieldBase + unified `Value`/`ValueChanged`).** The Touched-tracking machinery and the entire common parameter surface are implemented as a single abstract base class — **`FieldBase<TValue>`** at `Components/Chunks/Forms/FieldBase.cs` — that every `*Field` inherits via `@inherits FieldBase<TValue>`. The base owns:
+
+- Common parameters: `Label`, `HelpText`, `Required`, `Disabled`, `Id`, `Value` (`TValue`), `ValueChanged` (`EventCallback<TValue>`), `Error`, `ErrorChanged`.
+- `protected bool Touched` (flips on first `MarkTouched()` call).
+- `protected bool EffectiveError` — the `Error || (Required && Touched && IsEmpty(Value))` OR-combination.
+- `protected virtual bool IsEmpty(TValue)` — default: null / whitespace string / `false` bool. `SliderField` overrides to always return `false`.
+- `protected string HelpTextClass` — `text-xs` plus `text-danger-fg` when `EffectiveError`, else `text-muted-foreground`.
+- `protected Task UpdateValue(TValue)` and `protected Task MarkTouched()` — subclasses call from the wrapped control's value-change and `@onblur`/`@onfocusout` handlers.
+
+This replaces the originally-specced `FieldTouchedTracker` helper (mentioned in §11 risk #7) with an inheritance-based design that also unifies the field API: **every `*Field` exposes `Value` / `ValueChanged`**, including the boolean-shaped fields. The original spec named those bindings `Checked` / `CheckedChanged` (`CheckboxField`, `SwitchField`) and `Pressed` / `PressedChanged` (`ToggleField`); the as-built API uses `Value` / `ValueChanged` uniformly so consumers learn one binding name. Each chunk bridges to its wrapped primitive's actual parameter name internally (e.g. `CheckboxField` lifts `bool` to the primitive's `bool?` tri-state and back).
+
+For inner controls whose primitive doesn't accept passthrough attributes, `MarkTouched()` is wired from a wrapping `<div @onfocusout="MarkTouched">` rather than `@onblur` directly on the primitive.
 
 **5.12. Per-shared-enum helper classes.** When a shared enum from §5.10 is consumed by two or more Chunks (e.g. `Tone` is used by `Callout`, `AnnouncementBar`, `ConfirmDialog`), the enum-to-Tailwind-class mapping lives in a single internal helper class — *not* duplicated as a `switch` expression in each Chunk. The helper sits next to the Chunks that consume it (under `Components/Chunks/Shared/`) and exposes one static method per CSS context: text colour, background colour, border colour, hover variant, focus ring, etc. Example shape:
 
@@ -122,15 +138,26 @@ The expected helpers (one file each, under `Components/Chunks/Shared/`):
 
 | Helper | For shared enum | Methods |
 |---|---|---|
-| `ToneClasses` | `Tone` | `Text`, `Bg`, `Border`, `Icon`, plus `*Hover` variants where used |
-| `TrendClasses` | `Trend` | `Text`, `Icon` (arrow direction implied) |
+| `AlignmentClasses` | `Alignment` | `Items` (flex `items-*`) |
+| `ToneClasses` | `Tone` | `Text`, `Bg`, `Border`, plus `*Hover` variants where used |
+| `TrendClasses` | `Trend` | `Text`, `Bg` — CSS classes only |
+| `TrendIcons` | `Trend` | `ForTrend` — returns the matching `IconSvg` constant; sibling to `TrendClasses` so the latter stays CSS-only |
 | `DensityClasses` | `Density` | `Padding`, `Gap`, `Height` |
 | `OrientationClasses` | `Orientation` | `Flex`, `Divide` |
 | `PositionClasses` | `Position` | `Side`, `OffsetClass` |
 | `PlacementClasses` | `Placement` | `Side` (wraps both `Left`/`Right` cases; `None` returns empty) |
 | `ColumnsClasses` | `Columns` | `Grid` (e.g. `grid-cols-1` … `grid-cols-4`) |
+| `SizeClasses` | `Size` | `Width`, `MaxWidth`, `Gap` (`SizeClasses` is the existing helper for the project-root `Size` enum, surfaced here for completeness) |
 
 A helper without consumers in the v1 implementation is not added until a second consumer exists — this prevents speculative helpers.
+
+**As-built note (TrendClasses split + IconSvg surfacing).** The original spec listed `TrendClasses.Icon(Trend)` returning an SVG path string — a dual-purpose method on a class otherwise dedicated to CSS classes. The as-built design splits these:
+
+- `TrendClasses` stays CSS-only (`Text`, `Bg`).
+- A sibling `TrendIcons.ForTrend(Trend)` returns the appropriate `IconSvg` constant.
+- The constants `IconSvg.TrendingUp`, `IconSvg.TrendingDown`, `IconSvg.TrendingNeutral` are surfaced in the library project's `IconSvg.cs` subset (sourced from the canonical `PINGWorks.SitecoreBlok.BlazorUI.Icons` library). `IconSvg.ArrowLeft` is surfaced for `BackLink`'s use the same way.
+
+This keeps each helper class single-purpose and routes all icon-path resolution through `IconSvg` constants.
 
 **5.13. Wrapper-styling parameters absorb slot-content boilerplate.** When a Chunk wraps slot content in styled containers, the container's common visual concerns are exposed as declarative parameters on the Chunk rather than requiring the consumer to add Tailwind classes inside the slot. **Universal naming and defaults:**
 
@@ -151,6 +178,38 @@ The pattern doesn't apply to chunks with no chunk-owned region wrappers (DialogS
 
 **5.15. Catalogue pages always declare `@rendermode InteractiveServer`.** Regardless of the chunk's `Interactivity` flag (which documents the *consumer's* requirement when using the chunk in their own apps), the catalogue page itself uses interactive primitives — the `Tabs` inside `<ComponentExample>` for the Preview/Code/Primitives switcher requires interactive mode. Every catalogue page declares `@rendermode InteractiveServer` at the top.
 
+**5.16. Consumer `ClassName` overrides win — gate built-in emissions.** When a chunk (or any component) accepts a `[Parameter] public string? ClassName { get; set; }` and ALSO emits Tailwind utility classes through its internal `CssClassBuilder` chain, every emission whose prefix the consumer might override must be **gated** so the consumer's override wins cleanly. Without gating, both the built-in default and the consumer's override end up on the same element and Tailwind's resolution becomes order-dependent in the compiled CSS — fragile and surprising.
+
+The canonical pattern uses `CssClassBuilder.ContainsAny( ClassName, "<prefix>", … )` to detect the consumer override, and inverts that flag on the `.With(...)` condition:
+
+```csharp
+private string CssClass
+    => CssClassBuilder.Start( "inline-flex items-center justify-center" )
+        // Suppress the built-in size when the consumer passes any size-* class.
+        .With( SizeClass, !CssClassBuilder.ContainsAny( ClassName, "size-" ) )
+        // Suppress the built-in padding/rounded when the consumer overrides either.
+        .With( "p-4 rounded-md", !CssClassBuilder.ContainsAny( ClassName, "p-", "rounded" ) )
+        // ColorScheme classes don't conflict with consumer ClassName — leave unconditional.
+        .With( ColorSchemeClass )
+        .With( ClassName )
+        .Build();
+```
+
+**Rules:**
+
+- **Group-level suppression.** When a single `.With(...)` emits multiple prefixes from the same conceptual group (e.g. a `Size` enum case that produces `h-10 min-w-10 px-4`), gate on ANY of those prefixes appearing in `ClassName`. Partial override of a group means the consumer owns the whole group — emit nothing internal.
+- **Prefix selection.** Match exactly the prefix categories the consumer might override:
+  - Sizing: `"size-"`, `"w-"`, `"h-"`, `"min-w-"`, `"max-w-"`, `"min-h-"`, `"max-h-"`
+  - Spacing: `"p-"` (covers `px-`/`py-`/`pt-`/etc. via substring match), `"m-"` (covers `mx-`/`my-`/etc.), `"gap-"`
+  - Border radius: `"rounded"` (matches `rounded`, `rounded-md`, `rounded-full`, …)
+- **Don't gate non-conflicting categories.** Colour utilities (`text-foreground`, `bg-info-bg`, `border-border`) are typically additive — consumers compose them rather than override. Leave those `.With(...)` calls unconditional.
+- **`text-` and `border-` are tricky.** `text-` covers both size (`text-sm`) and colour (`text-foreground`); `border-` covers both width (`border`, `border-2`) and colour (`border-border`). Don't reflexively gate either — only gate when the internal emission is unambiguously the same shape as the override (e.g. emitting `text-sm` and gating on `"text-"` would suppress incorrectly when a consumer passes `text-foreground`). When in doubt, leave it unconditional and trust Tailwind's specificity rules.
+- **Combine with existing conditions.** If a `.With(...)` already has a condition (e.g. `Variant is ButtonVariant.Outline`), preserve it: `.With( "...", Variant is ButtonVariant.Outline && !CssClassBuilder.ContainsAny( ClassName, "..." ) )`.
+
+The helper lives at `Components/CssClassBuilder.cs`. The pattern was first applied in `Components/Icon/Icon.razor` (the `SizeClass` emission) after a chunk-side bug surfaced: `FilterChip` passed `ClassName="size-3"` to its inner `<Icon>` and ended up with both `size-3` AND the default `size-6` on the SVG. The sweep then propagated to ~18 primitives (Button, Avatar, Badge, Checkbox, CircularProgress, ActionBar, Card, Alert, Accordion×2, Dialog, Sheet headers/footers, Breadcrumb list/item, Sidebar menu button/item).
+
+**Apply this rule to every new chunk** that exposes a `ClassName` parameter and emits any of the listed prefixes internally. Existing chunks added before this rule should be retrofitted whenever their internals are touched for other reasons.
+
 ## 6. Folder layout
 
 ```
@@ -159,13 +218,15 @@ PINGWorks.SitecoreBlok.BlazorUI/
     └── Chunks/
         ├── Enums.cs                        ← Chunks-shared enums (§5.10) — kept separate from project-root Enums.cs
         ├── Shared/                         ← per-shared-enum helper classes (§5.12)
+        │   ├── AlignmentClasses.cs
         │   ├── ToneClasses.cs
-        │   ├── TrendClasses.cs
+        │   ├── TrendClasses.cs              ← CSS-only; sibling TrendIcons static class for IconSvg paths
         │   ├── DensityClasses.cs
         │   ├── OrientationClasses.cs
         │   ├── PositionClasses.cs
         │   ├── PlacementClasses.cs
-        │   └── ColumnsClasses.cs
+        │   ├── ColumnsClasses.cs
+        │   └── SizeClasses.cs                ← Width / MaxWidth / Gap helpers for the project-root Size enum
         ├── Layouts/
         │   ├── AppShell.razor
         │   ├── PageShell.razor
@@ -177,10 +238,10 @@ PINGWorks.SitecoreBlok.BlazorUI/
         │   └── SheetShell.razor
         ├── Headers/
         ├── Navigation/
-        ├── Content/
-        ├── Forms/
+        ├── Content/                          ← incl. ElevatedCard (Card primitive wrapper, see §10.9)
+        ├── Forms/                            ← incl. FieldBase.cs (abstract base for every *Field, see §5.11)
         ├── Data/
-        └── Marketplace/
+        └── Marketplace/                      ← chunks named without the Marketplace prefix (see §7.7)
 
 PINGWorks.SitecoreBlok.BlazorUI.Catalogue/
 └── Components/
@@ -241,7 +302,7 @@ PINGWorks.SitecoreBlok.BlazorUI.Catalogue/
 | `AccountMenu` | Avatar trigger + DropdownMenu shell with name/email header. | Props: `Name`, `Email`, `AvatarUrl`, `Initials`. Slot: `Items`. |
 | `BackLink` | Single "← Back to X" element. | Props: `Href`, `Label`. |
 
-### 7.4 Content/ — 19
+### 7.4 Content/ — 20
 
 | Chunk | Purpose | Key API |
 |---|---|---|
@@ -252,17 +313,18 @@ PINGWorks.SitecoreBlok.BlazorUI.Catalogue/
 | `FeatureCard` | Icon + Title + Description card; for landing/onboarding pages. | Props: `IconSvg`, `Title`, `Description`. Slot: `Footer`. |
 | `ActionCard` | Card with click target + trailing arrow; for navigation grids. | Props: `Title`, `Description`, `Href`, `IconSvg`, `OnClick`. |
 | `MediaCard` | Thumbnail-first card. Image + Title/Description + Actions. | Props: `ImageUrl`, `ImageAlt`, `Title`, `Description`. Slots: `Actions`, `Overlay`. |
+| `ElevatedCard` | `Card` primitive wrapper exposing the primitive's enum API directly. Sibling to the bool-flag card chunks; use when shadow / elevation matters more than the wrapper-styling toggles. | Props: `Style` (`CardStyle`), `Elevation` (`CardElevation`), `HoverElevation` (`CardElevation?`), `Padding` (`CardPadding`), `ClassName`. ChildContent. |
 | `KpiTile` | Single big-number stat tile. Use without `Delta`/`Trend`/`IconSvg` for a minimal stat; populate them for the full feature. | Props: `Label`, `Value`, `Delta`, `Trend` (shared `Trend`), `IconSvg`. |
 | `StatCard` | Card-based KPI variant; sparkline + actions slots. | Props: `Label`, `Value`, `Trend` (shared `Trend`). Slots: `Sparkline`, `Actions`. |
 | `MetricGroup` | Horizontal arrangement of `KpiTile`s with dividers. | ChildContent: `KpiTile`. |
 | `Hero` | Landing-style intro band. | Props: `Title`, `Subtitle`. Slots: `Actions`, `Media`. |
 | `Callout` | Visually distinct aside (gentler than `Alert`). | Props: `Title`, `Tone` (shared `Tone` enum), `IconSvg`. Slot: `ChildContent`. |
 | `EmptyStatePanel` | `EmptyState` wrapped in section-level chrome. | Props: `Title`, `Description`, `IconSvg`. Slot: `Action`. |
-| `EmptyView` | Full-page empty state (vs panel-level). | Same API as `EmptyStatePanel`; sized to viewport. |
+| `EmptyView` | Full-page empty state (vs panel-level). | Same API as `EmptyStatePanel` plus `MinHeight` (default `min-h-screen`). Composes `EmptyStatePanel` inside a viewport-sized centred wrapper; consumers (and the catalogue's bounded preview) can pass `MinHeight="h-full"` to fit a sized parent. |
 | `ErrorStatePanel` | `ErrorState` wrapped in section chrome. | Props: `Title`, `Description`, `Status`. Slot: `Action`. |
-| `ErrorView` | Full-page error. | Same API as `ErrorStatePanel`. |
+| `ErrorView` | Full-page error. | Same API as `ErrorStatePanel` plus `MinHeight`. |
 | `LoadingPanel` | Spinner + optional message centered in min-height block. | Props: `Message`, `MinHeight`. |
-| `LoadingView` | Full-page loading. | Props: `Message`. |
+| `LoadingView` | Full-page loading. | Props: `Message`, `MinHeight` (default `min-h-screen`, forwarded to `LoadingPanel`). |
 | `SkeletonCard` | Skeleton-of-a-card preset for grid loading. | Props: `Lines`, `WithHeader`, `WithFooter`. |
 
 ### 7.5 Forms/ — 25
@@ -281,26 +343,28 @@ PINGWorks.SitecoreBlok.BlazorUI.Catalogue/
 
 Each `*Field` has the same envelope shape: `Label` (above or inline depending on control) + control + (optional `HelpText` below). There is **no reserved space for an error message** — error rendering is the consumer's responsibility.
 
-Common props on every `*Field`: `Label` (string), `HelpText` (string), `bool Error`, `bool Required`, `bool Disabled`, `Id` (string). Each then surfaces the wrapped primitive's own parameters.
+Common props on every `*Field` (inherited from `FieldBase<TValue>` per §5.11): `Label` (string?), `HelpText` (string?), `Value` (`TValue`), `ValueChanged` (`EventCallback<TValue>`), `bool Error`, `EventCallback<bool> ErrorChanged`, `bool Required`, `bool Disabled`, `Id` (string). Each then surfaces the wrapped primitive's own parameters.
 
 `Error` is a **`bool` styling flag**, not a message: when `true` the field's control border, label colour, and any associated focus-ring switch to the danger/error visual state defined by Blok's semantic tokens. The same flag applies to `FormLabel` so a consumer composing a custom control can still get a coordinated error-styled label. The consumer renders the actual error *message* themselves — typically a small `<p class="text-danger text-sm">…</p>` or a `Callout` chunk — wherever they want it, including outside the field if appropriate.
 
-| Chunk | Wraps | Field-specific notes |
-|---|---|---|
-| `TextField` | `Input` | Enum `Type = Text|Email|Number|Tel|Url`. Surfaces `Value`, `ValueChanged`, `Placeholder`. |
-| `PasswordField` | `Input` (type=password) | Adds show/hide toggle button. Surfaces `Value`, `ValueChanged`. |
-| `TextAreaField` | `Textarea` | Surfaces `Rows`, `Resize`. |
-| `SelectField` | `Select` | Surfaces `Items`, `Value`, `ValueChanged`, `Placeholder`. |
-| `ComboboxField` | `Combobox` | Surfaces all Combobox parameters. |
-| `CheckboxField` | `Checkbox` | Inline (label-right) layout; supports tri-state. |
-| `RadioGroupField` | `RadioGroup` | Vertical group; label-above layout. |
-| `SwitchField` | `Switch` | Inline (label-right) layout. |
-| `ToggleField` | `Toggle` | Inline. |
-| `ToggleGroupField` | `ToggleGroup` | Horizontal multi-button group. |
-| `DateField` | `DatePicker` | |
-| `TimeField` | `TimePicker` | |
-| `SliderField` | `Slider` | Surfaces min/max/step/value. |
-| `SearchField` | `SearchInput` | For search-as-form-field cases (filter forms). |
+Bindings are unified — every `*Field` exposes `Value` / `ValueChanged`, regardless of the wrapped primitive's native parameter names. The chunk bridges to those native names (e.g. `Checkbox.CheckedChanged` `bool?` → `Value`/`ValueChanged` `bool`) internally. See §5.11 for the FieldBase rationale.
+
+| Chunk | TValue | Wraps | Field-specific notes |
+|---|---|---|---|
+| `TextField` | `string?` | `Input` | Enum `Type = Text|Email|Number|Tel|Url`. Surfaces `Placeholder`. |
+| `PasswordField` | `string?` | `Input` (type=password) | Adds show/hide toggle button. |
+| `TextAreaField` | `string?` | `Textarea` | Surfaces `Rows`. |
+| `SelectField` | `string?` | `Select` | Surfaces `Items`, `Placeholder`. |
+| `ComboboxField` | `string?` | `Combobox` | Surfaces relevant Combobox parameters. |
+| `CheckboxField` | `bool` | `Checkbox` | Inline (label-right) layout; bridges to primitive's `bool?` tri-state. |
+| `RadioGroupField` | `string?` | `RadioGroup` | Vertical group; label-above layout. |
+| `SwitchField` | `bool` | `Switch` | Inline (label-right) layout. |
+| `ToggleField` | `bool` | `Toggle` | Inline. Bridges chunk `Value` to primitive's `Pressed`. |
+| `ToggleGroupField` | `string?` | `ToggleGroup` | Horizontal multi-button group. |
+| `DateField` | `DateTime?` | `DatePicker` | |
+| `TimeField` | `TimeSpan?` | `TimePicker` | |
+| `SliderField` | `double` | `Slider` | Surfaces min/max/step. Overrides `IsEmpty(double) => false`. |
+| `SearchField` | `string?` | `SearchInput` | For search-as-form-field cases (filter forms). Bridges to primitive's `Value`/`ValueChanged`. |
 
 #### Composite
 
@@ -335,13 +399,15 @@ Shells for all five Sitecore Marketplace extension points. Three (`CustomField`,
 
 | Chunk | Host context | Constraints | Key API |
 |---|---|---|---|
-| `MarketplaceCustomFieldShell` | XMC Page Builder Custom Field dialog | Limited width and height; consumer fits the dialog. | Props: `Title` (optional). Slots: `Header` (optional), `Body`, `Actions`. |
-| `MarketplaceContextPanelShell` | XMC Page Builder left context panel | `max-w-[600px]`, full-height column, vertically scrollable body. | Slots: `Header`, `Body` (scrollable), `Footer`. |
-| `MarketplaceDashboardWidgetShell` | XMC Dashboard widget grid cell | Card-styled, fits the dashboard widget's allotted cell. | Props: `Title`. Slots: `Header` (Title text + actions slot), `Body`, `Footer`. |
-| `MarketplaceFullScreenShell` | XMC Sites top-bar nav (full-screen iframe) | None — the host fills the viewport. | `ChildContent` only. Sets `min-h-screen` and Blok background/font defaults so the shell composes cleanly inside the iframe. |
-| `MarketplaceStandaloneShell` | Cloud Portal homepage launch (new tab) | None — the app owns the whole tab. | `ChildContent` only. Same defaults as `MarketplaceFullScreenShell`; differs only in the Catalogue host-context documentation it carries. |
+| `CustomFieldShell` | XMC Page Builder Custom Field dialog | Limited width and height; consumer fits the dialog. | Props: `Title` (optional). Slots: `Header` (optional), `Body`, `Actions`. |
+| `ContextPanelShell` | XMC Page Builder left context panel | `max-w-[600px]`, full-height column, vertically scrollable body. | Slots: `Header`, `Body` (scrollable), `Footer`. |
+| `DashboardWidgetShell` | XMC Dashboard widget grid cell | Card-styled, fits the dashboard widget's allotted cell. | Props: `Title`. Slots: `Header` (Title text + actions slot), `Body`, `Footer`. |
+| `FullScreenShell` | XMC Sites top-bar nav (full-screen iframe) | None — the host fills the viewport. | `ChildContent` only. Sets `min-h-screen` and Blok background/font defaults so the shell composes cleanly inside the iframe. |
+| `StandaloneShell` | Cloud Portal homepage launch (new tab) | None — the app owns the whole tab. | `ChildContent` only. Same defaults as `FullScreenShell`; differs only in the Catalogue host-context documentation it carries. |
 
 Each Marketplace Catalogue page includes a `<HostContextNote>` block (analogous to `<DivergenceNote>` on Primitives) describing the host environment the shell targets.
+
+**As-built note (Marketplace prefix dropped).** The original spec named these chunks with a `Marketplace*` prefix. The names were too long to fit cleanly in the Catalogue's left-nav and their `Marketplace` family folder + manifest grouping already disambiguates them. The prefix has been removed across the chunk class names, file paths, and URL slugs. The `Marketplace` family label on the manifest is preserved so the left-nav grouping still reads "MARKETPLACE".
 
 ## 8. Catalogue integration
 
@@ -391,6 +457,26 @@ If a Chunk is missing for any of these reductions, the roster is wrong and must 
 
 **10.8. Idiomatic `IComponentRenderMode?` parameter values.** When a chunk has an `InteractiveRenderMode` parameter that the consumer fills in, the canonical value is `RenderMode.InteractiveServer` (the static field on `Microsoft.AspNetCore.Components.Web.RenderMode`) — NOT `new InteractiveServerRenderMode()`. Same for `RenderMode.InteractiveAuto` and `RenderMode.InteractiveWebAssembly`. Document this in every chunk's catalogue page that exposes such a parameter.
 
+**10.9. Card composition decision: parallel rather than universal.** The `Card` primitive has its own opinionated enum API (`CardStyle` × `CardElevation` × `HoverElevation` × `CardPadding`) that doesn't map cleanly to the bool `Borders` / `BgFilled` / `Gutters` triple used by every other wrapper-styling chunk. Two options were weighed during implementation: refactor every card-shaped chunk (`FeatureCard`, `ActionCard`, `MediaCard`, `KpiTile`, `StatCard`, `MetricGroup`, `SkeletonCard`) to compose `<Card>` and force-fit those bool flags onto Card's enums, **or** keep the bool-flag chunks rolling their own `<div>` and add a single sibling chunk that exposes Card's enum API directly.
+
+The as-built choice is the second: **`ElevatedCard`** (`Components/Chunks/Content/ElevatedCard.razor`) wraps the `Card` primitive, exposes `Style` / `Elevation` / `HoverElevation` / `Padding` parameters that pass straight through, and serves the use-cases where shadow / lift / hover-elevation matter. The other card-shaped chunks keep the §5.13 wrapper-styling pattern. This preserves cross-family consistency while giving consumers a first-class way to reach the Card primitive's full API surface.
+
+**10.10. Bounded preview and the `MinHeight` parameter on `*View` chunks.** `EmptyView`, `ErrorView`, and `LoadingView` are designed to fill the viewport (`min-h-screen flex items-center justify-center`). Inside the catalogue's bounded preview container (`h-96 overflow-hidden`), `min-h-screen` overflows the parent and the centred content sits below the visible region. Each `*View` therefore exposes a **`string MinHeight` parameter** (default `"min-h-screen"`) that controls the outer wrapper's min-height class. The catalogue passes `MinHeight="h-full"` to fit the preview; production consumers leave the default. `LoadingView` forwards its `MinHeight` to the inner `LoadingPanel`'s pre-existing `MinHeight` parameter.
+
+**10.11. Records colocated in `@code` blocks.** Per-chunk record types (`BreadcrumbItem`, `TabDefinition`, `NavRailItem`, `SettingsTab`, `WizardStep`, `LoginFormSubmitArgs`, `SelectFieldItem`, `RadioFieldOption`, `ToggleGroupOption`) are declared inline in the parent component's Razor `@code` block, not in colocated `.razor.cs` partial-class files. Consumers reference them with the qualified form `ParentChunk.RecordName` (e.g. `BreadcrumbBar.BreadcrumbItem`). This keeps each chunk's API surface self-contained in a single file.
+
+**10.12. `IconSvg` subset additions for chunk-internal use.** When a chunk references `IconSvg.X` directly inside its razor body (not via a parameter), `X` resolves to the library project's small `IconSvg` subset at `PINGWorks.SitecoreBlok.BlazorUI/IconSvg.cs` — not the full ~7,500-icon set in the companion `PINGWorks.SitecoreBlok.BlazorUI.Icons` package. Chunks added the following constants to that subset where a chunk needs them: `ArrowLeft` (for `BackLink`), `TrendingUp` / `TrendingDown` / `TrendingNeutral` (for `KpiTile` / `StatCard` via `TrendIcons.ForTrend`). Catalogue pages reference the full Icons package via `_Imports.razor` so they can use any of the 7,500 paths in `Code` / `Primitives` examples.
+
+**10.13. Per-chunk wrapper-styling exceptions to §5.13's universal defaults.** §5.13 establishes `Borders=true`, `Gutters=true`, `HeaderAlignment=Center` as universal defaults but acknowledges exceptions where a flag wouldn't meaningfully control class emissions. The chunks that deliberately deviate, with reasons documented in their `@*…*@` block:
+
+- **Single inline elements (no region wrappers):** `AppBrand`, `NavListItem`, `NavGroup`, `BackLink`, `BreadcrumbBar` — none of `Borders` / `Gutters` / `HeaderAlignment` apply.
+- **`Toolbar`** — uses `Density` (Comfortable / Compact) for padding/gap/height; drops `Gutters` because `Density` is more expressive. Defaults `Borders=false`, `BgFilled=false` — toolbars typically live inside another chrome that already has its own border.
+- **`AnnouncementBar`** — drops `BgFilled`; the tonal background IS the chunk's defining visual.
+- **`PageHeader`, `SectionHeader`** — `HeaderAlignment` defaults to `Alignment.Start` (not `Center`) because the title-and-description block sits next to side actions and centring drifts the buttons to the visual centre of the title block instead of the row.
+- **`NavRail`** — takes its own `IList<NavRailItem>` rather than wrapping `NavListItem` children. Documented at §10.4-style: avoids coupling NavListItem's row-mode styling to a CascadingValue<NavRail>.
+- **`ElevatedCard`** — exposes `Card`'s enum API instead of wrapper-styling bools (see §10.9).
+- **`FullScreenShell`, `StandaloneShell`** — unconstrained shells; no wrapper-styling parameters.
+
 ## 11. Risks
 
 1. **Tailwind literal-class scanning regressions.** Easy to slip into runtime string concatenation; `CssClassBuilder` discipline is the only guard. Mitigation: every Chunk reviewed for literal-only class output.
@@ -399,7 +485,7 @@ If a Chunk is missing for any of these reductions, the roster is wrong and must 
 4. **Future Bloks-port collision.** Chunk names that overlap with upstream Blok bloks (e.g. `DashboardWidget`) could clash. Mitigation: Chunks live in `Components/Chunks/`; Bloks port will live in `Components/Bloks/` (or similar) — different namespace path makes co-existence trivial.
 5. **API drift across the 25 Forms chunks.** With 14 per-field-type variants, surface consistency matters. Mitigation: `*Field` envelope shape (Label + control + optional HelpText, plus a `bool Error` styling flag with no reserved message region) is fixed; each Chunk only varies in surfaced primitive parameters.
 6. **Enum drift across Chunks.** The risk that Chunk authors create per-Chunk variants of `Tone`, `Density`, `Direction`, etc. instead of reusing the shared enums (§5.10), or duplicate the enum-to-Tailwind switch instead of calling the shared helper (§5.12). Mitigation: §5.10 enumerates the canonical shared set; §5.12 mandates the helper-class pattern; Chunk PR review confirms neither parallel enums nor inlined switches have crept in. Existing Primitive enums are out of scope and untouched.
-7. **`*Field` Touched-tracking subtleties.** Required-empty-on-touch (§5.11) is internal to each `*Field`. Edge cases: programmatic value changes (does that count as touched? — no), form-reset semantics (consumer's responsibility), bound `Value` flickering during async loads (Touched should not auto-reset). Mitigation: implementation plan defines a single `FieldTouchedTracker` helper used by every `*Field`; behaviour documented in each Catalogue page.
+7. **`*Field` Touched-tracking subtleties.** Required-empty-on-touch (§5.11) is internal to each `*Field`. Edge cases: programmatic value changes (does that count as touched? — no), form-reset semantics (consumer's responsibility), bound `Value` flickering during async loads (Touched should not auto-reset). Mitigation (as-built): a single abstract base class `FieldBase<TValue>` (see §5.11 as-built note) hosts the Touched state, the `EffectiveError` OR-combination, the `IsEmpty(TValue)` virtual, and the `MarkTouched()` / `UpdateValue(TValue)` protected methods. Every `*Field` inherits via `@inherits FieldBase<TValue>` so the behaviour is identical and consistent; behaviour is also documented on each Catalogue page.
 
 ## 12. Out-of-scope reminders (consolidated)
 
