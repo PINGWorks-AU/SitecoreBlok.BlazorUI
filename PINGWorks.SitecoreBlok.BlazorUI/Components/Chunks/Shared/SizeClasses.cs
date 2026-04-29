@@ -47,4 +47,20 @@ internal static class SizeClasses
 			Size.Full => "max-w-full",
 			_        => "max-w-md",
 		};
+
+	/// <summary>Inter-item gap class (<c>gap-*</c>) for the given size — used by Chunks that lay out flex/grid children.</summary>
+	public static string Gap( Size size )
+		=> size switch
+		{
+			Size.Xs3 => "gap-1",
+			Size.Xs2 => "gap-1.5",
+			Size.Xs  => "gap-2",
+			Size.Sm  => "gap-3",
+			Size.Md  => "gap-4",
+			Size.Lg  => "gap-6",
+			Size.Xl  => "gap-8",
+			Size.Xl2 => "gap-10",
+			Size.Xl3 => "gap-12",
+			_        => "gap-4",
+		};
 }

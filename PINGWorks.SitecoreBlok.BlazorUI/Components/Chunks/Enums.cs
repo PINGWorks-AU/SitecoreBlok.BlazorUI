@@ -11,3 +11,5 @@ public enum Alignment { Start, Center, End, Stretch }
 
 public enum Tone { Info, Success, Warning, Danger, Neutral }
 public enum Density { Comfortable, Compact }
+public enum Trend { Up, Down, Neutral }
+public enum Columns { One, Two, Three, Four }

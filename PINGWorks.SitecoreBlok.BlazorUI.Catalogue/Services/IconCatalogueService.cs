@@ -14,12 +14,10 @@ public sealed class IconCatalogueService
 		var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
 		var metaJson = File.ReadAllText( Path.Combine( webRoot, "icon-metadata.json" ) );
-		Metadata = JsonSerializer.Deserialize<Dictionary<string, IconMetadata>>( metaJson, options )
-			?? new Dictionary<string, IconMetadata>();
+		Metadata = JsonSerializer.Deserialize<Dictionary<string, IconMetadata>>( metaJson, options ) ?? [];
 
 		var catsJson = File.ReadAllText( Path.Combine( webRoot, "icon-categories.json" ) );
-		Categories = JsonSerializer.Deserialize<List<IconCategory>>( catsJson, options )
-			?? [];
+		Categories = JsonSerializer.Deserialize<List<IconCategory>>( catsJson, options ) ?? [];
 	}
 
 	public sealed record IconMetadata( string Mdi, string[] SeeAlso, string[] Categories );
