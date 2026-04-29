@@ -1,0 +1,51 @@
+@page "/chunks/dashboard-widget-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="DashboardWidgetShell" Description="Shell for the XMC Dashboard widget grid cell extension point" Interactivity="ComponentInteractivity.Ssr" ApiElements="@DashboardWidgetShellElements">
+
+	<HostContextNote>
+		Targets the XMC Dashboard widget grid cell. Card-styled, fits the dashboard's allotted cell. Title (or Header slot) at top, Body in middle, optional Footer.
+	</HostContextNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With title + body + footer"
+			Code="@("<DashboardWidgetShell Title=\"Recent activity\">\n    <Body>\n        <Text>Widget content goes here.</Text>\n    </Body>\n    <Footer>\n        <Text Size=\"Size.Sm\">Last updated: just now</Text>\n    </Footer>\n</DashboardWidgetShell>")"
+			Primitives="@("<div class=\"flex flex-col h-full w-full border border-border rounded-lg bg-background\">\n    <div class=\"flex-shrink-0 flex items-center gap-2 px-4 py-3 border-b border-border\">\n        <h3 class=\"text-sm font-semibold tracking-tight text-foreground\">Recent activity</h3>\n    </div>\n    <div class=\"flex-1 min-h-0 overflow-y-auto p-4\">Widget content goes here.</div>\n    <div class=\"flex-shrink-0 px-4 py-3 border-t border-border\">Last updated: just now</div>\n</div>")">
+			<div class="border-2 border-dashed border-border rounded-lg overflow-hidden h-96">
+				<DashboardWidgetShell Title="Recent activity">
+					<Body>
+						<Text>Widget content goes here.</Text>
+					</Body>
+					<Footer>
+						<Text Size="Size.Sm">Last updated: just now</Text>
+					</Footer>
+				</DashboardWidgetShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] DashboardWidgetShellElements =
+	[
+		new ApiElement(
+			Name: "DashboardWidgetShell",
+			Description: "Shell for the XMC Dashboard widget grid cell extension point. Card-styled, fits the dashboard's allotted cell. Title string and Header slot can be combined — Title renders as an `h3` and Header renders ml-auto beside it. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",    "string?",         false, "Optional widget title rendered as `h3 text-sm font-semibold`." ),
+				new ApiProperty( "Header",   "RenderFragment?", false, "Optional additional header content rendered `ml-auto` beside the Title." ),
+				new ApiProperty( "Body",     "RenderFragment?", false, "Main body slot — flex-1, vertically scrollable." ),
+				new ApiProperty( "Footer",   "RenderFragment?", false, "Optional footer slot, flex-shrink-0 at bottom of card." ),
+				new ApiProperty( "Borders",  "bool",            false, "Toggles outer border + horizontal dividers between regions. Default: `true`." ),
+				new ApiProperty( "Gutters",  "bool",            false, "Toggles `px-4 py-3` on header/footer and `p-4` on body. Default: `true`." ),
+				new ApiProperty( "BgFilled", "bool",            false, "Toggles `bg-background`. Default: `true`." ),
+			]
+		),
+	];
+}

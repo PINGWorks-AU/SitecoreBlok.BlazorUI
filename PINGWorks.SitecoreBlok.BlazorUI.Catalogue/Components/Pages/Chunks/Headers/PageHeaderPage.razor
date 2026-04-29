@@ -1,0 +1,66 @@
+@page "/chunks/page-header"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="PageHeader" Description="Top of an in-page area: Title, Description, plus Breadcrumbs / Actions / Status slots" Interactivity="ComponentInteractivity.Ssr" ApiElements="@PageHeaderElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Title + description"
+			Code="@("<PageHeader Title=\"Settings\" Description=\"Manage your project configuration.\" />")"
+			Primitives="@("<div class=\"space-y-3 pb-6 border-b border-border\">\n    <div class=\"flex items-start gap-4\">\n        <div class=\"flex-1 min-w-0 space-y-1\">\n            <div class=\"flex items-center gap-3\">\n                <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Settings</h1>\n            </div>\n            <p class=\"text-sm text-muted-foreground\">Manage your project configuration.</p>\n        </div>\n    </div>\n</div>")">
+			<PageHeader Title="Settings" Description="Manage your project configuration." />
+		</ComponentExample>
+
+		<ComponentExample Title="With actions"
+			Code="@("<PageHeader Title=\"Sites\" Description=\"All sites in this project.\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Filter</Button>\n        <Button Size=\"ButtonSize.Sm\">New site</Button>\n    </Actions>\n</PageHeader>")"
+			Primitives="@("<div class=\"space-y-3 pb-6 border-b border-border\">\n    <div class=\"flex items-start gap-4\">\n        <div class=\"flex-1 min-w-0 space-y-1\">\n            <div class=\"flex items-center gap-3\">\n                <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Sites</h1>\n            </div>\n            <p class=\"text-sm text-muted-foreground\">All sites in this project.</p>\n        </div>\n        <div class=\"flex-shrink-0 flex items-center gap-2\">\n            <button class=\"...\">Filter</button>\n            <button class=\"...\">New site</button>\n        </div>\n    </div>\n</div>")">
+			<PageHeader Title="Sites" Description="All sites in this project.">
+				<Actions>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Filter</Button>
+					<Button Size="ButtonSize.Sm">New site</Button>
+				</Actions>
+			</PageHeader>
+		</ComponentExample>
+
+		<ComponentExample Title="With status badge"
+			Code="@("<PageHeader Title=\"Production\" Description=\"Live environment.\">\n    <Status>\n        <Badge ColorScheme=\"BadgeColor.Success\">Healthy</Badge>\n    </Status>\n</PageHeader>")"
+			Primitives="@("<div class=\"space-y-3 pb-6 border-b border-border\">\n    <div class=\"flex items-start gap-4\">\n        <div class=\"flex-1 min-w-0 space-y-1\">\n            <div class=\"flex items-center gap-3\">\n                <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Production</h1>\n                <div>\n                    <span class=\"... text-success-fg bg-success-bg ...\">Healthy</span>\n                </div>\n            </div>\n            <p class=\"text-sm text-muted-foreground\">Live environment.</p>\n        </div>\n    </div>\n</div>")">
+			<PageHeader Title="Production" Description="Live environment.">
+				<Status>
+					<Badge ColorScheme="BadgeColor.Success">Healthy</Badge>
+				</Status>
+			</PageHeader>
+		</ComponentExample>
+
+		<ComponentExample Title="Borderless, gutters off"
+			Code="@("<PageHeader Title=\"Compact\" Description=\"No bottom border, tight vertical rhythm.\" Borders=\"false\" Gutters=\"false\" />")"
+			Primitives="@("<div class=\"space-y-3\">\n    <div class=\"flex items-start\">\n        <div class=\"flex-1 min-w-0 space-y-1\">\n            <div class=\"flex items-center gap-3\">\n                <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Compact</h1>\n            </div>\n            <p class=\"text-sm text-muted-foreground\">No bottom border, tight vertical rhythm.</p>\n        </div>\n    </div>\n</div>")">
+			<PageHeader Title="Compact" Description="No bottom border, tight vertical rhythm." Borders="false" Gutters="false" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] PageHeaderElements =
+	[
+		new ApiElement(
+			Name: "PageHeader",
+			Description: "Top of an in-page area: page title, description, plus optional breadcrumbs above and actions/status next to the title. Renders with a 1px bottom border so the header visually divides from the page body. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",           "string",          true,  "Page title. Rendered as `<h1>` in `text-2xl font-bold`." ),
+				new ApiProperty( "Description",     "string?",         false, "Sub-title text. Rendered in `text-muted-foreground` below the title." ),
+				new ApiProperty( "Breadcrumbs",     "RenderFragment?", false, "Slot rendered above the title row. Typically a `BreadcrumbBar` chunk." ),
+				new ApiProperty( "Actions",         "RenderFragment?", false, "Right-aligned action slot. Typically one or two `Button`s." ),
+				new ApiProperty( "Status",          "RenderFragment?", false, "Inline slot rendered next to the title. Typically a `Badge` showing environment / health / state." ),
+				new ApiProperty( "Borders",         "bool",            false, "Toggles `border-b border-border`. Default: `true`." ),
+				new ApiProperty( "Gutters",         "bool",            false, "Toggles `pb-6` outer / `gap-4` title row / `gap-2` actions row. Default: `true`." ),
+				new ApiProperty( "HeaderAlignment", "Alignment",       false, "Flex `items-*` on the title row. Default: `Alignment.Start` (multi-line title+description top-aligns with side-actions)." ),
+			]
+		),
+	];
+}

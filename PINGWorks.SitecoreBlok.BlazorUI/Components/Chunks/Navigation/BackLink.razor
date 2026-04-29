@@ -1,0 +1,18 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	BackLink — single "← Back to X" element. Inline anchor with a leading ArrowLeft icon.
+
+	A single inline element (no region wrappers), so wrapper-styling parameters
+	(Borders/Gutters/HeaderAlignment/BgFilled) do not apply.
+*@
+
+<a href="@Href" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors no-underline">
+	<Icon Svg="@IconSvg.ArrowLeft" ClassName="size-4" />
+	<span>@Label</span>
+</a>
+
+@code {
+	[Parameter] public string Href { get; set; } = "#";
+	[Parameter] public string Label { get; set; } = "Back";
+}

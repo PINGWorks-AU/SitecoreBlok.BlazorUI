@@ -27,6 +27,15 @@ public static class ChunksManifest
 		new( "Layouts", "BlankShell",      "blank-shell",       "No-chrome envelope; sets background and font only",        ComponentInteractivity.Ssr ),
 		new( "Layouts", "DialogShell",     "dialog-shell",      "Opinionated wrapper around the Dialog primitive",          ComponentInteractivity.Interactive ),
 		new( "Layouts", "SheetShell",      "sheet-shell",       "Edge-sliding panel; wraps Sheet primitive",                ComponentInteractivity.Interactive ),
+
+		// Headers
+		new( "Headers", "AppHeader",       "app-header",       "Sticky top bar with backdrop blur — slots: Brand, Nav, Actions",        ComponentInteractivity.Ssr ),
+		new( "Headers", "AppBrand",        "app-brand",        "Logo + product name + optional version chip",                           ComponentInteractivity.Ssr ),
+		new( "Headers", "PageHeader",      "page-header",      "Top of an in-page area: Title, Description, Breadcrumbs, Actions",      ComponentInteractivity.Ssr ),
+		new( "Headers", "SectionHeader",   "section-header",   "Smaller heading band inside a ContentSection",                          ComponentInteractivity.Ssr ),
+		new( "Headers", "SubHeader",       "sub-header",       "Context strip below AppHeader (env switcher, ambient breadcrumbs)",     ComponentInteractivity.Ssr ),
+		new( "Headers", "Toolbar",         "toolbar",          "Horizontal action strip — slots: Start, Center, End. Density enum",     ComponentInteractivity.Ssr ),
+		new( "Headers", "AnnouncementBar", "announcement-bar", "Top-of-app dismissible banner — Message + Tone + optional Action",      ComponentInteractivity.Interactive ),
 	];
 
 	public static IEnumerable<ChunkEntry> ByFamily( string family )

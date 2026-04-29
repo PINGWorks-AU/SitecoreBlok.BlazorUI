@@ -1,0 +1,30 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	DataPage — full data-table page.
+	Composes PageHeader at top + Toolbar slot + Table slot + Pagination slot.
+*@
+
+<div class="flex flex-col gap-4">
+	<PageHeader Title="@Title" Description="@Description" Borders="false" />
+	@if ( Toolbar is not null )
+	{
+		<div>@Toolbar</div>
+	}
+	@if ( Table is not null )
+	{
+		<div class="border border-border rounded-lg overflow-hidden">@Table</div>
+	}
+	@if ( Pagination is not null )
+	{
+		<div>@Pagination</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public RenderFragment? Toolbar { get; set; }
+	[Parameter] public RenderFragment? Table { get; set; }
+	[Parameter] public RenderFragment? Pagination { get; set; }
+}

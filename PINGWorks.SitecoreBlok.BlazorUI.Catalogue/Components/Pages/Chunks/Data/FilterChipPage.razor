@@ -1,0 +1,69 @@
+@page "/chunks/filter-chip"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FilterChip" Description="Single removable filter chip. Click the × button to fire OnRemove." Interactivity="ComponentInteractivity.Interactive" ApiElements="@FilterChipElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Single chip"
+			Code="@("<FilterChip Label=\"Status: Active\" OnRemove=\"@(() => ShowSingleChip = false)\" />")"
+			Primitives="@("<span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\">\n    <span>Status: Active</span>\n    <button type=\"button\" class=\"inline-flex items-center justify-center size-4 rounded-full hover:bg-neutral-bg-active text-muted-foreground hover:text-foreground transition-colors\" aria-label=\"Remove\">\n        <svg class=\"size-3\"><!-- close icon --></svg>\n    </button>\n</span>")">
+			@if ( ShowSingleChip )
+			{
+				<FilterChip Label="Status: Active" OnRemove="@(() => ShowSingleChip = false)" />
+			}
+			else
+			{
+				<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm" @onclick="@(() => ShowSingleChip = true)">Reset</Button>
+			}
+		</ComponentExample>
+
+		<ComponentExample Title="Row of three chips with different labels"
+			Code="@("<div class=\"flex flex-wrap gap-2\">\n    @foreach ( var chip in ActiveChips )\n    {\n        var name = chip;\n        <FilterChip Label=\"@name\" OnRemove=\"@(() => RemoveChip( name ))\" />\n    }\n</div>")"
+			Primitives="@("<div class=\"flex flex-wrap gap-2\">\n    <span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\"><span>Status: Active</span><button aria-label=\"Remove\">×</button></span>\n    <span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\"><span>Type: Admin</span><button aria-label=\"Remove\">×</button></span>\n    <span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\"><span>Region: APAC</span><button aria-label=\"Remove\">×</button></span>\n</div>")">
+			<div class="space-y-3">
+				<div class="flex flex-wrap gap-2">
+					@foreach ( var chip in ActiveChips )
+					{
+						var name = chip;
+						<FilterChip Label="@name" OnRemove="@(() => RemoveChip( name ))" />
+					}
+				</div>
+				@if ( ActiveChips.Count == 0 )
+				{
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm" @onclick="ResetChips">Reset</Button>
+				}
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool ShowSingleChip = true;
+
+	private List<string> ActiveChips = ["Status: Active", "Type: Admin", "Region: APAC"];
+
+	private void RemoveChip( string name )
+		=> ActiveChips.Remove( name );
+
+	private void ResetChips()
+		=> ActiveChips = ["Status: Active", "Type: Admin", "Region: APAC"];
+
+	private static readonly ApiElement[] FilterChipElements =
+	[
+		new ApiElement(
+			Name: "FilterChip",
+			Description: "A single removable filter chip rendered as a pill (`rounded-full`) with an optional leading icon and a × remove button. Compose multiple chips in a `flex flex-wrap gap-2` container (e.g. inside a `FilterBar`). Wire `OnRemove` to remove the filter from state.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Label",    "string",          true,  "Visible chip label text." ),
+				new ApiProperty( "OnRemove", "EventCallback",   false, "Fired when the × button is clicked. Wire this to remove the filter from state." ),
+				new ApiProperty( "IconSvg",  "string?",         false, "Optional leading icon SVG path rendered at `size-3`. Omit to suppress." ),
+			]
+		),
+	];
+}

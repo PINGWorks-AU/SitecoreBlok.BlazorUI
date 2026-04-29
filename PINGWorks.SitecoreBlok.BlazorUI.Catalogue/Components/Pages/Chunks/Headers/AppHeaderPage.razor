@@ -1,0 +1,63 @@
+@page "/chunks/app-header"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="AppHeader" Description="Sticky top bar with backdrop blur — Brand, Nav, Actions slots" Interactivity="ComponentInteractivity.Ssr" ApiElements="@AppHeaderElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<AppHeader>\n    <Brand>\n        <Text Kind=\"TextKind.Span\" SemiBold>Blok Blazor</Text>\n    </Brand>\n    <Nav>\n        <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\" Muted>Home</Text>\n        <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\" Muted>Docs</Text>\n    </Nav>\n    <Actions>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Sign in</Button>\n    </Actions>\n</AppHeader>")"
+			Primitives="@("<header class=\"sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur\">\n    <div class=\"flex items-center h-14 px-6 gap-4\">\n        <div class=\"flex items-center\">\n            <span class=\"font-semibold\">Blok Blazor</span>\n        </div>\n        <nav class=\"flex items-center gap-4\">\n            <span class=\"text-sm text-muted-foreground\">Home</span>\n            <span class=\"text-sm text-muted-foreground\">Docs</span>\n        </nav>\n        <div class=\"ml-auto flex items-center gap-1\">\n            <button class=\"...\">Sign in</button>\n        </div>\n    </div>\n</header>")">
+			<div class="border rounded-lg overflow-hidden">
+				<AppHeader>
+					<Brand><Text Kind="TextKind.Span" SemiBold>Blok Blazor</Text></Brand>
+					<Nav>
+						<Text Kind="TextKind.Span" Size="Size.Sm" Muted>Home</Text>
+						<Text Kind="TextKind.Span" Size="Size.Sm" Muted>Docs</Text>
+					</Nav>
+					<Actions>
+						<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Sign in</Button>
+					</Actions>
+				</AppHeader>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Borderless, no background fill, gutters off"
+			Code="@("<AppHeader Borders=\"false\" BgFilled=\"false\" Gutters=\"false\">\n    <Brand>\n        <Text Kind=\"TextKind.Span\" SemiBold>Minimal</Text>\n    </Brand>\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Action</Button>\n    </Actions>\n</AppHeader>")"
+			Primitives="@("<header>\n    <div class=\"flex items-center\">\n        <div class=\"flex items-center\">\n            <span class=\"font-semibold\">Minimal</span>\n        </div>\n        <div class=\"ml-auto flex items-center gap-1\">\n            <button class=\"...\">Action</button>\n        </div>\n    </div>\n</header>")">
+			<div class="border rounded-lg overflow-hidden">
+				<AppHeader Borders="false" BgFilled="false" Gutters="false">
+					<Brand><Text Kind="TextKind.Span" SemiBold>Minimal</Text></Brand>
+					<Actions>
+						<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Action</Button>
+					</Actions>
+				</AppHeader>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AppHeaderElements =
+	[
+		new ApiElement(
+			Name: "AppHeader",
+			Description: "Sticky top bar with backdrop-blurred background. Designed to sit at the top of an app shell. Three slots — Brand on the left, Nav in the centre-left, Actions on the right (auto-aligned via `ml-auto`). Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Brand",           "RenderFragment?",  false, "Left-most slot. Typically holds an `AppBrand` chunk or a logo + product-name link." ),
+				new ApiProperty( "Nav",             "RenderFragment?",  false, "Top-level navigation slot. Typically holds a row of `<a>`/`<NavLink>` elements." ),
+				new ApiProperty( "Actions",         "RenderFragment?",  false, "Right-aligned slot for sign-in / theme-toggle / settings buttons." ),
+				new ApiProperty( "Sticky",          "bool",             false, "When `true` (default), the header sticks to the top of the scrolling viewport via `sticky top-0 z-40`. Set to `false` for headers that scroll with content." ),
+				new ApiProperty( "Borders",         "bool",             false, "Toggles `border-b border-border`. Default: `true`." ),
+				new ApiProperty( "BgFilled",        "bool",             false, "Toggles `bg-background/95 backdrop-blur` on the band. Default: `true`." ),
+				new ApiProperty( "Gutters",         "bool",             false, "Toggles `h-14 px-6 gap-4` on the content row. Default: `true`. When false, the band collapses to its content height with no horizontal padding." ),
+				new ApiProperty( "HeaderAlignment", "Alignment",        false, "Flex `items-*` on the content row. Default: `Alignment.Center`. Other values: `Start`, `End`, `Stretch`. Shared `Alignment` enum." ),
+			]
+		),
+	];
+}

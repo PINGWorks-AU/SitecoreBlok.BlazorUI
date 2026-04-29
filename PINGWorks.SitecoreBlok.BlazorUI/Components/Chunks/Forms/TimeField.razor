@@ -1,0 +1,24 @@
+@inherits FieldBase<TimeSpan?>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	TimeField — labelled time-picker field chunk.
+	Wraps the TimePicker primitive with a label above and optional help text.
+*@
+
+<div class="space-y-1.5">
+	@if ( !string.IsNullOrEmpty( Label ) )
+	{
+		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+	}
+	<div @onfocusout="MarkTouched">
+		<TimePicker Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled" />
+	</div>
+	@if ( !string.IsNullOrEmpty( HelpText ) )
+	{
+		<p class="@HelpTextClass">@HelpText</p>
+	}
+</div>
+
+@code {
+}

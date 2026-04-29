@@ -1,0 +1,39 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	SettingsPage — vertical tab nav on the left + Content area on the right.
+*@
+
+<div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+	<aside class="lg:w-56 shrink-0">
+		<NavList>
+			@if ( Tabs is not null )
+			{
+				@foreach ( var tab in Tabs )
+				{
+					<NavListItem
+						Label="@tab.Label"
+						IconSvg="@tab.IconSvg"
+						Active="@(string.Equals( tab.Key, SelectedTab, StringComparison.Ordinal ))"
+						OnClick="@(() => HandleTabChange( tab.Key ))" />
+				}
+			}
+		</NavList>
+	</aside>
+	<div class="flex-1 min-w-0">@Content</div>
+</div>
+
+@code {
+	[Parameter] public IList<SettingsTab>? Tabs { get; set; }
+	[Parameter] public string? SelectedTab { get; set; }
+	[Parameter] public EventCallback<string> SelectedTabChanged { get; set; }
+	[Parameter] public RenderFragment? Content { get; set; }
+
+	public sealed record SettingsTab( string Label, string Key, string? IconSvg = null );
+
+	private async Task HandleTabChange( string key )
+	{
+		if ( SelectedTabChanged.HasDelegate )
+			await SelectedTabChanged.InvokeAsync( key );
+	}
+}

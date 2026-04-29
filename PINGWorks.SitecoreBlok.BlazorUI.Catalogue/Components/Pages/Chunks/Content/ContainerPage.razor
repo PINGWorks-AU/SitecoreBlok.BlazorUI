@@ -1,0 +1,51 @@
+@page "/chunks/container"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Container" Description="Max-width content centerer — constrains and horizontally centres a content column" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ContainerElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default (Lg)"
+			Code="@("<Container>\n    <!-- content -->\n</Container>")"
+			Primitives="@("<div class=\"mx-auto w-full max-w-lg\">\n    <!-- content -->\n</div>")">
+			<div class="border-2 border-dashed border-border rounded-lg">
+				<Container>
+					<div class="bg-subtle-bg rounded-lg p-4 text-center text-sm text-muted-foreground">
+						Content constrained to Lg (max-w-lg)
+					</div>
+				</Container>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Extra small (Xs)"
+			Code="@("<Container MaxWidth=\"Size.Xs\">\n    <!-- content -->\n</Container>")"
+			Primitives="@("<div class=\"mx-auto w-full max-w-xs\">\n    <!-- content -->\n</div>")">
+			<div class="border-2 border-dashed border-border rounded-lg">
+				<Container MaxWidth="Size.Xs">
+					<div class="bg-subtle-bg rounded-lg p-4 text-center text-sm text-muted-foreground">
+						Content constrained to Xs (max-w-xs)
+					</div>
+				</Container>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ContainerElements =
+	[
+		new ApiElement(
+			Name: "Container",
+			Description: "A single `<div>` that centres its content with `mx-auto` and caps its width via `SizeClasses.MaxWidth`. Use to keep prose and form content readable on wide viewports. No wrapper-styling parameters — Container has no toggleable border, background, or gutter behaviour; `MaxWidth` is the sole API surface.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "The content to constrain and centre." ),
+				new ApiProperty( "MaxWidth",     "Size",            false, "Maximum width cap. Default: `Size.Lg` (`max-w-lg`). Other values: `Xs3`, `Xs2`, `Xs`, `Sm`, `Md`, `Xl`, `Xl2`–`Xl8`, `Full`. Mapped through `SizeClasses.MaxWidth`." ),
+			]
+		),
+	];
+}

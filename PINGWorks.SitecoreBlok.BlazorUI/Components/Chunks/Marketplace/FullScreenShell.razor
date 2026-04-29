@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	FullScreenShell — shell for the XMC Sites full-screen iframe extension point.
+	The host fills the viewport; this shell sets min-h-screen + Blok background/font defaults
+	so the consumer's content composes cleanly inside the iframe.
+*@
+
+<div class="min-h-screen bg-background text-foreground">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

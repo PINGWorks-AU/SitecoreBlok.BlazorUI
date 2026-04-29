@@ -1,0 +1,58 @@
+@page "/chunks/content-section"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="ContentSection" Description="Section wrapper with a heading band (Title, Description, Actions) and a body slot" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ContentSectionElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Title and description"
+			Code="@("<ContentSection Title=\"Members\" Description=\"People with access to this project.\" />")"
+			Primitives="@("<section class=\"border-t border-border pt-6 pb-6\">\n    <div class=\"flex gap-4 items-start\">\n        <div class=\"flex-1 min-w-0\">\n            <h2 class=\"text-lg font-semibold tracking-tight text-foreground\">Members</h2>\n            <p class=\"text-sm text-muted-foreground mt-0.5\">People with access to this project.</p>\n        </div>\n    </div>\n</section>")">
+			<ContentSection Title="Members" Description="People with access to this project." />
+		</ComponentExample>
+
+		<ComponentExample Title="With Actions slot"
+			Code="@("<ContentSection Title=\"API keys\" Description=\"Active credentials for this environment.\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">New key</Button>\n    </Actions>\n</ContentSection>")"
+			Primitives="@("<section class=\"border-t border-border pt-6 pb-6\">\n    <div class=\"flex gap-4 items-start\">\n        <div class=\"flex-1 min-w-0\">\n            <h2 class=\"text-lg font-semibold tracking-tight text-foreground\">API keys</h2>\n            <p class=\"text-sm text-muted-foreground mt-0.5\">Active credentials for this environment.</p>\n        </div>\n        <div class=\"flex-shrink-0 flex items-center gap-2\">\n            <button class=\"...\">New key</button>\n        </div>\n    </div>\n</section>")">
+			<ContentSection Title="API keys" Description="Active credentials for this environment.">
+				<Actions>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">New key</Button>
+				</Actions>
+			</ContentSection>
+		</ComponentExample>
+
+		<ComponentExample Title="With body content"
+			Code="@("<ContentSection Title=\"Overview\" Description=\"Key metrics for this billing period.\">\n    <ChildContent>\n        <p class=\"text-sm text-muted-foreground\">Body content goes here.</p>\n    </ChildContent>\n</ContentSection>")"
+			Primitives="@("<section class=\"border-t border-border pt-6 pb-6\">\n    <div class=\"flex gap-4 items-start\">\n        <div class=\"flex-1 min-w-0\">\n            <h2 class=\"text-lg font-semibold tracking-tight text-foreground\">Overview</h2>\n            <p class=\"text-sm text-muted-foreground mt-0.5\">Key metrics for this billing period.</p>\n        </div>\n    </div>\n    <div class=\"mt-4\">\n        <p class=\"text-sm text-muted-foreground\">Body content goes here.</p>\n    </div>\n</section>")">
+			<ContentSection Title="Overview" Description="Key metrics for this billing period.">
+				<ChildContent>
+					<p class="text-sm text-muted-foreground">Body content goes here.</p>
+				</ChildContent>
+			</ContentSection>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ContentSectionElements =
+	[
+		new ApiElement(
+			Name: "ContentSection",
+			Description: "A section wrapper that pairs a heading band (Title, Description, optional Actions slot) with an optional body. The heading row is built from `<h2>` to sit below a `PageHeader` `<h1>` in document hierarchy. Top border and vertical padding are toggled independently via wrapper-styling flags. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",           "string",          true,  "Section title. Rendered as `<h2>` in `text-lg font-semibold`." ),
+				new ApiProperty( "Description",     "string?",         false, "Sub-title text in muted foreground." ),
+				new ApiProperty( "Actions",         "RenderFragment?", false, "Right-aligned action slot (e.g. buttons, menus)." ),
+				new ApiProperty( "ChildContent",    "RenderFragment?", false, "Body content rendered below the heading row with `mt-4` spacing." ),
+				new ApiProperty( "Borders",         "bool",            false, "Toggles `border-t border-border` above the section. Default: `true`." ),
+				new ApiProperty( "Gutters",         "bool",            false, "Toggles `pt-6 pb-6` on the section wrapper. Default: `true`." ),
+				new ApiProperty( "HeaderAlignment", "Alignment",       false, "Flex `items-*` on the heading row. Default: `Alignment.Start`." ),
+			]
+		),
+	];
+}

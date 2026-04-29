@@ -1,0 +1,28 @@
+@inherits FieldBase<bool>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	CheckboxField — labelled checkbox field chunk (inline layout).
+	Wraps the Checkbox primitive with a right-side label and optional help text.
+*@
+
+<div class="flex items-start gap-3" @onfocusout="MarkTouched">
+	<div class="pt-0.5">
+		<Checkbox Id="@Id" Checked="@Value"
+		          CheckedChanged="@( async (bool? v) => await UpdateValue( v ?? false ) )"
+		          Disabled="@Disabled" />
+	</div>
+	<div class="flex flex-col gap-1">
+		@if ( !string.IsNullOrEmpty( Label ) )
+		{
+			<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+		}
+		@if ( !string.IsNullOrEmpty( HelpText ) )
+		{
+			<p class="@HelpTextClass">@HelpText</p>
+		}
+	</div>
+</div>
+
+@code {
+}

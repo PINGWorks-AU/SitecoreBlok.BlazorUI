@@ -1,0 +1,65 @@
+@page "/chunks/slider-field"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="SliderField" Description="Labelled slider field — wraps the Slider primitive with a label above, the current value shown inline, and optional help text" Interactivity="ComponentInteractivity.Interactive" ApiElements="@SliderFieldElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default slider field (0–100)"
+			Code="@("<SliderField Label=\"Volume\" @bind-Value=\"Volume\" />")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <div class=\"flex items-center justify-between\">\n        <label class=\"text-sm font-medium text-foreground ...\">Volume</label>\n        <span class=\"text-xs text-muted-foreground\">50</span>\n    </div>\n    <div data-slot=\"slider\" class=\"relative flex w-full touch-none items-center select-none h-5\">\n        <div data-slot=\"slider-track\" class=\"...\"><div data-slot=\"slider-range\" class=\"...\" style=\"width:50%\" /></div>\n        <input type=\"range\" min=\"0\" max=\"100\" step=\"1\" class=\"...\" />\n        <div data-slot=\"slider-thumb\" class=\"...\" style=\"left:50%\" />\n    </div>\n</div>")">
+			<div class="max-w-sm">
+				<SliderField Label="Volume" @bind-Value="Volume" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Slider field with custom range and help text"
+			Code="@("<SliderField Label=\"Temperature (°C)\" Min=\"-20\" Max=\"40\" Step=\"0.5\" HelpText=\"Set the target temperature for the zone.\" @bind-Value=\"Temperature\" />")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <div class=\"flex items-center justify-between\">\n        <label class=\"text-sm font-medium text-foreground ...\">Temperature (°C)</label>\n        <span class=\"text-xs text-muted-foreground\">20</span>\n    </div>\n    <div data-slot=\"slider\" class=\"relative flex w-full touch-none items-center select-none h-5\">\n        <div data-slot=\"slider-track\" class=\"...\"><div data-slot=\"slider-range\" class=\"...\" style=\"width:66.67%\" /></div>\n        <input type=\"range\" min=\"-20\" max=\"40\" step=\"0.5\" class=\"...\" />\n        <div data-slot=\"slider-thumb\" class=\"...\" style=\"left:66.67%\" />\n    </div>\n    <p class=\"text-xs text-muted-foreground\">Set the target temperature for the zone.</p>\n</div>")">
+			<div class="max-w-sm">
+				<SliderField Label="Temperature (°C)" Min="-20" Max="40" Step="0.5" HelpText="Set the target temperature for the zone." @bind-Value="Temperature" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="ShowValue hidden — label only, no inline value"
+			Code="@("<SliderField Label=\"Opacity\" ShowValue=\"false\" @bind-Value=\"Opacity\" />")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <div class=\"flex items-center justify-between\">\n        <label class=\"text-sm font-medium text-foreground ...\">Opacity</label>\n        <!-- value span suppressed when ShowValue=false -->\n    </div>\n    <div data-slot=\"slider\" class=\"relative flex w-full touch-none items-center select-none h-5\">\n        <div data-slot=\"slider-track\" class=\"...\"><div data-slot=\"slider-range\" class=\"...\" /></div>\n        <input type=\"range\" min=\"0\" max=\"100\" step=\"1\" class=\"...\" />\n        <div data-slot=\"slider-thumb\" class=\"...\" />\n    </div>\n</div>")">
+			<div class="max-w-sm">
+				<SliderField Label="Opacity" ShowValue="false" @bind-Value="Opacity" />
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private double Volume = 50;
+	private double Temperature = 20;
+	private double Opacity = 75;
+
+	private static readonly ApiElement[] SliderFieldElements =
+	[
+		new ApiElement(
+			Name: "SliderField",
+			Description: "A labelled slider field chunk. Renders a `FormLabel` and current value above a `Slider` track. Wraps the `Slider` primitive.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Label",        "string?",               false, "Label text rendered above the slider via `FormLabel`. Omit to hide the label. The current value is shown to the right of the label when `ShowValue` is `true`." ),
+				new ApiProperty( "ShowValue",    "bool",                  false, "When `true` (default), renders the current numeric value as a `<span>` to the right of the label. Set to `false` to suppress the inline value display." ),
+				new ApiProperty( "HelpText",     "string?",               false, "Helper text rendered below the slider. Shown in `text-danger-fg` when `Error` is true, otherwise `text-muted-foreground`." ),
+				new ApiProperty( "Error",        "bool",                  false, "Applies error styling to the label and help text. Default: `false`." ),
+				new ApiProperty( "Required",     "bool",                  false, "Appends a red asterisk to the label via `FormLabel`. Default: `false`." ),
+				new ApiProperty( "Disabled",     "bool",                  false, "Disables the underlying slider. Default: `false`." ),
+				new ApiProperty( "Id",           "string",                false, "HTML `id` — auto-generated by default." ),
+				new ApiProperty( "Value",        "double",                false, "Currently selected value. Use `@bind-Value` for two-way binding. Default: `0`." ),
+				new ApiProperty( "ValueChanged", "EventCallback<double>", false, "Fires when the slider value changes. Part of the `@bind-Value` pair." ),
+				new ApiProperty( "Min",          "double",                false, "Minimum value of the slider range. Default: `0`." ),
+				new ApiProperty( "Max",          "double",                false, "Maximum value of the slider range. Default: `100`." ),
+				new ApiProperty( "Step",         "double",                false, "Increment between values. Default: `1`." ),
+			]
+		),
+	];
+}

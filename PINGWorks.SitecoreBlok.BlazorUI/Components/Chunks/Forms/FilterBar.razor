@@ -1,0 +1,20 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	FilterBar — horizontal filter-chip row.
+	Filters slot accepts chip / badge / button elements representing active filters.
+	ClearAction slot (trailing) is typically a ghost "Clear filters" button.
+*@
+
+<div class="flex items-center gap-2 flex-wrap">
+	@Filters
+	@if ( ClearAction is not null )
+	{
+		<div class="ml-auto">@ClearAction</div>
+	}
+</div>
+
+@code {
+	[Parameter] public RenderFragment? Filters { get; set; }
+	[Parameter] public RenderFragment? ClearAction { get; set; }
+}

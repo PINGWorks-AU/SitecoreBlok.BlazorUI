@@ -1,0 +1,52 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	ContentSection — section wrapper with a heading band (Title, Description, Actions) and a body slot.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders         (default true)  toggles border-t border-border above the section.
+		- Gutters         (default true)  toggles pt-6 pb-6 on the section wrapper.
+		- HeaderAlignment (default Start) flex items-* on the header row.
+*@
+
+<section class="@SectionClass">
+	<div class="@HeaderRowClass">
+		<div class="flex-1 min-w-0">
+			<h2 class="text-lg font-semibold tracking-tight text-foreground">@Title</h2>
+			@if ( !string.IsNullOrEmpty( Description ) )
+			{
+				<p class="text-sm text-muted-foreground mt-0.5">@Description</p>
+			}
+		</div>
+		@if ( Actions is not null )
+		{
+			<div class="flex-shrink-0 flex items-center gap-2">@Actions</div>
+		}
+	</div>
+	@if ( ChildContent is not null )
+	{
+		<div class="mt-4">@ChildContent</div>
+	}
+</section>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public Alignment HeaderAlignment { get; set; } = Alignment.Start;
+
+	private string SectionClass
+		=> CssClassBuilder.Start( "" )
+			.With( "border-t border-border", Borders )
+			.With( "pt-6 pb-6", Gutters )
+			.Build();
+
+	private string HeaderRowClass
+		=> CssClassBuilder.Start( "flex gap-4" )
+			.With( AlignmentClasses.Items( HeaderAlignment ) )
+			.Build();
+}

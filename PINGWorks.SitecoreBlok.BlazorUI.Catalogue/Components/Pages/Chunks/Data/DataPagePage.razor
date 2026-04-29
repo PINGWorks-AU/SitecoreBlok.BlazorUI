@@ -1,0 +1,78 @@
+@page "/chunks/data-page"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="DataPage" Description="Full data-table page envelope: PageHeader + Toolbar + Table + Pagination slots." Interactivity="ComponentInteractivity.Interactive" ApiElements="@DataPageElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With toolbar, table and pagination"
+			Code="@("<DataPage Title=\"Users\" Description=\"Manage user accounts.\">\n    <Toolbar>\n        <DataToolbar>\n            <Search><input class=\"border border-border rounded-md px-3 py-1.5 text-sm w-full\" placeholder=\"Search users...\" /></Search>\n            <Actions>\n                <Button Size=\"ButtonSize.Sm\">New user</Button>\n            </Actions>\n        </DataToolbar>\n    </Toolbar>\n    <Table>\n        <table class=\"w-full text-sm\">\n            <thead class=\"border-b border-border bg-subtle-bg\">\n                <tr>\n                    <th class=\"px-4 py-3 text-left font-medium text-muted-foreground\">Name</th>\n                    <th class=\"px-4 py-3 text-left font-medium text-muted-foreground\">Email</th>\n                    <th class=\"px-4 py-3 text-left font-medium text-muted-foreground\">Status</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr class=\"border-b border-border\">\n                    <td class=\"px-4 py-3\">Alice Martin</td>\n                    <td class=\"px-4 py-3 text-muted-foreground\">alice@example.com</td>\n                    <td class=\"px-4 py-3\"><Badge ColorScheme=\"BadgeColor.Success\">Active</Badge></td>\n                </tr>\n                <tr class=\"border-b border-border\">\n                    <td class=\"px-4 py-3\">Bob Chen</td>\n                    <td class=\"px-4 py-3 text-muted-foreground\">bob@example.com</td>\n                    <td class=\"px-4 py-3\"><Badge ColorScheme=\"BadgeColor.Warning\">Pending</Badge></td>\n                </tr>\n                <tr>\n                    <td class=\"px-4 py-3\">Clara Singh</td>\n                    <td class=\"px-4 py-3 text-muted-foreground\">clara@example.com</td>\n                    <td class=\"px-4 py-3\"><Badge ColorScheme=\"BadgeColor.Neutral\">Inactive</Badge></td>\n                </tr>\n            </tbody>\n        </table>\n    </Table>\n    <Pagination>\n        <DataPagination Page=\"1\" PageSize=\"10\" TotalItems=\"3\" />\n    </Pagination>\n</DataPage>")"
+			Primitives="@("<div class=\"flex flex-col gap-4\">\n    <!-- PageHeader (Borders=false) -->\n    <div class=\"space-y-3\">\n        <div class=\"flex items-start\">\n            <div class=\"flex-1 min-w-0 space-y-1\">\n                <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Users</h1>\n                <p class=\"text-sm text-muted-foreground\">Manage user accounts.</p>\n            </div>\n        </div>\n    </div>\n    <!-- Toolbar slot -->\n    <div>...</div>\n    <!-- Table slot -->\n    <div class=\"border border-border rounded-lg overflow-hidden\">...</div>\n    <!-- Pagination slot -->\n    <div>...</div>\n</div>")">
+			<DataPage Title="Users" Description="Manage user accounts.">
+				<Toolbar>
+					<DataToolbar>
+						<Search>
+							<input class="border border-border rounded-md px-3 py-1.5 text-sm w-full" placeholder="Search users..." />
+						</Search>
+						<Actions>
+							<Button Size="ButtonSize.Sm">New user</Button>
+						</Actions>
+					</DataToolbar>
+				</Toolbar>
+				<Table>
+					<table class="w-full text-sm">
+						<thead class="border-b border-border bg-subtle-bg">
+							<tr>
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Name</th>
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="border-b border-border">
+								<td class="px-4 py-3">Alice Martin</td>
+								<td class="px-4 py-3 text-muted-foreground">alice@example.com</td>
+								<td class="px-4 py-3"><Badge ColorScheme="BadgeColor.Success">Active</Badge></td>
+							</tr>
+							<tr class="border-b border-border">
+								<td class="px-4 py-3">Bob Chen</td>
+								<td class="px-4 py-3 text-muted-foreground">bob@example.com</td>
+								<td class="px-4 py-3"><Badge ColorScheme="BadgeColor.Warning">Pending</Badge></td>
+							</tr>
+							<tr>
+								<td class="px-4 py-3">Clara Singh</td>
+								<td class="px-4 py-3 text-muted-foreground">clara@example.com</td>
+								<td class="px-4 py-3"><Badge ColorScheme="BadgeColor.Neutral">Inactive</Badge></td>
+							</tr>
+						</tbody>
+					</table>
+				</Table>
+				<Pagination>
+					<DataPagination Page="1" PageSize="10" TotalItems="3" />
+				</Pagination>
+			</DataPage>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] DataPageElements =
+	[
+		new ApiElement(
+			Name: "DataPage",
+			Description: "Full data-table page envelope. Composes a borderless `PageHeader` at the top, then optional Toolbar, Table, and Pagination slots stacked vertically with `gap-4`. The Table slot is wrapped in a bordered rounded container.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string",          true,  "Page title forwarded to the inner `PageHeader`." ),
+				new ApiProperty( "Description", "string?",         false, "Sub-title forwarded to the inner `PageHeader`." ),
+				new ApiProperty( "Toolbar",     "RenderFragment?", false, "Slot rendered above the table — typically a `DataToolbar`." ),
+				new ApiProperty( "Table",       "RenderFragment?", false, "Slot rendered inside a bordered rounded container — typically an HTML `<table>` or a data-grid chunk." ),
+				new ApiProperty( "Pagination",  "RenderFragment?", false, "Slot rendered below the table — typically a `DataPagination`." ),
+			]
+		),
+	];
+}

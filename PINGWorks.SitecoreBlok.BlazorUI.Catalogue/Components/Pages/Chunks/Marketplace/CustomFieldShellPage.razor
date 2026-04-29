@@ -1,0 +1,52 @@
+@page "/chunks/custom-field-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="CustomFieldShell" Description="Shell for the XMC Page Builder Custom Field dialog extension point" Interactivity="ComponentInteractivity.Ssr" ApiElements="@CustomFieldShellElements">
+
+	<HostContextNote>
+		Targets the XMC Page Builder Custom Field dialog. The host provides a dialog of limited width and height; this shell arranges Title + Body + Actions inside that constrained area. Dimensions are imposed by the host. Consumer is responsible for postMessage SDK init.
+	</HostContextNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With title + body + actions"
+			Code="@("<CustomFieldShell Title=\"Edit field\">\n    <Body>\n        <Text>Field editor goes here.</Text>\n    </Body>\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\">Cancel</Button>\n        <Button>Save</Button>\n    </Actions>\n</CustomFieldShell>")"
+			Primitives="@("<div class=\"flex flex-col w-full h-full border border-border rounded-lg bg-background\">\n    <div class=\"flex-shrink-0 flex items-center gap-3 border-b border-border px-4 py-3\">\n        <h2 class=\"text-base font-semibold tracking-tight text-foreground\">Edit field</h2>\n    </div>\n    <div class=\"flex-1 min-h-0 overflow-y-auto p-4\">Field editor goes here.</div>\n    <div class=\"flex-shrink-0 flex items-center justify-end gap-2 border-t border-border px-4 py-3\">\n        <button class=\"...\">Cancel</button>\n        <button class=\"...\">Save</button>\n    </div>\n</div>")">
+			<div class="border-2 border-dashed border-border rounded-lg overflow-hidden h-96">
+				<CustomFieldShell Title="Edit field">
+					<Body>
+						<Text>Field editor goes here.</Text>
+					</Body>
+					<Actions>
+						<Button Variant="ButtonVariant.Outline">Cancel</Button>
+						<Button>Save</Button>
+					</Actions>
+				</CustomFieldShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] CustomFieldShellElements =
+	[
+		new ApiElement(
+			Name: "CustomFieldShell",
+			Description: "Shell for the XMC Page Builder Custom Field dialog extension point. Host imposes width/height constraints; this shell arranges Title + Header + Body + Actions inside that area. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",    "string?",         false, "Optional title shown at the top of the dialog." ),
+				new ApiProperty( "Header",   "RenderFragment?", false, "Optional additional header content rendered next to the Title." ),
+				new ApiProperty( "Body",     "RenderFragment?", false, "Main body slot — scrollable area." ),
+				new ApiProperty( "Actions",  "RenderFragment?", false, "Footer actions slot, right-aligned." ),
+				new ApiProperty( "Borders",  "bool",            false, "Toggles outer border + horizontal dividers between regions. Default: `true`." ),
+				new ApiProperty( "Gutters",  "bool",            false, "Toggles `px-4 py-3` on header/footer and `p-4` on body. Default: `true`." ),
+				new ApiProperty( "BgFilled", "bool",            false, "Toggles `bg-background`. Default: `true`." ),
+			]
+		),
+	];
+}

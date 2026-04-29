@@ -1,0 +1,23 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+    KvListItem — one row inside a KvList. Use Value (string) for plain text, or ChildContent for richer content.
+*@
+
+<dt class="text-muted-foreground">@Label</dt>
+<dd class="text-foreground">
+	@if ( ChildContent is not null )
+	{
+		@ChildContent
+	}
+	else
+	{
+		@Value
+	}
+</dd>
+
+@code {
+	[Parameter] public string Label { get; set; } = "";
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,54 @@
+@page "/chunks/feature-card"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FeatureCard" Description="Icon + title + description card for landing and onboarding pages" Interactivity="ComponentInteractivity.Ssr" ApiElements="@FeatureCardElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Icon, title and description"
+			Code="@("<FeatureCard IconSvg=\"@IconSvg.CheckCircle\" Title=\"Automatic backups\" Description=\"Daily snapshots of your data, retained for 30 days.\" />")"
+			Primitives="@("<div class=\"flex flex-col border border-border rounded-lg bg-background p-6 gap-4\">\n    <svg ...><!-- check-circle icon --></svg>\n    <div class=\"flex-1\">\n        <h3 class=\"text-base font-semibold tracking-tight text-foreground mb-1\">Automatic backups</h3>\n        <p class=\"text-sm text-muted-foreground\">Daily snapshots of your data, retained for 30 days.</p>\n    </div>\n</div>")">
+			<FeatureCard IconSvg="@IconSvg.CheckCircle" Title="Automatic backups" Description="Daily snapshots of your data, retained for 30 days." />
+		</ComponentExample>
+
+		<ComponentExample Title="With Footer slot"
+			Code="@("<FeatureCard IconSvg=\"@IconSvg.Information\" Title=\"Usage limits\" Description=\"Monitor your monthly API call allowance.\">\n    <Footer>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">View usage</Button>\n    </Footer>\n</FeatureCard>")"
+			Primitives="@("<div class=\"flex flex-col border border-border rounded-lg bg-background p-6 gap-4\">\n    <svg ...><!-- information icon --></svg>\n    <div class=\"flex-1\">\n        <h3 class=\"text-base font-semibold tracking-tight text-foreground mb-1\">Usage limits</h3>\n        <p class=\"text-sm text-muted-foreground\">Monitor your monthly API call allowance.</p>\n    </div>\n    <div>\n        <button class=\"...\">View usage</button>\n    </div>\n</div>")">
+			<FeatureCard IconSvg="@IconSvg.Information" Title="Usage limits" Description="Monitor your monthly API call allowance.">
+				<Footer>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">View usage</Button>
+				</Footer>
+			</FeatureCard>
+		</ComponentExample>
+
+		<ComponentExample Title="Borderless variant (no icon)"
+			Code="@("<FeatureCard Title=\"Simple feature\" Description=\"A minimal card with borders and background stripped away.\" Borders=\"false\" BgFilled=\"false\" />")"
+			Primitives="@("<div class=\"flex flex-col p-6 gap-4\">\n    <div class=\"flex-1\">\n        <h3 class=\"text-base font-semibold tracking-tight text-foreground mb-1\">Simple feature</h3>\n        <p class=\"text-sm text-muted-foreground\">A minimal card with borders and background stripped away.</p>\n    </div>\n</div>")">
+			<FeatureCard Title="Simple feature" Description="A minimal card with borders and background stripped away." Borders="false" BgFilled="false" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] FeatureCardElements =
+	[
+		new ApiElement(
+			Name: "FeatureCard",
+			Description: "A vertically-stacked card combining an optional icon, a title, an optional description, and an optional footer slot. Designed for landing pages, onboarding flows, and feature-highlight grids. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "IconSvg",     "string?",         false, "SVG path string for the leading icon. Rendered at `size-8 text-primary`. Omit to suppress the icon." ),
+				new ApiProperty( "Title",       "string",          false, "Card heading. Rendered as `<h3>` in `text-base font-semibold`. Default: empty string." ),
+				new ApiProperty( "Description", "string?",         false, "Supporting text in `text-sm text-muted-foreground`. Omit to suppress." ),
+				new ApiProperty( "Footer",      "RenderFragment?", false, "Optional slot rendered below the description — use for actions, links, or status." ),
+				new ApiProperty( "Borders",     "bool",            false, "Toggles `border border-border rounded-lg`. Default: `true`." ),
+				new ApiProperty( "BgFilled",    "bool",            false, "Toggles `bg-background`. Default: `true`." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Toggles `p-6 gap-4` on the card wrapper. Default: `true`." ),
+			]
+		),
+	];
+}

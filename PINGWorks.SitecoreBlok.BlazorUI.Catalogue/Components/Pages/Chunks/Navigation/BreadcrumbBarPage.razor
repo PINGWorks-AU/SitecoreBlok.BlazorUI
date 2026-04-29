@@ -1,0 +1,63 @@
+@page "/chunks/breadcrumb-bar"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="BreadcrumbBar" Description="Declarative breadcrumb — Items: IList<BreadcrumbItem>" Interactivity="ComponentInteractivity.Ssr" ApiElements="@BreadcrumbBarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Three-level trail"
+			Code="@("<BreadcrumbBar Items=\"@SimpleTrail\" />\n\n@code {\n    private static readonly IList<BreadcrumbBar.BreadcrumbItem> SimpleTrail =\n    [\n        new( \"Projects\",  \"/projects\" ),\n        new( \"Marketing\", \"/projects/marketing\" ),\n        new( \"Sites\",     \"#\" ),\n    ];\n}")"
+			Primitives="@("<nav aria-label=\"Breadcrumb\">\n    <ol class=\"flex items-center gap-1.5 text-sm\">\n        <li><a href=\"/projects\" class=\"text-muted-foreground hover:text-foreground no-underline\">Projects</a></li>\n        <li class=\"text-muted-foreground\">›</li>\n        <li><a href=\"/projects/marketing\" class=\"text-muted-foreground hover:text-foreground no-underline\">Marketing</a></li>\n        <li class=\"text-muted-foreground\">›</li>\n        <li><span class=\"text-foreground font-medium\">Sites</span></li>\n    </ol>\n</nav>")">
+			<BreadcrumbBar Items="@SimpleTrail" />
+		</ComponentExample>
+
+		<ComponentExample Title="With leading icon on root"
+			Code="@("<BreadcrumbBar Items=\"@IconTrail\" />\n\n@code {\n    private static readonly IList<BreadcrumbBar.BreadcrumbItem> IconTrail =\n    [\n        new( \"Home\",     \"/\",       IconSvg.Account ),\n        new( \"Settings\", \"/settings\" ),\n        new( \"Profile\",  \"#\" ),\n    ];\n}")"
+			Primitives="@("<nav aria-label=\"Breadcrumb\">\n    <ol class=\"flex items-center gap-1.5 text-sm\">\n        <li class=\"flex items-center gap-1.5\"><svg class=\"size-3.5\">...</svg><a href=\"/\" class=\"text-muted-foreground hover:text-foreground no-underline\">Home</a></li>\n        <li class=\"text-muted-foreground\">›</li>\n        <li><a href=\"/settings\" class=\"text-muted-foreground hover:text-foreground no-underline\">Settings</a></li>\n        <li class=\"text-muted-foreground\">›</li>\n        <li><span class=\"text-foreground font-medium\">Profile</span></li>\n    </ol>\n</nav>")">
+			<BreadcrumbBar Items="@IconTrail" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly IList<BreadcrumbBar.BreadcrumbItem> SimpleTrail =
+	[
+		new( "Projects",  "/projects" ),
+		new( "Marketing", "/projects/marketing" ),
+		new( "Sites",     "#" ),
+	];
+
+	private static readonly IList<BreadcrumbBar.BreadcrumbItem> IconTrail =
+	[
+		new( "Home",     "/",         IconSvg.Account ),
+		new( "Settings", "/settings" ),
+		new( "Profile",  "#" ),
+	];
+
+	private static readonly ApiElement[] BreadcrumbBarElements =
+	[
+		new ApiElement(
+			Name: "BreadcrumbBar",
+			Description: "Declarative breadcrumb taking a sequential `IList<BreadcrumbItem>`. The last item renders as the current page (bold foreground, no link); earlier items are anchored links separated by `›`. Each item can optionally carry a leading icon. As a single inline element it doesn't expose wrapper-styling parameters.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Items", "IList<BreadcrumbItem>?", false, "Sequential breadcrumb trail. The last item is rendered as the current page (no link)." ),
+			]
+		),
+		new ApiElement(
+			Name: "BreadcrumbItem",
+			Description: "Record describing one node in a breadcrumb trail.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Label",   "string",  true,  "Visible breadcrumb label." ),
+				new ApiProperty( "Href",    "string",  true,  "Anchor href (ignored on the last item, which renders as plain text)." ),
+				new ApiProperty( "IconSvg", "string?", false, "Optional leading icon (SVG path string from `IconSvg`)." ),
+			]
+		),
+	];
+}

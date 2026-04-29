@@ -1,0 +1,72 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	DataPagination — pagination row with item-count label on the left and page nav on the right.
+*@
+
+<div class="@RowClass">
+	@if ( ShowLabel )
+	{
+		<span class="text-sm text-muted-foreground">
+			Showing @StartItem–@EndItem of @TotalItems
+		</span>
+	}
+	<Pagination>
+		<PaginationContent>
+			<PaginationItem>
+				<PaginationPrevious
+					Disabled="@( Page <= 1 )"
+					Click="@(() => HandlePageChange( Page - 1 ))" />
+			</PaginationItem>
+			@for ( int p = 1; p <= TotalPages; p++ )
+			{
+				var pageNumber = p;
+				<PaginationItem>
+					<PaginationLink
+						IsActive="@( pageNumber == Page )"
+						Click="@(() => HandlePageChange( pageNumber ))">@pageNumber</PaginationLink>
+				</PaginationItem>
+			}
+			<PaginationItem>
+				<PaginationNext
+					Disabled="@( Page >= TotalPages )"
+					Click="@(() => HandlePageChange( Page + 1 ))" />
+			</PaginationItem>
+		</PaginationContent>
+	</Pagination>
+</div>
+
+@code {
+	[Parameter] public int Page { get; set; } = 1;
+	[Parameter] public EventCallback<int> PageChanged { get; set; }
+	[Parameter] public int PageSize { get; set; } = 10;
+	[Parameter] public int TotalItems { get; set; } = 0;
+	[Parameter] public bool ShowLabel { get; set; } = true;
+
+	private string RowClass
+		=> ShowLabel
+			? "flex items-center justify-between gap-3"
+			: "flex items-center justify-end gap-3";
+
+	private int TotalPages
+		=> PageSize > 0
+			? (int)Math.Ceiling( (double)TotalItems / PageSize )
+			: 1;
+
+	private int StartItem
+		=> TotalItems == 0
+			? 0
+			: ( Page - 1 ) * PageSize + 1;
+
+	private int EndItem
+		=> Math.Min( Page * PageSize, TotalItems );
+
+	private async Task HandlePageChange( int newPage )
+	{
+		if ( newPage < 1 || newPage > TotalPages )
+			return;
+
+		if ( PageChanged.HasDelegate )
+			await PageChanged.InvokeAsync( newPage );
+	}
+}

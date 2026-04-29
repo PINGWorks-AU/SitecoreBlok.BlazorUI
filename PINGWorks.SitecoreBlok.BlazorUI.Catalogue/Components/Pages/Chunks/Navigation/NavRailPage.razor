@@ -1,0 +1,57 @@
+@page "/chunks/nav-rail"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="NavRail" Description="Narrow icon-only nav rail — Items: IList<NavRailItem>" Interactivity="ComponentInteractivity.Ssr" ApiElements="@NavRailElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<NavRail Items=\"@RailItems\" />\n\n@code {\n    private static readonly IList<NavRail.NavRailItem> RailItems =\n    [\n        new( IconSvg.Account, \"Profile\",  \"#\", Active: true ),\n        new( IconSvg.Information, \"Inbox\", \"#\" ),\n        new( IconSvg.Logout, \"Sign out\",  \"#\" ),\n    ];\n}")"
+			Primitives="@("<aside class=\"w-14 shrink-0 h-full overflow-y-auto border-r border-border bg-background\">\n    <div class=\"flex flex-col items-center px-1 py-2 gap-1\">\n        <a href=\"#\" title=\"Profile\" aria-label=\"Profile\" class=\"flex items-center justify-center size-10 rounded-md bg-neutral-bg text-foreground\"><svg class=\"size-5\">...</svg></a>\n        <a href=\"#\" title=\"Inbox\" aria-label=\"Inbox\" class=\"flex items-center justify-center size-10 rounded-md text-muted-foreground hover:text-foreground hover:bg-neutral-bg\"><svg class=\"size-5\">...</svg></a>\n        <a href=\"#\" title=\"Sign out\" aria-label=\"Sign out\" class=\"flex items-center justify-center size-10 rounded-md text-muted-foreground hover:text-foreground hover:bg-neutral-bg\"><svg class=\"size-5\">...</svg></a>\n    </div>\n</aside>")">
+			<div class="h-64 border rounded-lg overflow-hidden flex">
+				<NavRail Items="@RailItems" />
+				<div class="flex-1 p-4 text-sm text-muted-foreground">Rail sits to the left of page content.</div>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly IList<NavRail.NavRailItem> RailItems =
+	[
+		new( IconSvg.Account,     "Profile",  "#", Active: true ),
+		new( IconSvg.Information, "Inbox",    "#" ),
+		new( IconSvg.Logout,      "Sign out", "#" ),
+	];
+
+	private static readonly ApiElement[] NavRailElements =
+	[
+		new ApiElement(
+			Name: "NavRail",
+			Description: "Narrow icon-only nav rail. A fixed-width `<aside>` column of icon-only links. Each item exposes a `title`/`aria-label` for screen readers and on hover. Wrapper-styling. **Design choice:** the rail takes its own `IList<NavRailItem>` rather than wrapping `NavListItem`s — this keeps it independent of the NavListItem row-mode styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Items",     "IList<NavRailItem>?", false, "Sequential rail items." ),
+				new ApiProperty( "Borders",   "bool",                false, "Toggles `border-r border-border`. Default: `true`." ),
+				new ApiProperty( "Gutters",   "bool",                false, "Toggles `px-1 py-2 gap-1` on the inner column. Default: `true`." ),
+				new ApiProperty( "BgFilled",  "bool",                false, "Toggles `bg-background`. Default: `true`." ),
+			]
+		),
+		new ApiElement(
+			Name: "NavRailItem",
+			Description: "Record describing one rail item.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "IconSvg", "string", true,  "Icon SVG path (use `IconSvg.X`)." ),
+				new ApiProperty( "Label",   "string", true,  "Accessible label (rendered as `title` and `aria-label`; not visible)." ),
+				new ApiProperty( "Href",    "string", true,  "Anchor href." ),
+				new ApiProperty( "Active",  "bool",   false, "When `true`, applies the active-state visual." ),
+			]
+		),
+	];
+}

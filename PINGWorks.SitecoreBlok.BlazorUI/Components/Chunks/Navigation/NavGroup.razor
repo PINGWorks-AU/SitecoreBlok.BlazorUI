@@ -1,0 +1,54 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	NavGroup — labelled grouping inside a NavList. When Collapsible=true the label
+	becomes a toggle button that expands/collapses ChildContent. Uses ChevronDown
+	(rotated when closed) to indicate state.
+
+	A single labelled grouping (no region wrappers), so wrapper-styling parameters
+	(Borders/Gutters/HeaderAlignment/BgFilled) do not apply.
+*@
+
+@if ( Collapsible )
+{
+	<button type="button" @onclick="HandleToggle"
+			class="flex items-center w-full gap-2 px-3 py-1 text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
+		<Icon Svg="@IconSvg.ChevronDown" ClassName="@ChevronClass" />
+		<span>@Label</span>
+	</button>
+
+	@if ( IsOpen )
+	{
+		<div>
+			@ChildContent
+		</div>
+	}
+}
+else
+{
+	<div class="text-xs uppercase tracking-wider text-muted-foreground px-3 py-1">@Label</div>
+	<div>
+		@ChildContent
+	</div>
+}
+
+@code {
+	[Parameter] public string Label { get; set; } = "";
+	[Parameter] public bool Collapsible { get; set; } = false;
+	[Parameter] public bool DefaultOpen { get; set; } = true;
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	private bool IsOpen;
+
+	protected override void OnInitialized()
+		=> IsOpen = DefaultOpen;
+
+	private string ChevronClass
+		=> CssClassBuilder.Start( "size-3 transition-transform" )
+			.With( "rotate-0", IsOpen )
+			.With( "-rotate-90", !IsOpen )
+			.Build();
+
+	private void HandleToggle()
+		=> IsOpen = !IsOpen;
+}

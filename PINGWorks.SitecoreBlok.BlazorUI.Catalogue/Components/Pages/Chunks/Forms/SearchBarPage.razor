@@ -1,0 +1,49 @@
+@page "/chunks/search-bar"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="SearchBar" Description="Toolbar-pattern search row — SearchInput with optional filter slot and result-count badge" Interactivity="ComponentInteractivity.Interactive" ApiElements="@SearchBarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Basic search bar"
+			Code="@("<SearchBar Query=\"@Query\" QueryChanged=\"@(q => Query = q)\" ResultCount=\"@ResultCount\" />")"
+			Primitives="@("<div class=\"flex items-center gap-3 w-full\">\n    <div class=\"flex-1 max-w-md\">\n        <div data-slot=\"search-input\" class=\"relative flex w-full items-center rounded-md border border-input h-10 ...\">\n            <input data-slot=\"search-input-control\" type=\"text\" placeholder=\"Search…\" class=\"...\" />\n        </div>\n    </div>\n    <span class=\"text-sm text-muted-foreground ml-auto\">42 results</span>\n</div>")">
+			<SearchBar Query="@Query" QueryChanged="@( q => Query = q )" ResultCount="@ResultCount" />
+		</ComponentExample>
+
+		<ComponentExample Title="Search bar with filter chips"
+			Code="@("<SearchBar Query=\"@Query\" QueryChanged=\"@(q => Query = q)\" ResultCount=\"@ResultCount\">\n    <Filters>\n        <span class=\"inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs\">Status <button @onclick=\"() => {}\">×</button></span>\n        <span class=\"inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs\">Type <button @onclick=\"() => {}\">×</button></span>\n    </Filters>\n</SearchBar>")"
+			Primitives="@("<div class=\"flex items-center gap-3 w-full\">\n    <div class=\"flex-1 max-w-md\">\n        <div data-slot=\"search-input\" class=\"relative flex w-full items-center rounded-md border border-input h-10 ...\">\n            <input data-slot=\"search-input-control\" type=\"text\" placeholder=\"Search…\" class=\"...\" />\n        </div>\n    </div>\n    <div class=\"flex items-center gap-2\">\n        <span class=\"inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs\">Status <button>×</button></span>\n        <span class=\"inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs\">Type <button>×</button></span>\n    </div>\n    <span class=\"text-sm text-muted-foreground ml-auto\">42 results</span>\n</div>")">
+			<SearchBar Query="@Query" QueryChanged="@( q => Query = q )" ResultCount="@ResultCount">
+				<Filters>
+					<span class="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs">Status <button @onclick="() => { }">×</button></span>
+					<span class="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs">Type <button @onclick="() => { }">×</button></span>
+				</Filters>
+			</SearchBar>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Query;
+	private int? ResultCount = 42;
+
+	private static readonly ApiElement[] SearchBarElements =
+	[
+		new ApiElement(
+			Name: "SearchBar",
+			Description: "A toolbar-pattern search row. Composes `SearchInput` + `SearchInputField` for the query box, accepts a `Filters` slot for filter chips, and shows an optional result count at the trailing end.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Query",        "string?",               false, "Current search query. Two-way bindable via `QueryChanged`." ),
+				new ApiProperty( "QueryChanged", "EventCallback<string?>", false, "Fires when the query changes (debounced 300 ms). Part of the `Query` two-way binding pair." ),
+				new ApiProperty( "ResultCount",  "int?",                  false, "When set, renders a trailing \"N result(s)\" label. Omit to hide." ),
+				new ApiProperty( "Filters",      "RenderFragment?",        false, "Optional slot for filter chips, dropdowns, or badge elements rendered between the search box and the result count." ),
+			]
+		),
+	];
+}

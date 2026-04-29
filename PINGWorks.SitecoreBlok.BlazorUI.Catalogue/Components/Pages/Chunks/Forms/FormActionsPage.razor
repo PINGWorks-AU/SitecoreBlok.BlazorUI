@@ -1,0 +1,62 @@
+@page "/chunks/form-actions"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FormActions" Description="Sticky-bottom action row — Start slot (left) and End slot (right) with optional backdrop-blur sticky positioning" Interactivity="ComponentInteractivity.Interactive" ApiElements="@FormActionsElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Non-sticky with Cancel and Save"
+			Code="@("<div class=\"space-y-4\">\n    <TextField Label=\"Full name\" @bind-Value=\"FullName\" />\n    <TextField Label=\"Email address\" Type=\"TextField.TextFieldType.Email\" @bind-Value=\"EmailAddress\" />\n</div>\n<FormActions>\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\">Cancel</Button>\n    </Start>\n    <End>\n        <Button>Save changes</Button>\n    </End>\n</FormActions>")"
+			Primitives="@("<div class=\"flex items-center pt-4 border-t border-border\">\n    <div class=\"flex items-center gap-2\">\n        <button class=\"...\">Cancel</button>\n    </div>\n    <div class=\"ml-auto flex items-center gap-2\">\n        <button class=\"...\">Save changes</button>\n    </div>\n</div>")">
+			<div class="space-y-4 mb-4">
+				<TextField Label="Full name" @bind-Value="FullName" />
+				<TextField Label="Email address" Type="TextField.TextFieldType.Email" @bind-Value="EmailAddress" />
+			</div>
+			<FormActions>
+				<Start>
+					<Button Variant="ButtonVariant.Ghost">Cancel</Button>
+				</Start>
+				<End>
+					<Button>Save changes</Button>
+				</End>
+			</FormActions>
+		</ComponentExample>
+
+		<ComponentExample Title="Sticky variant (scroll the page to see effect)"
+			Code="@("<FormActions Sticky=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\">Discard</Button>\n    </Start>\n    <End>\n        <Button Variant=\"ButtonVariant.Outline\">Save draft</Button>\n        <Button>Publish</Button>\n    </End>\n</FormActions>")"
+			Primitives="@("<div class=\"flex items-center pt-4 border-t border-border sticky bottom-0 z-10 bg-background/95 backdrop-blur px-6 py-4\">\n    <div class=\"flex items-center gap-2\">\n        <button class=\"...\">Discard</button>\n    </div>\n    <div class=\"ml-auto flex items-center gap-2\">\n        <button class=\"...\">Save draft</button>\n        <button class=\"...\">Publish</button>\n    </div>\n</div>")">
+			<FormActions Sticky="true">
+				<Start>
+					<Button Variant="ButtonVariant.Ghost">Discard</Button>
+				</Start>
+				<End>
+					<Button Variant="ButtonVariant.Outline">Save draft</Button>
+					<Button>Publish</Button>
+				</End>
+			</FormActions>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? FullName;
+	private string? EmailAddress;
+
+	private static readonly ApiElement[] FormActionsElements =
+	[
+		new ApiElement(
+			Name: "FormActions",
+			Description: "A bottom action row for forms. Renders a `Start` slot (left-aligned, e.g. Cancel) and an `End` slot (right-aligned, e.g. Submit). When `Sticky=true`, adds `sticky bottom-0 z-10 bg-background/95 backdrop-blur` so the row remains visible while the user scrolls a long form. `FormShell` uses this internally with `Sticky=true` for its Actions slot.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Sticky", "bool",            false, "Pins the row to the bottom of the scroll container with a frosted-glass background. Default: `false`." ),
+				new ApiProperty( "Start",  "RenderFragment?", false, "Left-aligned slot — typically a ghost Cancel button." ),
+				new ApiProperty( "End",    "RenderFragment?", false, "Right-aligned slot — typically the primary submit button and optional secondary actions." ),
+			]
+		),
+	];
+}

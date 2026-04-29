@@ -1,0 +1,40 @@
+@page "/chunks/standalone-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="StandaloneShell" Description="Shell for the Cloud Portal homepage launch (new-tab) extension point" Interactivity="ComponentInteractivity.Ssr" ApiElements="@StandaloneShellElements">
+
+	<HostContextNote>
+		Targets the Cloud Portal homepage launch — the app owns the whole tab. Identical render to FullScreenShell; differs only in the host context this catalogue page documents. Use the appropriate shell so the call site documents which extension point the consumer is targeting.
+	</HostContextNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With child content"
+			Code="@("<StandaloneShell>\n    <AppShell InteractiveRenderMode=\"RenderMode.InteractiveServer\">\n        <Header>\n            <Text Kind=\"TextKind.Span\" SemiBold>My standalone app</Text>\n        </Header>\n        <Content>\n            <Text>Standalone tab content.</Text>\n        </Content>\n    </AppShell>\n</StandaloneShell>")"
+			Primitives="@("<div class=\"min-h-screen bg-background text-foreground\">\n    <!-- consumer's standalone tab layout here -->\n</div>")">
+			<div class="border-2 border-dashed border-border rounded-lg overflow-hidden h-96">
+				<StandaloneShell>
+					<Text>Standalone tab content — consumer composes their own layout inside this shell.</Text>
+				</StandaloneShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] StandaloneShellElements =
+	[
+		new ApiElement(
+			Name: "StandaloneShell",
+			Description: "Shell for the Cloud Portal homepage launch (new-tab) extension point. The app owns the whole tab. Identical render to `FullScreenShell` — sets `min-h-screen bg-background text-foreground`. Use this shell (rather than `FullScreenShell`) when targeting the Cloud Portal launch extension point so the call site documents intent.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Consumer's standalone tab layout content. Rendered inside a `min-h-screen bg-background text-foreground` wrapper." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,65 @@
+@page "/chunks/hero"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Hero" Description="Landing-style intro band with title, subtitle, action slot, and media slot" Interactivity="ComponentInteractivity.Ssr" ApiElements="@HeroElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Title, subtitle and actions"
+			Code="@("<Hero Title=\"Build faster, ship sooner\" Subtitle=\"A modern component library for Sitecore Blazor applications — opinionated, accessible, and production-ready.\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Default\">Get started</Button>\n        <Button Variant=\"ButtonVariant.Outline\">Learn more</Button>\n    </Actions>\n</Hero>")"
+			Primitives="@("<section class=\"w-full py-16 px-6\">\n    <div class=\"flex flex-col lg:flex-row items-center gap-8 max-w-7xl mx-auto w-full\">\n        <div class=\"flex-1 text-center lg:text-start\">\n            <h1 class=\"text-4xl lg:text-5xl font-bold tracking-tight text-foreground\">Build faster, ship sooner</h1>\n            <p class=\"text-lg text-muted-foreground mt-4 max-w-2xl\">A modern component library...</p>\n            <div class=\"flex items-center justify-center lg:justify-start gap-3 mt-6\">\n                <button class=\"...\">Get started</button>\n                <button class=\"...\">Learn more</button>\n            </div>\n        </div>\n    </div>\n</section>")">
+			<div class="border rounded-lg overflow-hidden">
+				<Hero Title="Build faster, ship sooner" Subtitle="A modern component library for Sitecore Blazor applications — opinionated, accessible, and production-ready.">
+					<Actions>
+						<Button Variant="ButtonVariant.Default">Get started</Button>
+						<Button Variant="ButtonVariant.Outline">Learn more</Button>
+					</Actions>
+				</Hero>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With media slot"
+			Code="@("<Hero Title=\"Your data, beautifully visualised\" Subtitle=\"Real-time dashboards that give your team the insight they need.\" BgFilled=\"true\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Default\">Start free trial</Button>\n    </Actions>\n    <Media>\n        <img src=\"https://placehold.co/600x400\" alt=\"Dashboard preview\" class=\"rounded-xl shadow-lg w-full\" />\n    </Media>\n</Hero>")"
+			Primitives="@("<section class=\"w-full py-16 px-6 bg-subtle-bg\">\n    <div class=\"flex flex-col lg:flex-row items-center gap-8 max-w-7xl mx-auto w-full\">\n        <div class=\"flex-1 text-center lg:text-start\">\n            <h1 class=\"text-4xl lg:text-5xl font-bold tracking-tight text-foreground\">Your data, beautifully visualised</h1>\n            <p class=\"text-lg text-muted-foreground mt-4 max-w-2xl\">Real-time dashboards...</p>\n            <div class=\"flex items-center justify-center lg:justify-start gap-3 mt-6\">\n                <button class=\"...\">Start free trial</button>\n            </div>\n        </div>\n        <div class=\"flex-1 w-full max-w-lg\">\n            <img src=\"...\" alt=\"Dashboard preview\" class=\"rounded-xl shadow-lg w-full\" />\n        </div>\n    </div>\n</section>")">
+			<div class="border rounded-lg overflow-hidden">
+				<Hero Title="Your data, beautifully visualised" Subtitle="Real-time dashboards that give your team the insight they need." BgFilled="true">
+					<Actions>
+						<Button Variant="ButtonVariant.Default">Start free trial</Button>
+					</Actions>
+					<Media>
+						<img src="https://placehold.co/600x400" alt="Dashboard preview" class="rounded-xl shadow-lg w-full" />
+					</Media>
+				</Hero>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Title only — minimal"
+			Code="@("<Hero Title=\"Welcome back\" Gutters=\"false\" />")"
+			Primitives="@("<section class=\"w-full\">\n    <div class=\"flex flex-col lg:flex-row items-center gap-8 max-w-7xl mx-auto w-full\">\n        <div class=\"flex-1 text-center lg:text-start\">\n            <h1 class=\"text-4xl lg:text-5xl font-bold tracking-tight text-foreground\">Welcome back</h1>\n        </div>\n    </div>\n</section>")">
+			<Hero Title="Welcome back" Gutters="false" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] HeroElements =
+	[
+		new ApiElement(
+			Name: "Hero",
+			Description: "Landing-style intro band. Renders a centred two-column layout (text on the left, optional media on the right) that stacks vertically on small screens. Accepts an Actions slot for primary CTA buttons and a Media slot for images or illustrations. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",    "string",          true,  "Main heading. Rendered as `<h1>` in `text-4xl lg:text-5xl font-bold tracking-tight text-foreground`." ),
+				new ApiProperty( "Subtitle", "string?",         false, "Supporting tagline in `text-lg text-muted-foreground`. Omit to suppress." ),
+				new ApiProperty( "Actions",  "RenderFragment?", false, "Optional slot for primary/secondary CTA buttons. Rendered in a flex row below the subtitle." ),
+				new ApiProperty( "Media",    "RenderFragment?", false, "Optional slot for images, illustrations, or any media element. Occupies the right column on large screens." ),
+				new ApiProperty( "Gutters",  "bool",            false, "Toggles `py-16 px-6` on the section wrapper. Default: `true`." ),
+				new ApiProperty( "BgFilled", "bool",            false, "Toggles `bg-subtle-bg` on the section wrapper. Default: `false` — Hero is typically transparent so the page background shows through." ),
+			]
+		),
+	];
+}

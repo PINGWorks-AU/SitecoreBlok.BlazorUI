@@ -1,0 +1,40 @@
+@page "/chunks/full-screen-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FullScreenShell" Description="Shell for the XMC Sites full-screen iframe extension point" Interactivity="ComponentInteractivity.Ssr" ApiElements="@FullScreenShellElements">
+
+	<HostContextNote>
+		Targets the XMC Sites top-bar nav full-screen iframe. The host fills the viewport — no chrome constraints. This shell sets `min-h-screen` + Blok background/font defaults so the consumer's content composes cleanly.
+	</HostContextNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With child content"
+			Code="@("<FullScreenShell>\n    <AppShell InteractiveRenderMode=\"RenderMode.InteractiveServer\">\n        <Header>\n            <Text Kind=\"TextKind.Span\" SemiBold>My XMC app</Text>\n        </Header>\n        <Content>\n            <Text>Full-screen iframe content.</Text>\n        </Content>\n    </AppShell>\n</FullScreenShell>")"
+			Primitives="@("<div class=\"min-h-screen bg-background text-foreground\">\n    <!-- consumer's full-screen layout here -->\n</div>")">
+			<div class="border-2 border-dashed border-border rounded-lg overflow-hidden h-96">
+				<FullScreenShell>
+					<Text>Full-screen iframe content — consumer composes their own layout inside this shell.</Text>
+				</FullScreenShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] FullScreenShellElements =
+	[
+		new ApiElement(
+			Name: "FullScreenShell",
+			Description: "Shell for the XMC Sites top-bar nav full-screen iframe extension point. The host fills the viewport — no chrome constraints. Sets `min-h-screen bg-background text-foreground` so consumer content composes cleanly inside the iframe. Consumers typically nest an `AppShell` or their own layout inside `ChildContent`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Consumer's full-screen layout content. Rendered inside a `min-h-screen bg-background text-foreground` wrapper." ),
+			]
+		),
+	];
+}

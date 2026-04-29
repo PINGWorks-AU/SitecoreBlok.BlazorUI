@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	Container — max-width content centerer. Constrains content width and centres horizontally.
+
+	No wrapper-styling parameters: Container is a single inline element with no toggleable
+	border, background, or gutter behaviour. The MaxWidth parameter is the sole API surface.
+*@
+
+<div class="@($"mx-auto w-full {SizeClasses.MaxWidth( MaxWidth )}")">@ChildContent</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public Size MaxWidth { get; set; } = Size.Lg;
+}

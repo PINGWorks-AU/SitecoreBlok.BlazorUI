@@ -1,0 +1,49 @@
+@page "/chunks/metric-group"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="MetricGroup" Description="Horizontal arrangement of KpiTiles separated by dividers" Interactivity="ComponentInteractivity.Ssr" ApiElements="@MetricGroupElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Four tiles in a row"
+			Code="@("<MetricGroup>\n    <KpiTile Label=\"Total revenue\" Value=\"$84,320\" Delta=\"+12.3%\" Trend=\"Trend.Up\" Borders=\"false\" />\n    <KpiTile Label=\"Monthly users\" Value=\"12,480\" Delta=\"+8.4%\" Trend=\"Trend.Up\" Borders=\"false\" />\n    <KpiTile Label=\"Bounce rate\" Value=\"54.2%\" Delta=\"-3.1%\" Trend=\"Trend.Down\" Borders=\"false\" />\n    <KpiTile Label=\"Avg session\" Value=\"3m 42s\" Borders=\"false\" />\n</MetricGroup>")"
+			Primitives="@("<div class=\"flex divide-x divide-border border border-border rounded-lg overflow-hidden bg-background\">\n    <div class=\"flex flex-col p-4 gap-1\"><!-- tile 1 --></div>\n    <div class=\"flex flex-col p-4 gap-1\"><!-- tile 2 --></div>\n    <div class=\"flex flex-col p-4 gap-1\"><!-- tile 3 --></div>\n    <div class=\"flex flex-col p-4 gap-1\"><!-- tile 4 --></div>\n</div>")">
+			<MetricGroup>
+				<KpiTile Label="Total revenue" Value="$84,320" Delta="+12.3%" Trend="Trend.Up" Borders="false" />
+				<KpiTile Label="Monthly users" Value="12,480" Delta="+8.4%" Trend="Trend.Up" Borders="false" />
+				<KpiTile Label="Bounce rate" Value="54.2%" Delta="-3.1%" Trend="Trend.Down" Borders="false" />
+				<KpiTile Label="Avg session" Value="3m 42s" Borders="false" />
+			</MetricGroup>
+		</ComponentExample>
+
+		<ComponentExample Title="Three tiles, borderless group"
+			Code="@("<MetricGroup Borders=\"false\" BgFilled=\"false\">\n    <KpiTile Label=\"New signups\" Value=\"320\" Delta=\"+5.2%\" Trend=\"Trend.Up\" />\n    <KpiTile Label=\"Churned\" Value=\"14\" Delta=\"-2.1%\" Trend=\"Trend.Down\" />\n    <KpiTile Label=\"Net growth\" Value=\"+306\" Trend=\"Trend.Neutral\" />\n</MetricGroup>")"
+			Primitives="@("<div class=\"flex divide-x divide-border\">\n    <div class=\"flex flex-col border border-border rounded-lg bg-background p-4 gap-1\"><!-- tile 1 --></div>\n    <div class=\"flex flex-col border border-border rounded-lg bg-background p-4 gap-1\"><!-- tile 2 --></div>\n    <div class=\"flex flex-col border border-border rounded-lg bg-background p-4 gap-1\"><!-- tile 3 --></div>\n</div>")">
+			<MetricGroup Borders="false" BgFilled="false">
+				<KpiTile Label="New signups" Value="320" Delta="+5.2%" Trend="Trend.Up" />
+				<KpiTile Label="Churned" Value="14" Delta="-2.1%" Trend="Trend.Down" />
+				<KpiTile Label="Net growth" Value="+306" Trend="Trend.Neutral" />
+			</MetricGroup>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] MetricGroupElements =
+	[
+		new ApiElement(
+			Name: "MetricGroup",
+			Description: "A flex container that arranges KpiTile children side-by-side with dividers between them. When `Borders` is true (the default), the group draws its own outer border and rounds the corners — children KpiTiles should set `Borders=false` to avoid a doubled border effect. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "KpiTile children (or any content) to arrange horizontally. Typically a set of KpiTile components." ),
+				new ApiProperty( "Borders",      "bool",            false, "Toggles `border border-border rounded-lg overflow-hidden` on the group wrapper. Default: `true`. When true, children KpiTiles should set `Borders=false` to prevent double borders." ),
+				new ApiProperty( "BgFilled",     "bool",            false, "Toggles `bg-background`. Default: `true`." ),
+			]
+		),
+	];
+}

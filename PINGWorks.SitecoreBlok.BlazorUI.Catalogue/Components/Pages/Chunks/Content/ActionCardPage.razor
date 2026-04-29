@@ -1,0 +1,53 @@
+@page "/chunks/action-card"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="ActionCard" Description="Card with a click target and trailing chevron — renders as link, button or static div" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ActionCardElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Link card (Href)"
+			Code="@("<ActionCard Href=\"/settings/profile\" IconSvg=\"@IconSvg.Circle\" Title=\"Profile settings\" Description=\"Update your name, avatar and preferences.\" />")"
+			Primitives="@("<a href=\"/settings/profile\" class=\"flex flex-col group border border-border rounded-lg bg-background p-6 gap-4 hover:border-primary/50 hover:bg-subtle-bg cursor-pointer transition-colors no-underline\">\n    <div class=\"flex items-center gap-4\">\n        <svg ...><!-- icon --></svg>\n        <div class=\"flex-1 min-w-0\">\n            <h3 class=\"text-base font-semibold tracking-tight text-foreground\">Profile settings</h3>\n            <p class=\"text-sm text-muted-foreground mt-0.5\">Update your name, avatar and preferences.</p>\n        </div>\n        <svg ...><!-- chevron-right --></svg>\n    </div>\n</a>")">
+			<ActionCard Href="/settings/profile" IconSvg="@IconSvg.Circle" Title="Profile settings" Description="Update your name, avatar and preferences." />
+		</ComponentExample>
+
+		<ComponentExample Title="Button card (OnClick)"
+			Code="@("<ActionCard OnClick=\"HandleClick\" Title=\"Generate report\" Description=\"Compile usage data into a downloadable PDF.\" />")"
+			Primitives="@("<button type=\"button\" class=\"flex flex-col group border border-border rounded-lg bg-background p-6 gap-4 hover:border-primary/50 hover:bg-subtle-bg cursor-pointer transition-colors no-underline\">\n    <div class=\"flex items-center gap-4\">\n        <div class=\"flex-1 min-w-0\">\n            <h3 class=\"text-base font-semibold tracking-tight text-foreground\">Generate report</h3>\n            <p class=\"text-sm text-muted-foreground mt-0.5\">Compile usage data into a downloadable PDF.</p>\n        </div>\n        <svg ...><!-- chevron-right --></svg>\n    </div>\n</button>")">
+			<ActionCard OnClick="HandleClick" Title="Generate report" Description="Compile usage data into a downloadable PDF." />
+		</ComponentExample>
+
+		<ComponentExample Title="Static card (no interaction)"
+			Code="@("<ActionCard Title=\"Read-only entry\" />")"
+			Primitives="@("<div class=\"flex flex-col group border border-border rounded-lg bg-background p-6 gap-4\">\n    <div class=\"flex items-center gap-4\">\n        <div class=\"flex-1 min-w-0\">\n            <h3 class=\"text-base font-semibold tracking-tight text-foreground\">Read-only entry</h3>\n        </div>\n        <svg ...><!-- chevron-right --></svg>\n    </div>\n</div>")">
+			<ActionCard Title="Read-only entry" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private void HandleClick() { }
+
+	private static readonly ApiElement[] ActionCardElements =
+	[
+		new ApiElement(
+			Name: "ActionCard",
+			Description: "A horizontally-laid card with an optional leading icon, a title, an optional description, and a trailing chevron. Automatically renders as `<a>` when `Href` is set, `<button>` when `OnClick` is wired, or `<div>` otherwise. The `group` class enables the chevron's `group-hover:translate-x-0.5` animation. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string",          false, "Card heading. Rendered as `<h3>` in `text-base font-semibold`. Default: empty string." ),
+				new ApiProperty( "Description", "string?",         false, "Supporting text in `text-sm text-muted-foreground`. Omit to suppress." ),
+				new ApiProperty( "Href",        "string?",         false, "When set, renders the card as `<a href>`. Takes precedence over `OnClick`." ),
+				new ApiProperty( "IconSvg",     "string?",         false, "SVG path string for the leading icon. Rendered at `size-6 text-primary`. Omit to suppress." ),
+				new ApiProperty( "OnClick",     "EventCallback",   false, "Click callback. Used when `Href` is not set to render the card as `<button>`." ),
+				new ApiProperty( "Borders",     "bool",            false, "Toggles `border border-border rounded-lg`. Default: `true`." ),
+				new ApiProperty( "BgFilled",    "bool",            false, "Toggles `bg-background`. Default: `true`." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Toggles `p-6 gap-4` on the card wrapper. Default: `true`." ),
+			]
+		),
+	];
+}

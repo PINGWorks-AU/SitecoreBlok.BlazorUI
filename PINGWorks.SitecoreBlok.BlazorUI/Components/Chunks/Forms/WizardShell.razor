@@ -1,0 +1,79 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	WizardShell — stepper header + per-step body + Back/Next footer.
+	Steps is a list of WizardStep records; StepContent is a RenderFragment<int>
+	that the consumer uses to render different UI per step index.
+*@
+
+<div class="flex flex-col gap-6">
+
+	@* Stepper header *@
+	<ol class="flex items-center gap-2 flex-wrap">
+		@if ( Steps is not null )
+		{
+			for ( int i = 0; i < Steps.Count; i++ )
+			{
+				var step = Steps[ i ];
+				var isActive = i == CurrentStep;
+				var isComplete = i < CurrentStep;
+				var idx = i;
+				<li class="flex items-center gap-2">
+					<span class="@StepCircleClass( isActive, isComplete )">@( idx + 1 )</span>
+					<span class="@StepLabelClass( isActive, isComplete )">@step.Label</span>
+					@if ( idx < Steps.Count - 1 )
+					{
+						<span class="w-8 h-px bg-border"></span>
+					}
+				</li>
+			}
+		}
+	</ol>
+
+	@* Body *@
+	<div class="min-h-32">
+		@StepContent?.Invoke( CurrentStep )
+	</div>
+
+	@* Back/Next footer *@
+	<div class="flex items-center justify-between border-t border-border pt-4">
+		<Button Variant="ButtonVariant.Outline" Disabled="@( CurrentStep == 0 )" Click="HandleBack">Back</Button>
+		<Button Disabled="@( Steps is null || CurrentStep >= Steps.Count - 1 )" Click="HandleNext">Next</Button>
+	</div>
+
+</div>
+
+@code {
+	[Parameter] public IList<WizardStep>? Steps { get; set; }
+	[Parameter] public int CurrentStep { get; set; } = 0;
+	[Parameter] public EventCallback<int> CurrentStepChanged { get; set; }
+	[Parameter] public RenderFragment<int>? StepContent { get; set; }
+
+	private async Task HandleBack()
+	{
+		if ( CurrentStep > 0 && CurrentStepChanged.HasDelegate )
+			await CurrentStepChanged.InvokeAsync( CurrentStep - 1 );
+	}
+
+	private async Task HandleNext()
+	{
+		if ( Steps is not null && CurrentStep < Steps.Count - 1 && CurrentStepChanged.HasDelegate )
+			await CurrentStepChanged.InvokeAsync( CurrentStep + 1 );
+	}
+
+	private static string StepCircleClass( bool isActive, bool isComplete )
+		=> CssClassBuilder.Start( "inline-flex items-center justify-center size-7 rounded-full text-sm font-medium border" )
+			.With( "bg-primary text-inverse-text border-primary", isActive )
+			.With( "bg-success text-inverse-text border-success", isComplete )
+			.With( "bg-background text-muted-foreground border-border", !isActive && !isComplete )
+			.Build();
+
+	private static string StepLabelClass( bool isActive, bool isComplete )
+		=> CssClassBuilder.Start( "text-sm" )
+			.With( "font-semibold text-foreground", isActive )
+			.With( "text-success", isComplete )
+			.With( "text-muted-foreground", !isActive && !isComplete )
+			.Build();
+
+	public sealed record WizardStep( string Label, string? Description = null );
+}

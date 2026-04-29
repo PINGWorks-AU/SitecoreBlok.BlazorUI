@@ -1,0 +1,23 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	FormSection — labelled grouping of form fields.
+	Renders an h2 heading + optional description above a flex-col gap-4 body slot.
+*@
+
+<div class="flex flex-col gap-4">
+	<div>
+		<h2 class="text-lg font-semibold tracking-tight text-foreground">@Title</h2>
+		@if ( !string.IsNullOrEmpty( Description ) )
+		{
+			<p class="text-sm text-muted-foreground mt-0.5">@Description</p>
+		}
+	</div>
+	<div class="flex flex-col gap-4">@ChildContent</div>
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

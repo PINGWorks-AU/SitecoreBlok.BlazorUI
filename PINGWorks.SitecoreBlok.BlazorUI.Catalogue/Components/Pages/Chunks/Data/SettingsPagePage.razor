@@ -1,0 +1,87 @@
+@page "/chunks/settings-page"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="SettingsPage" Description="Side-nav tabs on the left with a content area on the right — standard settings layout." Interactivity="ComponentInteractivity.Interactive" ApiElements="@SettingsPageElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="4 tabs with per-tab content"
+			Code="@("<SettingsPage Tabs=\"@Tabs\" SelectedTab=\"@SelectedTab\" SelectedTabChanged=\"@(k => SelectedTab = k)\">\n    <Content>\n        @if (SelectedTab == \"profile\") {\n            <p class=\"text-sm\">Profile settings content.</p>\n        } else if (SelectedTab == \"account\") {\n            <p class=\"text-sm\">Account settings content.</p>\n        } else if (SelectedTab == \"notifications\") {\n            <p class=\"text-sm\">Notification preferences.</p>\n        } else {\n            <p class=\"text-sm\">Security settings.</p>\n        }\n    </Content>\n</SettingsPage>")"
+			Primitives="@("<div class=\"flex flex-col lg:flex-row gap-6 lg:gap-8\">\n    <aside class=\"lg:w-56 shrink-0\">\n        <nav class=\"flex flex-col space-y-1 p-2\">\n            <button class=\"... text-foreground bg-neutral-bg font-medium\">Profile</button>\n            <button class=\"... text-muted-foreground hover:text-foreground hover:bg-neutral-bg\">Account</button>\n            <button class=\"...\">Notifications</button>\n            <button class=\"...\">Security</button>\n        </nav>\n    </aside>\n    <div class=\"flex-1 min-w-0\"><!-- tab content --></div>\n</div>")">
+			<SettingsPage Tabs="@ExTabs" SelectedTab="@ExTab" SelectedTabChanged="@(k => ExTab = k)">
+				<Content>
+					@if ( ExTab == "profile" )
+					{
+						<div class="space-y-3">
+							<h3 class="text-base font-semibold">Profile</h3>
+							<p class="text-sm text-muted-foreground">Update your display name and profile photo.</p>
+						</div>
+					}
+					else if ( ExTab == "account" )
+					{
+						<div class="space-y-3">
+							<h3 class="text-base font-semibold">Account</h3>
+							<p class="text-sm text-muted-foreground">Manage your email address and password.</p>
+						</div>
+					}
+					else if ( ExTab == "notifications" )
+					{
+						<div class="space-y-3">
+							<h3 class="text-base font-semibold">Notifications</h3>
+							<p class="text-sm text-muted-foreground">Choose which events trigger email or in-app alerts.</p>
+						</div>
+					}
+					else
+					{
+						<div class="space-y-3">
+							<h3 class="text-base font-semibold">Security</h3>
+							<p class="text-sm text-muted-foreground">Configure two-factor authentication and active sessions.</p>
+						</div>
+					}
+				</Content>
+			</SettingsPage>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string ExTab = "profile";
+
+	private static readonly IList<SettingsPage.SettingsTab> ExTabs =
+	[
+		new SettingsPage.SettingsTab( "Profile",       "profile" ),
+		new SettingsPage.SettingsTab( "Account",       "account" ),
+		new SettingsPage.SettingsTab( "Notifications", "notifications" ),
+		new SettingsPage.SettingsTab( "Security",      "security" ),
+	];
+
+	private static readonly ApiElement[] SettingsPageElements =
+	[
+		new ApiElement(
+			Name: "SettingsPage",
+			Description: "Two-column settings layout: a `NavList` of tab buttons in a fixed-width left sidebar (`lg:w-56`) and a `Content` area that fills the remaining width. Tab switching is fully controlled — pass `SelectedTab` and handle `SelectedTabChanged` to swap the content.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Tabs",               "IList<SettingsTab>?", false, "Ordered list of tab descriptors displayed in the sidebar nav." ),
+				new ApiProperty( "SelectedTab",        "string?",             false, "Key of the currently active tab. Controls the active state in the nav." ),
+				new ApiProperty( "SelectedTabChanged", "EventCallback<string>",false,"Fired with the new tab key when the user clicks a different tab." ),
+				new ApiProperty( "Content",            "RenderFragment?",     false, "Main content area rendered to the right of the nav." ),
+			]
+		),
+		new ApiElement(
+			Name: "SettingsPage.SettingsTab",
+			Description: "Immutable record describing a single sidebar tab.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Label",   "string",  true,  "Display text for the tab button." ),
+				new ApiProperty( "Key",     "string",  true,  "Unique identifier compared against `SelectedTab`." ),
+				new ApiProperty( "IconSvg", "string?", false, "Optional SVG path forwarded to `NavListItem.IconSvg`." ),
+			]
+		),
+	];
+}

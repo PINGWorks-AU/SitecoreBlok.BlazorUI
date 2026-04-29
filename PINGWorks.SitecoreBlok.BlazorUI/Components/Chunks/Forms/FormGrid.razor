@@ -1,0 +1,14 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	FormGrid — multi-column field layout.
+	Uses the same ColumnsClasses.Grid + SizeClasses.Gap pattern as CardGrid.
+*@
+
+<div class="@($"grid {ColumnsClasses.Grid( Columns )} {SizeClasses.Gap( Gap )}")">@ChildContent</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public Columns Columns { get; set; } = Columns.Two;
+	[Parameter] public Size Gap { get; set; } = Size.Md;
+}

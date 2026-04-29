@@ -1,0 +1,49 @@
+@inherits FieldBase<string?>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	ToggleGroupField — labelled toggle-group field chunk.
+	Wraps the ToggleGroup primitive with a label above and one ToggleGroupItem per option.
+	Each option may carry an IconSvg path; when present the icon renders inside the button
+	(typically replacing the text label, since ToggleGroup is designed for icon-only toolbars
+	like alignment or formatting selectors). When IconSvg is null the option's Label string
+	is rendered instead.
+*@
+
+<div class="space-y-1.5">
+	@if ( !string.IsNullOrEmpty( Label ) )
+	{
+		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+	}
+	<div @onfocusout="MarkTouched">
+		<ToggleGroup Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled" ClassName="@SizeClasses.Gap( Gap )">
+			@if ( Options is not null )
+			{
+				@foreach ( var option in Options )
+				{
+					<ToggleGroupItem Value="@option.Value">
+						@if ( !string.IsNullOrEmpty( option.IconSvg ) )
+						{
+							<Icon Svg="@option.IconSvg" ClassName="size-4" />
+						}
+						else
+						{
+							@option.Label
+						}
+					</ToggleGroupItem>
+				}
+			}
+		</ToggleGroup>
+	</div>
+	@if ( !string.IsNullOrEmpty( HelpText ) )
+	{
+		<p class="@HelpTextClass">@HelpText</p>
+	}
+</div>
+
+@code {
+	public sealed record ToggleGroupOption( string Value, string Label, string? IconSvg = null );
+
+	[Parameter] public IList<ToggleGroupOption>? Options { get; set; }
+	[Parameter] public Size Gap { get; set; } = Size.Xs3;
+}

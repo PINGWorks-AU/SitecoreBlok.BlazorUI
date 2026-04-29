@@ -1,0 +1,42 @@
+@page "/chunks/form-section"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FormSection" Description="Labelled grouping of form fields — h2 heading, optional description, and a flex-col body slot" Interactivity="ComponentInteractivity.Ssr" ApiElements="@FormSectionElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Section with fields"
+			Code="@("<FormSection Title=\"Personal details\" Description=\"Your name and contact information.\">\n    <TextField Label=\"Full name\" @bind-Value=\"FullName\" />\n    <TextField Label=\"Email address\" Type=\"TextField.TextFieldType.Email\" @bind-Value=\"EmailAddress\" />\n    <TextField Label=\"Phone\" Type=\"TextField.TextFieldType.Tel\" @bind-Value=\"Phone\" />\n</FormSection>")"
+			Primitives="@("<div class=\"flex flex-col gap-4\">\n    <div>\n        <h2 class=\"text-lg font-semibold tracking-tight text-foreground\">Personal details</h2>\n        <p class=\"text-sm text-muted-foreground mt-0.5\">Your name and contact information.</p>\n    </div>\n    <div class=\"flex flex-col gap-4\">\n        <!-- TextField × 3 -->\n    </div>\n</div>")">
+			<FormSection Title="Personal details" Description="Your name and contact information.">
+				<TextField Label="Full name" @bind-Value="FullName" />
+				<TextField Label="Email address" Type="TextField.TextFieldType.Email" @bind-Value="EmailAddress" />
+				<TextField Label="Phone" Type="TextField.TextFieldType.Tel" @bind-Value="Phone" />
+			</FormSection>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? FullName;
+	private string? EmailAddress;
+	private string? Phone;
+
+	private static readonly ApiElement[] FormSectionElements =
+	[
+		new ApiElement(
+			Name: "FormSection",
+			Description: "A labelled grouping of form fields. Renders an `<h2>` heading and optional description above a `flex-col gap-4` body slot. Intended to be stacked inside a `FormShell` Sections slot to divide a long form into logical groups.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",        "string",          true,  "Section heading. Rendered as `<h2>` in `text-lg font-semibold tracking-tight`." ),
+				new ApiProperty( "Description",  "string?",         false, "Optional sub-title rendered in `text-muted-foreground` below the heading." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Field elements rendered in a `flex-col gap-4` wrapper." ),
+			]
+		),
+	];
+}

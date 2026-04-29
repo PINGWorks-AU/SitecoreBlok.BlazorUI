@@ -1,0 +1,60 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	NavRail — narrow icon-only nav rail. Rendered as a fixed-width <aside> column
+	containing icon-only links.
+
+	Design choice: rather than coupling to NavListItem via a CascadingValue,
+	NavRail takes its own IList<NavRailItem> and renders its own icon buttons.
+	This keeps the rail independent of NavListItem's row-mode styling.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders  (default true) toggles border-r border-border.
+		- Gutters  (default true) toggles px-1 py-2 gap-1 on the inner column.
+		- BgFilled (default true) toggles bg-background.
+*@
+
+<aside class="@RailClass">
+	<div class="@ColumnClass">
+		@if ( Items is not null )
+		{
+			@foreach ( var item in Items )
+			{
+				<a href="@item.Href" title="@item.Label" aria-label="@item.Label" class="@ItemClass( item.Active )">
+					<Icon Svg="@item.IconSvg" ClassName="size-5" />
+				</a>
+			}
+		}
+	</div>
+</aside>
+
+@code {
+	[Parameter] public IList<NavRailItem>? Items { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+
+	private string RailClass
+		=> CssClassBuilder.Start( "w-14 shrink-0 h-full overflow-y-auto" )
+			.With( "border-r border-border", Borders )
+			.With( "bg-background", BgFilled )
+			.Build();
+
+	private string ColumnClass
+		=> CssClassBuilder.Start( "flex flex-col items-center" )
+			.With( "px-1 py-2 gap-1", Gutters )
+			.Build();
+
+	private static string ItemClass( bool isActive )
+		=> CssClassBuilder.Start( "flex items-center justify-center size-10 rounded-md transition-colors no-underline" )
+			.With( "bg-neutral-bg text-foreground", isActive )
+			.With( "text-muted-foreground hover:text-foreground hover:bg-neutral-bg", !isActive )
+			.Build();
+
+	public sealed record NavRailItem(
+		string IconSvg,
+		string Label,
+		string Href,
+		bool Active = false );
+}

@@ -1,0 +1,61 @@
+@page "/chunks/callout"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Callout" Description="Visually distinct aside for tips, warnings, and contextual notes — gentler than Alert" Interactivity="ComponentInteractivity.Ssr" ApiElements="@CalloutElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Info (default) with title and body"
+			Code="@("<Callout Title=\"Did you know?\" IconSvg=\"@IconSvg.Information\">\n    Sitecore Blok tokens are fully compatible with Tailwind CSS v4 and cascade naturally through your design system.\n</Callout>")"
+			Primitives="@("<div class=\"flex items-start bg-info-bg text-info-fg border border-info-fg rounded-lg p-4 gap-3\" role=\"status\">\n    <svg class=\"size-5 shrink-0 mt-0.5\"><!-- information icon --></svg>\n    <div class=\"flex-1 min-w-0\">\n        <p class=\"text-sm font-semibold mb-1\">Did you know?</p>\n        <div class=\"text-sm\">Sitecore Blok tokens are fully compatible with Tailwind CSS v4...</div>\n    </div>\n</div>")">
+			<Callout Title="Did you know?" IconSvg="@IconSvg.Information">
+				Sitecore Blok tokens are fully compatible with Tailwind CSS v4 and cascade naturally through your design system.
+			</Callout>
+		</ComponentExample>
+
+		<ComponentExample Title="Warning with icon"
+			Code="@("<Callout Title=\"Heads up\" Tone=\"Tone.Warning\" IconSvg=\"@IconSvg.Alert\">\n    Saving will overwrite your current draft. Make sure you have a backup before continuing.\n</Callout>")"
+			Primitives="@("<div class=\"flex items-start bg-warning-bg text-warning-fg border border-warning-fg rounded-lg p-4 gap-3\" role=\"status\">\n    <svg class=\"size-5 shrink-0 mt-0.5\"><!-- warning icon --></svg>\n    <div class=\"flex-1 min-w-0\">\n        <p class=\"text-sm font-semibold mb-1\">Heads up</p>\n        <div class=\"text-sm\">Saving will overwrite your current draft...</div>\n    </div>\n</div>")">
+			<Callout Title="Heads up" Tone="Tone.Warning" IconSvg="@IconSvg.Alert">
+				Saving will overwrite your current draft. Make sure you have a backup before continuing.
+			</Callout>
+		</ComponentExample>
+
+		<ComponentExample Title="Danger — title only"
+			Code="@("<Callout Title=\"This action cannot be undone.\" Tone=\"Tone.Danger\" />")"
+			Primitives="@("<div class=\"flex items-start bg-danger-bg text-danger-fg border border-danger-fg rounded-lg p-4 gap-3\" role=\"status\">\n    <div class=\"flex-1 min-w-0\">\n        <p class=\"text-sm font-semibold mb-1\">This action cannot be undone.</p>\n    </div>\n</div>")">
+			<Callout Title="This action cannot be undone." Tone="Tone.Danger" />
+		</ComponentExample>
+
+		<ComponentExample Title="Success — borderless"
+			Code="@("<Callout Title=\"All systems operational\" Tone=\"Tone.Success\" Borders=\"false\">\n    Every service is running within normal parameters.\n</Callout>")"
+			Primitives="@("<div class=\"flex items-start bg-success-bg text-success-fg p-4 gap-3\" role=\"status\">\n    <div class=\"flex-1 min-w-0\">\n        <p class=\"text-sm font-semibold mb-1\">All systems operational</p>\n        <div class=\"text-sm\">Every service is running within normal parameters.</div>\n    </div>\n</div>")">
+			<Callout Title="All systems operational" Tone="Tone.Success" Borders="false">
+				Every service is running within normal parameters.
+			</Callout>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] CalloutElements =
+	[
+		new ApiElement(
+			Name: "Callout",
+			Description: "Visually distinct aside for tips, warnings, and contextual notes. Softer than Alert — intended for supplementary information rather than critical errors. Uses the shared `Tone` enum and `ToneClasses` helper for tonal Tailwind classes. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",        "string?",         false, "Optional heading rendered in `text-sm font-semibold`. Omit to suppress." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Body slot for the callout text or any inline content. Rendered in `text-sm`." ),
+				new ApiProperty( "Tone",         "Tone",            false, "Tonal style. Default: `Tone.Info`. Other values: `Success`, `Warning`, `Danger`, `Neutral`. Drives background, foreground, and border colours via `ToneClasses`." ),
+				new ApiProperty( "IconSvg",      "string?",         false, "SVG path string for an optional leading icon. Rendered at `size-5 shrink-0 mt-0.5`. Omit to suppress." ),
+				new ApiProperty( "Borders",      "bool",            false, "Toggles `border`, the tonal border colour, and `rounded-lg`. Default: `true`." ),
+				new ApiProperty( "Gutters",      "bool",            false, "Toggles `p-4 gap-3` on the wrapper. Default: `true`." ),
+			]
+		),
+	];
+}

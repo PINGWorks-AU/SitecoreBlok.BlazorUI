@@ -1,0 +1,87 @@
+@page "/chunks/toolbar"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Toolbar" Description="Horizontal action strip — Start, Center, End slots. Density (Comfortable / Compact)" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ToolbarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Comfortable (default)"
+			Code="@("<Toolbar Borders=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Filter</Button>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Sort</Button>\n    </Start>\n    <End>\n        <Button Size=\"ButtonSize.Sm\">New item</Button>\n    </End>\n</Toolbar>")"
+			Primitives="@("<div class=\"flex items-center w-full px-4 py-2 min-h-12 gap-3 border border-border rounded-md\">\n    <div class=\"flex items-center gap-3\">\n        <button class=\"...\">Filter</button>\n        <button class=\"...\">Sort</button>\n    </div>\n    <div class=\"flex-1\"></div>\n    <div class=\"flex items-center gap-3\">\n        <button class=\"...\">New item</button>\n    </div>\n</div>")">
+			<Toolbar Borders="true">
+				<Start>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Filter</Button>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Sort</Button>
+				</Start>
+				<End>
+					<Button Size="ButtonSize.Sm">New item</Button>
+				</End>
+			</Toolbar>
+		</ComponentExample>
+
+		<ComponentExample Title="Compact density"
+			Code="@("<Toolbar Density=\"Density.Compact\" Borders=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Refresh</Button>\n    </Start>\n    <End>\n        <Text Kind=\"TextKind.Span\" Size=\"Size.Xs\" Muted>12 items</Text>\n    </End>\n</Toolbar>")"
+			Primitives="@("<div class=\"flex items-center w-full px-3 py-1 min-h-9 gap-2 border border-border rounded-md\">\n    <div class=\"flex items-center gap-2\">\n        <button class=\"...\">Refresh</button>\n    </div>\n    <div class=\"flex-1\"></div>\n    <div class=\"flex items-center gap-2\">\n        <span class=\"text-xs text-muted-foreground\">12 items</span>\n    </div>\n</div>")">
+			<Toolbar Density="Density.Compact" Borders="true">
+				<Start>
+					<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Refresh</Button>
+				</Start>
+				<End>
+					<Text Kind="TextKind.Span" Size="Size.Xs" Muted>12 items</Text>
+				</End>
+			</Toolbar>
+		</ComponentExample>
+
+		<ComponentExample Title="With center slot"
+			Code="@("<Toolbar Borders=\"true\">\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Back</Button>\n    </Start>\n    <Center>\n        <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\" SemiBold>Page title</Text>\n    </Center>\n    <End>\n        <Button Size=\"ButtonSize.Sm\">Save</Button>\n    </End>\n</Toolbar>")"
+			Primitives="@("<div class=\"flex items-center w-full px-4 py-2 min-h-12 gap-3 border border-border rounded-md\">\n    <div class=\"flex items-center gap-3\">\n        <button class=\"...\">Back</button>\n    </div>\n    <div class=\"flex-1 flex items-center justify-center gap-3\">\n        <span class=\"text-sm font-semibold\">Page title</span>\n    </div>\n    <div class=\"flex items-center gap-3\">\n        <button class=\"...\">Save</button>\n    </div>\n</div>")">
+			<Toolbar Borders="true">
+				<Start>
+					<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Back</Button>
+				</Start>
+				<Center>
+					<Text Kind="TextKind.Span" Size="Size.Sm" SemiBold>Page title</Text>
+				</Center>
+				<End>
+					<Button Size="ButtonSize.Sm">Save</Button>
+				</End>
+			</Toolbar>
+		</ComponentExample>
+
+		<ComponentExample Title="Bare (no border, no background)"
+			Code="@("<Toolbar>\n    <Start>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Action</Button>\n    </Start>\n    <End>\n        <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\" Muted>Inline</Text>\n    </End>\n</Toolbar>")"
+			Primitives="@("<div class=\"flex items-center w-full px-4 py-2 min-h-12 gap-3\">\n    <div class=\"flex items-center gap-3\">\n        <button class=\"...\">Action</button>\n    </div>\n    <div class=\"flex-1\"></div>\n    <div class=\"flex items-center gap-3\">\n        <span class=\"text-sm text-muted-foreground\">Inline</span>\n    </div>\n</div>")">
+			<Toolbar>
+				<Start>
+					<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Action</Button>
+				</Start>
+				<End>
+					<Text Kind="TextKind.Span" Size="Size.Sm" Muted>Inline</Text>
+				</End>
+			</Toolbar>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ToolbarElements =
+	[
+		new ApiElement(
+			Name: "Toolbar",
+			Description: "Horizontal action strip. Three slots — `Start` (left-aligned), `Center` (centred, takes remaining space), `End` (right-aligned). When `Center` is null, an empty `flex-1` spacer fills the middle so `End` stays right-aligned. `Density` controls padding, gap, and min-height via `DensityClasses`. Toolbar does NOT expose `Gutters` (Density already covers it) or `HeaderAlignment`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Start",    "RenderFragment?", false, "Left-aligned slot. Typically filter/sort buttons or a back button." ),
+				new ApiProperty( "Center",   "RenderFragment?", false, "Centred slot. Optional — when null, a spacer fills the middle. Typically a title or step indicator." ),
+				new ApiProperty( "End",      "RenderFragment?", false, "Right-aligned slot. Typically the primary action button." ),
+				new ApiProperty( "Density",  "Density",         false, "Vertical rhythm. Default: `Density.Comfortable`. Other value: `Compact`. Drives `DensityClasses.Padding/Gap/Height`. Shared `Density` enum." ),
+				new ApiProperty( "Borders",  "bool",            false, "Toggles `border border-border rounded-md`. Default: `false`. Set `true` for free-standing toolbars; leave `false` when embedded in another container that has its own border." ),
+				new ApiProperty( "BgFilled", "bool",            false, "Toggles `bg-background`. Default: `false`." ),
+			]
+		),
+	];
+}

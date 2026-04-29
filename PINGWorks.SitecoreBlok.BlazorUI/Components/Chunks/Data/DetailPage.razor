@@ -1,0 +1,28 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	DetailPage — record detail layout. PageHeader at top + two-column flex (Main + Aside) + Footer.
+*@
+
+<div class="flex flex-col gap-6">
+	<PageHeader Title="@Title" Description="@Description" />
+	<div class="flex flex-col lg:flex-row gap-6">
+		<div class="flex-1 min-w-0">@Main</div>
+		@if ( Aside is not null )
+		{
+			<aside class="lg:w-72 shrink-0">@Aside</aside>
+		}
+	</div>
+	@if ( Footer is not null )
+	{
+		<div class="border-t border-border pt-4">@Footer</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public RenderFragment? Main { get; set; }
+	[Parameter] public RenderFragment? Aside { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+}

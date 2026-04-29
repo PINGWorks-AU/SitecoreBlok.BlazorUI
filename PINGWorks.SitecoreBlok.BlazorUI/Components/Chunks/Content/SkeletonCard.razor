@@ -1,0 +1,66 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	SkeletonCard — skeleton-of-a-card preset for grid loading states.
+
+	Renders shimmer bars that mirror the layout of a typical content card:
+	an optional header bar, a configurable number of text lines with
+	natural width variation, and an optional button-shaped footer bar.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders   (default true)  — border border-border rounded-lg.
+		- BgFilled  (default true)  — bg-background.
+		- Gutters   (default true)  — p-4 gap-3.
+*@
+
+<div class="@CardClass">
+	@if ( WithHeader )
+	{
+		<Skeleton ClassName="h-5 w-2/3" />
+	}
+	<div class="flex flex-col gap-2">
+		@for ( int i = 0; i < Lines; i++ )
+		{
+			<Skeleton ClassName="@($"h-3 {LineWidthFor( i )}")" />
+		}
+	</div>
+	@if ( WithFooter )
+	{
+		<Skeleton ClassName="h-8 w-24 mt-1" />
+	}
+</div>
+
+@code {
+	/// <summary>Number of skeleton text bars in the body. Default: <c>3</c>.</summary>
+	[Parameter] public int Lines { get; set; } = 3;
+
+	/// <summary>Show a taller header bar (<c>h-5 w-2/3</c>) above the text lines. Default: <c>false</c>.</summary>
+	[Parameter] public bool WithHeader { get; set; } = false;
+
+	/// <summary>Show a button-shaped footer bar (<c>h-8 w-24</c>) below the text lines. Default: <c>false</c>.</summary>
+	[Parameter] public bool WithFooter { get; set; } = false;
+
+	/// <summary>Toggles <c>border border-border rounded-lg</c> on the wrapper. Default: <c>true</c>.</summary>
+	[Parameter] public bool Borders { get; set; } = true;
+
+	/// <summary>Toggles <c>bg-background</c> on the wrapper. Default: <c>true</c>.</summary>
+	[Parameter] public bool BgFilled { get; set; } = true;
+
+	/// <summary>Toggles <c>p-4 gap-3</c> on the wrapper. Default: <c>true</c>.</summary>
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private string CardClass
+		=> CssClassBuilder.Start( "flex flex-col" )
+			.With( "border border-border rounded-lg", Borders )
+			.With( "bg-background", BgFilled )
+			.With( "p-4 gap-3", Gutters )
+			.Build();
+
+	private static string LineWidthFor( int index )
+		=> index switch
+		{
+			0 => "w-full",
+			1 => "w-5/6",
+			_ => "w-3/4",
+		};
+}

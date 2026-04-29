@@ -1,0 +1,47 @@
+@page "/chunks/page-content"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="PageContent" Description="Vertical stack of sections with a consistent gap" Interactivity="ComponentInteractivity.Ssr" ApiElements="@PageContentElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Three stacked sections (default Lg gap)"
+			Code="@("<PageContent>\n    <ContentSection Title=\"Members\" Description=\"People with access to this project.\" />\n    <ContentSection Title=\"API keys\" Description=\"Active credentials for this environment.\" />\n    <ContentSection Title=\"Danger zone\" Description=\"Irreversible actions — proceed with caution.\" />\n</PageContent>")"
+			Primitives="@("<div class=\"flex flex-col gap-6\">\n    <section class=\"border-t border-border pt-6 pb-6\"><!-- Members --></section>\n    <section class=\"border-t border-border pt-6 pb-6\"><!-- API keys --></section>\n    <section class=\"border-t border-border pt-6 pb-6\"><!-- Danger zone --></section>\n</div>")">
+			<PageContent>
+				<ContentSection Title="Members" Description="People with access to this project." />
+				<ContentSection Title="API keys" Description="Active credentials for this environment." />
+				<ContentSection Title="Danger zone" Description="Irreversible actions — proceed with caution." />
+			</PageContent>
+		</ComponentExample>
+
+		<ComponentExample Title="Compact gap (Sm)"
+			Code="@("<PageContent Gap=\"Size.Sm\">\n    <ContentSection Title=\"Section A\" />\n    <ContentSection Title=\"Section B\" />\n    <ContentSection Title=\"Section C\" />\n</PageContent>")"
+			Primitives="@("<div class=\"flex flex-col gap-3\">\n    <section class=\"border-t border-border pt-6 pb-6\"><!-- Section A --></section>\n    <section class=\"border-t border-border pt-6 pb-6\"><!-- Section B --></section>\n    <section class=\"border-t border-border pt-6 pb-6\"><!-- Section C --></section>\n</div>")">
+			<PageContent Gap="Size.Sm">
+				<ContentSection Title="Section A" />
+				<ContentSection Title="Section B" />
+				<ContentSection Title="Section C" />
+			</PageContent>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] PageContentElements =
+	[
+		new ApiElement(
+			Name: "PageContent",
+			Description: "A vertical flex-col container for stacking page sections with a consistent `gap-*`. Pair with `ContentSection` children for the canonical settings-page layout. No wrapper-styling parameters — PageContent is a layout helper with no toggleable border, background, or padding; spacing is controlled entirely by `Gap`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Sections or other block content to stack vertically." ),
+				new ApiProperty( "Gap",          "Size",            false, "Inter-section gap. Default: `Size.Lg` (`gap-6`). Mapped through `SizeClasses.Gap`." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,60 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	AccountMenu — avatar trigger + DropdownMenu shell with name/email header.
+	Wraps DropdownMenu + DropdownMenuTrigger + Avatar + DropdownMenuContent +
+	DropdownMenuSeparator. The Items slot is where consumers put their
+	<DropdownMenuItem>s.
+
+	No wrapper-styling parameters exposed — the visual shape comes from the
+	underlying primitives' tokens.
+*@
+
+<DropdownMenu>
+	<DropdownMenuTrigger ClassName="rounded-full">
+		<Avatar>
+			@if ( !string.IsNullOrEmpty( AvatarUrl ) )
+			{
+				<AvatarImage Src="@AvatarUrl" />
+			}
+			<AvatarFallback>@DisplayInitials</AvatarFallback>
+		</Avatar>
+	</DropdownMenuTrigger>
+	<DropdownMenuContent ClassName="min-w-[14rem]">
+		<div class="flex flex-col gap-0.5 px-2 py-2">
+			<span class="text-sm font-semibold">@Name</span>
+			@if ( !string.IsNullOrEmpty( Email ) )
+			{
+				<span class="text-xs text-muted-foreground truncate">@Email</span>
+			}
+		</div>
+		<DropdownMenuSeparator />
+		@Items
+	</DropdownMenuContent>
+</DropdownMenu>
+
+@code {
+	[Parameter] public string Name { get; set; } = "";
+	[Parameter] public string? Email { get; set; }
+	[Parameter] public string? AvatarUrl { get; set; }
+	[Parameter] public string? Initials { get; set; }
+	[Parameter] public RenderFragment? Items { get; set; }
+
+	private string DisplayInitials
+		=> !string.IsNullOrEmpty( Initials )
+			? Initials
+			: DeriveInitials( Name );
+
+	private static string DeriveInitials( string name )
+	{
+		if ( string.IsNullOrWhiteSpace( name ) )
+			return "?";
+
+		var parts = name.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
+		if ( parts.Length == 0 )
+			return "?";
+		if ( parts.Length == 1 )
+			return parts[ 0 ][ 0 ].ToString().ToUpperInvariant();
+		return ( parts[ 0 ][ 0 ].ToString() + parts[ ^1 ][ 0 ].ToString() ).ToUpperInvariant();
+	}
+}

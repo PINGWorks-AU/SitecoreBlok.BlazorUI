@@ -1,0 +1,58 @@
+@page "/chunks/account-menu"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="AccountMenu" Description="Avatar trigger + DropdownMenu shell — Name, Email, AvatarUrl, Initials, Items slot" Interactivity="ComponentInteractivity.Interactive" ApiElements="@AccountMenuElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With initials fallback"
+			Code="@("<AccountMenu Name=\"Richard Hauer\" Email=\"richard@example.com\">\n    <Items>\n        <DropdownMenuItem Click=\"() => {}\">Profile</DropdownMenuItem>\n        <DropdownMenuItem Click=\"() => {}\">Settings</DropdownMenuItem>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\" Click=\"() => {}\">Sign out</DropdownMenuItem>\n    </Items>\n</AccountMenu>")"
+			Primitives="@("<button class=\"rounded-full\">\n    <span class=\"relative flex size-8 shrink-0 overflow-hidden rounded-full\">\n        <span class=\"bg-muted flex size-full items-center justify-center rounded-full text-xs font-medium text-foreground\">RH</span>\n    </span>\n</button>\n<!-- Menu opens on click; renders DropdownMenuContent with header + items -->")">
+			<div class="flex justify-end p-4">
+				<AccountMenu Name="Richard Hauer" Email="richard@example.com">
+					<Items>
+						<DropdownMenuItem>Profile</DropdownMenuItem>
+						<DropdownMenuItem>Settings</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive">Sign out</DropdownMenuItem>
+					</Items>
+				</AccountMenu>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With explicit initials"
+			Code="@("<AccountMenu Name=\"Anonymous\" Initials=\"AN\">\n    <Items>\n        <DropdownMenuItem>Sign in</DropdownMenuItem>\n        <DropdownMenuItem>Create account</DropdownMenuItem>\n    </Items>\n</AccountMenu>")"
+			Primitives="@("<button class=\"rounded-full\">\n    <span class=\"relative flex size-8 shrink-0 overflow-hidden rounded-full\">\n        <span class=\"bg-muted flex size-full items-center justify-center rounded-full text-xs font-medium text-foreground\">AN</span>\n    </span>\n</button>")">
+			<div class="flex justify-end p-4">
+				<AccountMenu Name="Anonymous" Initials="AN">
+					<Items>
+						<DropdownMenuItem>Sign in</DropdownMenuItem>
+						<DropdownMenuItem>Create account</DropdownMenuItem>
+					</Items>
+				</AccountMenu>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AccountMenuElements =
+	[
+		new ApiElement(
+			Name: "AccountMenu",
+			Description: "Avatar trigger + DropdownMenu shell with name/email header. Wraps `DropdownMenu` + `DropdownMenuTrigger` + `Avatar` + `DropdownMenuContent` + `DropdownMenuSeparator`. The `Items` slot is where consumers put their `<DropdownMenuItem>`s. When `AvatarUrl` is null (or fails to load), the Avatar shows initials — explicit via `Initials` or derived from `Name`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Name",      "string",          true,  "User's display name. Shown semibold in the menu header." ),
+				new ApiProperty( "Email",     "string?",         false, "User's email. Shown muted in the menu header below the name." ),
+				new ApiProperty( "AvatarUrl", "string?",         false, "Avatar image URL. When set, the avatar shows the image; when null (or the image errors), falls back to initials." ),
+				new ApiProperty( "Initials",  "string?",         false, "Explicit fallback text when no image (e.g. `RH`). When null and `Name` is set, the chunk derives initials from the first letter of each word in `Name` (max 2)." ),
+				new ApiProperty( "Items",     "RenderFragment?", false, "Menu items slot. Consumer fills with `<DropdownMenuItem>` and `<DropdownMenuSeparator>` elements." ),
+			]
+		),
+	];
+}

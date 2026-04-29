@@ -1,0 +1,37 @@
+@inherits FieldBase<double>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	SliderField — labelled slider field chunk.
+	Wraps the Slider primitive with a label above, the current value displayed inline,
+	and optional help text below.
+*@
+
+<div class="space-y-1.5">
+	@if ( !string.IsNullOrEmpty( Label ) )
+	{
+		<div class="flex items-center justify-between">
+			<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+			@if ( ShowValue )
+			{
+				<span class="text-xs text-muted-foreground">@Value</span>
+			}
+		</div>
+	}
+	<Slider Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )"
+	        Min="@Min" Max="@Max" Step="@Step" Disabled="@Disabled"
+	        @onblur="MarkTouched" />
+	@if ( !string.IsNullOrEmpty( HelpText ) )
+	{
+		<p class="@HelpTextClass">@HelpText</p>
+	}
+</div>
+
+@code {
+	[Parameter] public double Min { get; set; } = 0;
+	[Parameter] public double Max { get; set; } = 100;
+	[Parameter] public double Step { get; set; } = 1;
+	[Parameter] public bool ShowValue { get; set; } = true;
+
+	protected override bool IsEmpty( double value ) => false;
+}

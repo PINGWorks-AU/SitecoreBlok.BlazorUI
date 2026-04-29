@@ -1,0 +1,65 @@
+@page "/chunks/confirm-dialog"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="ConfirmDialog" Description="Dialog-based confirm-action wrapper — title, message, Cancel/Confirm buttons, tone-driven color scheme" Interactivity="ComponentInteractivity.Interactive" ApiElements="@ConfirmDialogElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Danger confirm dialog"
+			Code="@("<Button ColorScheme=\"ButtonColor.Danger\" Click=\"() => DeleteOpen = true\">Delete item</Button>\n<ConfirmDialog\n    Open=\"@DeleteOpen\" OpenChanged=\"v => DeleteOpen = v\"\n    Title=\"Delete item?\"\n    Message=\"This action cannot be undone. The item will be permanently removed.\"\n    ConfirmLabel=\"Delete\"\n    Tone=\"Tone.Danger\"\n    OnConfirm=\"HandleDelete\" />\n\n@code {\n    private bool DeleteOpen;\n    private void HandleDelete() { }\n}")"
+			Primitives="@("<Dialog Open=\"@DeleteOpen\" OpenChanged=\"v => DeleteOpen = v\">\n    <DialogHeader>\n        <DialogTitle>Delete item?</DialogTitle>\n        <DialogDescription>This action cannot be undone. The item will be permanently removed.</DialogDescription>\n    </DialogHeader>\n    <DialogFooter>\n        <button class=\"...\">Cancel</button>\n        <button class=\"bg-danger ...\">Delete</button>\n    </DialogFooter>\n</Dialog>")">
+			<Button ColorScheme="ButtonColor.Danger" Click="() => DeleteOpen = true">Delete item</Button>
+			<ConfirmDialog
+				Open="@DeleteOpen" OpenChanged="v => DeleteOpen = v"
+				Title="Delete item?"
+				Message="This action cannot be undone. The item will be permanently removed."
+				ConfirmLabel="Delete"
+				Tone="Tone.Danger"
+				OnConfirm="HandleDelete" />
+		</ComponentExample>
+
+		<ComponentExample Title="Success confirm dialog"
+			Code="@("<Button Click=\"() => PublishOpen = true\">Publish</Button>\n<ConfirmDialog\n    Open=\"@PublishOpen\" OpenChanged=\"v => PublishOpen = v\"\n    Title=\"Publish changes?\"\n    Message=\"Your changes will be visible to all users immediately.\"\n    ConfirmLabel=\"Publish\"\n    Tone=\"Tone.Success\"\n    OnConfirm=\"HandlePublish\" />\n\n@code {\n    private bool PublishOpen;\n    private void HandlePublish() { }\n}")"
+			Primitives="@("<Dialog Open=\"@PublishOpen\" OpenChanged=\"v => PublishOpen = v\">\n    <DialogHeader>\n        <DialogTitle>Publish changes?</DialogTitle>\n        <DialogDescription>Your changes will be visible to all users immediately.</DialogDescription>\n    </DialogHeader>\n    <DialogFooter>\n        <button class=\"...\">Cancel</button>\n        <button class=\"bg-success ...\">Publish</button>\n    </DialogFooter>\n</Dialog>")">
+			<Button Click="() => PublishOpen = true">Publish</Button>
+			<ConfirmDialog
+				Open="@PublishOpen" OpenChanged="v => PublishOpen = v"
+				Title="Publish changes?"
+				Message="Your changes will be visible to all users immediately."
+				ConfirmLabel="Publish"
+				Tone="Tone.Success"
+				OnConfirm="HandlePublish" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private bool DeleteOpen;
+	private bool PublishOpen;
+
+	private void HandleDelete() { }
+	private void HandlePublish() { }
+
+	private static readonly ApiElement[] ConfirmDialogElements =
+	[
+		new ApiElement(
+			Name: "ConfirmDialog",
+			Description: "A Dialog-based confirm-action wrapper. Hides the Dialog/DialogHeader/DialogTitle/DialogDescription/DialogFooter composition behind text props and a `Tone` enum that drives the Confirm button's color scheme.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",        "string",              false, "Dialog title. Default: `\"Are you sure?\"`." ),
+				new ApiProperty( "Message",      "string",              false, "Explanatory message rendered in `DialogDescription`. Default: `\"\"`." ),
+				new ApiProperty( "ConfirmLabel", "string",              false, "Confirm button text. Default: `\"Confirm\"`." ),
+				new ApiProperty( "CancelLabel",  "string",              false, "Cancel button text. Default: `\"Cancel\"`." ),
+				new ApiProperty( "Tone",         "Tone",                false, "Drives the Confirm button's `ColorScheme`. `Danger` → red, `Success` → green, others → `Primary`. Default: `Tone.Danger`." ),
+				new ApiProperty( "Open",         "bool",                false, "Dialog open state. Two-way bindable via `OpenChanged`." ),
+				new ApiProperty( "OpenChanged",  "EventCallback<bool>", false, "Fires when the dialog requests to close. Pair with `Open` for two-way binding." ),
+				new ApiProperty( "OnConfirm",    "EventCallback",       false, "Fires when the Confirm button is clicked. The dialog closes immediately after." ),
+			]
+		),
+	];
+}

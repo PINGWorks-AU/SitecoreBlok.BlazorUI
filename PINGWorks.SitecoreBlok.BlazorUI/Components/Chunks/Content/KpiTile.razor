@@ -1,0 +1,52 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	KpiTile — single big-number stat tile for dashboards and summary panels.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders   (default true) toggles border border-border rounded-lg.
+		- BgFilled  (default true) toggles bg-background.
+		- Gutters   (default true) toggles p-4 gap-1.
+*@
+
+<div class="@TileClass">
+	<div class="flex items-start justify-between gap-2">
+		<span class="text-sm text-muted-foreground">@Label</span>
+		@if ( !string.IsNullOrEmpty( IconSvg ) )
+		{
+			<Icon Svg="@IconSvg" ClassName="size-4 text-muted-foreground shrink-0" />
+		}
+	</div>
+	<div class="text-2xl font-bold tracking-tight text-foreground">@Value</div>
+	@if ( !string.IsNullOrEmpty( Delta ) )
+	{
+		<div class="@DeltaClass">
+			<Icon Svg="@TrendIcons.ForTrend( Trend )" ClassName="size-4" />
+			<span>@Delta</span>
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string Label { get; set; } = "";
+	[Parameter] public string Value { get; set; } = "";
+	[Parameter] public string? Delta { get; set; }
+	[Parameter] public Trend Trend { get; set; } = Trend.Neutral;
+	[Parameter] public string? IconSvg { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private string TileClass
+		=> CssClassBuilder.Start( "flex flex-col" )
+			.With( "border border-border rounded-lg", Borders )
+			.With( "bg-background", BgFilled )
+			.With( "p-4 gap-1", Gutters )
+			.Build();
+
+	private string DeltaClass
+		=> CssClassBuilder.Start( "flex items-center gap-1 text-sm" )
+			.With( TrendClasses.Text( Trend ) )
+			.Build();
+}

@@ -1,0 +1,67 @@
+@page "/chunks/form-grid"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FormGrid" Description="Multi-column field layout — column count and gap parameterised via the shared Columns and Size enums" Interactivity="ComponentInteractivity.Ssr" ApiElements="@FormGridElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Two columns (default)"
+			Code="@("<FormGrid>\n    <TextField Label=\"First name\" @bind-Value=\"FirstName\" />\n    <TextField Label=\"Last name\" @bind-Value=\"LastName\" />\n    <TextField Label=\"Email\" Type=\"TextField.TextFieldType.Email\" @bind-Value=\"Email\" />\n    <TextField Label=\"Phone\" Type=\"TextField.TextFieldType.Tel\" @bind-Value=\"Phone\" />\n</FormGrid>")"
+			Primitives="@("<div class=\"grid grid-cols-1 sm:grid-cols-2 gap-4\">\n    <!-- TextField × 4 -->\n</div>")">
+			<FormGrid>
+				<TextField Label="First name" @bind-Value="FirstName" />
+				<TextField Label="Last name" @bind-Value="LastName" />
+				<TextField Label="Email" Type="TextField.TextFieldType.Email" @bind-Value="Email" />
+				<TextField Label="Phone" Type="TextField.TextFieldType.Tel" @bind-Value="Phone" />
+			</FormGrid>
+		</ComponentExample>
+
+		<ComponentExample Title="Three columns"
+			Code="@("<FormGrid Columns=\"Columns.Three\">\n    <TextField Label=\"First name\" @bind-Value=\"FirstName\" />\n    <TextField Label=\"Last name\" @bind-Value=\"LastName\" />\n    <TextField Label=\"Email\" Type=\"TextField.TextFieldType.Email\" @bind-Value=\"Email\" />\n    <TextField Label=\"Phone\" Type=\"TextField.TextFieldType.Tel\" @bind-Value=\"Phone\" />\n    <SelectField Label=\"Country\" Items=\"@Countries\" @bind-Value=\"Country\" />\n    <TextField Label=\"Postcode\" @bind-Value=\"Postcode\" />\n</FormGrid>")"
+			Primitives="@("<div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4\">\n    <!-- TextField × 4, SelectField × 1, TextField × 1 -->\n</div>")">
+			<FormGrid Columns="Columns.Three">
+				<TextField Label="First name" @bind-Value="FirstName" />
+				<TextField Label="Last name" @bind-Value="LastName" />
+				<TextField Label="Email" Type="TextField.TextFieldType.Email" @bind-Value="Email" />
+				<TextField Label="Phone" Type="TextField.TextFieldType.Tel" @bind-Value="Phone" />
+				<SelectField Label="Country" Items="@Countries" @bind-Value="Country" />
+				<TextField Label="Postcode" @bind-Value="Postcode" />
+			</FormGrid>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? FirstName;
+	private string? LastName;
+	private string? Email;
+	private string? Phone;
+	private string? Country;
+	private string? Postcode;
+
+	private static readonly List<SelectField.SelectFieldItem> Countries =
+	[
+		new( "au", "Australia" ),
+		new( "us", "United States" ),
+		new( "uk", "United Kingdom" ),
+		new( "ca", "Canada" ),
+	];
+
+	private static readonly ApiElement[] FormGridElements =
+	[
+		new ApiElement(
+			Name: "FormGrid",
+			Description: "A responsive CSS grid wrapper for form field layouts. Column count and gap are parameterised via the shared `Columns` and `Size` enums. Breakpoint logic is centralised in `ColumnsClasses.Grid` so Tailwind scans literal class strings. Default is two columns (`Columns.Two`) with a medium gap (`Size.Md`).",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Field elements placed in the grid." ),
+				new ApiProperty( "Columns",      "Columns",         false, "Number of columns (responsive). Default: `Columns.Two` (`grid-cols-1 sm:grid-cols-2`). Mapped through `ColumnsClasses.Grid`." ),
+				new ApiProperty( "Gap",          "Size",            false, "Grid gap. Default: `Size.Md` (`gap-4`). Mapped through `SizeClasses.Gap`." ),
+			]
+		),
+	];
+}

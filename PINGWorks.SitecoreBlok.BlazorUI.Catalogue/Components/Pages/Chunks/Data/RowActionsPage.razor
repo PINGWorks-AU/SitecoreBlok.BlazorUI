@@ -1,0 +1,39 @@
+@page "/chunks/row-actions"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="RowActions" Description="Table-row dropdown action menu — three-dot trigger with DropdownMenuItem children in the Items slot." Interactivity="ComponentInteractivity.Interactive" ApiElements="@RowActionsElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Edit / Duplicate / Delete menu"
+			Code="@("<RowActions>\n    <Items>\n        <DropdownMenuItem>Edit</DropdownMenuItem>\n        <DropdownMenuItem>Duplicate</DropdownMenuItem>\n        <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\">Delete</DropdownMenuItem>\n    </Items>\n</RowActions>")"
+			Primitives="@("<div class=\"relative inline-block\">\n    <button type=\"button\" class=\"rounded-md hover:bg-neutral-bg p-1 relative inline-block\">\n        <svg class=\"size-4 text-muted-foreground\"><!-- dots-horizontal --></svg>\n    </button>\n    <!-- dropdown panel (when open) -->\n    <div class=\"bg-popover text-popover-foreground z-50 min-w-[10rem] overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md fixed\">\n        <div class=\"...\">Edit</div>\n        <div class=\"...\">Duplicate</div>\n        <div class=\"... data-[variant=destructive]:hover:text-destructive data-[variant=destructive]:hover:bg-destructive/10\" data-variant=\"destructive\">Delete</div>\n    </div>\n</div>")">
+			<RowActions>
+				<Items>
+					<DropdownMenuItem>Edit</DropdownMenuItem>
+					<DropdownMenuItem>Duplicate</DropdownMenuItem>
+					<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive">Delete</DropdownMenuItem>
+				</Items>
+			</RowActions>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] RowActionsElements =
+	[
+		new ApiElement(
+			Name: "RowActions",
+			Description: "A pre-wired `DropdownMenu` for table row actions. Renders a small icon button (three-dot by default) as the trigger, with a `DropdownMenuContent` panel sized to `min-w-[10rem]`. Populate the `Items` slot with `DropdownMenuItem` elements.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "IconSvg", "string",          false, "SVG path for the trigger icon. Defaults to `IconSvg.DotsHorizontal`." ),
+				new ApiProperty( "Items",   "RenderFragment?", false, "Slot for `DropdownMenuItem` children rendered inside the dropdown panel." ),
+			]
+		),
+	];
+}

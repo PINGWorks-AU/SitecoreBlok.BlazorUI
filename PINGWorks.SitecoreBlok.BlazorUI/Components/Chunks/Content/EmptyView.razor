@@ -1,0 +1,30 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	EmptyView — full-viewport empty state. Composes EmptyStatePanel inside a
+	flex wrapper sized via MinHeight so the centred layout fills the chosen area.
+	Accepts the same API as EmptyStatePanel and forwards all parameters.
+
+	MinHeight defaults to "min-h-screen" for production use. Consumers (and the
+	catalogue's bounded preview container) can pass "h-full" to fit a parent.
+*@
+
+<div class="@($"{MinHeight} flex items-center justify-center bg-subtle-bg p-6")">
+	<EmptyStatePanel Title="@Title" Description="@Description" IconSvg="@IconSvg"
+	                 Borders="@Borders" BgFilled="@BgFilled" Gutters="@Gutters">
+		<Action>@Action</Action>
+	</EmptyStatePanel>
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public string? IconSvg { get; set; }
+	[Parameter] public RenderFragment? Action { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = false;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	[Parameter] public string MinHeight { get; set; } = "min-h-screen";
+}

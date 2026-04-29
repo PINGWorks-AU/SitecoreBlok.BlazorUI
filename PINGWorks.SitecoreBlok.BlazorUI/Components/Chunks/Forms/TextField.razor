@@ -1,0 +1,65 @@
+@inherits FieldBase<string?>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	TextField — labelled text-input field chunk.
+	Wraps the Input primitive with a label, help text, and error state.
+	When StartAddon or EndAddon slots are provided, the chunk renders the
+	input inside an InputGroup with InputGroupAddon siblings (icon, prefix,
+	suffix text, action button, etc.).
+*@
+
+<div class="space-y-1.5">
+	@if ( !string.IsNullOrEmpty( Label ) )
+	{
+		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+	}
+	@if ( StartAddon is not null || EndAddon is not null )
+	{
+		<InputGroup>
+			@if ( StartAddon is not null )
+			{
+				<InputGroupAddon Align="InputGroupAlign.InlineStart">@StartAddon</InputGroupAddon>
+			}
+			<InputGroupInput Type="@TypeString" Value="@Value"
+				ValueChanged="@( async v => await UpdateValue( v ) )"
+				Placeholder="@Placeholder" Disabled="@Disabled"
+				@onblur="MarkTouched"
+				id="@Id" />
+			@if ( EndAddon is not null )
+			{
+				<InputGroupAddon Align="InputGroupAlign.InlineEnd">@EndAddon</InputGroupAddon>
+			}
+		</InputGroup>
+	}
+	else
+	{
+		<Input Id="@Id" Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )"
+		       Type="@TypeString" Placeholder="@Placeholder" Disabled="@Disabled"
+		       @onblur="MarkTouched" />
+	}
+	@if ( !string.IsNullOrEmpty( HelpText ) )
+	{
+		<p class="@HelpTextClass">@HelpText</p>
+	}
+</div>
+
+@code {
+	public enum TextFieldType { Text, Email, Number, Tel, Url }
+
+	[Parameter] public string? Placeholder { get; set; }
+	[Parameter] public TextFieldType Type { get; set; } = TextFieldType.Text;
+
+	[Parameter] public RenderFragment? StartAddon { get; set; }
+	[Parameter] public RenderFragment? EndAddon { get; set; }
+
+	private string TypeString
+		=> Type switch
+		{
+			TextFieldType.Email  => "email",
+			TextFieldType.Number => "number",
+			TextFieldType.Tel    => "tel",
+			TextFieldType.Url    => "url",
+			_                    => "text",
+		};
+}

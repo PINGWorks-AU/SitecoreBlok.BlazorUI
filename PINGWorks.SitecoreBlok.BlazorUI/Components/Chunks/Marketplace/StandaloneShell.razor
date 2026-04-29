@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	StandaloneShell — shell for the Cloud Portal homepage launch (new-tab) extension point.
+	The app owns the whole tab. This shell sets min-h-screen + Blok defaults — identical render to
+	FullScreenShell, but the catalogue page documents the different host context.
+*@
+
+<div class="min-h-screen bg-background text-foreground">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

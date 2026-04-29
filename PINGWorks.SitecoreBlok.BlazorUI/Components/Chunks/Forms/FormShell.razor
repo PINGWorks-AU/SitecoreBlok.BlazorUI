@@ -1,0 +1,30 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	FormShell — page-level form envelope.
+	Composes PageHeader for the title/description band, renders a Sections slot
+	inside a flex-col gap-8 wrapper, and wraps the Actions slot inside a sticky
+	FormActions row at the bottom.
+*@
+
+<form @onsubmit="OnSubmit" @onsubmit:preventDefault="true" class="flex flex-col gap-8">
+	<PageHeader Title="@Title" Description="@Description" />
+	@if ( Sections is not null )
+	{
+		<div class="flex flex-col gap-8">@Sections</div>
+	}
+	@if ( Actions is not null )
+	{
+		<FormActions Sticky="true">
+			<End>@Actions</End>
+		</FormActions>
+	}
+</form>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public EventCallback OnSubmit { get; set; }
+	[Parameter] public RenderFragment? Sections { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
+}

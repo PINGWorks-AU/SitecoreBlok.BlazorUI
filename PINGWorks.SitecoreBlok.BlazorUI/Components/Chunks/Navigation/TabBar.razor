@@ -1,0 +1,84 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	TabBar — horizontal tab strip with route-aware active state.
+	Renders each tab as <button> when SelectedChanged is wired; otherwise as <a href>.
+	Selected is the Href of the active tab — drives the active-state visual.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders (default true) toggles border-b border-border on the bottom of the row.
+		- Gutters (default true) toggles px-4 gap-6 on the row.
+*@
+
+@if ( Items is not null && Items.Count > 0 )
+{
+	<nav class="@RowClass">
+		@foreach ( var tab in Items )
+		{
+			var isActive = !string.IsNullOrEmpty( Selected ) && string.Equals( Selected, tab.Href, StringComparison.Ordinal );
+			var tabClass = TabClass( isActive );
+
+			@if ( SelectedChanged.HasDelegate )
+			{
+				<button type="button" @onclick="@(() => HandleSelect( tab.Href ))" class="@tabClass">
+					@if ( !string.IsNullOrEmpty( tab.IconSvg ) )
+					{
+						<Icon Svg="@tab.IconSvg" ClassName="size-4 shrink-0" />
+					}
+					<span>@tab.Label</span>
+					@if ( !string.IsNullOrEmpty( tab.Badge ) )
+					{
+						<Badge ColorScheme="BadgeColor.Neutral">@tab.Badge</Badge>
+					}
+				</button>
+			}
+			else
+			{
+				<a href="@tab.Href" class="@($"{tabClass} no-underline")">
+					@if ( !string.IsNullOrEmpty( tab.IconSvg ) )
+					{
+						<Icon Svg="@tab.IconSvg" ClassName="size-4 shrink-0" />
+					}
+					<span>@tab.Label</span>
+					@if ( !string.IsNullOrEmpty( tab.Badge ) )
+					{
+						<Badge ColorScheme="BadgeColor.Neutral">@tab.Badge</Badge>
+					}
+				</a>
+			}
+		}
+	</nav>
+}
+
+@code {
+	[Parameter] public IList<TabDefinition>? Items { get; set; }
+	[Parameter] public string? Selected { get; set; }
+	[Parameter] public EventCallback<string> SelectedChanged { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private string RowClass
+		=> CssClassBuilder.Start( "flex items-end" )
+			.With( "border-b border-border", Borders )
+			.With( "px-4 gap-6", Gutters )
+			.Build();
+
+	private static string TabClass( bool isActive )
+		=> CssClassBuilder.Start( "flex items-center gap-2 py-3 text-sm transition-colors border-b-2 -mb-px" )
+			.With( "border-primary text-foreground font-medium", isActive )
+			.With( "border-transparent text-muted-foreground hover:text-foreground hover:border-border", !isActive )
+			.Build();
+
+	private async Task HandleSelect( string href )
+	{
+		if ( SelectedChanged.HasDelegate )
+			await SelectedChanged.InvokeAsync( href );
+	}
+
+	public sealed record TabDefinition(
+		string Label,
+		string Href,
+		string? IconSvg = null,
+		string? Badge = null );
+}

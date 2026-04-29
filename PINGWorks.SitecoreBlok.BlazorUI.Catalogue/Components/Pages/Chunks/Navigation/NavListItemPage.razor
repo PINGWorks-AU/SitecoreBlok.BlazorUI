@@ -1,0 +1,55 @@
+@page "/chunks/nav-list-item"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="NavListItem" Description="Single nav row — Href, IconSvg, Label, Active, Badge, OnClick" Interactivity="ComponentInteractivity.Ssr" ApiElements="@NavListItemElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default (icon + label)"
+			Code="@("<NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Profile\" />")"
+			Primitives="@("<a href=\"#\" class=\"flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-neutral-bg no-underline\">\n    <svg class=\"size-4 shrink-0\">...</svg>\n    <span class=\"truncate\">Profile</span>\n</a>")">
+			<div class="border rounded-lg p-2 max-w-md">
+				<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Profile" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Active state"
+			Code="@("<NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Profile\" Active=\"true\" />")"
+			Primitives="@("<a href=\"#\" class=\"flex items-center gap-3 px-3 py-2 rounded-md text-sm text-foreground bg-neutral-bg font-medium no-underline\">\n    <svg class=\"size-4 shrink-0\">...</svg>\n    <span class=\"truncate\">Profile</span>\n</a>")">
+			<div class="border rounded-lg p-2 max-w-md">
+				<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Profile" Active="true" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With trailing badge"
+			Code="@("<NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Inbox\" Badge=\"3\" />")"
+			Primitives="@("<a href=\"#\" class=\"flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-neutral-bg no-underline\">\n    <svg class=\"size-4 shrink-0\">...</svg>\n    <span class=\"truncate\">Inbox</span>\n    <span class=\"ml-auto\">\n        <span class=\"... bg-neutral-bg text-neutral-fg ...\">3</span>\n    </span>\n</a>")">
+			<div class="border rounded-lg p-2 max-w-md">
+				<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Inbox" Badge="3" />
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] NavListItemElements =
+	[
+		new ApiElement(
+			Name: "NavListItem",
+			Description: "Single nav row with optional leading icon, label, optional trailing badge, and active-state visual. Rendered as `<a>` when `Href` is set, `<button>` when `OnClick` is set with no `Href`. Active state uses `bg-neutral-bg text-foreground font-medium`. As a single inline element it doesn't expose the wrapper-styling parameters (Borders/Gutters/HeaderAlignment/BgFilled) — those apply to chunks with region wrappers.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Href",    "string?",       false, "Anchor `href`. When set, the item renders as `<a>`." ),
+				new ApiProperty( "IconSvg", "string?",       false, "Leading icon (SVG path string). Use members of the `IconSvg` static class (e.g. `IconSvg.Account`)." ),
+				new ApiProperty( "Label",   "string",        true,  "Visible row text." ),
+				new ApiProperty( "Active",  "bool",          false, "When `true`, the row uses the active-state visual: `bg-neutral-bg text-foreground font-medium`. Default: `false`." ),
+				new ApiProperty( "Badge",   "string?",       false, "Optional trailing badge label rendered via the `Badge` primitive." ),
+				new ApiProperty( "OnClick", "EventCallback", false, "Click handler. When set with no `Href`, the item renders as `<button>`." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,49 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	BreadcrumbBar — declarative breadcrumb. Takes an IList<BreadcrumbItem> trail;
+	the last item is rendered as the current page (bold foreground, no link),
+	earlier items are anchored links separated by `›`.
+
+	A single inline element (no region wrappers), so wrapper-styling parameters do not apply.
+*@
+
+@if ( Items is not null && Items.Count > 0 )
+{
+	<nav aria-label="Breadcrumb">
+		<ol class="flex items-center gap-1.5 text-sm">
+			@for ( int i = 0; i < Items.Count; i++ )
+			{
+				var item = Items[ i ];
+				var isLast = i == Items.Count - 1;
+				<li class="flex items-center gap-1.5">
+					@if ( !string.IsNullOrEmpty( item.IconSvg ) )
+					{
+						<Icon Svg="@item.IconSvg" ClassName="size-3.5 shrink-0" />
+					}
+					@if ( isLast )
+					{
+						<span class="text-foreground font-medium">@item.Label</span>
+					}
+					else
+					{
+						<a href="@item.Href" class="text-muted-foreground hover:text-foreground transition-colors no-underline">@item.Label</a>
+					}
+				</li>
+				@if ( !isLast )
+				{
+					<li class="flex items-center text-muted-foreground" aria-hidden="true">›</li>
+				}
+			}
+		</ol>
+	</nav>
+}
+
+@code {
+	[Parameter] public IList<BreadcrumbItem>? Items { get; set; }
+
+	public sealed record BreadcrumbItem(
+		string Label,
+		string Href,
+		string? IconSvg = null );
+}

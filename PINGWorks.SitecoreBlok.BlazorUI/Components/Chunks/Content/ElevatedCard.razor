@@ -1,0 +1,27 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	ElevatedCard — Content-family chunk that encapsulates the Card primitive.
+	Sibling to FeatureCard / ActionCard / MediaCard but exposes Card's
+	enum-driven Style / Elevation / HoverElevation / Padding API instead of
+	the wrapper-styling Borders / BgFilled / Gutters bool triple.
+
+	Use when you want a shadow / lift effect (e.g. dashboard tiles, hero
+	cards, raised dialogs). For flat outlined cards with simpler toggles,
+	prefer FeatureCard or one of the other Content card chunks.
+*@
+
+<Card Style="@Style" Elevation="@Elevation" HoverElevation="@HoverElevation" Padding="@Padding" ClassName="@ClassName">
+	@ChildContent
+</Card>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	[Parameter] public CardStyle Style { get; set; } = CardStyle.Outline;
+	[Parameter] public CardElevation Elevation { get; set; } = CardElevation.Sm;
+	[Parameter] public CardElevation? HoverElevation { get; set; }
+	[Parameter] public CardPadding Padding { get; set; } = CardPadding.Lg;
+
+	[Parameter] public string? ClassName { get; set; }
+}

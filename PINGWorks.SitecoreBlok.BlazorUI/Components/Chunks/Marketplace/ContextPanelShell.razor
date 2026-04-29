@@ -1,0 +1,52 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	ContextPanelShell — shell for the XMC Page Builder left context panel
+	extension point. Constrained to max-w-[600px], full-height column with a
+	scrollable body. Header and Footer are flex-shrink-0; Body is flex-1 + overflow-y-auto.
+*@
+
+<div class="@OuterClass">
+	@if ( Header is not null )
+	{
+		<div class="@HeaderClass">@Header</div>
+	}
+	<div class="@BodyClass">@Body</div>
+	@if ( Footer is not null )
+	{
+		<div class="@FooterClass">@Footer</div>
+	}
+</div>
+
+@code {
+	[Parameter] public RenderFragment? Header { get; set; }
+	[Parameter] public RenderFragment? Body { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+
+	private string OuterClass
+		=> CssClassBuilder.Start( "flex flex-col h-full w-full max-w-[600px]" )
+			.With( "border border-border rounded-lg", Borders )
+			.With( "bg-background", BgFilled )
+			.Build();
+
+	private string HeaderClass
+		=> CssClassBuilder.Start( "flex-shrink-0" )
+			.With( "border-b border-border", Borders )
+			.With( "px-4 py-3", Gutters )
+			.Build();
+
+	private string BodyClass
+		=> CssClassBuilder.Start( "flex-1 min-h-0 overflow-y-auto" )
+			.With( "p-4", Gutters )
+			.Build();
+
+	private string FooterClass
+		=> CssClassBuilder.Start( "flex-shrink-0" )
+			.With( "border-t border-border", Borders )
+			.With( "px-4 py-3", Gutters )
+			.Build();
+}

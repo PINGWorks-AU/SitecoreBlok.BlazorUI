@@ -1,0 +1,53 @@
+@page "/chunks/context-panel-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="ContextPanelShell" Description="Shell for the XMC Page Builder left context panel extension point" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ContextPanelShellElements">
+
+	<HostContextNote>
+		Targets the XMC Page Builder left context panel. Constrained to `max-w-[600px]`, full-height column, vertically scrollable body. Header and Footer are flex-shrink-0; Body is flex-1 + overflow-y-auto.
+	</HostContextNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With header + body + footer"
+			Code="@("<ContextPanelShell>\n    <Header>\n        <Text SemiBold>Context panel header</Text>\n    </Header>\n    <Body>\n        <Text>Panel body content goes here.</Text>\n    </Body>\n    <Footer>\n        <Text Size=\"Size.Sm\">Footer note</Text>\n    </Footer>\n</ContextPanelShell>")"
+			Primitives="@("<div class=\"flex flex-col h-full w-full max-w-[600px] border border-border rounded-lg bg-background\">\n    <div class=\"flex-shrink-0 border-b border-border px-4 py-3\">Context panel header</div>\n    <div class=\"flex-1 min-h-0 overflow-y-auto p-4\">Panel body content goes here.</div>\n    <div class=\"flex-shrink-0 border-t border-border px-4 py-3\">Footer note</div>\n</div>")">
+			<div class="border-2 border-dashed border-border rounded-lg overflow-hidden h-96">
+				<ContextPanelShell>
+					<Header>
+						<Text SemiBold>Context panel header</Text>
+					</Header>
+					<Body>
+						<Text>Panel body content goes here.</Text>
+					</Body>
+					<Footer>
+						<Text Size="Size.Sm">Footer note</Text>
+					</Footer>
+				</ContextPanelShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ContextPanelShellElements =
+	[
+		new ApiElement(
+			Name: "ContextPanelShell",
+			Description: "Shell for the XMC Page Builder left context panel extension point. Constrained to `max-w-[600px]`, full-height column with a vertically scrollable body. Header and Footer are flex-shrink-0; Body is flex-1 + overflow-y-auto. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Header",   "RenderFragment?", false, "Optional header slot, flex-shrink-0 at top of panel." ),
+				new ApiProperty( "Body",     "RenderFragment?", false, "Main body slot — flex-1, vertically scrollable." ),
+				new ApiProperty( "Footer",   "RenderFragment?", false, "Optional footer slot, flex-shrink-0 at bottom of panel." ),
+				new ApiProperty( "Borders",  "bool",            false, "Toggles outer border + horizontal dividers between regions. Default: `true`." ),
+				new ApiProperty( "Gutters",  "bool",            false, "Toggles `px-4 py-3` on header/footer and `p-4` on body. Default: `true`." ),
+				new ApiProperty( "BgFilled", "bool",            false, "Toggles `bg-background`. Default: `true`." ),
+			]
+		),
+	];
+}

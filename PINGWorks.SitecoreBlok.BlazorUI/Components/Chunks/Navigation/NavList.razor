@@ -1,0 +1,24 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	NavList — vertical link list. ChildContent is typically NavListItem and NavGroup.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Gutters (default true) toggles space-y-1 p-2 (inter-item spacing + small padding).
+		                         When false, the consumer styles inside the slot.
+*@
+
+<nav class="@NavClass">
+	@ChildContent
+</nav>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private string NavClass
+		=> CssClassBuilder.Start( "flex flex-col" )
+			.With( "space-y-1 p-2", Gutters )
+			.Build();
+}

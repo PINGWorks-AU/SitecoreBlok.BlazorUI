@@ -1,0 +1,63 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	AppSidebar — pre-wired sidebar with Brand / Nav / Footer slots.
+	A column flex <aside> with Brand at top, Nav scrollable middle, Footer at bottom.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders  (default true) toggles border-r border-border.
+		- Gutters  (default true) toggles p-4 on Brand and Footer wrappers.
+		                          (Nav stays controlled by its inner content.)
+		- BgFilled (default true) toggles bg-background.
+		- Width    (default Size.Md ~ w-56) Size enum mapped via SizeClasses.Width.
+*@
+
+<aside class="@SidebarClass">
+	@if ( Brand is not null )
+	{
+		<div class="@BrandClass">
+			@Brand
+		</div>
+	}
+
+	<div class="flex-1 min-h-0 overflow-y-auto">
+		@Nav
+	</div>
+
+	@if ( Footer is not null )
+	{
+		<div class="@FooterClass">
+			@Footer
+		</div>
+	}
+</aside>
+
+@code {
+	[Parameter] public RenderFragment? Brand { get; set; }
+	[Parameter] public RenderFragment? Nav { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+	[Parameter] public Size Width { get; set; } = Size.Md;
+
+	private string SidebarClass
+		=> CssClassBuilder.Start( "shrink-0 h-full flex flex-col" )
+			.With( SizeClasses.Width( Width ) )
+			.With( "border-r border-border", Borders )
+			.With( "bg-background", BgFilled )
+			.Build();
+
+	private string BrandClass
+		=> CssClassBuilder.Start( "flex-shrink-0" )
+			.With( "p-4", Gutters )
+			.With( "border-b border-border", Borders )
+			.Build();
+
+	private string FooterClass
+		=> CssClassBuilder.Start( "flex-shrink-0" )
+			.With( "p-4", Gutters )
+			.With( "border-t border-border", Borders )
+			.Build();
+}

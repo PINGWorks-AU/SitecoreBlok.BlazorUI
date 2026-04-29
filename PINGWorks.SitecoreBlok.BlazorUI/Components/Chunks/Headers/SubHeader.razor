@@ -1,0 +1,36 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	SubHeader — context strip below AppHeader (env switcher, ambient breadcrumbs, scope chip).
+	Single ChildContent slot — free-form content.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders  (default true) toggles border-b on the band.
+		- Gutters  (default true) toggles px-6 py-2 gap-3 on the content row.
+		- BgFilled (default true) toggles bg-subtle-bg on the band.
+*@
+
+<div class="@StripClass">
+	<div class="@RowClass">
+		@ChildContent
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+
+	private string StripClass
+		=> CssClassBuilder.Start( "" )
+			.With( "bg-subtle-bg", BgFilled )
+			.With( "border-b border-border", Borders )
+			.Build();
+
+	private string RowClass
+		=> CssClassBuilder.Start( "flex items-center" )
+			.With( "px-6 py-2 gap-3", Gutters )
+			.Build();
+}

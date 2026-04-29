@@ -1,0 +1,68 @@
+@page "/chunks/announcement-bar"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="AnnouncementBar" Description="Top-of-app dismissible banner. Tone enum + optional action slot" Interactivity="ComponentInteractivity.Interactive" ApiElements="@AnnouncementBarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Info (default)"
+			Code="@("<AnnouncementBar Message=\"New version available — refresh to update.\" Tone=\"Tone.Info\" />")"
+			Primitives="@("<div class=\"flex items-center bg-info-bg text-info-fg border-b border-info-fg px-4 py-2 gap-3\" role=\"status\">\n    <div class=\"flex-1 flex items-center gap-3 min-w-0\">\n        <span class=\"text-sm\">New version available — refresh to update.</span>\n    </div>\n    <button type=\"button\" class=\"...\" aria-label=\"Dismiss\">\n        <svg>...</svg>\n    </button>\n</div>")">
+			<div class="border rounded-lg overflow-hidden">
+				<AnnouncementBar Message="New version available — refresh to update." Tone="Tone.Info" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Warning with action"
+			Code="@("<AnnouncementBar Message=\"Your trial ends in 3 days.\" Tone=\"Tone.Warning\">\n    <Action>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Upgrade</Button>\n    </Action>\n</AnnouncementBar>")"
+			Primitives="@("<div class=\"flex items-center bg-warning-bg text-warning-fg border-b border-warning-fg px-4 py-2 gap-3\" role=\"status\">\n    <div class=\"flex-1 flex items-center gap-3 min-w-0\">\n        <span class=\"text-sm\">Your trial ends in 3 days.</span>\n        <div class=\"flex items-center\">\n            <button class=\"...\">Upgrade</button>\n        </div>\n    </div>\n    <button type=\"button\" class=\"...\" aria-label=\"Dismiss\">\n        <svg>...</svg>\n    </button>\n</div>")">
+			<div class="border rounded-lg overflow-hidden">
+				<AnnouncementBar Message="Your trial ends in 3 days." Tone="Tone.Warning">
+					<Action>
+						<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Upgrade</Button>
+					</Action>
+				</AnnouncementBar>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Danger, non-dismissible"
+			Code="@("<AnnouncementBar Message=\"Production database is read-only — maintenance in progress.\" Tone=\"Tone.Danger\" Dismissible=\"false\" />")"
+			Primitives="@("<div class=\"flex items-center bg-danger-bg text-danger-fg border-b border-danger-fg px-4 py-2 gap-3\" role=\"status\">\n    <div class=\"flex-1 flex items-center gap-3 min-w-0\">\n        <span class=\"text-sm\">Production database is read-only — maintenance in progress.</span>\n    </div>\n</div>")">
+			<div class="border rounded-lg overflow-hidden">
+				<AnnouncementBar Message="Production database is read-only — maintenance in progress." Tone="Tone.Danger" Dismissible="false" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Success, no border, gutters off"
+			Code="@("<AnnouncementBar Message=\"Saved.\" Tone=\"Tone.Success\" Borders=\"false\" Gutters=\"false\" Dismissible=\"false\" />")"
+			Primitives="@("<div class=\"flex items-center bg-success-bg text-success-fg\" role=\"status\">\n    <div class=\"flex-1 flex items-center gap-3 min-w-0\">\n        <span class=\"text-sm\">Saved.</span>\n    </div>\n</div>")">
+			<div class="border rounded-lg overflow-hidden">
+				<AnnouncementBar Message="Saved." Tone="Tone.Success" Borders="false" Gutters="false" Dismissible="false" />
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AnnouncementBarElements =
+	[
+		new ApiElement(
+			Name: "AnnouncementBar",
+			Description: "Top-of-app banner with a tone-coloured background. The dismiss button hides the bar locally; consumers can persist via the `OnDismiss` callback. Uses the shared `Tone` enum and the `ToneClasses` helper for tonal Tailwind classes. Does NOT expose `BgFilled` — the tonal background IS the defining visual.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Message",     "string",          true,  "Banner text. Rendered in `text-sm` next to the optional action." ),
+				new ApiProperty( "Action",      "RenderFragment?", false, "Optional action slot rendered next to the message. Typically one `Button`." ),
+				new ApiProperty( "Tone",        "Tone",            false, "Tonal style. Default: `Tone.Info`. Other values: `Success`, `Warning`, `Danger`, `Neutral`. Drives background, foreground, and border colours via `ToneClasses`." ),
+				new ApiProperty( "Dismissible", "bool",            false, "When `true` (default), shows a close button on the right. Set to `false` for non-dismissible banners (e.g. critical maintenance notices)." ),
+				new ApiProperty( "OnDismiss",   "EventCallback",   false, "Fires when the user clicks dismiss. The bar hides itself locally regardless; this callback is for persistence (e.g. setting a cookie so the banner doesn't reappear)." ),
+				new ApiProperty( "Borders",     "bool",            false, "Toggles `border-b` (with the tonal border colour). Default: `true`." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Toggles `px-4 py-2 gap-3` on the row. Default: `true`." ),
+			]
+		),
+	];
+}

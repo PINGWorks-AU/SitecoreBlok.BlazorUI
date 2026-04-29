@@ -1,0 +1,28 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	AppBrand — logo + product name + optional version chip. Reusable inside or outside AppHeader.
+	A single inline element (no region wrappers), so wrapper-styling parameters (Borders, Gutters,
+	HeaderAlignment) do not apply.
+*@
+
+<a href="@Href" class="flex items-center gap-2 no-underline text-foreground hover:text-primary transition-colors">
+	@if ( Logo is not null )
+	{
+		<span class="flex items-center">
+			@Logo
+		</span>
+	}
+	<span class="text-base font-bold tracking-tight">@Name</span>
+	@if ( !string.IsNullOrEmpty( Version ) )
+	{
+		<Badge ColorScheme="BadgeColor.Neutral" Size="BadgeSize.Sm">@Version</Badge>
+	}
+</a>
+
+@code {
+	[Parameter] public string Name { get; set; } = "";
+	[Parameter] public string? Href { get; set; } = "/";
+	[Parameter] public string? Version { get; set; }
+	[Parameter] public RenderFragment? Logo { get; set; }
+}

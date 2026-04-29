@@ -1,0 +1,56 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	StatCard — card-based KPI variant with an optional Sparkline area and Actions slot.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders   (default true) toggles border border-border rounded-lg.
+		- BgFilled  (default true) toggles bg-background.
+		- Gutters   (default true) toggles p-4 gap-3.
+*@
+
+<div class="@CardClass">
+	<div class="flex items-start justify-between gap-2">
+		<div class="flex flex-col gap-1">
+			<span class="text-sm text-muted-foreground">@Label</span>
+			<span class="text-2xl font-bold tracking-tight text-foreground">@Value</span>
+		</div>
+		<div class="@TrendBadgeClass">
+			<Icon Svg="@TrendIcons.ForTrend( Trend )" ClassName="size-3" />
+		</div>
+	</div>
+	@if ( Sparkline is not null )
+	{
+		<div class="h-12">@Sparkline</div>
+	}
+	@if ( Actions is not null )
+	{
+		<div class="flex items-center gap-2 mt-auto pt-2 border-t border-border">@Actions</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string Label { get; set; } = "";
+	[Parameter] public string Value { get; set; } = "";
+	[Parameter] public Trend Trend { get; set; } = Trend.Neutral;
+
+	[Parameter] public RenderFragment? Sparkline { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private string CardClass
+		=> CssClassBuilder.Start( "flex flex-col" )
+			.With( "border border-border rounded-lg", Borders )
+			.With( "bg-background", BgFilled )
+			.With( "p-4 gap-3", Gutters )
+			.Build();
+
+	private string TrendBadgeClass
+		=> CssClassBuilder.Start( "inline-flex items-center justify-center size-7 rounded-full" )
+			.With( TrendClasses.Bg( Trend ) )
+			.With( TrendClasses.Text( Trend ) )
+			.Build();
+}

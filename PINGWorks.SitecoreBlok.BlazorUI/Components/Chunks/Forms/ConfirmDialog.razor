@@ -1,0 +1,51 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	ConfirmDialog — Dialog-based confirm-action wrapper.
+	Composes the Dialog primitive cluster with a title, message, and Cancel/Confirm
+	button pair. Tone drives the Confirm button's color scheme.
+*@
+
+<Dialog Open="@Open" OpenChanged="@OpenChanged">
+	<DialogHeader>
+		<DialogTitle>@Title</DialogTitle>
+		<DialogDescription>@Message</DialogDescription>
+	</DialogHeader>
+	<DialogFooter>
+		<Button Variant="ButtonVariant.Outline" Click="HandleCancel">@CancelLabel</Button>
+		<Button ColorScheme="@ConfirmColor" Click="HandleConfirm">@ConfirmLabel</Button>
+	</DialogFooter>
+</Dialog>
+
+@code {
+	[Parameter] public string Title { get; set; } = "Are you sure?";
+	[Parameter] public string Message { get; set; } = "";
+	[Parameter] public string ConfirmLabel { get; set; } = "Confirm";
+	[Parameter] public string CancelLabel { get; set; } = "Cancel";
+	[Parameter] public Tone Tone { get; set; } = Tone.Danger;
+	[Parameter] public bool Open { get; set; }
+	[Parameter] public EventCallback<bool> OpenChanged { get; set; }
+	[Parameter] public EventCallback OnConfirm { get; set; }
+
+	private ButtonColor ConfirmColor
+		=> Tone switch
+		{
+			Tone.Danger   => ButtonColor.Danger,
+			Tone.Success  => ButtonColor.Success,
+			_             => ButtonColor.Primary,
+		};
+
+	private async Task HandleCancel()
+	{
+		if ( OpenChanged.HasDelegate )
+			await OpenChanged.InvokeAsync( false );
+	}
+
+	private async Task HandleConfirm()
+	{
+		if ( OnConfirm.HasDelegate )
+			await OnConfirm.InvokeAsync();
+		if ( OpenChanged.HasDelegate )
+			await OpenChanged.InvokeAsync( false );
+	}
+}

@@ -1,0 +1,39 @@
+@page "/chunks/back-link"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="BackLink" Description="Single &quot;← Back to X&quot; element — Href, Label" Interactivity="ComponentInteractivity.Ssr" ApiElements="@BackLinkElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<BackLink Href=\"#\" />")"
+			Primitives="@("<a href=\"#\" class=\"inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground no-underline\">\n    <svg class=\"size-4\">...</svg>\n    <span>Back</span>\n</a>")">
+			<BackLink Href="#" />
+		</ComponentExample>
+
+		<ComponentExample Title="Custom label"
+			Code="@("<BackLink Href=\"#\" Label=\"Back to projects\" />")"
+			Primitives="@("<a href=\"#\" class=\"inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground no-underline\">\n    <svg class=\"size-4\">...</svg>\n    <span>Back to projects</span>\n</a>")">
+			<BackLink Href="#" Label="Back to projects" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] BackLinkElements =
+	[
+		new ApiElement(
+			Name: "BackLink",
+			Description: "Single \"← Back to X\" element. Inline `<a>` with a leading `IconSvg.ArrowLeft` icon. Use at the top of a detail page (or anywhere the user needs a one-click way back to the previous list/index). As a single inline element it doesn't expose wrapper-styling parameters.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Href",  "string", false, "Anchor `href`. Default: `#`." ),
+				new ApiProperty( "Label", "string", false, "Visible text. Default: `Back`." ),
+			]
+		),
+	];
+}

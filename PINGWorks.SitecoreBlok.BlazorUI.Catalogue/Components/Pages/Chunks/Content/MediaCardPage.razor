@@ -1,0 +1,59 @@
+@page "/chunks/media-card"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="MediaCard" Description="Thumbnail-first card with edge-to-edge image, optional overlay, and an actions slot" Interactivity="ComponentInteractivity.Ssr" ApiElements="@MediaCardElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Image, title and description"
+			Code="@("<MediaCard\n    ImageUrl=\"https://picsum.photos/seed/blok/640/360\"\n    ImageAlt=\"Placeholder landscape\"\n    Title=\"Getting started guide\"\n    Description=\"Everything you need to set up your first project in under five minutes.\" />")"
+			Primitives="@("<div class=\"flex flex-col overflow-hidden border border-border rounded-lg bg-background\">\n    <div class=\"relative\">\n        <img src=\"https://picsum.photos/seed/blok/640/360\" alt=\"Placeholder landscape\" class=\"w-full aspect-video object-cover\" />\n    </div>\n    <div class=\"flex flex-col p-4\">\n        <h3 class=\"text-base font-semibold tracking-tight text-foreground\">Getting started guide</h3>\n        <p class=\"text-sm text-muted-foreground mt-1\">Everything you need to set up your first project in under five minutes.</p>\n    </div>\n</div>")">
+			<MediaCard
+				ImageUrl="https://picsum.photos/seed/blok/640/360"
+				ImageAlt="Placeholder landscape"
+				Title="Getting started guide"
+				Description="Everything you need to set up your first project in under five minutes." />
+		</ComponentExample>
+
+		<ComponentExample Title="With Actions slot"
+			Code="@("<MediaCard\n    ImageUrl=\"https://picsum.photos/seed/blok2/640/360\"\n    ImageAlt=\"Placeholder abstract\"\n    Title=\"Component library\"\n    Description=\"Browse all available Blok primitives and chunks.\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Default\" Size=\"ButtonSize.Sm\">Open docs</Button>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Dismiss</Button>\n    </Actions>\n</MediaCard>")"
+			Primitives="@("<div class=\"flex flex-col overflow-hidden border border-border rounded-lg bg-background\">\n    <div class=\"relative\">\n        <img src=\"https://picsum.photos/seed/blok2/640/360\" alt=\"Placeholder abstract\" class=\"w-full aspect-video object-cover\" />\n    </div>\n    <div class=\"flex flex-col p-4\">\n        <h3 class=\"text-base font-semibold tracking-tight text-foreground\">Component library</h3>\n        <p class=\"text-sm text-muted-foreground mt-1\">Browse all available Blok primitives and chunks.</p>\n        <div class=\"mt-3 flex items-center gap-2\">\n            <button class=\"...\">Open docs</button>\n            <button class=\"...\">Dismiss</button>\n        </div>\n    </div>\n</div>")">
+			<MediaCard
+				ImageUrl="https://picsum.photos/seed/blok2/640/360"
+				ImageAlt="Placeholder abstract"
+				Title="Component library"
+				Description="Browse all available Blok primitives and chunks.">
+				<Actions>
+					<Button Variant="ButtonVariant.Default" Size="ButtonSize.Sm">Open docs</Button>
+					<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Dismiss</Button>
+				</Actions>
+			</MediaCard>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] MediaCardElements =
+	[
+		new ApiElement(
+			Name: "MediaCard",
+			Description: "A card where the image leads, spanning the full card width edge-to-edge. The content area (title, description, actions) sits below. An optional `Overlay` slot is absolutely positioned over the image for badges, gradients, or play buttons. Wrapper-styling — `Gutters` controls the inner content padding only; the image is always flush.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ImageUrl",    "string",          false, "URL for the card thumbnail. Rendered with `aspect-video object-cover w-full`. Default: empty string." ),
+				new ApiProperty( "ImageAlt",    "string",          false, "Alt text for the image. Default: empty string." ),
+				new ApiProperty( "Title",       "string",          false, "Card heading. Rendered as `<h3>` in `text-base font-semibold`. Default: empty string." ),
+				new ApiProperty( "Description", "string?",         false, "Supporting text in `text-sm text-muted-foreground mt-1`. Omit to suppress." ),
+				new ApiProperty( "Actions",     "RenderFragment?", false, "Optional action slot rendered below the description with `mt-3 flex items-center gap-2`." ),
+				new ApiProperty( "Overlay",     "RenderFragment?", false, "Optional slot absolutely positioned over the image (`absolute inset-0`). Use for badges, gradients, or media controls." ),
+				new ApiProperty( "Borders",     "bool",            false, "Toggles `border border-border rounded-lg`. Default: `true`." ),
+				new ApiProperty( "BgFilled",    "bool",            false, "Toggles `bg-background`. Default: `true`." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Toggles `p-4` on the content area below the image. Default: `true`." ),
+			]
+		),
+	];
+}

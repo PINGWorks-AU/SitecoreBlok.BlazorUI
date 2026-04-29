@@ -1,0 +1,42 @@
+@inherits FieldBase<string?>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	ComboboxField — labelled combobox field chunk.
+	Wraps the Combobox primitive cluster with a label, help text, and error state.
+*@
+
+<div class="space-y-1.5">
+	@if ( !string.IsNullOrEmpty( Label ) )
+	{
+		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+	}
+	<div @onfocusout="MarkTouched">
+		<Combobox Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled">
+			<ComboboxInput Placeholder="@Placeholder" />
+			<ComboboxContent>
+				<ComboboxList>
+					@if ( Items is not null )
+					{
+						@foreach ( var item in Items )
+						{
+							<ComboboxItem Value="@item.Value" Label="@item.Label" />
+						}
+					}
+					<ComboboxEmpty>No results found.</ComboboxEmpty>
+				</ComboboxList>
+			</ComboboxContent>
+		</Combobox>
+	</div>
+	@if ( !string.IsNullOrEmpty( HelpText ) )
+	{
+		<p class="@HelpTextClass">@HelpText</p>
+	}
+</div>
+
+@code {
+	public sealed record ComboboxFieldItem( string Value, string Label );
+
+	[Parameter] public string? Placeholder { get; set; }
+	[Parameter] public IList<ComboboxFieldItem>? Items { get; set; }
+}

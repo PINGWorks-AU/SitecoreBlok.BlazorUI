@@ -1,0 +1,52 @@
+@page "/chunks/sub-header"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="SubHeader" Description="Context strip below AppHeader — env switcher, ambient breadcrumbs, scope chip" Interactivity="ComponentInteractivity.Ssr" ApiElements="@SubHeaderElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<SubHeader>\n    <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\" Muted>Environment:</Text>\n    <Badge ColorScheme=\"BadgeColor.Blue\">Production</Badge>\n    <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\" Muted>·</Text>\n    <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\">Sites &gt; Marketing</Text>\n</SubHeader>")"
+			Primitives="@("<div class=\"bg-subtle-bg border-b border-border\">\n    <div class=\"flex items-center px-6 py-2 gap-3\">\n        <span class=\"text-sm text-muted-foreground\">Environment:</span>\n        <span class=\"... bg-blue-100 text-blue-800 ...\">Production</span>\n        <span class=\"text-sm text-muted-foreground\">·</span>\n        <span class=\"text-sm\">Sites &gt; Marketing</span>\n    </div>\n</div>")">
+			<div class="border rounded-lg overflow-hidden">
+				<SubHeader>
+					<Text Kind="TextKind.Span" Size="Size.Sm" Muted>Environment:</Text>
+					<Badge ColorScheme="BadgeColor.Blue">Production</Badge>
+					<Text Kind="TextKind.Span" Size="Size.Sm" Muted>·</Text>
+					<Text Kind="TextKind.Span" Size="Size.Sm">Sites &gt; Marketing</Text>
+				</SubHeader>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Borderless, no fill, gutters off"
+			Code="@("<SubHeader Borders=\"false\" BgFilled=\"false\" Gutters=\"false\">\n    <Text Kind=\"TextKind.Span\" Size=\"Size.Sm\">Bare strip</Text>\n</SubHeader>")"
+			Primitives="@("<div>\n    <div class=\"flex items-center\">\n        <span class=\"text-sm\">Bare strip</span>\n    </div>\n</div>")">
+			<div class="border rounded-lg overflow-hidden">
+				<SubHeader Borders="false" BgFilled="false" Gutters="false">
+					<Text Kind="TextKind.Span" Size="Size.Sm">Bare strip</Text>
+				</SubHeader>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] SubHeaderElements =
+	[
+		new ApiElement(
+			Name: "SubHeader",
+			Description: "A subtle horizontal strip rendered below an `AppHeader`. Use for ambient context that's relevant across pages — current environment, scope (project/team), or breadcrumbs that belong outside the page header. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Strip content. Free-form — typically a flow of text + badges + dividers." ),
+				new ApiProperty( "Borders",      "bool",            false, "Toggles `border-b border-border`. Default: `true`." ),
+				new ApiProperty( "Gutters",      "bool",            false, "Toggles `px-6 py-2 gap-3` on the content row. Default: `true`." ),
+				new ApiProperty( "BgFilled",     "bool",            false, "Toggles `bg-subtle-bg`. Default: `true`." ),
+			]
+		),
+	];
+}

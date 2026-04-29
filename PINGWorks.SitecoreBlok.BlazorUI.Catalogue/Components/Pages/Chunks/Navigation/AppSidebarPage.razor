@@ -1,0 +1,74 @@
+@page "/chunks/app-sidebar"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="AppSidebar" Description="Pre-wired sidebar with Brand / Nav / Footer slots" Interactivity="ComponentInteractivity.Ssr" ApiElements="@AppSidebarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<AppSidebar>\n    <Brand>\n        <AppBrand Name=\"Blok Blazor\" Version=\"v1.2\" />\n    </Brand>\n    <Nav>\n        <NavList>\n            <NavGroup Label=\"Workspace\">\n                <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Profile\" Active=\"true\" />\n                <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Settings\" />\n            </NavGroup>\n        </NavList>\n    </Nav>\n    <Footer>\n        <Text Kind=\"TextKind.Span\" Size=\"Size.Xs\" Muted>v1.2.0</Text>\n    </Footer>\n</AppSidebar>")"
+			Primitives="@("<aside class=\"w-56 shrink-0 h-full flex flex-col border-r border-border bg-background\">\n    <div class=\"flex-shrink-0 p-4 border-b border-border\">...</div>\n    <div class=\"flex-1 min-h-0 overflow-y-auto\">\n        <nav class=\"flex flex-col space-y-1 p-2\">...</nav>\n    </div>\n    <div class=\"flex-shrink-0 p-4 border-t border-border\">\n        <span class=\"text-xs text-muted-foreground\">v1.2.0</span>\n    </div>\n</aside>")">
+			<div class="h-96 border rounded-lg overflow-hidden flex">
+				<AppSidebar>
+					<Brand>
+						<AppBrand Name="Blok Blazor" Version="v1.2" />
+					</Brand>
+					<Nav>
+						<NavList>
+							<NavGroup Label="Workspace">
+								<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Profile" Active="true" />
+								<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Settings" />
+							</NavGroup>
+						</NavList>
+					</Nav>
+					<Footer>
+						<Text Kind="TextKind.Span" Size="Size.Xs" Muted>v1.2.0</Text>
+					</Footer>
+				</AppSidebar>
+				<div class="flex-1 p-4 text-sm text-muted-foreground">Page content</div>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Wide, no border"
+			Code="@("<AppSidebar Width=\"Size.Lg\" Borders=\"false\">\n    <Brand>\n        <AppBrand Name=\"Wide Brand\" />\n    </Brand>\n    <Nav>\n        <NavList>\n            <NavListItem Href=\"#\" Label=\"Item\" />\n        </NavList>\n    </Nav>\n</AppSidebar>")"
+			Primitives="@("<aside class=\"w-72 shrink-0 h-full flex flex-col bg-background\">\n    <div class=\"flex-shrink-0 p-4\">...</div>\n    <div class=\"flex-1 min-h-0 overflow-y-auto\"><nav class=\"flex flex-col space-y-1 p-2\">...</nav></div>\n</aside>")">
+			<div class="h-96 border rounded-lg overflow-hidden flex">
+				<AppSidebar Width="Size.Lg" Borders="false">
+					<Brand>
+						<AppBrand Name="Wide Brand" />
+					</Brand>
+					<Nav>
+						<NavList>
+							<NavListItem Href="#" Label="Item" />
+						</NavList>
+					</Nav>
+				</AppSidebar>
+				<div class="flex-1 p-4 text-sm text-muted-foreground">Wide rail, no right border</div>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AppSidebarElements =
+	[
+		new ApiElement(
+			Name: "AppSidebar",
+			Description: "Pre-wired sidebar with three slots: `Brand` (top), `Nav` (scrollable middle), `Footer` (bottom). A column flex `<aside>` with fixed width and full height, designed to live inside an `AppShell.Sidebar` slot or freestanding. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Brand",    "RenderFragment?", false, "Branding row at the top. Typically an `AppBrand` chunk." ),
+				new ApiProperty( "Nav",      "RenderFragment?", false, "Main nav slot. Typically a `<NavList>`." ),
+				new ApiProperty( "Footer",   "RenderFragment?", false, "Footer row at the bottom. Typically a version label, `AccountMenu`, or settings link." ),
+				new ApiProperty( "Borders",  "bool",            false, "Toggles `border-r border-border` on the aside, plus `border-b`/`border-t` on Brand/Footer wrappers. Default: `true`." ),
+				new ApiProperty( "Gutters",  "bool",            false, "Toggles `p-4` on Brand and Footer wrappers. Default: `true`. Nav slot stays controlled by its inner content." ),
+				new ApiProperty( "BgFilled", "bool",            false, "Toggles `bg-background`. Default: `true`." ),
+				new ApiProperty( "Width",    "Size",            false, "Sidebar width via the shared `Size` enum (mapped through `SizeClasses.Width`). Default: `Size.Md` (`w-56`). Common values: `Sm` (`w-48`), `Md` (`w-56`), `Lg` (`w-72`)." ),
+			]
+		),
+	];
+}

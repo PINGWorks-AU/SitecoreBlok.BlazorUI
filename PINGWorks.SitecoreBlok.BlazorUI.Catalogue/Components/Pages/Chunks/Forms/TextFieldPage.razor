@@ -1,0 +1,91 @@
+@page "/chunks/text-field"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="TextField" Description="Labelled single-line text input — wraps the Input primitive with label, help text, error state, and multiple input types" Interactivity="ComponentInteractivity.Interactive" ApiElements="@TextFieldElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default text field"
+			Code="@("<TextField Label=\"Full name\" Placeholder=\"Enter your name\" @bind-Value=\"Name\" />")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <label class=\"text-sm font-medium text-foreground ...\">Full name</label>\n    <input type=\"text\" placeholder=\"Enter your name\" class=\"...\" />\n</div>")">
+			<div class="max-w-sm">
+				<TextField Label="Full name" Placeholder="Enter your name" @bind-Value="Name" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Email field with help text"
+			Code="@("<TextField Label=\"Email address\" Placeholder=\"you@example.com\" Type=\"TextField.TextFieldType.Email\" HelpText=\"We'll never share your email.\" @bind-Value=\"Email\" />")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <label class=\"text-sm font-medium text-foreground ...\">Email address</label>\n    <input type=\"email\" placeholder=\"you@example.com\" class=\"...\" />\n    <p class=\"text-xs text-muted-foreground\">We'll never share your email.</p>\n</div>")">
+			<div class="max-w-sm">
+				<TextField Label="Email address" Placeholder="you@example.com" Type="TextField.TextFieldType.Email" HelpText="We'll never share your email." @bind-Value="Email" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Error state with required"
+			Code="@("<TextField Label=\"Username\" Placeholder=\"Choose a username\" Required=\"true\" Error=\"true\" HelpText=\"Username is already taken.\" @bind-Value=\"Username\" />")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <label class=\"text-sm font-medium text-danger-fg ...\">Username<span class=\"text-danger-fg\">*</span></label>\n    <input type=\"text\" placeholder=\"Choose a username\" class=\"...\" />\n    <p class=\"text-xs text-danger-fg\">Username is already taken.</p>\n</div>")">
+			<div class="max-w-sm">
+				<TextField Label="Username" Placeholder="Choose a username" Required="true" Error="true" HelpText="Username is already taken." @bind-Value="Username" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With leading icon addon (StartAddon)"
+			Code="@("<TextField Label=\"Search\" Placeholder=\"Search records...\" @bind-Value=\"SearchQuery\">\n    <StartAddon>\n        <Icon Svg=\"@IconSvg.Magnify\" />\n    </StartAddon>\n</TextField>")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <label class=\"text-sm font-medium text-foreground ...\">Search</label>\n    <div data-slot=\"input-group\" class=\"flex\">\n        <div data-slot=\"input-group-addon\" class=\"...\"><svg class=\"...\"><!-- magnify --></svg></div>\n        <input type=\"text\" placeholder=\"Search records...\" class=\"...\" />\n    </div>\n</div>")">
+			<div class="max-w-sm">
+				<TextField Label="Search" Placeholder="Search records..." @bind-Value="SearchQuery">
+					<StartAddon>
+						<Icon Svg="@IconSvg.Magnify" />
+					</StartAddon>
+				</TextField>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="With trailing currency addon (EndAddon)"
+			Code="@("<TextField Label=\"Amount\" Placeholder=\"0.00\" Type=\"TextField.TextFieldType.Number\" @bind-Value=\"Amount\">\n    <EndAddon>\n        <span>USD</span>\n    </EndAddon>\n</TextField>")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <label class=\"text-sm font-medium text-foreground ...\">Amount</label>\n    <div data-slot=\"input-group\" class=\"flex\">\n        <input type=\"number\" placeholder=\"0.00\" class=\"...\" />\n        <div data-slot=\"input-group-addon\" class=\"...\"><span>USD</span></div>\n    </div>\n</div>")">
+			<div class="max-w-sm">
+				<TextField Label="Amount" Placeholder="0.00" Type="TextField.TextFieldType.Number" @bind-Value="Amount">
+					<EndAddon>
+						<span>USD</span>
+					</EndAddon>
+				</TextField>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Name;
+	private string? Email;
+	private string? Username;
+	private string? SearchQuery;
+	private string? Amount;
+
+	private static readonly ApiElement[] TextFieldElements =
+	[
+		new ApiElement(
+			Name: "TextField",
+			Description: "A labelled single-line text input chunk. Wraps the `Input` primitive inside a `space-y-1.5` envelope with an optional `FormLabel`, the input itself, and optional help text. Supports multiple input types via the `Type` enum. When `StartAddon` or `EndAddon` slots are provided, the input is rendered inside an `InputGroup` with `InputGroupAddon` siblings.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Label",        "string?",                    false, "Label text rendered above the input via `FormLabel`. Omit to hide the label." ),
+				new ApiProperty( "HelpText",     "string?",                    false, "Helper text rendered below the input. Shown in `text-danger-fg` when `Error` is true, otherwise `text-muted-foreground`." ),
+				new ApiProperty( "Error",        "bool",                       false, "Applies error styling to the label and help text. Default: `false`." ),
+				new ApiProperty( "Required",     "bool",                       false, "Appends a red asterisk to the label via `FormLabel`. Default: `false`." ),
+				new ApiProperty( "Disabled",     "bool",                       false, "Disables the underlying input. Default: `false`." ),
+				new ApiProperty( "Id",           "string",                     false, "HTML `id` for the input — wired to the label's `for` attribute. Auto-generated by default." ),
+				new ApiProperty( "Value",        "string?",                    false, "Current input value. Use `@bind-Value` for two-way binding." ),
+				new ApiProperty( "ValueChanged", "EventCallback<string?>",     false, "Fires when the value changes. Part of the `@bind-Value` pair." ),
+				new ApiProperty( "Placeholder",  "string?",                    false, "Placeholder text shown in the empty input." ),
+				new ApiProperty( "Type",         "TextField.TextFieldType",    false, "Input type. One of `Text`, `Email`, `Number`, `Tel`, `Url`. Default: `Text`." ),
+				new ApiProperty( "StartAddon",   "RenderFragment?",            false, "Optional leading addon slot. When set, the input renders inside an `InputGroup` with an `InputGroupAddon` (Align `InlineStart`) wrapping this content. Use for leading icons, prefix text, etc." ),
+				new ApiProperty( "EndAddon",     "RenderFragment?",            false, "Optional trailing addon slot. When set, the input renders inside an `InputGroup` with an `InputGroupAddon` (Align `InlineEnd`) wrapping this content. Use for trailing icons, suffix text, currency labels, etc." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,43 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	DataToolbar — horizontal action strip above a data table.
+	Slots: Search (left, takes flex-1), Filters, ViewSwitcher, Actions (all right-aligned).
+*@
+
+<div class="@RowClass">
+	@if ( Search is not null )
+	{
+		<div class="flex-1 max-w-md">@Search</div>
+	}
+	@if ( Filters is not null )
+	{
+		<div class="flex items-center gap-2">@Filters</div>
+	}
+	@if ( ViewSwitcher is not null )
+	{
+		<div class="flex items-center">@ViewSwitcher</div>
+	}
+	@if ( Actions is not null )
+	{
+		<div class="ml-auto flex items-center gap-2">@Actions</div>
+	}
+</div>
+
+@code {
+	[Parameter] public RenderFragment? Search { get; set; }
+	[Parameter] public RenderFragment? Filters { get; set; }
+	[Parameter] public RenderFragment? ViewSwitcher { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = false;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public Density Density { get; set; } = Density.Comfortable;
+
+	private string RowClass
+		=> CssClassBuilder.Start( "flex items-center w-full" )
+			.With( DensityClasses.Gap( Density ) )
+			.With( "border border-border rounded-lg", Borders )
+			.With( DensityClasses.Padding( Density ), Gutters )
+			.Build();
+}

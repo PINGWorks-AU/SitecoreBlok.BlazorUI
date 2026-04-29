@@ -1,0 +1,67 @@
+@page "/chunks/data-toolbar"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="DataToolbar" Description="Horizontal action strip above a data table — Search, Filters, ViewSwitcher, and Actions slots." Interactivity="ComponentInteractivity.Interactive" ApiElements="@DataToolbarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="All slots — search, filters, view switcher, actions"
+			Code="@("<DataToolbar Borders=\"true\">\n    <Search>\n        <input class=\"border border-border rounded-md px-3 py-1.5 text-sm w-full\" placeholder=\"Search...\" />\n    </Search>\n    <Filters>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Status</Button>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Role</Button>\n    </Filters>\n    <ViewSwitcher>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">Grid</Button>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\">List</Button>\n    </ViewSwitcher>\n    <Actions>\n        <Button Size=\"ButtonSize.Sm\">Export</Button>\n        <Button Size=\"ButtonSize.Sm\">New</Button>\n    </Actions>\n</DataToolbar>")"
+			Primitives="@("<div class=\"flex items-center w-full gap-3 border border-border rounded-lg px-4 py-2\">\n    <div class=\"flex-1 max-w-md\"><input .../></div>\n    <div class=\"flex items-center gap-2\"><!-- filters --></div>\n    <div class=\"flex items-center\"><!-- view switcher --></div>\n    <div class=\"ml-auto flex items-center gap-2\"><!-- actions --></div>\n</div>")">
+			<DataToolbar Borders="true">
+				<Search>
+					<input class="border border-border rounded-md px-3 py-1.5 text-sm w-full" placeholder="Search..." />
+				</Search>
+				<Filters>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Status</Button>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Role</Button>
+				</Filters>
+				<ViewSwitcher>
+					<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Grid</Button>
+					<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">List</Button>
+				</ViewSwitcher>
+				<Actions>
+					<Button Size="ButtonSize.Sm">Export</Button>
+					<Button Size="ButtonSize.Sm">New</Button>
+				</Actions>
+			</DataToolbar>
+		</ComponentExample>
+
+		<ComponentExample Title="Search + Actions only"
+			Code="@("<DataToolbar>\n    <Search>\n        <input class=\"border border-border rounded-md px-3 py-1.5 text-sm w-full\" placeholder=\"Search records...\" />\n    </Search>\n    <Actions>\n        <Button Size=\"ButtonSize.Sm\">Add record</Button>\n    </Actions>\n</DataToolbar>")"
+			Primitives="@("<div class=\"flex items-center w-full gap-3 px-4 py-2\">\n    <div class=\"flex-1 max-w-md\"><input .../></div>\n    <div class=\"ml-auto flex items-center gap-2\"><!-- actions --></div>\n</div>")">
+			<DataToolbar>
+				<Search>
+					<input class="border border-border rounded-md px-3 py-1.5 text-sm w-full" placeholder="Search records..." />
+				</Search>
+				<Actions>
+					<Button Size="ButtonSize.Sm">Add record</Button>
+				</Actions>
+			</DataToolbar>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] DataToolbarElements =
+	[
+		new ApiElement(
+			Name: "DataToolbar",
+			Description: "Horizontal flex strip sitting above a data table. The `Search` slot occupies `flex-1 max-w-md` on the left; `Filters` and `ViewSwitcher` sit in the middle; `Actions` is pinned to the trailing edge with `ml-auto`. Density controls padding and gap; `Borders` wraps the strip in a bordered rounded container.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Search",      "RenderFragment?", false, "Left-aligned search input area (`flex-1 max-w-md`)." ),
+				new ApiProperty( "Filters",     "RenderFragment?", false, "Middle filter controls — typically one or more `Button` chips." ),
+				new ApiProperty( "ViewSwitcher","RenderFragment?", false, "View toggle controls — typically icon buttons." ),
+				new ApiProperty( "Actions",     "RenderFragment?", false, "Trailing action slot pinned to the right with `ml-auto`." ),
+				new ApiProperty( "Borders",     "bool",            false, "Wraps the strip in `border border-border rounded-lg`. Default: `false`." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Adds density-appropriate padding to the strip. Default: `true`." ),
+				new ApiProperty( "Density",     "Density",         false, "Controls padding and gap. `Comfortable` (default) or `Compact`." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,69 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	Toolbar — horizontal action strip. Slots: Start, Center, End.
+
+	Density (Comfortable | Compact) drives padding / gap / height via DensityClasses
+	(spec §5.12). Documented exception to spec §5.13: Toolbar does NOT expose `Gutters`
+	(Density is the more expressive control) or `HeaderAlignment` (a horizontal row
+	doesn't need it).
+
+	Wrapper-styling parameters:
+		- Density  (default Comfortable) — Comfortable | Compact.
+		- Borders  (default false)       — toggles border + rounded background container.
+		- BgFilled (default false)       — toggles bg-background.
+*@
+
+<div class="@ToolbarClass">
+	@if ( Start is not null )
+	{
+		<div class="@SlotClass">
+			@Start
+		</div>
+	}
+
+	@if ( Center is not null )
+	{
+		<div class="flex-1 flex items-center justify-center @InnerGapClass">
+			@Center
+		</div>
+	}
+	else
+	{
+		<div class="flex-1"></div>
+	}
+
+	@if ( End is not null )
+	{
+		<div class="@SlotClass">
+			@End
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public RenderFragment? Start { get; set; }
+	[Parameter] public RenderFragment? Center { get; set; }
+	[Parameter] public RenderFragment? End { get; set; }
+
+	[Parameter] public Density Density { get; set; } = Density.Comfortable;
+	[Parameter] public bool Borders { get; set; } = false;
+	[Parameter] public bool BgFilled { get; set; } = false;
+
+	private string ToolbarClass
+		=> CssClassBuilder.Start( "flex items-center w-full" )
+			.With( DensityClasses.Padding( Density ) )
+			.With( DensityClasses.Height( Density ) )
+			.With( DensityClasses.Gap( Density ) )
+			.With( "border border-border rounded-md", Borders )
+			.With( "bg-background", BgFilled )
+			.Build();
+
+	private string SlotClass
+		=> CssClassBuilder.Start( "flex items-center" )
+			.With( InnerGapClass )
+			.Build();
+
+	private string InnerGapClass
+		=> DensityClasses.Gap( Density );
+}

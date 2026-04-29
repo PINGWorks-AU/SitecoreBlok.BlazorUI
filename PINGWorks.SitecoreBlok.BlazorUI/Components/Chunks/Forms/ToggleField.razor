@@ -1,0 +1,36 @@
+@inherits FieldBase<bool>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	ToggleField — labelled toggle field chunk (inline layout).
+	Wraps the Toggle primitive with a right-side label and optional help text.
+	An optional IconSvg renders inside the toggle button — Toggle is designed
+	to host an icon glyph rather than a blank button, so most consumers will
+	want to pass one (e.g. IconSvg.FormatBold for a bold toggle).
+*@
+
+<div class="flex items-center gap-3">
+	<div class="pt-0.5">
+		<Toggle Pressed="@Value" PressedChanged="@( async v => await UpdateValue( v ) )"
+		        Disabled="@Disabled" @onblur="MarkTouched">
+			@if ( !string.IsNullOrEmpty( IconSvg ) )
+			{
+				<Icon Svg="@IconSvg" ClassName="size-4" />
+			}
+		</Toggle>
+	</div>
+	<div class="flex flex-col gap-1">
+		@if ( !string.IsNullOrEmpty( Label ) )
+		{
+			<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+		}
+		@if ( !string.IsNullOrEmpty( HelpText ) )
+		{
+			<p class="@HelpTextClass">@HelpText</p>
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter] public string? IconSvg { get; set; }
+}

@@ -1,0 +1,26 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	LoadingPanel — spinner + optional message centred in a configurable min-height block.
+
+	No wrapper-styling parameters are exposed intentionally: LoadingPanel is designed to
+	be used inside containers that already supply their own chrome (cards, panels, modals).
+	Consumers control the footprint via MinHeight only. For a full-viewport variant, use
+	LoadingView which composes this component with MinHeight="min-h-screen".
+*@
+
+<div class="@($"flex flex-col items-center justify-center gap-3 w-full {MinHeight}")">
+	<Spinner />
+	@if ( !string.IsNullOrEmpty( Message ) )
+	{
+		<p class="text-sm text-muted-foreground">@Message</p>
+	}
+</div>
+
+@code {
+	/// <summary>Optional loading message rendered below the spinner.</summary>
+	[Parameter] public string? Message { get; set; }
+
+	/// <summary>Tailwind min-height class applied to the wrapper. Default: <c>min-h-32</c>.</summary>
+	[Parameter] public string MinHeight { get; set; } = "min-h-32";
+}

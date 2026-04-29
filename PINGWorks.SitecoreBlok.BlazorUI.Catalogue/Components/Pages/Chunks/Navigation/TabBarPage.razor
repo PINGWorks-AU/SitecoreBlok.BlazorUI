@@ -1,0 +1,67 @@
+@page "/chunks/tab-bar"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="TabBar" Description="Top-of-page tab navigation — Items: IList<TabDefinition>, Selected (Href), SelectedChanged" Interactivity="ComponentInteractivity.Interactive" ApiElements="@TabBarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="URL-based (selection by href)"
+			Code="@("<TabBar Items=\"@PageTabs\" Selected=\"#sites\" />\n\n@code {\n    private static readonly IList<TabBar.TabDefinition> PageTabs =\n    [\n        new( \"Overview\", \"#overview\" ),\n        new( \"Sites\",    \"#sites\", null, \"4\" ),\n        new( \"Members\",  \"#members\" ),\n        new( \"Settings\", \"#settings\" ),\n    ];\n}")"
+			Primitives="@("<nav class=\"flex items-end border-b border-border px-4 gap-6\">\n    <a href=\"#overview\" class=\"flex items-center gap-2 py-3 text-sm border-b-2 -mb-px border-transparent text-muted-foreground hover:text-foreground no-underline\">Overview</a>\n    <a href=\"#sites\" class=\"flex items-center gap-2 py-3 text-sm border-b-2 -mb-px border-primary text-foreground font-medium no-underline\">Sites <span class=\"... bg-neutral-bg text-neutral-fg ...\">4</span></a>\n    <a href=\"#members\" class=\"...\">Members</a>\n    <a href=\"#settings\" class=\"...\">Settings</a>\n</nav>")">
+			<TabBar Items="@PageTabs" Selected="#sites" />
+		</ComponentExample>
+
+		<ComponentExample Title="Programmatic selection"
+			Code="@("<TabBar Items=\"@PageTabs\" Selected=\"@CurrentTab\" SelectedChanged=\"OnTabChange\" />\n\n@code {\n    private string CurrentTab = \"#overview\";\n\n    private void OnTabChange( string href ) => CurrentTab = href;\n}")"
+			Primitives="@("<nav class=\"flex items-end border-b border-border px-4 gap-6\">\n    <button type=\"button\" class=\"flex items-center gap-2 py-3 text-sm border-b-2 -mb-px border-primary text-foreground font-medium\">Overview</button>\n    <button type=\"button\" class=\"flex items-center gap-2 py-3 text-sm border-b-2 -mb-px border-transparent text-muted-foreground hover:text-foreground\">Sites</button>\n    <button class=\"...\">Members</button>\n    <button class=\"...\">Settings</button>\n</nav>")">
+			<TabBar Items="@PageTabs" Selected="@CurrentTab" SelectedChanged="OnTabChange" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly IList<TabBar.TabDefinition> PageTabs =
+	[
+		new( "Overview", "#overview" ),
+		new( "Sites",    "#sites", null, "4" ),
+		new( "Members",  "#members" ),
+		new( "Settings", "#settings" ),
+	];
+
+	private string CurrentTab = "#overview";
+
+	private void OnTabChange( string href )
+		=> CurrentTab = href;
+
+	private static readonly ApiElement[] TabBarElements =
+	[
+		new ApiElement(
+			Name: "TabBar",
+			Description: "Horizontal tab navigation. Active state is driven by the `Selected` parameter (Href match). When `SelectedChanged` is wired, each tab is a `<button>` that fires the callback on click; otherwise tabs render as `<a href>` for URL-based routing.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Items",           "IList<TabDefinition>?",  false, "Sequential tabs to render." ),
+				new ApiProperty( "Selected",        "string?",                false, "Href of the active tab. Drives the active-state visual." ),
+				new ApiProperty( "SelectedChanged", "EventCallback<string>",  false, "Fires with the clicked tab's `Href` when set. When wired, tabs render as buttons (programmatic selection); otherwise they render as anchors (URL routing)." ),
+				new ApiProperty( "Borders",         "bool",                   false, "Toggles `border-b border-border` on the bottom of the row. Default: `true`." ),
+				new ApiProperty( "Gutters",         "bool",                   false, "Toggles `px-4 gap-6` on the row. Default: `true`." ),
+			]
+		),
+		new ApiElement(
+			Name: "TabDefinition",
+			Description: "Record describing one tab.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Label",   "string",  true,  "Visible tab label." ),
+				new ApiProperty( "Href",    "string",  true,  "Tab `href`. Also used for active-state matching against `Selected`." ),
+				new ApiProperty( "IconSvg", "string?", false, "Optional leading icon (SVG path string from `IconSvg`)." ),
+				new ApiProperty( "Badge",   "string?", false, "Optional trailing badge label." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,55 @@
+@page "/chunks/app-brand"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="AppBrand" Description="Logo + product name + optional version chip — reusable inside or outside AppHeader" Interactivity="ComponentInteractivity.Ssr" ApiElements="@AppBrandElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Name only"
+			Code="@("<AppBrand Name=\"Blok Blazor\" />")"
+			Primitives="@("<a href=\"/\" class=\"flex items-center gap-2 no-underline text-foreground hover:text-primary transition-colors\">\n    <span class=\"text-base font-bold tracking-tight\">Blok Blazor</span>\n</a>")">
+			<AppBrand Name="Blok Blazor" />
+		</ComponentExample>
+
+		<ComponentExample Title="With version chip"
+			Code="@("<AppBrand Name=\"Blok Blazor\" Version=\"v1.2\" />")"
+			Primitives="@("<a href=\"/\" class=\"flex items-center gap-2 no-underline text-foreground hover:text-primary transition-colors\">\n    <span class=\"text-base font-bold tracking-tight\">Blok Blazor</span>\n    <span class=\"inline-flex items-center rounded w-fit whitespace-nowrap text-sm h-4 bg-neutral-bg text-neutral-fg px-2\">v1.2</span>\n</a>")">
+			<AppBrand Name="Blok Blazor" Version="v1.2" />
+		</ComponentExample>
+
+		<ComponentExample Title="With logo slot"
+			Code="@("<AppBrand Name=\"Blok Blazor\">\n    <Logo>\n        <svg class=\"size-5\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\">\n            <path d=\"M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\" stroke=\"currentColor\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n        </svg>\n    </Logo>\n</AppBrand>")"
+			Primitives="@("<a href=\"/\" class=\"flex items-center gap-2 no-underline text-foreground hover:text-primary transition-colors\">\n    <span class=\"flex items-center\">\n        <svg class=\"size-5\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\">...</svg>\n    </span>\n    <span class=\"text-base font-bold tracking-tight\">Blok Blazor</span>\n</a>")">
+			<AppBrand Name="Blok Blazor">
+				<Logo>
+					<svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M12 2L2 7l10 5 10-5-10-5z" />
+						<path d="M2 17l10 5 10-5" />
+						<path d="M2 12l10 5 10-5" />
+					</svg>
+				</Logo>
+			</AppBrand>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] AppBrandElements =
+	[
+		new ApiElement(
+			Name: "AppBrand",
+			Description: "Compact branding row: logo (slot) + product name (text) + optional version badge. Wraps the whole row in an `<a>` so the brand is clickable; `Href` defaults to `/`. As a single inline element it doesn't expose the wrapper-styling parameters (Borders/Gutters/HeaderAlignment) — those apply to chunks with region wrappers.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Name",    "string",          true,  "Product name. Rendered as bold text." ),
+				new ApiProperty( "Href",    "string?",         false, "Anchor href. Default: `/`." ),
+				new ApiProperty( "Version", "string?",         false, "Optional version label rendered in a neutral `Badge` to the right of the name." ),
+				new ApiProperty( "Logo",    "RenderFragment?", false, "Logo slot. Typically holds an `<Icon>` or `<svg>`. Renders to the left of the name." ),
+			]
+		),
+	];
+}

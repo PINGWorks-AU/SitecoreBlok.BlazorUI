@@ -1,0 +1,49 @@
+@page "/chunks/skeleton-card"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Skeleton Card" Description="Skeleton-of-a-card preset for grid loading states — shimmer bars mirroring a typical content card layout" Interactivity="ComponentInteractivity.Ssr" ApiElements="@SkeletonCardElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default — 3 text lines"
+			Code="@("<SkeletonCard />")"
+			Primitives="@("<div class=\"flex flex-col border border-border rounded-lg bg-background p-4 gap-3\">\n    <div class=\"flex flex-col gap-2\">\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-full\"></div>\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-5/6\"></div>\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-3/4\"></div>\n    </div>\n</div>")">
+			<SkeletonCard />
+		</ComponentExample>
+
+		<ComponentExample Title="With header"
+			Code="@("<SkeletonCard WithHeader=\"true\" />")"
+			Primitives="@("<div class=\"flex flex-col border border-border rounded-lg bg-background p-4 gap-3\">\n    <div class=\"animate-pulse rounded-md bg-neutral-50 h-5 w-2/3\"></div>\n    <div class=\"flex flex-col gap-2\">\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-full\"></div>\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-5/6\"></div>\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-3/4\"></div>\n    </div>\n</div>")">
+			<SkeletonCard WithHeader="true" />
+		</ComponentExample>
+
+		<ComponentExample Title="With header and footer"
+			Code="@("<SkeletonCard WithHeader=\"true\" WithFooter=\"true\" />")"
+			Primitives="@("<div class=\"flex flex-col border border-border rounded-lg bg-background p-4 gap-3\">\n    <div class=\"animate-pulse rounded-md bg-neutral-50 h-5 w-2/3\"></div>\n    <div class=\"flex flex-col gap-2\">\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-full\"></div>\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-5/6\"></div>\n        <div class=\"animate-pulse rounded-md bg-neutral-50 h-3 w-3/4\"></div>\n    </div>\n    <div class=\"animate-pulse rounded-md bg-neutral-50 h-8 w-24 mt-1\"></div>\n</div>")">
+			<SkeletonCard WithHeader="true" WithFooter="true" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] SkeletonCardElements =
+	[
+		new ApiElement(
+			Name: "SkeletonCard",
+			Description: "Skeleton-of-a-card preset for grid loading states. Renders animate-pulse shimmer bars that mirror a typical content card: an optional header bar, a configurable number of text lines with natural width variation (full / 5/6 / 3/4), and an optional button-shaped footer bar.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Lines",     "int",  false, "Number of skeleton text bars in the body. Width varies per line index for a natural look. Default: `3`." ),
+				new ApiProperty( "WithHeader", "bool", false, "Show a taller header bar (`h-5 w-2/3`) above the text lines. Default: `false`." ),
+				new ApiProperty( "WithFooter", "bool", false, "Show a button-shaped footer bar (`h-8 w-24`) below the text lines. Default: `false`." ),
+				new ApiProperty( "Borders",    "bool", false, "Toggles `border border-border rounded-lg` on the wrapper. Default: `true`." ),
+				new ApiProperty( "BgFilled",   "bool", false, "Toggles `bg-background` on the wrapper. Default: `true`." ),
+				new ApiProperty( "Gutters",    "bool", false, "Toggles `p-4 gap-3` on the wrapper. Default: `true`." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,31 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+    EmptyTable — empty state inside a Table. Renders as a TableRow containing a raw <td>
+    with colspan = ColumnCount. (TableCell does not expose a ColSpan parameter, so the
+    native HTML attribute is used directly.)
+*@
+
+<TableRow>
+	<td colspan="@ColumnCount" class="whitespace-nowrap align-middle text-foreground min-h-[48px] py-12 px-5 @ClassName">
+		<div class="flex flex-col items-center justify-center gap-3 text-center">
+			@if ( !string.IsNullOrEmpty( IconSvg ) )
+			{
+				<Icon Svg="@IconSvg" ClassName="size-10 text-muted-foreground" />
+			}
+			<p class="text-sm text-muted-foreground">@Message</p>
+			@if ( Action is not null )
+			{
+				<div>@Action</div>
+			}
+		</div>
+	</td>
+</TableRow>
+
+@code {
+	[Parameter] public int ColumnCount { get; set; } = 1;
+	[Parameter] public string Message { get; set; } = "No items";
+	[Parameter] public string? IconSvg { get; set; }
+	[Parameter] public RenderFragment? Action { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+}

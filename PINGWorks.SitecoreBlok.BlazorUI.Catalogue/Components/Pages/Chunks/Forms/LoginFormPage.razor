@@ -1,0 +1,51 @@
+@page "/chunks/login-form"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="LoginForm" Description="Opinionated email + password login template — composes TextField, PasswordField, and a submit button" Interactivity="ComponentInteractivity.Interactive" ApiElements="@LoginFormElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default login form"
+			Code="@("<div class=\"flex justify-center p-6\">\n    <LoginForm OnSubmit=\"HandleLogin\" />\n</div>")"
+			Primitives="@("<form class=\"flex flex-col gap-6 max-w-sm w-full\">\n    <div>\n        <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Sign in</h1>\n    </div>\n    <div class=\"space-y-1.5\">\n        <label class=\"text-sm font-medium text-foreground ...\">Email</label>\n        <input type=\"email\" class=\"...\" />\n    </div>\n    <div class=\"space-y-1.5\">\n        <label class=\"text-sm font-medium text-foreground ...\">Password</label>\n        <input type=\"password\" class=\"...\" />\n    </div>\n    <button type=\"submit\" class=\"...\">Sign in</button>\n</form>")">
+			<div class="flex justify-center p-6">
+				<LoginForm OnSubmit="HandleLogin" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Login form with description and footer"
+			Code="@("<div class=\"flex justify-center p-6\">\n    <LoginForm Title=\"Welcome back\" Description=\"Sign in to your account to continue.\" OnSubmit=\"HandleLogin\">\n        <Footer>\n            <a href=\"/forgot-password\" class=\"text-primary hover:underline\">Forgot your password?</a>\n        </Footer>\n    </LoginForm>\n</div>")"
+			Primitives="@("<form class=\"flex flex-col gap-6 max-w-sm w-full\">\n    <div>\n        <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Welcome back</h1>\n        <p class=\"text-sm text-muted-foreground mt-1\">Sign in to your account to continue.</p>\n    </div>\n    <!-- Email + Password fields -->\n    <button type=\"submit\" class=\"...\">Sign in</button>\n    <div class=\"text-center text-sm\">\n        <a href=\"/forgot-password\" class=\"text-primary hover:underline\">Forgot your password?</a>\n    </div>\n</form>")">
+			<div class="flex justify-center p-6">
+				<LoginForm Title="Welcome back" Description="Sign in to your account to continue." OnSubmit="HandleLogin">
+					<Footer>
+						<a href="#" class="text-primary hover:underline">Forgot your password?</a>
+					</Footer>
+				</LoginForm>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private void HandleLogin( LoginForm.LoginFormSubmitArgs args ) { }
+
+	private static readonly ApiElement[] LoginFormElements =
+	[
+		new ApiElement(
+			Name: "LoginForm",
+			Description: "An opinionated email + password login form. Composes `TextField` (email type) and `PasswordField` chunks with a native submit button. Fires `OnSubmit` with a `LoginFormSubmitArgs` record containing the entered email and password.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "OnSubmit",    "EventCallback<LoginFormSubmitArgs>", false, "Fired when the form is submitted. The argument contains `Email` and `Password` strings." ),
+				new ApiProperty( "Title",       "string?",                            false, "Heading text rendered as `<h1>`. Default: `\"Sign in\"`." ),
+				new ApiProperty( "Description", "string?",                            false, "Optional subtitle rendered below the title. Omit to hide." ),
+				new ApiProperty( "Footer",      "RenderFragment?",                    false, "Optional slot below the submit button — typically a \"Forgot password?\" link." ),
+			]
+		),
+	];
+}

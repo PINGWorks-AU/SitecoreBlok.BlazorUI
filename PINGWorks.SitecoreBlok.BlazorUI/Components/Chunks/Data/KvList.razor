@@ -1,0 +1,13 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+    KvList — label/value definition list. ChildContent is typically KvListItem children.
+*@
+
+<dl class="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm">
+	@ChildContent
+</dl>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

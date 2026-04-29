@@ -1,0 +1,58 @@
+@page "/chunks/form-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FormShell" Description="Page-level form envelope — composes PageHeader, Sections slot, and a sticky FormActions row" Interactivity="ComponentInteractivity.Interactive" ApiElements="@FormShellElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Form with two sections and actions"
+			Code="@("<FormShell Title=\"Edit profile\" Description=\"Update your personal information.\" OnSubmit=\"HandleSubmit\">\n    <Sections>\n        <FormSection Title=\"Basic info\" Description=\"Your name and contact details.\">\n            <TextField Label=\"Full name\" @bind-Value=\"FullName\" />\n            <TextField Label=\"Email address\" Type=\"TextField.TextFieldType.Email\" @bind-Value=\"EmailAddress\" />\n        </FormSection>\n        <FormSection Title=\"Preferences\" Description=\"How you would like to be contacted.\">\n            <SwitchField Label=\"Email notifications\" @bind-Value=\"EmailNotif\" />\n            <SwitchField Label=\"SMS notifications\" @bind-Value=\"SmsNotif\" />\n        </FormSection>\n    </Sections>\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\">Cancel</Button>\n        <Button>Save changes</Button>\n    </Actions>\n</FormShell>")"
+			Primitives="@("<form class=\"flex flex-col gap-8\">\n    <div class=\"space-y-3 pb-6 border-b border-border\">\n        <div class=\"flex items-start gap-4\">\n            <div class=\"flex-1 min-w-0 space-y-1\">\n                <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Edit profile</h1>\n                <p class=\"text-sm text-muted-foreground\">Update your personal information.</p>\n            </div>\n        </div>\n    </div>\n    <div class=\"flex flex-col gap-8\">\n        <!-- FormSection × 2 -->\n    </div>\n    <div class=\"flex items-center pt-4 border-t border-border sticky bottom-0 z-10 bg-background/95 backdrop-blur px-6 py-4\">\n        <div class=\"ml-auto flex items-center gap-2\">\n            <button class=\"...\">Cancel</button>\n            <button class=\"...\">Save changes</button>\n        </div>\n    </div>\n</form>")">
+			<FormShell Title="Edit profile" Description="Update your personal information." OnSubmit="HandleSubmit">
+				<Sections>
+					<FormSection Title="Basic info" Description="Your name and contact details.">
+						<TextField Label="Full name" @bind-Value="FullName" />
+						<TextField Label="Email address" Type="TextField.TextFieldType.Email" @bind-Value="EmailAddress" />
+					</FormSection>
+					<FormSection Title="Preferences" Description="How you would like to be contacted.">
+						<SwitchField Label="Email notifications" @bind-Value="EmailNotif" />
+						<SwitchField Label="SMS notifications" @bind-Value="SmsNotif" />
+					</FormSection>
+				</Sections>
+				<Actions>
+					<Button Variant="ButtonVariant.Outline">Cancel</Button>
+					<Button>Save changes</Button>
+				</Actions>
+			</FormShell>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? FullName;
+	private string? EmailAddress;
+	private bool EmailNotif;
+	private bool SmsNotif;
+
+	private static readonly ApiElement[] FormShellElements =
+	[
+		new ApiElement(
+			Name: "FormShell",
+			Description: "Page-level form envelope. Composes `PageHeader` for the title/description band, renders a `Sections` slot inside a `flex-col gap-8` wrapper, and wraps the `Actions` slot inside a sticky `FormActions` row at the bottom. The `<form>` element handles submit via `OnSubmit` with `preventDefault` so the browser does not navigate.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string",          true,  "Form title. Forwarded to `PageHeader` and rendered as `<h1>`." ),
+				new ApiProperty( "Description", "string?",         false, "Optional sub-title forwarded to `PageHeader`." ),
+				new ApiProperty( "OnSubmit",    "EventCallback",   false, "Callback fired when the form is submitted. The default browser navigation is suppressed." ),
+				new ApiProperty( "Sections",    "RenderFragment?", false, "Slot for `FormSection` children. Rendered in a `flex-col gap-8` wrapper." ),
+				new ApiProperty( "Actions",     "RenderFragment?", false, "Action buttons slot (e.g. Cancel + Save). Rendered inside a sticky `FormActions` row pinned to the bottom of the form." ),
+			]
+		),
+	];
+
+	private void HandleSubmit() { }
+}

@@ -1,0 +1,45 @@
+@page "/chunks/empty-view"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Empty View" Description="Full-viewport empty state — composes EmptyStatePanel inside a min-h-screen centered wrapper" Interactivity="ComponentInteractivity.Ssr" ApiElements="@EmptyViewElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Full-viewport empty state with action"
+			Code="@("<EmptyView Title=\"No items yet\" Description=\"Get started by creating your first item. It only takes a moment.\" IconSvg=\"@IconSvg.PlusCircle\">\n    <Action>\n        <Button Variant=\"ButtonVariant.Default\">Create item</Button>\n    </Action>\n</EmptyView>")"
+			Primitives="@("<div class=\"min-h-screen flex items-center justify-center bg-subtle-bg p-6\">\n    <div class=\"flex flex-col items-center justify-center text-center gap-3 w-full border-2 border-dashed border-border rounded-lg py-12 px-6\">\n        <svg class=\"size-12 text-muted-foreground\"><!-- plus-circle icon --></svg>\n        <h3 class=\"text-lg font-semibold tracking-tight text-foreground\">No items yet</h3>\n        <p class=\"text-sm text-muted-foreground max-w-md\">Get started by creating your first item. It only takes a moment.</p>\n        <div class=\"mt-2\"><button class=\"...\">Create item</button></div>\n    </div>\n</div>")">
+			<div class="h-96 border rounded-lg overflow-hidden">
+				<EmptyView MinHeight="h-full" Title="No items yet" Description="Get started by creating your first item. It only takes a moment." IconSvg="@IconSvg.PlusCircle">
+					<Action>
+						<Button Variant="ButtonVariant.Default">Create item</Button>
+					</Action>
+				</EmptyView>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] EmptyViewElements =
+	[
+		new ApiElement(
+			Name: "EmptyView",
+			Description: "Full-viewport empty state. Wraps `EmptyStatePanel` in a `min-h-screen flex items-center justify-center bg-subtle-bg` container so the centred layout fills the browser window. Accepts the identical parameter surface as `EmptyStatePanel` and forwards all values.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string",          true,  "Heading for the empty state. Forwarded to `EmptyStatePanel`." ),
+				new ApiProperty( "Description", "string?",         false, "Supporting muted text. Forwarded to `EmptyStatePanel`. Omit to suppress." ),
+				new ApiProperty( "IconSvg",     "string?",         false, "SVG path string for an optional icon. Forwarded to `EmptyStatePanel`. Omit to suppress." ),
+				new ApiProperty( "Action",      "RenderFragment?", false, "Optional action slot. Forwarded to `EmptyStatePanel`." ),
+				new ApiProperty( "Borders",     "bool",            false, "Forwarded to `EmptyStatePanel`. Default: `true`." ),
+				new ApiProperty( "BgFilled",    "bool",            false, "Forwarded to `EmptyStatePanel`. Default: `false`." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Forwarded to `EmptyStatePanel`. Default: `true`." ),
+				new ApiProperty( "MinHeight",   "string",          false, "Min-height Tailwind class on the outer wrapper. Default: `min-h-screen` (full viewport). Set to `h-full` for embedded use inside a sized parent (the catalogue preview uses this)." ),
+			]
+		),
+	];
+}

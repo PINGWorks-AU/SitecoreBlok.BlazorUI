@@ -1,0 +1,20 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	LoadingView — full-viewport loading state.
+
+	Composes LoadingPanel with the supplied MinHeight (defaults to "min-h-screen")
+	so the spinner and message fill the chosen area. Intended for top-level route
+	transitions or initial page load states. For section-scoped loading, use
+	LoadingPanel directly. The catalogue passes "h-full" for bounded preview.
+*@
+
+<LoadingPanel Message="@Message" MinHeight="@MinHeight" />
+
+@code {
+	/// <summary>Optional loading message forwarded to <see cref="LoadingPanel"/>.</summary>
+	[Parameter] public string? Message { get; set; }
+
+	/// <summary>Min-height Tailwind class forwarded to <see cref="LoadingPanel"/>. Default: <c>min-h-screen</c>.</summary>
+	[Parameter] public string MinHeight { get; set; } = "min-h-screen";
+}

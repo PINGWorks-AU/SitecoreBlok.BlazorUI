@@ -1,0 +1,45 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	EmptyStatePanel — section-level empty-state chrome with a centred column
+	layout: optional icon, title, muted description, and an action slot.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders   (default true)  — dashed border convention: border-2 border-dashed border-border rounded-lg.
+		- BgFilled  (default false) — toggles bg-subtle-bg.
+		- Gutters   (default true)  — toggles py-12 px-6.
+*@
+
+<div class="@PanelClass">
+	@if ( !string.IsNullOrEmpty( IconSvg ) )
+	{
+		<Icon Svg="@IconSvg" ClassName="size-12 text-muted-foreground" />
+	}
+	<h3 class="text-lg font-semibold tracking-tight text-foreground">@Title</h3>
+	@if ( !string.IsNullOrEmpty( Description ) )
+	{
+		<p class="text-sm text-muted-foreground max-w-md">@Description</p>
+	}
+	@if ( Action is not null )
+	{
+		<div class="mt-2">@Action</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public string? IconSvg { get; set; }
+	[Parameter] public RenderFragment? Action { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = false;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private string PanelClass
+		=> CssClassBuilder.Start( "flex flex-col items-center justify-center text-center gap-3 w-full" )
+			.With( "border-2 border-dashed border-border rounded-lg", Borders )
+			.With( "bg-subtle-bg", BgFilled )
+			.With( "py-12 px-6", Gutters )
+			.Build();
+}

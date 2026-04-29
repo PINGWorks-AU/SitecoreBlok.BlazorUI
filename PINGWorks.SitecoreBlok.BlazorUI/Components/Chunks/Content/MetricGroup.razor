@@ -1,0 +1,31 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	MetricGroup — horizontal arrangement of KpiTiles separated by dividers.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders   (default true) toggles border border-border rounded-lg overflow-hidden
+		             on the group wrapper, and uses divide-x divide-border for tile dividers.
+		- BgFilled  (default true) toggles bg-background.
+
+	Note: Children KpiTiles should set Borders=false when placed inside a MetricGroup
+	with Borders=true, otherwise the borders double up — the outer border of the group
+	plus the per-tile border create a doubled visual. The catalogue example demonstrates this.
+*@
+
+<div class="@GroupClass">
+	@ChildContent
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+
+	private string GroupClass
+		=> CssClassBuilder.Start( "flex divide-x divide-border" )
+			.With( "border border-border rounded-lg overflow-hidden", Borders )
+			.With( "bg-background", BgFilled )
+			.Build();
+}

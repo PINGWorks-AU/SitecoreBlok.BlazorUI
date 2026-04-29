@@ -1,0 +1,49 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	SectionHeader — smaller heading band inside a ContentSection. h2 instead of h1, less padding.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders         (default true)  toggles border-b under the row.
+		- Gutters         (default true)  toggles pb-3 / actions gap-2.
+		- HeaderAlignment (default Start) flex items-* on the row.
+*@
+
+<div class="@RowClass">
+	<div class="flex-1 min-w-0">
+		<h2 class="text-lg font-semibold tracking-tight text-foreground">@Title</h2>
+		@if ( !string.IsNullOrEmpty( Description ) )
+		{
+			<p class="text-sm text-muted-foreground mt-0.5">@Description</p>
+		}
+	</div>
+
+	@if ( Actions is not null )
+	{
+		<div class="@ActionsClass">
+			@Actions
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public Alignment HeaderAlignment { get; set; } = Alignment.Start;
+
+	private string RowClass
+		=> CssClassBuilder.Start( "flex gap-4" )
+			.With( AlignmentClasses.Items( HeaderAlignment ) )
+			.With( "pb-3", Gutters )
+			.With( "border-b border-border", Borders )
+			.Build();
+
+	private string ActionsClass
+		=> CssClassBuilder.Start( "flex-shrink-0 flex items-center" )
+			.With( "gap-2", Gutters )
+			.Build();
+}

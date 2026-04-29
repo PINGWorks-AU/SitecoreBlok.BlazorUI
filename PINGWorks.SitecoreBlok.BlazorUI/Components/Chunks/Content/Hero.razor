@@ -1,0 +1,46 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	Hero — landing-style intro band with a title, optional subtitle, optional
+	action slot, and an optional media slot.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Gutters   (default true)  toggles py-16 px-6.
+		- BgFilled  (default false) toggles bg-subtle-bg.
+*@
+
+<section class="@HeroClass">
+	<div class="flex flex-col lg:flex-row items-center gap-8 max-w-7xl mx-auto w-full">
+		<div class="flex-1 text-center lg:text-start">
+			<h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-foreground">@Title</h1>
+			@if ( !string.IsNullOrEmpty( Subtitle ) )
+			{
+				<p class="text-lg text-muted-foreground mt-4 max-w-2xl">@Subtitle</p>
+			}
+			@if ( Actions is not null )
+			{
+				<div class="flex items-center justify-center lg:justify-start gap-3 mt-6">@Actions</div>
+			}
+		</div>
+		@if ( Media is not null )
+		{
+			<div class="flex-1 w-full max-w-lg">@Media</div>
+		}
+	</div>
+</section>
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Subtitle { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
+	[Parameter] public RenderFragment? Media { get; set; }
+
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = false;
+
+	private string HeroClass
+		=> CssClassBuilder.Start( "w-full" )
+			.With( "py-16 px-6", Gutters )
+			.With( "bg-subtle-bg", BgFilled )
+			.Build();
+}

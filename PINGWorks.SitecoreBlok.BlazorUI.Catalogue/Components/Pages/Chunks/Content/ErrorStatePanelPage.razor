@@ -1,0 +1,52 @@
+@page "/chunks/error-state-panel"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Error State Panel" Description="Section-level error-state chrome — optional status code, title, description, and action slot" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ErrorStatePanelElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="404 with status, description and action"
+			Code="@("<ErrorStatePanel Status=\"404\" Title=\"Page not found\" Description=\"The page you are looking for doesn't exist or has been moved.\">\n    <Action>\n        <Button Variant=\"ButtonVariant.Default\">Go to homepage</Button>\n    </Action>\n</ErrorStatePanel>")"
+			Primitives="@("<div class=\"flex flex-col items-center justify-center text-center gap-3 w-full border border-border rounded-lg bg-subtle-bg py-12 px-6\">\n    <div class=\"text-6xl font-bold text-muted-foreground/40 tracking-tight\">404</div>\n    <h3 class=\"text-lg font-semibold tracking-tight text-foreground\">Page not found</h3>\n    <p class=\"text-sm text-muted-foreground max-w-md\">The page you are looking for doesn't exist or has been moved.</p>\n    <div class=\"mt-2\"><button class=\"...\">Go to homepage</button></div>\n</div>")">
+			<ErrorStatePanel Status="404" Title="Page not found" Description="The page you are looking for doesn't exist or has been moved.">
+				<Action>
+					<Button Variant="ButtonVariant.Default">Go to homepage</Button>
+				</Action>
+			</ErrorStatePanel>
+		</ComponentExample>
+
+		<ComponentExample Title="Without status — generic error"
+			Code="@("<ErrorStatePanel Title=\"Something went wrong\" Description=\"An unexpected error occurred. Please try again or contact support if the problem persists.\">\n    <Action>\n        <Button Variant=\"ButtonVariant.Outline\">Try again</Button>\n    </Action>\n</ErrorStatePanel>")"
+			Primitives="@("<div class=\"flex flex-col items-center justify-center text-center gap-3 w-full border border-border rounded-lg bg-subtle-bg py-12 px-6\">\n    <h3 class=\"text-lg font-semibold tracking-tight text-foreground\">Something went wrong</h3>\n    <p class=\"text-sm text-muted-foreground max-w-md\">An unexpected error occurred. Please try again or contact support if the problem persists.</p>\n    <div class=\"mt-2\"><button class=\"...\">Try again</button></div>\n</div>")">
+			<ErrorStatePanel Title="Something went wrong" Description="An unexpected error occurred. Please try again or contact support if the problem persists.">
+				<Action>
+					<Button Variant="ButtonVariant.Outline">Try again</Button>
+				</Action>
+			</ErrorStatePanel>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ErrorStatePanelElements =
+	[
+		new ApiElement(
+			Name: "ErrorStatePanel",
+			Description: "Section-level error-state chrome. Renders a centred column with an optional large Status code (e.g. \"404\", \"500\"), a required title, an optional muted description, and an optional action slot. Background fill is on by default to visually differentiate from empty states. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string",          true,  "Error heading. Rendered as `<h3>` in `text-lg font-semibold tracking-tight text-foreground`." ),
+				new ApiProperty( "Description", "string?",         false, "Supporting muted text in `text-sm text-muted-foreground max-w-md`. Omit to suppress." ),
+				new ApiProperty( "Status",      "string?",         false, "Optional HTTP status code or short label (e.g. `\"404\"`, `\"500\"`). Rendered above the title in `text-6xl font-bold text-muted-foreground/40`. Omit to suppress." ),
+				new ApiProperty( "Action",      "RenderFragment?", false, "Optional action slot rendered below the description. Typically a single `<Button>`." ),
+				new ApiProperty( "Borders",     "bool",            false, "Toggles `border border-border rounded-lg`. Default: `true`." ),
+				new ApiProperty( "BgFilled",    "bool",            false, "Toggles `bg-subtle-bg` on the wrapper. Default: `true` — provides visual contrast against page background." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Toggles `py-12 px-6` on the wrapper. Default: `true`." ),
+			]
+		),
+	];
+}

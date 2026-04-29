@@ -1,0 +1,19 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+    RowActions — table-row dropdown action menu pattern. The Items slot holds DropdownMenuItem children.
+*@
+
+<DropdownMenu>
+	<DropdownMenuTrigger ClassName="rounded-md hover:bg-neutral-bg p-1">
+		<Icon Svg="@IconSvg" ClassName="size-4 text-muted-foreground" />
+	</DropdownMenuTrigger>
+	<DropdownMenuContent ClassName="min-w-[10rem]">
+		@Items
+	</DropdownMenuContent>
+</DropdownMenu>
+
+@code {
+	[Parameter] public string IconSvg { get; set; } = PINGWorks.SitecoreBlok.BlazorUI.IconSvg.DotsHorizontal;
+	[Parameter] public RenderFragment? Items { get; set; }
+}

@@ -1,0 +1,48 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	Callout — visually distinct aside, gentler than Alert. Supports a title,
+	body content slot, an optional leading icon, and the shared Tone enum for
+	tonal styling (spec §5.12).
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders (default true) — toggles border, tonal border colour, and rounded-lg.
+		- Gutters (default true) — toggles p-4 gap-3.
+*@
+
+<div class="@CalloutClass" role="status">
+	@if ( !string.IsNullOrEmpty( IconSvg ) )
+	{
+		<Icon Svg="@IconSvg" ClassName="size-5 shrink-0 mt-0.5" />
+	}
+	<div class="flex-1 min-w-0">
+		@if ( !string.IsNullOrEmpty( Title ) )
+		{
+			<p class="text-sm font-semibold mb-1">@Title</p>
+		}
+		@if ( ChildContent is not null )
+		{
+			<div class="text-sm">@ChildContent</div>
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter] public string? Title { get; set; }
+	[Parameter] public Tone Tone { get; set; } = Tone.Info;
+	[Parameter] public string? IconSvg { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private string CalloutClass
+		=> CssClassBuilder.Start( "flex items-start" )
+			.With( ToneClasses.Bg( Tone ) )
+			.With( ToneClasses.Text( Tone ) )
+			.With( "border", Borders )
+			.With( ToneClasses.Border( Tone ), Borders )
+			.With( "rounded-lg", Borders )
+			.With( "p-4 gap-3", Gutters )
+			.Build();
+}

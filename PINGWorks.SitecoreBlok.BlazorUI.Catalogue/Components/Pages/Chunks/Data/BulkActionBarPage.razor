@@ -1,0 +1,75 @@
+@page "/chunks/bulk-action-bar"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="BulkActionBar" Description="Selection-driven action bar appearing above a table when rows are selected. Hidden when SelectedCount is 0." Interactivity="ComponentInteractivity.Interactive" ApiElements="@BulkActionBarElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="3 rows selected with bulk actions"
+			Code="@("<BulkActionBar SelectedCount=\"3\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Delete</Button>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Archive</Button>\n    </Actions>\n</BulkActionBar>")"
+			Primitives="@("<div class=\"flex items-center gap-3 px-4 py-2 border border-border rounded-lg bg-subtle-bg\">\n    <span class=\"text-sm font-medium\">3 selected</span>\n    <button type=\"button\" class=\"text-sm text-muted-foreground hover:text-foreground transition-colors\">Clear</button>\n    <div class=\"ml-auto flex items-center gap-2\">\n        <button class=\"...\">Delete</button>\n        <button class=\"...\">Archive</button>\n    </div>\n</div>")">
+			<BulkActionBar SelectedCount="3">
+				<Actions>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Delete</Button>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Archive</Button>
+				</Actions>
+			</BulkActionBar>
+		</ComponentExample>
+
+		<ComponentExample Title="0 selected — bar is hidden"
+			Code="@("<BulkActionBar SelectedCount=\"0\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Delete</Button>\n    </Actions>\n</BulkActionBar>")"
+			Primitives="@("<!-- Nothing rendered when SelectedCount = 0 -->")">
+			<div class="text-sm text-muted-foreground italic">
+				(BulkActionBar with SelectedCount=0 renders nothing — the bar only appears when at least one row is selected.)
+			</div>
+			<BulkActionBar SelectedCount="0">
+				<Actions>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Delete</Button>
+				</Actions>
+			</BulkActionBar>
+		</ComponentExample>
+
+		<ComponentExample Title="Popup mode — fixed-position pill floats from bottom of viewport"
+			Code="@("<BulkActionBar Popup=\"true\" SelectedCount=\"@SelectedCount\" OnClear=\"@(() => SelectedCount = 0)\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Delete</Button>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Archive</Button>\n    </Actions>\n</BulkActionBar>")"
+			Primitives="@("<!-- When Popup=true and SelectedCount > 0, renders the ActionBar primitive -->\n<div data-slot=\"action-bar\" class=\"fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-full border border-border bg-background px-4 py-2 shadow-lg\">\n    <span class=\"text-sm font-medium\">2 selected</span>\n    <button type=\"button\" class=\"...\">Clear</button>\n    <div class=\"flex items-center gap-2\">\n        <button class=\"...\">Delete</button>\n        <button class=\"...\">Archive</button>\n    </div>\n</div>")">
+			<div class="space-y-3">
+				<div class="flex items-center gap-3">
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm" @onclick="@(() => PopupCount = Math.Max( 0, PopupCount - 1 ))">Deselect one</Button>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm" @onclick="@(() => PopupCount++)">Select one</Button>
+					<Text Size="Size.Sm" Muted>@PopupCount selected</Text>
+				</div>
+				<Text Size="Size.Sm" Muted>When SelectedCount &gt; 0, the ActionBar pill appears fixed at the bottom of the browser viewport.</Text>
+			</div>
+			<BulkActionBar Popup="true" SelectedCount="@PopupCount" OnClear="@(() => PopupCount = 0)">
+				<Actions>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Delete</Button>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Archive</Button>
+				</Actions>
+			</BulkActionBar>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private int PopupCount = 0;
+
+	private static readonly ApiElement[] BulkActionBarElements =
+	[
+		new ApiElement(
+			Name: "BulkActionBar",
+			Description: "Selection-driven action bar. When `Popup=false` (default), renders a flex bar with a count label and a Clear button when `SelectedCount > 0`; renders nothing when `SelectedCount` is 0. When `Popup=true`, delegates to the `ActionBar` primitive — a fixed-position pill that floats from the bottom of the viewport (`position: fixed`) whenever `SelectedCount > 0`. The optional `Actions` slot is pinned to the trailing end.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "SelectedCount", "int",              true,  "Number of selected rows. The bar (or popup pill) is only rendered when this value is greater than 0." ),
+				new ApiProperty( "OnClear",       "EventCallback",    false, "Fired when the Clear button is clicked. Wire this to deselect all rows." ),
+				new ApiProperty( "Actions",       "RenderFragment?",  false, "Optional trailing action slot. Typically one or more `<Button>` elements (e.g. Delete, Archive)." ),
+				new ApiProperty( "Popup",         "bool",             false, "When `true`, uses the `ActionBar` primitive instead of the inline bar. The `ActionBar` is `position: fixed` and floats from the bottom of the browser viewport. Default: `false`." ),
+				new ApiProperty( "Align",         "ActionBarAlign",   false, "Horizontal alignment of the popup pill. Only relevant when `Popup=true`. Default: `ActionBarAlign.Center`." ),
+			]
+		),
+	];
+}

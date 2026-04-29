@@ -1,0 +1,59 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	NavListItem — single nav row. Rendered as <a> when Href is set, otherwise as <button>
+	when OnClick has a delegate.
+
+	A single inline element (no region wrappers), so wrapper-styling parameters
+	(Borders/Gutters/HeaderAlignment/BgFilled) do not apply.
+*@
+
+@if ( !string.IsNullOrEmpty( Href ) )
+{
+	<a href="@Href" class="@RowClass">
+		@RenderRowContent
+	</a>
+}
+else if ( OnClick.HasDelegate )
+{
+	<button type="button" @onclick="OnClick" class="@RowClass">
+		@RenderRowContent
+	</button>
+}
+else
+{
+	<div class="@RowClass">
+		@RenderRowContent
+	</div>
+}
+
+@code {
+	[Parameter] public string? Href { get; set; }
+	[Parameter] public string? IconSvg { get; set; }
+	[Parameter] public string Label { get; set; } = "";
+	[Parameter] public bool Active { get; set; } = false;
+	[Parameter] public string? Badge { get; set; }
+	[Parameter] public EventCallback OnClick { get; set; }
+
+	private string RowClass
+		=> CssClassBuilder.Start( "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors no-underline w-full text-left" )
+			.With( "text-foreground bg-neutral-bg font-medium", Active )
+			.With( "text-muted-foreground hover:text-foreground hover:bg-neutral-bg", !Active )
+			.Build();
+
+	private RenderFragment RenderRowContent
+		=> __builder =>
+		{
+			if ( !string.IsNullOrEmpty( IconSvg ) )
+			{
+				<Icon Svg="@IconSvg" ClassName="size-4 shrink-0" />
+			}
+			<span class="truncate">@Label</span>
+			if ( !string.IsNullOrEmpty( Badge ) )
+			{
+				<span class="ml-auto">
+					<Badge ColorScheme="BadgeColor.Neutral">@Badge</Badge>
+				</span>
+			}
+		};
+}

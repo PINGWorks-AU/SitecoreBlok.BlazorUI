@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	InlineForm — single-row form for search-and-go / subscribe / quick-add patterns.
+	Renders its ChildContent in a flex row so fields and buttons sit side-by-side.
+*@
+
+<form @onsubmit="OnSubmit" @onsubmit:preventDefault="true" class="flex items-end gap-2">
+	@ChildContent
+</form>
+
+@code {
+	[Parameter] public EventCallback OnSubmit { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+}

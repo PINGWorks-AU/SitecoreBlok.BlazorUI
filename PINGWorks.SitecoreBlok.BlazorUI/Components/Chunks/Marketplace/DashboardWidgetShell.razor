@@ -1,0 +1,62 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	DashboardWidgetShell — shell for the XMC Dashboard widget grid cell
+	extension point. Card-styled, fits the dashboard's allotted cell. Title (or
+	Header slot) at top, Body in middle, optional Footer.
+*@
+
+<div class="@OuterClass">
+	@if ( !string.IsNullOrEmpty( Title ) || Header is not null )
+	{
+		<div class="@HeaderClass">
+			@if ( !string.IsNullOrEmpty( Title ) )
+			{
+				<h3 class="text-sm font-semibold tracking-tight text-foreground">@Title</h3>
+			}
+			@if ( Header is not null )
+			{
+				<div class="ml-auto">@Header</div>
+			}
+		</div>
+	}
+	<div class="@BodyClass">@Body</div>
+	@if ( Footer is not null )
+	{
+		<div class="@FooterClass">@Footer</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string? Title { get; set; }
+	[Parameter] public RenderFragment? Header { get; set; }
+	[Parameter] public RenderFragment? Body { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+
+	private string OuterClass
+		=> CssClassBuilder.Start( "flex flex-col h-full w-full" )
+			.With( "border border-border rounded-lg", Borders )
+			.With( "bg-background", BgFilled )
+			.Build();
+
+	private string HeaderClass
+		=> CssClassBuilder.Start( "flex-shrink-0 flex items-center gap-2" )
+			.With( "px-4 py-3", Gutters )
+			.With( "border-b border-border", Borders )
+			.Build();
+
+	private string BodyClass
+		=> CssClassBuilder.Start( "flex-1 min-h-0 overflow-y-auto" )
+			.With( "p-4", Gutters )
+			.Build();
+
+	private string FooterClass
+		=> CssClassBuilder.Start( "flex-shrink-0" )
+			.With( "px-4 py-3", Gutters )
+			.With( "border-t border-border", Borders )
+			.Build();
+}

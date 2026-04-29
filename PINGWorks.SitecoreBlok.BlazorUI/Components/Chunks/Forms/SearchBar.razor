@@ -1,0 +1,37 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	SearchBar — toolbar-pattern search row.
+	Composes the SearchInput + SearchInputField primitives for the query box,
+	exposes a Filters slot for filter chips / dropdowns, and shows an optional
+	result count at the trailing end.
+*@
+
+<div class="flex items-center gap-3 w-full">
+
+	<div class="flex-1 max-w-md">
+		<SearchInput>
+			<SearchInputField Value="@Query" ValueChanged="@QueryChanged" Placeholder="Search…" DebounceMs="300" />
+		</SearchInput>
+	</div>
+
+	@if ( Filters is not null )
+	{
+		<div class="flex items-center gap-2">@Filters</div>
+	}
+
+	@if ( ResultCount.HasValue )
+	{
+		<span class="text-sm text-muted-foreground ml-auto">
+			@ResultCount.Value result@( ResultCount.Value == 1 ? "" : "s" )
+		</span>
+	}
+
+</div>
+
+@code {
+	[Parameter] public string? Query { get; set; }
+	[Parameter] public EventCallback<string?> QueryChanged { get; set; }
+	[Parameter] public int? ResultCount { get; set; }
+	[Parameter] public RenderFragment? Filters { get; set; }
+}

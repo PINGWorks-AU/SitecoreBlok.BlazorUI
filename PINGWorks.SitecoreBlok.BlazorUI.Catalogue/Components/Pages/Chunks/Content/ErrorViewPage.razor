@@ -1,0 +1,45 @@
+@page "/chunks/error-view"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Error View" Description="Full-viewport error state — composes ErrorStatePanel inside a min-h-screen centered wrapper" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ErrorViewElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Full-viewport 500 error with action"
+			Code="@("<ErrorView Status=\"500\" Title=\"Internal server error\" Description=\"Something went wrong on our end. Our team has been notified and is working on a fix.\">\n    <Action>\n        <Button Variant=\"ButtonVariant.Default\">Refresh page</Button>\n    </Action>\n</ErrorView>")"
+			Primitives="@("<div class=\"min-h-screen flex items-center justify-center bg-subtle-bg p-6\">\n    <div class=\"flex flex-col items-center justify-center text-center gap-3 w-full border border-border rounded-lg bg-subtle-bg py-12 px-6\">\n        <div class=\"text-6xl font-bold text-muted-foreground/40 tracking-tight\">500</div>\n        <h3 class=\"text-lg font-semibold tracking-tight text-foreground\">Internal server error</h3>\n        <p class=\"text-sm text-muted-foreground max-w-md\">Something went wrong on our end. Our team has been notified and is working on a fix.</p>\n        <div class=\"mt-2\"><button class=\"...\">Refresh page</button></div>\n    </div>\n</div>")">
+			<div class="h-96 border rounded-lg overflow-hidden">
+				<ErrorView MinHeight="h-full" Status="500" Title="Internal server error" Description="Something went wrong on our end. Our team has been notified and is working on a fix.">
+					<Action>
+						<Button Variant="ButtonVariant.Default">Refresh page</Button>
+					</Action>
+				</ErrorView>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ErrorViewElements =
+	[
+		new ApiElement(
+			Name: "ErrorView",
+			Description: "Full-viewport error state. Wraps `ErrorStatePanel` in a `min-h-screen flex items-center justify-center bg-subtle-bg` container so the centred layout fills the browser window. Accepts the identical parameter surface as `ErrorStatePanel` and forwards all values.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string",          true,  "Error heading. Forwarded to `ErrorStatePanel`." ),
+				new ApiProperty( "Description", "string?",         false, "Supporting muted text. Forwarded to `ErrorStatePanel`. Omit to suppress." ),
+				new ApiProperty( "Status",      "string?",         false, "Optional HTTP status code or label. Forwarded to `ErrorStatePanel`. Omit to suppress." ),
+				new ApiProperty( "Action",      "RenderFragment?", false, "Optional action slot. Forwarded to `ErrorStatePanel`." ),
+				new ApiProperty( "Borders",     "bool",            false, "Forwarded to `ErrorStatePanel`. Default: `true`." ),
+				new ApiProperty( "BgFilled",    "bool",            false, "Forwarded to `ErrorStatePanel`. Default: `true`." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Forwarded to `ErrorStatePanel`. Default: `true`." ),
+				new ApiProperty( "MinHeight",   "string",          false, "Min-height Tailwind class on the outer wrapper. Default: `min-h-screen` (full viewport). Set to `h-full` for embedded use inside a sized parent (the catalogue preview uses this)." ),
+			]
+		),
+	];
+}

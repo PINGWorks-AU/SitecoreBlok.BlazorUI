@@ -1,0 +1,60 @@
+@page "/chunks/detail-page"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="DetailPage" Description="Record detail layout: PageHeader at top, two-column main + aside, optional footer." Interactivity="ComponentInteractivity.Ssr" ApiElements="@DetailPageElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Record detail with KvList, aside panel, and footer actions"
+			Code="@("<DetailPage Title=\"Alice Martin\" Description=\"User account details.\">\n    <Main>\n        <KvList>\n            <KvListItem Label=\"Email\" Value=\"alice@example.com\" />\n            <KvListItem Label=\"Role\" Value=\"Administrator\" />\n            <KvListItem Label=\"Created\" Value=\"12 Jan 2025\" />\n            <KvListItem Label=\"Status\">\n                <Badge ColorScheme=\"BadgeColor.Success\">Active</Badge>\n            </KvListItem>\n        </KvList>\n    </Main>\n    <Aside>\n        <div class=\"border border-border rounded-lg p-4 space-y-3\">\n            <h3 class=\"text-sm font-semibold\">Quick info</h3>\n            <p class=\"text-sm text-muted-foreground\">Last login 3 days ago.</p>\n            <p class=\"text-sm text-muted-foreground\">2FA enabled.</p>\n        </div>\n    </Aside>\n    <Footer>\n        <div class=\"flex items-center gap-2\">\n            <Button Size=\"ButtonSize.Sm\">Save changes</Button>\n            <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Cancel</Button>\n        </div>\n    </Footer>\n</DetailPage>")"
+			Primitives="@("<div class=\"flex flex-col gap-6\">\n    <!-- PageHeader -->\n    <div class=\"space-y-3 pb-6 border-b border-border\">\n        <h1 class=\"text-2xl font-bold tracking-tight text-foreground\">Alice Martin</h1>\n        <p class=\"text-sm text-muted-foreground\">User account details.</p>\n    </div>\n    <!-- Main + Aside row -->\n    <div class=\"flex flex-col lg:flex-row gap-6\">\n        <div class=\"flex-1 min-w-0\"><!-- KvList --></div>\n        <aside class=\"lg:w-72 shrink-0\"><!-- quick info card --></aside>\n    </div>\n    <!-- Footer -->\n    <div class=\"border-t border-border pt-4\">\n        <div class=\"flex items-center gap-2\"><!-- Save / Cancel --></div>\n    </div>\n</div>")">
+			<DetailPage Title="Alice Martin" Description="User account details.">
+				<Main>
+					<KvList>
+						<KvListItem Label="Email" Value="alice@example.com" />
+						<KvListItem Label="Role" Value="Administrator" />
+						<KvListItem Label="Created" Value="12 Jan 2025" />
+						<KvListItem Label="Status">
+							<Badge ColorScheme="BadgeColor.Success">Active</Badge>
+						</KvListItem>
+					</KvList>
+				</Main>
+				<Aside>
+					<div class="border border-border rounded-lg p-4 space-y-3">
+						<h3 class="text-sm font-semibold">Quick info</h3>
+						<p class="text-sm text-muted-foreground">Last login 3 days ago.</p>
+						<p class="text-sm text-muted-foreground">2FA enabled.</p>
+					</div>
+				</Aside>
+				<Footer>
+					<div class="flex items-center gap-2">
+						<Button Size="ButtonSize.Sm">Save changes</Button>
+						<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">Cancel</Button>
+					</div>
+				</Footer>
+			</DetailPage>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] DetailPageElements =
+	[
+		new ApiElement(
+			Name: "DetailPage",
+			Description: "Record detail layout. Renders a `PageHeader` at the top, then a responsive two-column row (`Main` full-width + optional `Aside` sidebar at `lg:w-72`), and an optional `Footer` separated by a top border. On narrow viewports the columns stack vertically.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string",          true,  "Record title forwarded to the inner `PageHeader`." ),
+				new ApiProperty( "Description", "string?",         false, "Sub-title forwarded to the inner `PageHeader`." ),
+				new ApiProperty( "Main",        "RenderFragment?", false, "Primary content column (`flex-1 min-w-0`)." ),
+				new ApiProperty( "Aside",       "RenderFragment?", false, "Optional sidebar (`lg:w-72 shrink-0`). Hidden when null." ),
+				new ApiProperty( "Footer",      "RenderFragment?", false, "Optional footer area separated by a top border. Hidden when null." ),
+			]
+		),
+	];
+}

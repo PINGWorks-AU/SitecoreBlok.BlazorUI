@@ -1,0 +1,64 @@
+@page "/chunks/results-list"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="ResultsList" Description="Generic vertical list of result-cards with selection, optional pagination, and an empty-state fallback." Interactivity="ComponentInteractivity.Interactive" ApiElements="@ResultsListElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Search results with selection"
+			Code="@("<ResultsList TItem=\"SearchResult\" Items=\"@Results\" Selected=\"@Selected\" SelectedChanged=\"@(v => Selected = v)\">\n    <ItemTemplate Context=\"item\">\n        <div class=\"flex flex-col gap-0.5\">\n            <span class=\"text-sm font-medium\">@item.Title</span>\n            <span class=\"text-xs text-muted-foreground\">@item.Snippet</span>\n        </div>\n    </ItemTemplate>\n</ResultsList>")"
+			Primitives="@("<div class=\"flex flex-col gap-2\">\n    <button type=\"button\" class=\"w-full text-left rounded-md border transition-colors cursor-pointer p-3 bg-neutral-bg border-border\">\n        <div class=\"flex flex-col gap-0.5\">\n            <span class=\"text-sm font-medium\">Intro to Blazor</span>\n            <span class=\"text-xs text-muted-foreground\">Blazor lets you build interactive UIs using C#.</span>\n        </div>\n    </button>\n    <button type=\"button\" class=\"w-full text-left rounded-md border transition-colors cursor-pointer p-3 bg-background border-border hover:bg-subtle-bg\">\n        <!-- additional items -->\n    </button>\n</div>")">
+			<ResultsList TItem="SearchResult" Items="@Results" Selected="@Selected" SelectedChanged="@(v => Selected = v)">
+				<ItemTemplate Context="item">
+					<div class="flex flex-col gap-0.5">
+						<span class="text-sm font-medium">@item.Title</span>
+						<span class="text-xs text-muted-foreground">@item.Snippet</span>
+					</div>
+				</ItemTemplate>
+			</ResultsList>
+			@if ( Selected is not null )
+			{
+				<p class="text-xs text-muted-foreground mt-2">Selected: @Selected.Title</p>
+			}
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private record SearchResult( string Id, string Title, string Snippet );
+
+	private SearchResult? Selected;
+
+	private static readonly IList<SearchResult> Results =
+	[
+		new SearchResult( "1", "Intro to Blazor", "Blazor lets you build interactive UIs using C# instead of JavaScript." ),
+		new SearchResult( "2", "Component lifecycle", "Understand OnInitialized, OnParametersSet, and StateHasChanged." ),
+		new SearchResult( "3", "Data binding in Blazor", "Two-way binding with @bind keeps UI and model in sync automatically." ),
+		new SearchResult( "4", "Render modes explained", "Choose between SSR, InteractiveServer, InteractiveWebAssembly, and Auto." ),
+	];
+
+	private static readonly ApiElement[] ResultsListElements =
+	[
+		new ApiElement(
+			Name: "ResultsList<TItem>",
+			Description: "Generic vertical list of selectable result cards. Each item is rendered by the `ItemTemplate` render fragment inside a full-width button. The selected item is highlighted. When the list is empty the optional `Empty` slot is shown; if that slot is also null a default `EmptyStatePanel` is used. Attach `DataPagination` automatically via the `Pageable` flag.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Items",           "IList<TItem>?",         false, "The collection of items to display." ),
+				new ApiProperty( "Selected",        "TItem?",                false, "The currently selected item. The matching row receives active styling." ),
+				new ApiProperty( "SelectedChanged", "EventCallback<TItem?>", false, "Fired when the user clicks a row." ),
+				new ApiProperty( "ItemTemplate",    "RenderFragment<TItem>?",false, "Render fragment receiving each item as context. Renders the row content inside the button." ),
+				new ApiProperty( "Empty",           "RenderFragment?",       false, "Custom empty-state content shown when `Items` is null or empty. Defaults to `EmptyStatePanel` with 'No results'." ),
+				new ApiProperty( "Pageable",        "bool",                  false, "When `true`, renders a `DataPagination` below the list. Default: `false`." ),
+				new ApiProperty( "Page",            "int",                   false, "Current page number forwarded to `DataPagination`. Default: `1`." ),
+				new ApiProperty( "PageChanged",     "EventCallback<int>",    false, "Page-change callback forwarded to `DataPagination`." ),
+				new ApiProperty( "PageSize",        "int",                   false, "Items per page forwarded to `DataPagination`. Default: `10`." ),
+				new ApiProperty( "TotalItems",      "int",                   false, "Total item count forwarded to `DataPagination`. Default: `0`." ),
+			]
+		),
+	];
+}

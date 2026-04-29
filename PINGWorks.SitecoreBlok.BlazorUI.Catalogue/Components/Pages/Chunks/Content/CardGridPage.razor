@@ -1,0 +1,63 @@
+@page "/chunks/card-grid"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="CardGrid" Description="Responsive grid of cards — column count and gap are parameterised" Interactivity="ComponentInteractivity.Ssr" ApiElements="@CardGridElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Two columns"
+			Code="@("<CardGrid Columns=\"Columns.Two\">\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 1</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 2</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 3</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 4</div>\n</CardGrid>")"
+			Primitives="@("<div class=\"grid grid-cols-1 sm:grid-cols-2 gap-4\">\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 1</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 2</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 3</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 4</div>\n</div>")">
+			<CardGrid Columns="Columns.Two">
+				<div class="rounded-lg border bg-background p-4 text-center">Card 1</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 2</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 3</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 4</div>
+			</CardGrid>
+		</ComponentExample>
+
+		<ComponentExample Title="Three columns (default)"
+			Code="@("<CardGrid>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 1</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 2</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 3</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 4</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 5</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 6</div>\n</CardGrid>")"
+			Primitives="@("<div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4\">\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 1</div>\n    ...\n</div>")">
+			<CardGrid>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 1</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 2</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 3</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 4</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 5</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 6</div>
+			</CardGrid>
+		</ComponentExample>
+
+		<ComponentExample Title="Four columns, small gap"
+			Code="@("<CardGrid Columns=\"Columns.Four\" Gap=\"Size.Sm\">\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 1</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 2</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 3</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 4</div>\n</CardGrid>")"
+			Primitives="@("<div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3\">\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 1</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 2</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 3</div>\n    <div class=\"rounded-lg border bg-background p-4 text-center\">Card 4</div>\n</div>")">
+			<CardGrid Columns="Columns.Four" Gap="Size.Sm">
+				<div class="rounded-lg border bg-background p-4 text-center">Card 1</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 2</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 3</div>
+				<div class="rounded-lg border bg-background p-4 text-center">Card 4</div>
+			</CardGrid>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] CardGridElements =
+	[
+		new ApiElement(
+			Name: "CardGrid",
+			Description: "A responsive CSS grid wrapper for card layouts. Column count and gap are parameterised via the shared `Columns` and `Size` enums. Breakpoint logic is centralised in `ColumnsClasses.Grid` so Tailwind scans literal class strings. Children are plain `<div>` or Blok card components.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Card elements to place in the grid." ),
+				new ApiProperty( "Columns",      "Columns",         false, "Number of columns (responsive). Default: `Columns.Three` (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`). Mapped through `ColumnsClasses.Grid`." ),
+				new ApiProperty( "Gap",          "Size",            false, "Grid gap. Default: `Size.Md` (`gap-4`). Mapped through `SizeClasses.Gap`." ),
+			]
+		),
+	];
+}

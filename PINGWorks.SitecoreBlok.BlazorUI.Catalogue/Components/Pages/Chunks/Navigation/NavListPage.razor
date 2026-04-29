@@ -1,0 +1,40 @@
+@page "/chunks/nav-list"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="NavList" Description="Vertical link list — ChildContent of NavListItem / NavGroup" Interactivity="ComponentInteractivity.Ssr" ApiElements="@NavListElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default"
+			Code="@("<NavList>\n    <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Profile\" Active=\"true\" />\n    <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Settings\" />\n    <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Inbox\" Badge=\"3\" />\n    <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Logout\" Label=\"Sign out\" />\n</NavList>")"
+			Primitives="@("<nav class=\"flex flex-col space-y-1 p-2\">\n    <a href=\"#\" class=\"flex items-center gap-3 px-3 py-2 rounded-md text-sm text-foreground bg-neutral-bg font-medium\"><svg class=\"size-4 shrink-0\">...</svg><span>Profile</span></a>\n    <a href=\"#\" class=\"flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-neutral-bg\"><svg class=\"size-4 shrink-0\">...</svg><span>Settings</span></a>\n    <a href=\"#\" class=\"flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-neutral-bg\"><svg class=\"size-4 shrink-0\">...</svg><span>Inbox</span><span class=\"ml-auto\">3</span></a>\n    <a href=\"#\" class=\"flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-neutral-bg\"><svg class=\"size-4 shrink-0\">...</svg><span>Sign out</span></a>\n</nav>")">
+			<div class="border rounded-lg max-w-md">
+				<NavList>
+					<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Profile" Active="true" />
+					<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Settings" />
+					<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Inbox" Badge="3" />
+					<NavListItem Href="#" IconSvg="@IconSvg.Logout" Label="Sign out" />
+				</NavList>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] NavListElements =
+	[
+		new ApiElement(
+			Name: "NavList",
+			Description: "Vertical link list. Wraps `ChildContent` (typically `NavListItem` and `NavGroup`) in a `<nav>` with consistent inter-item spacing. Designed to live inside an `AppSidebar` (or similar containing chunk) which owns its own border / fill / width.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Nav rows — typically `NavListItem` and `NavGroup`." ),
+				new ApiProperty( "Gutters",      "bool",            false, "Toggles `space-y-1 p-2` (inter-item spacing + small padding). Default: `true`." ),
+			]
+		),
+	];
+}

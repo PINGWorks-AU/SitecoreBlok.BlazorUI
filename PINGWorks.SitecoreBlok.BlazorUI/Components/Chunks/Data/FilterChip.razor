@@ -1,0 +1,22 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+    FilterChip — single removable filter chip. Click the × to fire OnRemove.
+*@
+
+<span class="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs">
+	@if ( !string.IsNullOrEmpty( IconSvg ) )
+	{
+		<Icon Svg="@IconSvg" ClassName="size-3 shrink-0" />
+	}
+	<span>@Label</span>
+	<button type="button" @onclick="OnRemove" class="inline-flex items-center justify-center size-4 rounded-full hover:bg-neutral-bg-active text-muted-foreground hover:text-foreground transition-colors" aria-label="Remove">
+		<Icon Svg="@PINGWorks.SitecoreBlok.BlazorUI.IconSvg.Close" ClassName="size-3" />
+	</button>
+</span>
+
+@code {
+	[Parameter] public string Label { get; set; } = "";
+	[Parameter] public EventCallback OnRemove { get; set; }
+	[Parameter] public string? IconSvg { get; set; }
+}

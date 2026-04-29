@@ -1,0 +1,29 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	FormActions — sticky-bottom action row.
+	Start slot (left, e.g. Cancel) and End slot (right, e.g. Submit).
+	When Sticky=true, adds backdrop-blur + fixed-bottom positioning.
+*@
+
+<div class="@RowClass">
+	@if ( Start is not null )
+	{
+		<div class="flex items-center gap-2">@Start</div>
+	}
+	@if ( End is not null )
+	{
+		<div class="ml-auto flex items-center gap-2">@End</div>
+	}
+</div>
+
+@code {
+	[Parameter] public bool Sticky { get; set; } = false;
+	[Parameter] public RenderFragment? Start { get; set; }
+	[Parameter] public RenderFragment? End { get; set; }
+
+	private string RowClass
+		=> CssClassBuilder.Start( "flex items-center pt-4 border-t border-border" )
+			.With( "sticky bottom-0 z-10 bg-background/95 backdrop-blur px-6 py-4", Sticky )
+			.Build();
+}

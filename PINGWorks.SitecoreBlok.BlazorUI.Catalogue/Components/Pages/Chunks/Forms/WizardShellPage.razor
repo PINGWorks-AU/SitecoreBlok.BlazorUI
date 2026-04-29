@@ -1,0 +1,63 @@
+@page "/chunks/wizard-shell"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="WizardShell" Description="Stepper header + per-step body + Back/Next footer — encapsulates multi-step form navigation" Interactivity="ComponentInteractivity.Interactive" ApiElements="@WizardShellElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Three-step wizard"
+			Code="@("<WizardShell Steps=\"@Steps\" CurrentStep=\"@CurrentStep\" CurrentStepChanged=\"@(i => CurrentStep = i)\">\n    <StepContent Context=\"step\">\n        @if ( step == 0 )\n        {\n            <TextField Label=\"Full name\" @bind-Value=\"Name\" />\n        }\n        else if ( step == 1 )\n        {\n            <TextField Label=\"Email address\" Type=\"TextField.TextFieldType.Email\" @bind-Value=\"Email\" />\n        }\n        else\n        {\n            <p class=\"text-sm text-muted-foreground\">Review: @Name · @Email</p>\n        }\n    </StepContent>\n</WizardShell>\n\n@code {\n    private int CurrentStep = 0;\n    private string? Name;\n    private string? Email;\n    private static readonly IList<WizardStep> Steps = [ new(\"Your details\"), new(\"Contact\"), new(\"Review\") ];\n}")"
+			Primitives="@("<div class=\"flex flex-col gap-6\">\n    <ol class=\"flex items-center gap-2 flex-wrap\">\n        <li class=\"flex items-center gap-2\">\n            <span class=\"inline-flex items-center justify-center size-7 rounded-full text-sm font-medium border ...\">1</span>\n            <span class=\"text-sm font-semibold text-foreground\">Your details</span>\n            <span class=\"w-8 h-px bg-border\"></span>\n        </li>\n        <!-- more steps -->\n    </ol>\n    <div class=\"min-h-32\"><!-- step body --></div>\n    <div class=\"flex items-center justify-between border-t border-border pt-4\">\n        <button class=\"...\">Back</button>\n        <button class=\"...\">Next</button>\n    </div>\n</div>")">
+			<div class="max-w-lg">
+				<WizardShell Steps="@Steps" CurrentStep="@CurrentStep" CurrentStepChanged="@( i => CurrentStep = i )">
+					<StepContent Context="step">
+						@if ( step == 0 )
+						{
+							<TextField Label="Full name" @bind-Value="Name" />
+						}
+						else if ( step == 1 )
+						{
+							<TextField Label="Email address" Type="TextField.TextFieldType.Email" @bind-Value="Email" />
+						}
+						else
+						{
+							<p class="text-sm text-muted-foreground">Review: @Name &middot; @Email</p>
+						}
+					</StepContent>
+				</WizardShell>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private int CurrentStep = 0;
+	private string? Name;
+	private string? Email;
+
+	private static readonly IList<WizardShell.WizardStep> Steps =
+	[
+		new( "Your details" ),
+		new( "Contact" ),
+		new( "Review" ),
+	];
+
+	private static readonly ApiElement[] WizardShellElements =
+	[
+		new ApiElement(
+			Name: "WizardShell",
+			Description: "A multi-step wizard shell. Renders a numbered stepper header, a body area driven by `StepContent`, and a Back/Next footer. The consumer owns `CurrentStep` state and passes a `CurrentStepChanged` callback — WizardShell is fully controlled.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Steps",              "IList<WizardStep>?",    false, "Ordered list of step definitions. Each `WizardStep` has a `Label` and optional `Description`." ),
+				new ApiProperty( "CurrentStep",        "int",                   false, "Zero-based index of the active step. Default: `0`." ),
+				new ApiProperty( "CurrentStepChanged", "EventCallback<int>",    false, "Fires when Back or Next is clicked with the new step index. Use with `CurrentStep` for two-way binding." ),
+				new ApiProperty( "StepContent",        "RenderFragment<int>?",  false, "Per-step body. The `Context` variable receives the current step index so you can render different UI per step." ),
+			]
+		),
+	];
+}

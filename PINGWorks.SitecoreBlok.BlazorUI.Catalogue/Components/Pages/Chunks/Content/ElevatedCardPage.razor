@@ -1,0 +1,67 @@
+@page "/chunks/elevated-card"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="ElevatedCard" Description="Card-shaped chunk that encapsulates the Card primitive — exposes Style / Elevation / HoverElevation / Padding instead of Borders / BgFilled / Gutters" Interactivity="ComponentInteractivity.Ssr" ApiElements="@ElevatedCardElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Outline + small elevation (default)"
+			Code="@("<ElevatedCard>\n    <Text Bold>Daily revenue</Text>\n    <Text Size=\"Size.Lg\">$12,480</Text>\n    <Text Size=\"Size.Sm\" Muted>+8.4% vs yesterday</Text>\n</ElevatedCard>")"
+			Primitives="@("<div data-slot=\"card\" class=\"flex flex-col gap-6 border shadow-sm bg-background text-foreground border-border px-7 py-7 rounded-lg ...\">\n    <span class=\"font-bold\">Daily revenue</span>\n    <span class=\"text-lg\">$12,480</span>\n    <span class=\"text-sm text-muted-foreground\">+8.4% vs yesterday</span>\n</div>")">
+			<ElevatedCard>
+				<Text Bold>Daily revenue</Text>
+				<Text Size="Size.Lg">$12,480</Text>
+				<Text Size="Size.Sm" Muted>+8.4% vs yesterday</Text>
+			</ElevatedCard>
+		</ComponentExample>
+
+		<ComponentExample Title="Filled style, no elevation"
+			Code="@("<ElevatedCard Style=\"CardStyle.Filled\" Elevation=\"CardElevation.None\">\n    <Text Bold>Subtle filled card</Text>\n    <Text Size=\"Size.Sm\" Muted>Use Style.Filled for a tonal background without a border or shadow.</Text>\n</ElevatedCard>")"
+			Primitives="@("<div data-slot=\"card\" class=\"flex flex-col gap-6 border shadow-none bg-subtle-bg text-foreground border-transparent px-7 py-7 rounded-lg\">\n    <span class=\"font-bold\">Subtle filled card</span>\n    <span class=\"text-sm text-muted-foreground\">Use Style.Filled for a tonal background without a border or shadow.</span>\n</div>")">
+			<ElevatedCard Style="CardStyle.Filled" Elevation="CardElevation.None">
+				<Text Bold>Subtle filled card</Text>
+				<Text Size="Size.Sm" Muted>Use Style.Filled for a tonal background without a border or shadow.</Text>
+			</ElevatedCard>
+		</ComponentExample>
+
+		<ComponentExample Title="Elevation lifts on hover"
+			Code="@("<ElevatedCard Elevation=\"CardElevation.Sm\" HoverElevation=\"CardElevation.Lg\">\n    <Text Bold>Hover me</Text>\n    <Text Size=\"Size.Sm\" Muted>Resting at sm; lifts to lg on hover via the Card primitive's HoverElevation.</Text>\n</ElevatedCard>")"
+			Primitives="@("<div data-slot=\"card\" class=\"flex flex-col gap-6 border shadow-sm hover:shadow-lg transition-shadow ...\">\n    <span class=\"font-bold\">Hover me</span>\n    <span class=\"text-sm text-muted-foreground\">Resting at sm; lifts to lg on hover.</span>\n</div>")">
+			<ElevatedCard Elevation="CardElevation.Sm" HoverElevation="CardElevation.Lg">
+				<Text Bold>Hover me</Text>
+				<Text Size="Size.Sm" Muted>Resting at sm; lifts to lg on hover via the Card primitive's HoverElevation.</Text>
+			</ElevatedCard>
+		</ComponentExample>
+
+		<ComponentExample Title="Compact padding"
+			Code="@("<ElevatedCard Padding=\"CardPadding.Sm\">\n    <Text Size=\"Size.Sm\">Tighter padding for dense layouts.</Text>\n</ElevatedCard>")"
+			Primitives="@("<div data-slot=\"card\" class=\"flex flex-col gap-6 border shadow-sm bg-background border-border px-3 py-3 rounded-base\">\n    <span class=\"text-sm\">Tighter padding for dense layouts.</span>\n</div>")">
+			<ElevatedCard Padding="CardPadding.Sm">
+				<Text Size="Size.Sm">Tighter padding for dense layouts.</Text>
+			</ElevatedCard>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] ElevatedCardElements =
+	[
+		new ApiElement(
+			Name: "ElevatedCard",
+			Description: "Card-shaped chunk that wraps the underlying `Card` primitive. Sibling to `FeatureCard`, `ActionCard`, and `MediaCard` but exposes the primitive's enum-driven `Style` / `Elevation` / `HoverElevation` / `Padding` parameters instead of the bool `Borders` / `BgFilled` / `Gutters` triple. Use this when you want a shadow / lift effect — e.g. dashboard tiles, hero cards, raised dialogs.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent",   "RenderFragment?",  false, "Card content. Free-form — typically a stack of `Text` / inline elements / actions." ),
+				new ApiProperty( "Style",          "CardStyle",        false, "Visual style. `Flat` (transparent border, plain bg), `Outline` (visible border, plain bg), `Filled` (no border, subtle tonal bg). Default: `Outline`." ),
+				new ApiProperty( "Elevation",      "CardElevation",    false, "Resting shadow level. Values: `None`, `Xs`, `Sm`, `Base`, `Md`, `Lg`, `Xl`. Default: `Sm`." ),
+				new ApiProperty( "HoverElevation", "CardElevation?",   false, "Optional hover shadow level. When set and different from `Elevation`, the card transitions to this elevation on hover." ),
+				new ApiProperty( "Padding",        "CardPadding",      false, "Inner padding scale. Values: `Sm`, `Md`, `Lg`. Default: `Lg`." ),
+				new ApiProperty( "ClassName",      "string?",          false, "Additional CSS class string passed through to the underlying `Card` primitive." ),
+			]
+		),
+	];
+}

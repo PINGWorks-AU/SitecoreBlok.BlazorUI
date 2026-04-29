@@ -1,0 +1,52 @@
+@page "/chunks/data-pagination"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="DataPagination" Description="Pre-styled pagination row: item-count label on the left, page navigation on the right." Interactivity="ComponentInteractivity.Interactive" ApiElements="@DataPaginationElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Page 1 of 5"
+			Code="@("<DataPagination Page=\"@CurrentPage\" PageChanged=\"@(p => CurrentPage = p)\" PageSize=\"10\" TotalItems=\"50\" />")"
+			Primitives="@("<div class=\"flex items-center justify-between gap-3\">\n    <span class=\"text-sm text-muted-foreground\">Showing 1–10 of 50</span>\n    <nav aria-label=\"pagination\" class=\"mx-auto flex w-full justify-center\">\n        <ul class=\"flex flex-row items-center gap-1\">\n            <li><button disabled ...>&#8249;</button></li>\n            <li><button aria-current=\"page\" class=\"... bg-primary-bg\">1</button></li>\n            <li><button>2</button></li>\n            <!-- ... -->\n            <li><button>5</button></li>\n            <li><button>&#8250;</button></li>\n        </ul>\n    </nav>\n</div>")">
+			<DataPagination Page="@ExPage1" PageChanged="@(p => ExPage1 = p)" PageSize="10" TotalItems="50" />
+		</ComponentExample>
+
+		<ComponentExample Title="Page 3 of 10 (mid-range)"
+			Code="@("<DataPagination Page=\"@CurrentPage\" PageChanged=\"@(p => CurrentPage = p)\" PageSize=\"10\" TotalItems=\"100\" />")"
+			Primitives="@("<div class=\"flex items-center justify-between gap-3\">\n    <span class=\"text-sm text-muted-foreground\">Showing 21–30 of 100</span>\n    <nav aria-label=\"pagination\" class=\"mx-auto flex w-full justify-center\">\n        <ul class=\"flex flex-row items-center gap-1\">\n            <li><button>&#8249;</button></li>\n            <li><button>1</button></li>\n            <!-- ... -->\n            <li><button aria-current=\"page\" class=\"... bg-primary-bg\">3</button></li>\n            <!-- ... -->\n            <li><button>10</button></li>\n            <li><button>&#8250;</button></li>\n        </ul>\n    </nav>\n</div>")">
+			<DataPagination Page="@ExPage2" PageChanged="@(p => ExPage2 = p)" PageSize="10" TotalItems="100" />
+		</ComponentExample>
+
+		<ComponentExample Title="ShowLabel hidden — pagination only, no item count"
+			Code="@("<DataPagination ShowLabel=\"false\" Page=\"@CurrentPage\" PageChanged=\"@(p => CurrentPage = p)\" PageSize=\"10\" TotalItems=\"50\" />")"
+			Primitives="@("<div class=\"flex items-center justify-end gap-3\">\n    <!-- label span suppressed; row uses justify-end when ShowLabel=false -->\n    <nav aria-label=\"pagination\" class=\"mx-auto flex w-full justify-center\">\n        <ul class=\"flex flex-row items-center gap-1\">\n            <li><button disabled ...>&#8249;</button></li>\n            <li><button aria-current=\"page\" class=\"... bg-primary-bg\">1</button></li>\n            <li><button>2</button></li>\n            <!-- ... -->\n            <li><button>5</button></li>\n            <li><button>&#8250;</button></li>\n        </ul>\n    </nav>\n</div>")">
+			<DataPagination ShowLabel="false" Page="@ExPage3" PageChanged="@(p => ExPage3 = p)" PageSize="10" TotalItems="50" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private int ExPage1 = 1;
+	private int ExPage2 = 3;
+	private int ExPage3 = 1;
+
+	private static readonly ApiElement[] DataPaginationElements =
+	[
+		new ApiElement(
+			Name: "DataPagination",
+			Description: "A two-part flex row: a `Showing X–Y of Z` count label on the left, and a full `Pagination` / `PaginationContent` page-number row on the right. Previous and Next buttons are automatically disabled at the boundaries. Fires `PageChanged` when the user clicks a page number or arrow. When `ShowLabel` is `false` the label is suppressed and the row uses `justify-end`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Page",        "int",               false, "Current (1-based) page number. Default: `1`." ),
+				new ApiProperty( "PageChanged", "EventCallback<int>", false, "Fired with the new page number when the user navigates." ),
+				new ApiProperty( "PageSize",    "int",               false, "Items per page used to compute `TotalPages`, `StartItem`, and `EndItem`. Default: `10`." ),
+				new ApiProperty( "TotalItems",  "int",               false, "Total number of records across all pages. Default: `0`." ),
+				new ApiProperty( "ShowLabel",   "bool",              false, "When `true` (default), renders the `Showing X–Y of Z` caption on the left. Set to `false` to suppress the label; the row shifts to `justify-end`. Default: `true`." ),
+			]
+		),
+	];
+}

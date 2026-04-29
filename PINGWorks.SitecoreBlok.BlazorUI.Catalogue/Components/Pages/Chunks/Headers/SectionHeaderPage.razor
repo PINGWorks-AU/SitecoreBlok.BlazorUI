@@ -1,0 +1,53 @@
+@page "/chunks/section-header"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="SectionHeader" Description="Smaller heading band inside a section — Title, Description, Actions slot" Interactivity="ComponentInteractivity.Ssr" ApiElements="@SectionHeaderElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Title + description"
+			Code="@("<SectionHeader Title=\"Members\" Description=\"People with access to this project.\" />")"
+			Primitives="@("<div class=\"flex items-start gap-4 pb-3 border-b border-border\">\n    <div class=\"flex-1 min-w-0\">\n        <h2 class=\"text-lg font-semibold tracking-tight text-foreground\">Members</h2>\n        <p class=\"text-sm text-muted-foreground mt-0.5\">People with access to this project.</p>\n    </div>\n</div>")">
+			<SectionHeader Title="Members" Description="People with access to this project." />
+		</ComponentExample>
+
+		<ComponentExample Title="With action"
+			Code="@("<SectionHeader Title=\"API keys\" Description=\"Active credentials for this environment.\">\n    <Actions>\n        <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">New key</Button>\n    </Actions>\n</SectionHeader>")"
+			Primitives="@("<div class=\"flex items-start gap-4 pb-3 border-b border-border\">\n    <div class=\"flex-1 min-w-0\">\n        <h2 class=\"text-lg font-semibold tracking-tight text-foreground\">API keys</h2>\n        <p class=\"text-sm text-muted-foreground mt-0.5\">Active credentials for this environment.</p>\n    </div>\n    <div class=\"flex-shrink-0 flex items-center gap-2\">\n        <button class=\"...\">New key</button>\n    </div>\n</div>")">
+			<SectionHeader Title="API keys" Description="Active credentials for this environment.">
+				<Actions>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm">New key</Button>
+				</Actions>
+			</SectionHeader>
+		</ComponentExample>
+
+		<ComponentExample Title="Borderless"
+			Code="@("<SectionHeader Title=\"Tags\" Description=\"Loose grouping label.\" Borders=\"false\" />")"
+			Primitives="@("<div class=\"flex items-start gap-4 pb-3\">\n    <div class=\"flex-1 min-w-0\">\n        <h2 class=\"text-lg font-semibold tracking-tight text-foreground\">Tags</h2>\n        <p class=\"text-sm text-muted-foreground mt-0.5\">Loose grouping label.</p>\n    </div>\n</div>")">
+			<SectionHeader Title="Tags" Description="Loose grouping label." Borders="false" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] SectionHeaderElements =
+	[
+		new ApiElement(
+			Name: "SectionHeader",
+			Description: "Smaller heading band inside a section. Use as the top of a `ContentSection`. Rendered as `<h2>` (smaller than PageHeader's `<h1>`) with optional description and right-aligned actions. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",           "string",          true,  "Section title. Rendered as `<h2>` in `text-lg font-semibold`." ),
+				new ApiProperty( "Description",     "string?",         false, "Sub-title text in muted foreground." ),
+				new ApiProperty( "Actions",         "RenderFragment?", false, "Right-aligned action slot." ),
+				new ApiProperty( "Borders",         "bool",            false, "Toggles `border-b border-border`. Default: `true`." ),
+				new ApiProperty( "Gutters",         "bool",            false, "Toggles `pb-3` and the actions inner-gap. Default: `true`." ),
+				new ApiProperty( "HeaderAlignment", "Alignment",       false, "Flex `items-*` on the row. Default: `Alignment.Start`." ),
+			]
+		),
+	];
+}

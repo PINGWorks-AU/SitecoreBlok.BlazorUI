@@ -1,0 +1,48 @@
+@page "/chunks/empty-state-panel"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Empty State Panel" Description="Section-level empty-state chrome — centred icon, title, description, and optional action slot" Interactivity="ComponentInteractivity.Ssr" ApiElements="@EmptyStatePanelElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="With icon, description and action"
+			Code="@("<EmptyStatePanel Title=\"No results found\" Description=\"Try adjusting your filters or search terms to find what you're looking for.\" IconSvg=\"@IconSvg.Magnify\">\n    <Action>\n        <Button Variant=\"ButtonVariant.Outline\">Clear filters</Button>\n    </Action>\n</EmptyStatePanel>")"
+			Primitives="@("<div class=\"flex flex-col items-center justify-center text-center gap-3 w-full border-2 border-dashed border-border rounded-lg py-12 px-6\">\n    <svg class=\"size-12 text-muted-foreground\"><!-- magnify icon --></svg>\n    <h3 class=\"text-lg font-semibold tracking-tight text-foreground\">No results found</h3>\n    <p class=\"text-sm text-muted-foreground max-w-md\">Try adjusting your filters or search terms to find what you're looking for.</p>\n    <div class=\"mt-2\"><button class=\"...\">Clear filters</button></div>\n</div>")">
+			<EmptyStatePanel Title="No results found" Description="Try adjusting your filters or search terms to find what you're looking for." IconSvg="@IconSvg.Magnify">
+				<Action>
+					<Button Variant="ButtonVariant.Outline">Clear filters</Button>
+				</Action>
+			</EmptyStatePanel>
+		</ComponentExample>
+
+		<ComponentExample Title="Minimal — title only"
+			Code="@("<EmptyStatePanel Title=\"Nothing here yet\" />")"
+			Primitives="@("<div class=\"flex flex-col items-center justify-center text-center gap-3 w-full border-2 border-dashed border-border rounded-lg py-12 px-6\">\n    <h3 class=\"text-lg font-semibold tracking-tight text-foreground\">Nothing here yet</h3>\n</div>")">
+			<EmptyStatePanel Title="Nothing here yet" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] EmptyStatePanelElements =
+	[
+		new ApiElement(
+			Name: "EmptyStatePanel",
+			Description: "Section-level empty-state chrome. Renders a centred column with an optional icon, a required title, an optional muted description, and an optional action slot. Uses a dashed border by default to signal a fillable area. Wrapper-styling.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Title",       "string",          true,  "Heading for the empty state. Rendered as `<h3>` in `text-lg font-semibold tracking-tight text-foreground`." ),
+				new ApiProperty( "Description", "string?",         false, "Supporting muted text in `text-sm text-muted-foreground max-w-md`. Omit to suppress." ),
+				new ApiProperty( "IconSvg",     "string?",         false, "SVG path string for an optional icon rendered at `size-12 text-muted-foreground` above the title. Omit to suppress." ),
+				new ApiProperty( "Action",      "RenderFragment?", false, "Optional action slot rendered below the description. Typically a single `<Button>`." ),
+				new ApiProperty( "Borders",     "bool",            false, "Toggles `border-2 border-dashed border-border rounded-lg`. Default: `true`." ),
+				new ApiProperty( "BgFilled",    "bool",            false, "Toggles `bg-subtle-bg` on the wrapper. Default: `false`." ),
+				new ApiProperty( "Gutters",     "bool",            false, "Toggles `py-12 px-6` on the wrapper. Default: `true`." ),
+			]
+		),
+	];
+}

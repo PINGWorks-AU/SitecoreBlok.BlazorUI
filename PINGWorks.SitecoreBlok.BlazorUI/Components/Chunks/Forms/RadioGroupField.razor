@@ -1,0 +1,35 @@
+@inherits FieldBase<string?>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	RadioGroupField — labelled radio group field chunk.
+	Wraps the RadioGroup primitive with a label above and one RadioGroupItem per option.
+*@
+
+<div class="space-y-1.5">
+	@if ( !string.IsNullOrEmpty( Label ) )
+	{
+		<FormLabel Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+	}
+	<div @onfocusout="MarkTouched">
+		<RadioGroup Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled">
+			@if ( Options is not null )
+			{
+				@foreach ( var option in Options )
+				{
+					<RadioGroupItem Value="@option.Value" Label="@option.Label" />
+				}
+			}
+		</RadioGroup>
+	</div>
+	@if ( !string.IsNullOrEmpty( HelpText ) )
+	{
+		<p class="@HelpTextClass">@HelpText</p>
+	}
+</div>
+
+@code {
+	public sealed record RadioFieldOption( string Value, string Label );
+
+	[Parameter] public IList<RadioFieldOption>? Options { get; set; }
+}

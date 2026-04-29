@@ -1,0 +1,55 @@
+@page "/chunks/nav-group"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="NavGroup" Description="Labelled grouping inside a NavList — Label, Collapsible, DefaultOpen" Interactivity="ComponentInteractivity.Interactive" ApiElements="@NavGroupElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Non-collapsible (static label)"
+			Code="@("<NavList>\n    <NavGroup Label=\"Workspace\">\n        <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Profile\" />\n        <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Settings\" />\n    </NavGroup>\n</NavList>")"
+			Primitives="@("<nav class=\"flex flex-col space-y-1 p-2\">\n    <div class=\"text-xs uppercase tracking-wider text-muted-foreground px-3 py-1\">Workspace</div>\n    <div>\n        <a href=\"#\" class=\"...\"><svg>...</svg><span>Profile</span></a>\n        <a href=\"#\" class=\"...\"><svg>...</svg><span>Settings</span></a>\n    </div>\n</nav>")">
+			<div class="border rounded-lg max-w-md">
+				<NavList>
+					<NavGroup Label="Workspace">
+						<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Profile" />
+						<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Settings" />
+					</NavGroup>
+				</NavList>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Collapsible (start collapsed)"
+			Code="@("<NavList>\n    <NavGroup Label=\"Workspace\" Collapsible=\"true\" DefaultOpen=\"false\">\n        <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Profile\" />\n        <NavListItem Href=\"#\" IconSvg=\"@IconSvg.Account\" Label=\"Settings\" />\n    </NavGroup>\n</NavList>")"
+			Primitives="@("<nav class=\"flex flex-col space-y-1 p-2\">\n    <button type=\"button\" class=\"flex items-center w-full gap-2 px-3 py-1 text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground\">\n        <svg class=\"size-3 -rotate-90\">...</svg>\n        <span>Workspace</span>\n    </button>\n    <!-- ChildContent hidden when collapsed -->\n</nav>")">
+			<div class="border rounded-lg max-w-md">
+				<NavList>
+					<NavGroup Label="Workspace" Collapsible="true" DefaultOpen="false">
+						<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Profile" />
+						<NavListItem Href="#" IconSvg="@IconSvg.Account" Label="Settings" />
+					</NavGroup>
+				</NavList>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] NavGroupElements =
+	[
+		new ApiElement(
+			Name: "NavGroup",
+			Description: "Labelled grouping inside a `NavList`. When `Collapsible=true`, the label becomes a toggle button — clicking it expands/collapses `ChildContent`, with a chevron indicating state. As a single labelled grouping it doesn't expose wrapper-styling parameters.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Label",        "string",          true,  "Group label. Rendered as a small uppercase muted caption (or a toggle button when `Collapsible=true`)." ),
+				new ApiProperty( "Collapsible",  "bool",            false, "When `true`, the label is a `<button>` that toggles `ChildContent` visibility on click. Default: `false`." ),
+				new ApiProperty( "DefaultOpen",  "bool",            false, "Initial open/closed state when `Collapsible=true`. Default: `true`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Group items — typically `NavListItem`s." ),
+			]
+		),
+	];
+}

@@ -1,0 +1,50 @@
+@page "/chunks/kv-list"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="KvList" Description="Label/value definition list — compose KvListItem children for each row." Interactivity="ComponentInteractivity.Ssr" ApiElements="@KvListElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="User detail with 4 rows — last row uses ChildContent with a Badge"
+			Code="@("<KvList>\n    <KvListItem Label=\"Name\" Value=\"Jane Smith\" />\n    <KvListItem Label=\"Email\" Value=\"jane.smith@example.com\" />\n    <KvListItem Label=\"Created\" Value=\"12 Jan 2025\" />\n    <KvListItem Label=\"Status\">\n        <Badge ColorScheme=\"BadgeColor.Success\">Active</Badge>\n    </KvListItem>\n</KvList>")"
+			Primitives="@("<dl class=\"grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm\">\n    <dt class=\"text-muted-foreground\">Name</dt>\n    <dd class=\"text-foreground\">Jane Smith</dd>\n    <dt class=\"text-muted-foreground\">Email</dt>\n    <dd class=\"text-foreground\">jane.smith@example.com</dd>\n    <dt class=\"text-muted-foreground\">Created</dt>\n    <dd class=\"text-foreground\">12 Jan 2025</dd>\n    <dt class=\"text-muted-foreground\">Status</dt>\n    <dd class=\"text-foreground\"><span class=\"... bg-success-bg text-success-fg ...\">Active</span></dd>\n</dl>")">
+			<KvList>
+				<KvListItem Label="Name" Value="Jane Smith" />
+				<KvListItem Label="Email" Value="jane.smith@example.com" />
+				<KvListItem Label="Created" Value="12 Jan 2025" />
+				<KvListItem Label="Status">
+					<Badge ColorScheme="BadgeColor.Success">Active</Badge>
+				</KvListItem>
+			</KvList>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] KvListElements =
+	[
+		new ApiElement(
+			Name: "KvList",
+			Description: "A `<dl>` definition list laid out in a two-column grid (`grid-cols-[max-content_1fr]`). Labels are left-aligned and `max-content` wide; values fill the remaining space. Populate with `KvListItem` children.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Row items — typically `KvListItem` elements." ),
+			]
+		),
+		new ApiElement(
+			Name: "KvListItem",
+			Description: "A single `<dt>`/`<dd>` pair inside a `KvList`. Use the `Value` string parameter for plain text, or supply `ChildContent` for richer content (e.g. a `Badge` or link). When both are provided, `ChildContent` takes precedence.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Label",        "string",          true,  "Row label rendered as `<dt class=\"text-muted-foreground\">`." ),
+				new ApiProperty( "Value",        "string?",         false, "Plain-text value. Rendered inside `<dd>` when `ChildContent` is null." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Rich value content rendered inside `<dd>`. Takes precedence over `Value` when set." ),
+			]
+		),
+	];
+}

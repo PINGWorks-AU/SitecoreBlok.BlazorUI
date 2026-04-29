@@ -1,0 +1,74 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	ActionCard — card with a click target and trailing arrow.
+
+	Renders as <a> when Href is set, <button> when only OnClick is wired, or <div> otherwise.
+	The `group` class on the wrapper enables the chevron's group-hover translate.
+
+	Wrapper-styling parameters (per spec §5.13):
+		- Borders   (default true) toggles border border-border rounded-lg.
+		- BgFilled  (default true) toggles bg-background.
+		- Gutters   (default true) toggles p-6 gap-4.
+*@
+
+@if ( !string.IsNullOrEmpty( Href ) )
+{
+	<a href="@Href" class="@CardClass">
+		@CardContent
+	</a>
+}
+else if ( OnClick.HasDelegate )
+{
+	<button type="button" @onclick="OnClick" class="@CardClass">
+		@CardContent
+	</button>
+}
+else
+{
+	<div class="@CardClass">
+		@CardContent
+	</div>
+}
+
+@code {
+	[Parameter] public string Title { get; set; } = "";
+	[Parameter] public string? Description { get; set; }
+	[Parameter] public string? Href { get; set; }
+	[Parameter] public string? IconSvg { get; set; }
+	[Parameter] public EventCallback OnClick { get; set; }
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool BgFilled { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	private bool IsInteractive
+		=> !string.IsNullOrEmpty( Href ) || OnClick.HasDelegate;
+
+	private string CardClass
+		=> CssClassBuilder.Start( "flex flex-col group" )
+			.With( "border border-border rounded-lg", Borders )
+			.With( "bg-background", BgFilled )
+			.With( "p-6 gap-4", Gutters )
+			.With( "hover:border-primary/50 hover:bg-subtle-bg cursor-pointer transition-colors no-underline", IsInteractive )
+			.Build();
+
+	private RenderFragment CardContent
+		=> __builder =>
+		{
+			<div class="flex items-center gap-4">
+				@if ( !string.IsNullOrEmpty( IconSvg ) )
+				{
+					<Icon Svg="@IconSvg" ClassName="size-6 text-primary shrink-0" />
+				}
+				<div class="flex-1 min-w-0">
+					<h3 class="text-base font-semibold tracking-tight text-foreground">@Title</h3>
+					@if ( !string.IsNullOrEmpty( Description ) )
+					{
+						<p class="text-sm text-muted-foreground mt-0.5">@Description</p>
+					}
+				</div>
+				<Icon Svg="@PINGWorks.SitecoreBlok.BlazorUI.IconSvg.ChevronRight" ClassName="size-4 text-muted-foreground shrink-0 transition-transform group-hover:translate-x-0.5" />
+			</div>
+		};
+}

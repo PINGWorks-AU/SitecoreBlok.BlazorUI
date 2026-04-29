@@ -1,0 +1,26 @@
+@inherits FieldBase<string?>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	TextAreaField — labelled multi-line textarea field chunk.
+	Wraps the Textarea primitive with a label, help text, and error state.
+*@
+
+<div class="space-y-1.5">
+	@if ( !string.IsNullOrEmpty( Label ) )
+	{
+		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+	}
+	<Textarea Id="@Id" Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )"
+	          Placeholder="@Placeholder" Rows="@Rows" Disabled="@Disabled"
+	          @onblur="MarkTouched" />
+	@if ( !string.IsNullOrEmpty( HelpText ) )
+	{
+		<p class="@HelpTextClass">@HelpText</p>
+	}
+</div>
+
+@code {
+	[Parameter] public string? Placeholder { get; set; }
+	[Parameter] public int Rows { get; set; } = 3;
+}

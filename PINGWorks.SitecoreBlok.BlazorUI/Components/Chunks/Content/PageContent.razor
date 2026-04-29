@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	PageContent — vertical stack of sections with a consistent gap between them.
+
+	No wrapper-styling parameters: PageContent is a layout helper that provides
+	a single flex-col container. Spacing is controlled entirely by the Gap parameter.
+*@
+
+<div class="@($"flex flex-col {SizeClasses.Gap( Gap )}")">@ChildContent</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public Size Gap { get; set; } = Size.Lg;
+}

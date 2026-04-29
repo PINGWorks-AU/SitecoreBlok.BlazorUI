@@ -1,0 +1,52 @@
+@page "/chunks/empty-table"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="EmptyTable" Description="Empty state inside a Table — spans all columns with a centred icon, message, and optional action." Interactivity="ComponentInteractivity.Ssr" ApiElements="@EmptyTableElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="4-column table with empty state"
+			Code="@("<Table>\n    <TableHeader>\n        <TableRow>\n            <TableHead>Name</TableHead>\n            <TableHead>Email</TableHead>\n            <TableHead>Role</TableHead>\n            <TableHead>Status</TableHead>\n        </TableRow>\n    </TableHeader>\n    <TableBody>\n        <EmptyTable ColumnCount=\"4\" Message=\"No users found\" IconSvg=\"@IconSvg.Account\">\n            <Action>\n                <Button Variant=\"ButtonVariant.Outline\">Invite user</Button>\n            </Action>\n        </EmptyTable>\n    </TableBody>\n</Table>")"
+			Primitives="@("<table class=\"w-full caption-bottom text-sm border-separate border-spacing-0\">\n    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>\n    <tbody>\n        <tr>\n            <td colspan=\"4\" class=\"whitespace-nowrap align-middle text-foreground min-h-[48px] py-12 px-5\">\n                <div class=\"flex flex-col items-center justify-center gap-3 text-center\">\n                    <svg class=\"size-10 text-muted-foreground\"><!-- account icon --></svg>\n                    <p class=\"text-sm text-muted-foreground\">No users found</p>\n                    <div><button class=\"...\">Invite user</button></div>\n                </div>\n            </td>\n        </tr>\n    </tbody>\n</table>")">
+			<Table>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Name</TableHead>
+						<TableHead>Email</TableHead>
+						<TableHead>Role</TableHead>
+						<TableHead>Status</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					<EmptyTable ColumnCount="4" Message="No users found" IconSvg="@IconSvg.Account">
+						<Action>
+							<Button Variant="ButtonVariant.Outline">Invite user</Button>
+						</Action>
+					</EmptyTable>
+				</TableBody>
+			</Table>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] EmptyTableElements =
+	[
+		new ApiElement(
+			Name: "EmptyTable",
+			Description: "An empty-state row for use inside a `<TableBody>`. Renders a `<TableRow>` containing a native `<td>` with `colspan` set to `ColumnCount`, so the cell spans all columns. The cell content is a centred column with an optional icon, a muted message, and an optional action slot. `TableCell` does not expose a `ColSpan` parameter, so the native HTML attribute is used directly.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ColumnCount", "int",             false, "Number of columns the empty-state cell should span. Match the number of columns in your table header. Default: `1`." ),
+				new ApiProperty( "Message",     "string",          false, "Muted descriptive text shown below the optional icon. Default: `\"No items\"`." ),
+				new ApiProperty( "IconSvg",     "string?",         false, "Optional SVG path for an icon rendered at `size-10 text-muted-foreground` above the message. Omit to suppress." ),
+				new ApiProperty( "Action",      "RenderFragment?", false, "Optional action slot rendered below the message. Typically a single `<Button>`." ),
+				new ApiProperty( "ClassName",   "string?",         false, "Additional CSS classes applied to the `<td>` element." ),
+			]
+		),
+	];
+}

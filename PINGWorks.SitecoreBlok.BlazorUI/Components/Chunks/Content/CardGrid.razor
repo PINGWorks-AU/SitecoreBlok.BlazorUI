@@ -1,0 +1,15 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	CardGrid — responsive grid of cards. Column count and gap are parameterised.
+	Grid breakpoints are handled by ColumnsClasses.Grid so Tailwind scans the
+	literal class strings in that file.
+*@
+
+<div class="@($"grid {ColumnsClasses.Grid( Columns )} {SizeClasses.Gap( Gap )}")">@ChildContent</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public Columns Columns { get; set; } = Columns.Three;
+	[Parameter] public Size Gap { get; set; } = Size.Md;
+}

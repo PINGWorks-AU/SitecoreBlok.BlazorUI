@@ -1,0 +1,41 @@
+@inherits FieldBase<string?>
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	SelectField — labelled select-dropdown field chunk.
+	Wraps the Select primitive cluster with a label, help text, and error state.
+*@
+
+<div class="space-y-1.5">
+	@if ( !string.IsNullOrEmpty( Label ) )
+	{
+		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
+	}
+	<div @onfocusout="MarkTouched">
+		<Select Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled">
+			<SelectTrigger>
+				<SelectValue Placeholder="@Placeholder" />
+			</SelectTrigger>
+			<SelectContent>
+				@if ( Items is not null )
+				{
+					@foreach ( var item in Items )
+					{
+						<SelectItem Value="@item.Value" Label="@item.Label" />
+					}
+				}
+			</SelectContent>
+		</Select>
+	</div>
+	@if ( !string.IsNullOrEmpty( HelpText ) )
+	{
+		<p class="@HelpTextClass">@HelpText</p>
+	}
+</div>
+
+@code {
+	public sealed record SelectFieldItem( string Value, string Label );
+
+	[Parameter] public string? Placeholder { get; set; }
+	[Parameter] public IList<SelectFieldItem>? Items { get; set; }
+}

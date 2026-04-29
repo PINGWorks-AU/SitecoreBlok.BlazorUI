@@ -1,0 +1,55 @@
+@page "/chunks/inline-form"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="InlineForm" Description="Single-row form for search-and-go, subscribe, or quick-add patterns — renders fields and actions in a flex row" Interactivity="ComponentInteractivity.Interactive" ApiElements="@InlineFormElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Subscribe form"
+			Code="@("<InlineForm OnSubmit=\"HandleSubscribe\">\n    <TextField Placeholder=\"you@example.com\" Type=\"TextField.TextFieldType.Email\" @bind-Value=\"Email\" />\n    <Button>Subscribe</Button>\n</InlineForm>")"
+			Primitives="@("<form class=\"flex items-end gap-2\">\n    <div class=\"space-y-1.5\">\n        <input type=\"email\" placeholder=\"you@example.com\" class=\"...\" />\n    </div>\n    <button class=\"...\">Subscribe</button>\n</form>")">
+			<div class="max-w-lg">
+				<InlineForm OnSubmit="HandleSubscribe">
+					<TextField Placeholder="you@example.com" Type="TextField.TextFieldType.Email" @bind-Value="Email" />
+					<Button>Subscribe</Button>
+				</InlineForm>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Quick-add form"
+			Code="@("<InlineForm OnSubmit=\"HandleAdd\">\n    <TextField Label=\"New item\" Placeholder=\"Enter item name\" @bind-Value=\"ItemName\" />\n    <Button>Add</Button>\n</InlineForm>")"
+			Primitives="@("<form class=\"flex items-end gap-2\">\n    <div class=\"space-y-1.5\">\n        <label class=\"text-sm font-medium text-foreground ...\">New item</label>\n        <input type=\"text\" placeholder=\"Enter item name\" class=\"...\" />\n    </div>\n    <button class=\"...\">Add</button>\n</form>")">
+			<div class="max-w-lg">
+				<InlineForm OnSubmit="HandleAdd">
+					<TextField Label="New item" Placeholder="Enter item name" @bind-Value="ItemName" />
+					<Button>Add</Button>
+				</InlineForm>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Email;
+	private string? ItemName;
+
+	private void HandleSubscribe() { }
+	private void HandleAdd() { }
+
+	private static readonly ApiElement[] InlineFormElements =
+	[
+		new ApiElement(
+			Name: "InlineForm",
+			Description: "A single-row form envelope. Renders `ChildContent` in a `flex items-end gap-2` row so text fields and action buttons sit side-by-side. The browser's default form navigation is suppressed — submit is handled via `OnSubmit`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "OnSubmit",     "EventCallback",   false, "Callback fired when the form is submitted. Default browser navigation is suppressed." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Form fields and action buttons rendered in a flex row." ),
+			]
+		),
+	];
+}

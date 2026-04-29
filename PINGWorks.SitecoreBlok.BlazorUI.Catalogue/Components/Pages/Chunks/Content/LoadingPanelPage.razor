@@ -1,0 +1,45 @@
+@page "/chunks/loading-panel"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="Loading Panel" Description="Spinner and optional message centred in a configurable min-height block — no wrapper chrome, designed for use inside existing containers" Interactivity="ComponentInteractivity.Ssr" ApiElements="@LoadingPanelElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Minimal — spinner only"
+			Code="@("<LoadingPanel />")"
+			Primitives="@("<div class=\"flex flex-col items-center justify-center gap-3 w-full min-h-32\">\n    <svg class=\"size-4 animate-spin text-neutral-fg\" role=\"status\" aria-label=\"Loading\"><!-- spinner arc --></svg>\n</div>")">
+			<LoadingPanel />
+		</ComponentExample>
+
+		<ComponentExample Title="With message"
+			Code="@("<LoadingPanel Message=\"Loading data…\" />")"
+			Primitives="@("<div class=\"flex flex-col items-center justify-center gap-3 w-full min-h-32\">\n    <svg class=\"size-4 animate-spin text-neutral-fg\" role=\"status\" aria-label=\"Loading\"><!-- spinner arc --></svg>\n    <p class=\"text-sm text-muted-foreground\">Loading data…</p>\n</div>")">
+			<LoadingPanel Message="Loading data…" />
+		</ComponentExample>
+
+		<ComponentExample Title="Tall variant with message"
+			Code="@("<LoadingPanel Message=\"Please wait while we fetch your results.\" MinHeight=\"min-h-64\" />")"
+			Primitives="@("<div class=\"flex flex-col items-center justify-center gap-3 w-full min-h-64\">\n    <svg class=\"size-4 animate-spin text-neutral-fg\" role=\"status\" aria-label=\"Loading\"><!-- spinner arc --></svg>\n    <p class=\"text-sm text-muted-foreground\">Please wait while we fetch your results.</p>\n</div>")">
+			<LoadingPanel Message="Please wait while we fetch your results." MinHeight="min-h-64" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] LoadingPanelElements =
+	[
+		new ApiElement(
+			Name: "LoadingPanel",
+			Description: "Spinner centred in a configurable min-height block with an optional muted message below. Intentionally exposes no wrapper-styling parameters — it is designed to sit inside containers that already supply their own chrome. For a full-viewport loading state, use LoadingView.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Message",   "string?", false, "Optional loading message rendered below the spinner in `text-sm text-muted-foreground`. Omit to show the spinner alone." ),
+				new ApiProperty( "MinHeight", "string",  false, "Tailwind min-height class applied to the wrapper. Default: `min-h-32`. Pass any Tailwind `min-h-*` class to control the block height." ),
+			]
+		),
+	];
+}

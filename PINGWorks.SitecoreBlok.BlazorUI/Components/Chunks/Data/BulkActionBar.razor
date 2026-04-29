@@ -1,0 +1,41 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+    BulkActionBar — selection-driven action bar appearing above a table when rows are selected.
+    Hidden when SelectedCount is 0.
+
+    When Popup=true, the chunk renders the ActionBar primitive (a fixed-position pill that
+    floats up from the bottom of the viewport) instead of the inline border-and-padded row.
+    Useful for full-page tables where the bar should not push other content down.
+*@
+
+@if ( Popup )
+{
+	<ActionBar Open="@( SelectedCount > 0 )"
+	           SelectedCount="@SelectedCount"
+	           OnCancel="@OnClear"
+	           Align="@Align">
+		@Actions
+	</ActionBar>
+}
+else if ( SelectedCount > 0 )
+{
+	<div class="flex items-center gap-3 px-4 py-2 border border-border rounded-lg bg-subtle-bg">
+		<span class="text-sm font-medium">
+			@SelectedCount selected
+		</span>
+		<button type="button" @onclick="OnClear" class="text-sm text-muted-foreground hover:text-foreground transition-colors">Clear</button>
+		@if ( Actions is not null )
+		{
+			<div class="ml-auto flex items-center gap-2">@Actions</div>
+		}
+	</div>
+}
+
+@code {
+	[Parameter] public int SelectedCount { get; set; }
+	[Parameter] public EventCallback OnClear { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
+	[Parameter] public bool Popup { get; set; } = false;
+	[Parameter] public ActionBarAlign Align { get; set; } = ActionBarAlign.Center;
+}

@@ -1,0 +1,48 @@
+@page "/chunks/form-label"
+@rendermode InteractiveServer
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FormLabel" Description="Form-context wrapper around the Label primitive — adds Required, Optional, and Error state markers" Interactivity="ComponentInteractivity.Ssr" ApiElements="@FormLabelElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default label"
+			Code="@("<FormLabel For=\"email\">Email address</FormLabel>")"
+			Primitives="@("<label for=\"email\" class=\"text-sm font-medium text-foreground flex items-center gap-2 leading-none select-none\">Email address</label>")">
+			<FormLabel For="email">Email address</FormLabel>
+		</ComponentExample>
+
+		<ComponentExample Title="Required label"
+			Code="@("<FormLabel For=\"name\" Required=\"true\">Full name</FormLabel>")"
+			Primitives="@("<label for=\"name\" class=\"text-sm font-medium text-foreground flex items-center gap-2 leading-none select-none\">\n    Full name\n    <span class=\"text-danger-fg\">*</span>\n</label>")">
+			<FormLabel For="name" Required="true">Full name</FormLabel>
+		</ComponentExample>
+
+		<ComponentExample Title="Error state"
+			Code="@("<FormLabel For=\"username\" Error=\"true\">Username</FormLabel>")"
+			Primitives="@("<label for=\"username\" class=\"text-sm font-medium text-danger-fg flex items-center gap-2 leading-none select-none\">Username</label>")">
+			<FormLabel For="username" Error="true">Username</FormLabel>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private static readonly ApiElement[] FormLabelElements =
+	[
+		new ApiElement(
+			Name: "FormLabel",
+			Description: "A form-context wrapper around the `Label` primitive. Adds a required asterisk (`*`), an optional badge, or an error colour override on top of the base label styles. `Required` and `Optional` are mutually exclusive; `Error` applies independently.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "For",          "string?",         false, "Maps to the `for` attribute of the underlying `<label>` element. Pass the `id` of the associated input." ),
+				new ApiProperty( "Required",     "bool",            false, "Appends a red asterisk (`*` in `text-danger-fg`) after the label text. Default: `false`. Mutually exclusive with `Optional`." ),
+				new ApiProperty( "Optional",     "bool",            false, "Appends a muted `(optional)` marker after the label text. Default: `false`. Mutually exclusive with `Required`." ),
+				new ApiProperty( "Error",        "bool",            false, "Overrides the label colour to `text-danger-fg` to signal a validation error. Default: `false`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Label text or content." ),
+			]
+		),
+	];
+}
