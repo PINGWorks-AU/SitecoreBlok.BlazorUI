@@ -24,7 +24,11 @@
 	private string SizeAttr => Size switch { SidebarMenuButtonSize.Sm => "sm", SidebarMenuButtonSize.Lg => "lg", _ => "default" };
 
 	private string CssClass => CssClassBuilder.Start(
-		"peer/menu-button flex w-full h-full items-center gap-2 overflow-hidden rounded-md p-2.5 text-left font-medium ring-primary/50 outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! bg-transparent text-neutral-fg hover:bg-(--color-neutral-100) hover:text-neutral-fg focus-visible:ring-2 active:bg-primary-bg active:text-primary-fg disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-primary-bg data-[active=true]:text-primary-fg data-[state=open]:hover:bg-(--color-neutral-100) data-[state=open]:hover:text-neutral-fg [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0" )
+		"peer/menu-button flex items-center gap-2 overflow-hidden text-left font-medium ring-primary/50 outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! bg-transparent text-neutral-fg hover:bg-(--color-neutral-100) hover:text-neutral-fg focus-visible:ring-2 active:bg-primary-bg active:text-primary-fg disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-primary-bg data-[active=true]:text-primary-fg data-[state=open]:hover:bg-(--color-neutral-100) data-[state=open]:hover:text-neutral-fg [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0" )
+		.With( "w-full", !CssClassBuilder.ContainsAny( ClassName, "w-" ) )
+		.With( "h-full", !CssClassBuilder.ContainsAny( ClassName, "h-" ) )
+		.With( "p-2.5", !CssClassBuilder.ContainsAny( ClassName, "p-" ) )
+		.With( "rounded-md", !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
 		.With( "hover:bg-(--color-neutral-100) hover:text-neutral-fg" )
 		.With( "text-sm", Size is SidebarMenuButtonSize.Default )
 		.With( "text-xs", Size is SidebarMenuButtonSize.Sm )

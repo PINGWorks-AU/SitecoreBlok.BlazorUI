@@ -22,7 +22,9 @@
 		await InvokeAsync( StateHasChanged );
 	}
 
-	private string CssClass => CssClassBuilder.Start( "relative flex size-8 shrink-0 overflow-hidden rounded-full" )
+	private string CssClass => CssClassBuilder.Start( "relative flex shrink-0 overflow-hidden" )
+											.With( "size-8", !CssClassBuilder.ContainsAny( ClassName, "size-" ) )
+											.With( "rounded-full", !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
 											.With( ClassName )
 											.Build();
 }

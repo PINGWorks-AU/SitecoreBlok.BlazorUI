@@ -13,12 +13,17 @@
 	[Parameter] public BadgeVariant Variant { get; set; } = BadgeVariant.Default;
 	[Parameter] public BadgeColor ColorScheme { get; set; } = BadgeColor.Neutral;
 
-	private string CssClass => CssClassBuilder.Start( "inline-flex items-center px-2 justify-center rounded w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden" )
+	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden" )
+										.With( "px-2", !CssClassBuilder.ContainsAny( ClassName, "px-", "p-" ) )
+										.With( "rounded", !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
 										.With( "font-normal", Variant is BadgeVariant.Default )
 										.With( "uppercase font-bold", Variant is BadgeVariant.Bold )
-										.With( "text-sm h-4", Size is BadgeSize.Sm )
-										.With( "text-md h-5", Size is BadgeSize.Md )
-										.With( "text-md h-6", Size is BadgeSize.Lg )
+										.With( "text-sm", Size is BadgeSize.Sm )
+										.With( "h-4", Size is BadgeSize.Sm && !CssClassBuilder.ContainsAny( ClassName, "h-" ) )
+										.With( "text-md", Size is BadgeSize.Md )
+										.With( "h-5", Size is BadgeSize.Md && !CssClassBuilder.ContainsAny( ClassName, "h-" ) )
+										.With( "text-md", Size is BadgeSize.Lg )
+										.With( "h-6", Size is BadgeSize.Lg && !CssClassBuilder.ContainsAny( ClassName, "h-" ) )
 										.With( "bg-neutral-bg text-neutral-fg", ColorScheme is BadgeColor.Neutral )
 										.With( "bg-primary-bg text-primary-fg", ColorScheme is BadgeColor.Primary )
 										.With( "bg-danger-bg text-danger-fg", ColorScheme is BadgeColor.Danger )

@@ -27,7 +27,9 @@
 	// Uses opacity + pointer-events rather than translate-y. A `transform` on an ancestor
 	// breaks `position: fixed` for descendants (CSS spec), which would stop child popovers
 	// like DropdownMenu from positioning correctly when opened from within the ActionBar.
-	private string OuterCssClass => CssClassBuilder.Start( "fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 transition-opacity duration-300 ease-in-out" )
+	private string OuterCssClass => CssClassBuilder.Start( "fixed bottom-0 left-0 right-0 z-50 transition-opacity duration-300 ease-in-out" )
+										.With( "px-4", !CssClassBuilder.ContainsAny( ClassName, "px-", "p-" ) )
+										.With( "pb-4", !CssClassBuilder.ContainsAny( ClassName, "pb-", "p-" ) )
 										.With( "opacity-100", Open )
 										.With( "opacity-0 pointer-events-none", !Open )
 										.With( ClassName )

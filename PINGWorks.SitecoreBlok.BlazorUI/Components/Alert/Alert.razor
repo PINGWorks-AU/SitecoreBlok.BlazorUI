@@ -36,14 +36,16 @@
 	//   (b) the icon colour will drop to `currentColor` only (no variant colouring)
 	// Also: `text-foreground` is explicit so the body text stays legible under
 	// light/dark theme flips.
-	private string CssClass => CssClassBuilder.Start( "relative w-full rounded-md px-4 py-3 text-sm text-foreground grid has-[svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[svg]:gap-x-4 gap-y-0.5 items-center [&_svg]:size-4 [&_svg]:text-current" )
-											.With( "bg-primary-bg [&_svg]:text-primary-500 dark:[&_svg]:text-primary-200", Variant is AlertVariant.Default )
-											.With( "bg-primary-bg [&_svg]:text-primary-500 dark:[&_svg]:text-primary-200", Variant is AlertVariant.Primary )
-											.With( "bg-danger-bg [&_svg]:text-danger-500 dark:[&_svg]:text-danger-200", Variant is AlertVariant.Danger )
-											.With( "bg-warning-bg [&_svg]:text-warning-500 dark:[&_svg]:text-warning-200", Variant is AlertVariant.Warning )
-											.With( "bg-success-bg [&_svg]:text-success-500 dark:[&_svg]:text-success-200", Variant is AlertVariant.Success )
-											.With( ClassName )
-											.Build();
+	private string CssClass => CssClassBuilder.Start( "relative w-full text-sm text-foreground grid has-[svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[svg]:gap-x-4 gap-y-0.5 items-center [&_svg]:size-4 [&_svg]:text-current" )
+										.With( "px-4 py-3", !CssClassBuilder.ContainsAny( ClassName, "p-", "px-", "py-" ) )
+										.With( "rounded-md", !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
+										.With( "bg-primary-bg [&_svg]:text-primary-500 dark:[&_svg]:text-primary-200", Variant is AlertVariant.Default )
+										.With( "bg-primary-bg [&_svg]:text-primary-500 dark:[&_svg]:text-primary-200", Variant is AlertVariant.Primary )
+										.With( "bg-danger-bg [&_svg]:text-danger-500 dark:[&_svg]:text-danger-200", Variant is AlertVariant.Danger )
+										.With( "bg-warning-bg [&_svg]:text-warning-500 dark:[&_svg]:text-warning-200", Variant is AlertVariant.Warning )
+										.With( "bg-success-bg [&_svg]:text-success-500 dark:[&_svg]:text-success-200", Variant is AlertVariant.Success )
+										.With( ClassName )
+										.Build();
 
 	private string VariantIcon => Variant switch
 	{

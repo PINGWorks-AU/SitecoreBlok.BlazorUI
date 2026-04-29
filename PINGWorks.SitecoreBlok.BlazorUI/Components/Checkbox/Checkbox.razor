@@ -92,7 +92,9 @@ else
 	[Parameter] public string? Label { get; set; }
 	[Parameter] public string? Description { get; set; }
 
-	private string CssClass => CssClassBuilder.Start( "peer border-input dark:bg-input/30 inline-flex items-center justify-center overflow-hidden data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50" )
+	private string CssClass => CssClassBuilder.Start( "peer border-input dark:bg-input/30 inline-flex items-center justify-center overflow-hidden data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shrink-0 border outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50" )
+										.With( "size-4", !CssClassBuilder.ContainsAny( ClassName, "size-" ) )
+										.With( "rounded-[4px]", !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
 										.With( "data-[state=checked]:border-info-600 data-[state=checked]:bg-info-600 data-[state=checked]:text-white dark:data-[state=checked]:border-info-700 dark:data-[state=checked]:bg-info-700", Enhanced )
 										.With( ClassName )
 										.Build();

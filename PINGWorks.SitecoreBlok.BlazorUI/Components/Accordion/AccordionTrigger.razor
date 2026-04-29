@@ -16,7 +16,9 @@
 	// `text-foreground` is explicit so the trigger text stays legible across
 	// light/dark theme flips. Chevron rotation uses `_svg` (descendant) — works
 	// regardless of whether Icon wraps the svg or emits it directly.
-	private string CssClass => CssClassBuilder.Start( "focus-visible:border-ring focus-visible:ring-ring/50 text-md font-normal text-foreground hover:bg-blackAlpha-50 flex flex-1 cursor-pointer items-start justify-between gap-4 px-2 py-4 text-left transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]_svg]:rotate-180" )
+	private string CssClass => CssClassBuilder.Start( "focus-visible:border-ring focus-visible:ring-ring/50 text-md font-normal text-foreground hover:bg-blackAlpha-50 flex flex-1 cursor-pointer items-start justify-between gap-4 text-left transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]_svg]:rotate-180" )
+											.With( "px-2", !CssClassBuilder.ContainsAny( ClassName, "px-", "p-" ) )
+											.With( "py-4", !CssClassBuilder.ContainsAny( ClassName, "py-", "p-" ) )
 											.With( ClassName )
 											.Build();
 }

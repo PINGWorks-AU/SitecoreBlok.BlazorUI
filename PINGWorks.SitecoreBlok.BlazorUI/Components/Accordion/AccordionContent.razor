@@ -20,7 +20,9 @@
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 
-	private string InnerClass => CssClassBuilder.Start( "text-md px-2 py-2 pt-0 pb-4" )
+	private string InnerClass => CssClassBuilder.Start( "text-md" )
+											.With( "px-2", !CssClassBuilder.ContainsAny( ClassName, "px-", "p-" ) )
+											.With( "pt-0 pb-4", !CssClassBuilder.ContainsAny( ClassName, "py-", "pt-", "pb-", "p-" ) )
 											.With( ClassName )
 											.Build();
 }

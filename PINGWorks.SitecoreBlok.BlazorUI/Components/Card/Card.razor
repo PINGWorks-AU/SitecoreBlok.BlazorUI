@@ -41,9 +41,12 @@
 										.With( "bg-subtle-bg text-foreground border-transparent", Style is CardStyle.Filled )
 
 										// padding
-										.With( "px-3 py-3 rounded-base", Padding is CardPadding.Sm )
-										.With( "px-5 py-5 rounded-md", Padding is CardPadding.Md )
-										.With( "px-7 py-7 rounded-lg", Padding is CardPadding.Lg )
+										.With( "px-3 py-3", Padding is CardPadding.Sm && !CssClassBuilder.ContainsAny( ClassName, "p-", "px-", "py-" ) )
+										.With( "rounded-base", Padding is CardPadding.Sm && !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
+										.With( "px-5 py-5", Padding is CardPadding.Md && !CssClassBuilder.ContainsAny( ClassName, "p-", "px-", "py-" ) )
+										.With( "rounded-md", Padding is CardPadding.Md && !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
+										.With( "px-7 py-7", Padding is CardPadding.Lg && !CssClassBuilder.ContainsAny( ClassName, "p-", "px-", "py-" ) )
+										.With( "rounded-lg", Padding is CardPadding.Lg && !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
 										.With( ClassName )
 										.Build();
 }

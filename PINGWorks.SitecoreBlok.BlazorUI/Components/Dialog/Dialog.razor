@@ -31,7 +31,8 @@
 	// Catalogue render path. Removing this regresses dark-mode text contrast.
 	private string ContentCssClass => CssClassBuilder.Start(
 		"bg-background text-foreground fixed top-[50%] left-[50%] z-50 grid translate-x-[-50%] translate-y-[-50%] gap-4 shadow-lg duration-200 transition-all" )
-										.With( "rounded-lg px-7 py-5", Size is not DialogSize.Full )
+										.With( "px-7 py-5", Size is not DialogSize.Full && !CssClassBuilder.ContainsAny( ClassName, "p-", "px-", "py-" ) )
+										.With( "rounded-lg", Size is not DialogSize.Full && !CssClassBuilder.ContainsAny( ClassName, "rounded" ) )
 										.With( "scale-100 opacity-100", Open )
 										.With( "scale-95 opacity-0", !Open )
 										.With( "w-[25vw] min-w-[20rem]", Size is DialogSize.Sm )

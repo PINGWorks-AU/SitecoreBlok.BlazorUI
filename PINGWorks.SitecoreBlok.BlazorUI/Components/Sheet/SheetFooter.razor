@@ -8,7 +8,8 @@
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 
-	private string CssClass => CssClassBuilder.Start("flex gap-2 p-4 justify-end")
-										.With(ClassName)
+	private string CssClass => CssClassBuilder.Start( "flex gap-2 justify-end" )
+										.With( "p-4", !CssClassBuilder.ContainsAny( ClassName, "p-" ) )
+										.With( ClassName )
 										.Build();
 }

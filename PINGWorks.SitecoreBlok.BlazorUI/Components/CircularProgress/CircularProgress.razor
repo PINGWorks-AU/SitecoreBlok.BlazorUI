@@ -27,7 +27,8 @@
 	private double Circumference => 2 * Math.PI * 16;
 	private double DashOffset => Circumference - (Percentage / 100 * Circumference);
 
-	private string CssClass => CssClassBuilder.Start("relative inline-flex size-10")
-										.With(ClassName)
+	private string CssClass => CssClassBuilder.Start( "relative inline-flex" )
+										.With( "size-10", !CssClassBuilder.ContainsAny( ClassName, "size-" ) )
+										.With( ClassName )
 										.Build();
 }

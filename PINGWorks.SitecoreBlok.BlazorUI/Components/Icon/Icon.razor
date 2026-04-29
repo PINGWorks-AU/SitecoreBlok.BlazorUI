@@ -76,7 +76,7 @@ else
 	// stripped SizeClass too; that was a footgun and broke the Checkbox tick.
 	private string CssClass => CssClassBuilder.Start()
 		.With( "inline-block align-middle shrink-0", !ResetClassName )
-		.With( SizeClass )
+		.With( SizeClass, !CssClassBuilder.ContainsAny( ClassName, "size-" ) )
 		.With( ColorSchemeClass )
 		.With( ClassName )
 		.Build();

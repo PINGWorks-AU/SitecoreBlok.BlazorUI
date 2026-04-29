@@ -8,7 +8,8 @@
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 
-	private string CssClass => CssClassBuilder.Start("flex flex-col gap-0.5 p-4")
-										.With(ClassName)
+	private string CssClass => CssClassBuilder.Start( "flex flex-col gap-0.5" )
+										.With( "p-4", !CssClassBuilder.ContainsAny( ClassName, "p-" ) )
+										.With( ClassName )
 										.Build();
 }
