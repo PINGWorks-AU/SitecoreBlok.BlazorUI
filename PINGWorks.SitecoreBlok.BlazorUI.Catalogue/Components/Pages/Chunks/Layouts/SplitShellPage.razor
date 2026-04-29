@@ -60,13 +60,13 @@
 	[
 		new ApiElement(
 			Name: "SplitShell",
-			Description: "Two-pane layout for master/detail or any split-axis arrangement. When `IsResizable` is true, wraps the panes in the `ResizablePanelGroup` primitive so users can drag the splitter; otherwise renders a static flex container. Wrapper-styling per spec §5.13: `Borders`, `Gutters`, and `BgFilled` control the static-mode pane appearance so consumers do not need wrapper divs in slot content.",
+			Description: "Two-pane layout for master/detail or any split-axis arrangement. When `IsResizable` is true, wraps the panes in the `ResizablePanelGroup` primitive so users can drag the splitter; otherwise renders a static flex container. Wrapper-styling: `Borders`, `Gutters`, and `BgFilled` control the static-mode pane appearance so consumers do not need wrapper divs in slot content.",
 			Depth: 0,
 			Properties:
 			[
 				new ApiProperty( "Start",       "RenderFragment?",  false, "Left pane (when `Direction = Horizontal`) or top pane (when `Vertical`). In static mode the chunk owns background and padding via `BgFilled` / `Gutters`." ),
 				new ApiProperty( "End",         "RenderFragment?",  false, "Right pane (when `Direction = Horizontal`) or bottom pane (when `Vertical`). Same ownership rules as `Start`." ),
-				new ApiProperty( "Direction",   "Orientation",      false, "Split axis. Default: `Orientation.Horizontal`. Other values: `Vertical`. Shared `Orientation` enum per spec §5.10." ),
+				new ApiProperty( "Direction",   "Orientation",      false, "Split axis. Default: `Orientation.Horizontal`. Other values: `Vertical`. Shared `Orientation` enum." ),
 				new ApiProperty( "IsResizable", "bool",             false, "When `true`, the panes are wrapped in `ResizablePanelGroup` and the consumer can drag the divider. Default: `false`. **Interactive-mode requirement:** `IsResizable=true` uses JSInterop — render in an interactive context (e.g. `@rendermode InteractiveServer`). The default `IsResizable=false` is SSR-safe." ),
 				new ApiProperty( "Ratio",       "double",           false, "Initial split ratio between `Start` and `End` when `IsResizable = true`. Range 0.0–1.0; default `0.5` (equal split). Ignored when `IsResizable = false`." ),
 				new ApiProperty( "Borders",     "bool",             false, "Toggles the `divide-x` / `divide-y` divider line between panes (static mode). Default: `true`. When `false`, no separator is rendered." ),

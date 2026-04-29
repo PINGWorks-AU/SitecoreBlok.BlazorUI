@@ -68,7 +68,7 @@
 	[
 		new ApiElement(
 			Name: "ListDetailShell",
-			Description: "Opinionated split layout: list on the left, detail on the right. Selection state is exposed through `SelectedId` / `SelectedIdChanged` so consumers can two-way bind. When `SelectedId` is null (or `default(TId)` for value types), the `Empty` slot renders instead of the `Detail` slot. Generic on `TId` — pass `TId=\"string\"` (or any type) at the call site. Value-type consumers should use a nullable wrapper (e.g. `TId=\"int?\"`) to avoid `default(int) == 0` colliding with a legitimate selection of `0`. Wrapper-styling per spec §5.13: the chunk owns list-pane width/fill and the optional divider line.",
+			Description: "Opinionated split layout: list on the left, detail on the right. Selection state is exposed through `SelectedId` / `SelectedIdChanged` so consumers can two-way bind. When `SelectedId` is null (or `default(TId)` for value types), the `Empty` slot renders instead of the `Detail` slot. Generic on `TId` — pass `TId=\"string\"` (or any type) at the call site. Value-type consumers should use a nullable wrapper (e.g. `TId=\"int?\"`) to avoid `default(int) == 0` colliding with a legitimate selection of `0`. Wrapper-styling: the chunk owns list-pane width/fill and the optional divider line.",
 			Depth: 0,
 			Properties:
 			[

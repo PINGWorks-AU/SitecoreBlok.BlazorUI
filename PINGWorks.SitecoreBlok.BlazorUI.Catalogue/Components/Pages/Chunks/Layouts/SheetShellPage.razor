@@ -35,10 +35,10 @@
 			Depth: 0,
 			Properties:
 			[
-				new ApiProperty( "Header",      "RenderFragment?",      false, "Top of the sheet. Renders inside `<SheetHeader>` (which has `p-4`). Strict-shape slot per spec §5.1." ),
-				new ApiProperty( "Body",        "RenderFragment?",      false, "Main scrollable content. Wrapped in a padded flex-filling div (`flex-1 min-h-0 overflow-y-auto px-4`) so content aligns with the header/footer padding. Strict-shape slot." ),
+				new ApiProperty( "Header",      "RenderFragment?",      false, "Top of the sheet. Renders inside `<SheetHeader>` (which has `p-4`). Strict-shape slot." ),
+				new ApiProperty( "Body",        "RenderFragment?",      false, "Main scrollable content. Wrapped in a padded flex-filling div (`flex-1 min-h-0 overflow-y-auto px-4`) so content aligns with the header/footer padding." ),
 				new ApiProperty( "Actions",     "RenderFragment?",      false, "Bottom action row. Renders inside `<SheetFooter>` (`p-4 justify-end`). Typically two `Button`s. Strict-shape slot." ),
-				new ApiProperty( "Side",        "Position",             false, "Edge the sheet slides in from. Default: `Position.Right`. Other values: `Top`, `Bottom`, `Left`. Translated internally to the primitive's `SheetSide` enum. Shared `Position` enum per spec §5.10." ),
+				new ApiProperty( "Side",        "Position",             false, "Edge the sheet slides in from. Default: `Position.Right`. Other values: `Top`, `Bottom`, `Left`. Translated internally to the primitive's `SheetSide` enum. Shared `Position` enum." ),
 				new ApiProperty( "Open",        "bool",                 false, "Open state. Two-way bindable via `OpenChanged`." ),
 				new ApiProperty( "OpenChanged", "EventCallback<bool>",  false, "Fires when the sheet requests to close. Pair with `Open` for two-way binding." ),
 			]

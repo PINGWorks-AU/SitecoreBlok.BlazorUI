@@ -39,18 +39,18 @@
 	[
 		new ApiElement(
 			Name: "AppShell",
-			Description: "Outermost shell for a top-level Blazor app. Provides the `data-dark-mode-target` wrapper, the ambient flex layout, and mounts the global `Popovers` and `Toaster` primitives once with the consumer-supplied render mode. Consumers do **not** add `Popovers`/`Toaster` separately — `AppShell` owns them. Wrapper-styling per spec §5.13: chunks absorb common layout decisions (borders, padding, alignment, widths) so consumers don't write Tailwind in slot content.",
+			Description: "Outermost shell for a top-level Blazor app. Provides the `data-dark-mode-target` wrapper, the ambient flex layout, and mounts the global `Popovers` and `Toaster` primitives once with the consumer-supplied render mode. Consumers do **not** add `Popovers`/`Toaster` separately — `AppShell` owns them. Wrapper-styling: chunks absorb common layout decisions (borders, padding, alignment, widths) so consumers don't write Tailwind in slot content.",
 			Depth: 0,
 			Properties:
 			[
-				new ApiProperty( "Header",                "RenderFragment?",         false, "Sticky top bar slot. Renders inside a `<header>` whose styling (border, blur, alignment) is controlled by `Borders`, `HeaderBgFilled`, `HeaderAlignment`, `Gutters`. Strict-shape slot per §5.1." ),
-				new ApiProperty( "Sidebar",               "RenderFragment?",         false, "Left rail slot. Renders inside an `<aside>` whose width / border / fill / padding is controlled by `SidebarWidth`, `Borders`, `SidebarBgFilled`, `Gutters`. Strict-shape slot." ),
+				new ApiProperty( "Header",                "RenderFragment?",         false, "Sticky top bar slot. Renders inside a `<header>` whose styling (border, blur, alignment) is controlled by `Borders`, `HeaderBgFilled`, `HeaderAlignment`, `Gutters`. Strict-shape slot." ),
+				new ApiProperty( "Sidebar",               "RenderFragment?",         false, "Left rail slot. Renders inside an `<aside>` whose width / border / fill / padding is controlled by `SidebarWidth`, `Borders`, `SidebarBgFilled`, `Gutters`." ),
 				new ApiProperty( "Content",               "RenderFragment?",         false, "Main scrollable content slot. `flex-1 min-h-0 overflow-y-auto` baseline; padding via `Gutters`." ),
 				new ApiProperty( "Footer",                "RenderFragment?",         false, "Bottom band slot. Border / fill / padding controlled by `Borders` and `Gutters`." ),
 				new ApiProperty( "InteractiveRenderMode", "IComponentRenderMode?",   false, "Render mode applied to the internally-mounted `Popovers` and `Toaster`. Default: `null` (inherits from consumer's surrounding context)." ),
 				new ApiProperty( "Borders",               "bool",                    false, "Toggles `border-b` on Header, `border-r` on Sidebar, `border-t` on Footer. Default: `true`." ),
 				new ApiProperty( "Gutters",               "bool",                    false, "Toggles internal padding: Sidebar/Content/Footer get `p-4`; Header content row gets `px-6 gap-4`. Default: `true`." ),
-				new ApiProperty( "HeaderAlignment",       "Alignment",               false, "Flex `items-*` value on the Header content row. Default: `Alignment.Center`. Other values: `Start`, `End`, `Stretch`. Shared `Alignment` enum per §5.10." ),
+				new ApiProperty( "HeaderAlignment",       "Alignment",               false, "Flex `items-*` value on the Header content row. Default: `Alignment.Center`. Other values: `Start`, `End`, `Stretch`. Shared `Alignment` enum." ),
 				new ApiProperty( "SidebarWidth",          "Size",                    false, "Sidebar width via the shared `Size` enum (mapped through `SizeClasses.Width`). Default: `Size.Md` (`w-56`). Common values: `Sm` (`w-48`), `Md` (`w-56`), `Lg` (`w-72`)." ),
 				new ApiProperty( "SidebarBgFilled",       "bool",                    false, "Toggles `bg-background` on the Sidebar wrapper. Default: `true`." ),
 				new ApiProperty( "HeaderBgFilled",        "bool",                    false, "Toggles `bg-background/95 backdrop-blur` on the Header band. Default: `true`." ),

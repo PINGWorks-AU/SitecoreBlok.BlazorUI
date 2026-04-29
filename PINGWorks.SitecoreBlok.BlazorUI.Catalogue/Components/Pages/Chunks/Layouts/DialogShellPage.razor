@@ -38,7 +38,7 @@
 			[
 				new ApiProperty( "Title",       "string?",              false, "Dialog title text. Renders inside `<DialogTitle>` when set. Omitted from the rendered DOM when null/empty." ),
 				new ApiProperty( "Description", "string?",              false, "Dialog description text. Renders inside `<DialogDescription>` when set. Omitted when null/empty." ),
-				new ApiProperty( "Body",        "RenderFragment?",      false, "Main dialog content slot. Renders directly between header and footer (no wrapper). Strict-shape slot per spec §5.1." ),
+				new ApiProperty( "Body",        "RenderFragment?",      false, "Main dialog content slot. Renders directly between header and footer (no wrapper). Strict-shape slot." ),
 				new ApiProperty( "Actions",     "RenderFragment?",      false, "Footer action slot. Renders inside `<DialogFooter>`. Typically two `Button`s (Cancel + Confirm). Strict-shape slot." ),
 				new ApiProperty( "Open",        "bool",                 false, "Open state. Two-way bindable via `OpenChanged`." ),
 				new ApiProperty( "OpenChanged", "EventCallback<bool>",  false, "Fires when the dialog requests to close (overlay click, close button, or Escape). Pair with `Open` for two-way binding." ),

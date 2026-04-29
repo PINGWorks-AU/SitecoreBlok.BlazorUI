@@ -62,18 +62,18 @@
 	[
 		new ApiElement(
 			Name: "PageShell",
-			Description: "In-app page envelope. Sits inside `AppShell.Content` (or directly inside a Blazor host page) and arranges a header band, scrollable body, optional aside rail, and optional footer band into one composable surface. Wrapper-styling per spec §5.13: chunk absorbs common layout decisions (borders, padding, alignment, aside width and fill) so consumers don't write Tailwind in slot content.",
+			Description: "In-app page envelope. Sits inside `AppShell.Content` (or directly inside a Blazor host page) and arranges a header band, scrollable body, optional aside rail, and optional footer band into one composable surface. Wrapper-styling: chunk absorbs common layout decisions (borders, padding, alignment, aside width and fill) so consumers don't write Tailwind in slot content.",
 			Depth: 0,
 			Properties:
 			[
-				new ApiProperty( "Header",          "RenderFragment?",  false, "Top band slot. Renders inside a `flex-shrink-0` wrapper whose border / alignment / padding is controlled by `Borders`, `HeaderAlignment`, `Gutters`. Strict-shape slot per §5.1." ),
+				new ApiProperty( "Header",          "RenderFragment?",  false, "Top band slot. Renders inside a `flex-shrink-0` wrapper whose border / alignment / padding is controlled by `Borders`, `HeaderAlignment`, `Gutters`. Strict-shape slot." ),
 				new ApiProperty( "Body",            "RenderFragment?",  false, "Main scrollable area. `flex-1 min-w-0 overflow-y-auto` baseline; padding via `Gutters`." ),
 				new ApiProperty( "Aside",           "RenderFragment?",  false, "Side rail slot. Width / fill / border / padding controlled by `AsideWidth`, `AsideBgFilled`, `Borders`, `Gutters`. Hidden when `AsidePlacement = Placement.None`." ),
 				new ApiProperty( "Footer",          "RenderFragment?",  false, "Bottom band slot. Border / padding via `Borders` and `Gutters`." ),
-				new ApiProperty( "AsidePlacement",  "Placement",        false, "Where the Aside renders. Default: `Placement.Right`. Other values: `Left`, `None`. Shared `Placement` enum per §5.10." ),
+				new ApiProperty( "AsidePlacement",  "Placement",        false, "Where the Aside renders. Default: `Placement.Right`. Other values: `Left`, `None`. Shared `Placement` enum." ),
 				new ApiProperty( "Borders",         "bool",             false, "Toggles `border-b` on Header, `border-l/r` on Aside (matching `AsidePlacement`), `border-t` on Footer. Default: `true`." ),
 				new ApiProperty( "Gutters",         "bool",             false, "Toggles `p-4` inside each region wrapper. Default: `false` — consumers style inside slots if `Gutters=false`." ),
-				new ApiProperty( "HeaderAlignment", "Alignment",        false, "Flex `items-*` value on the Header content row. Default: `Alignment.Center`. Shared `Alignment` enum per §5.10." ),
+				new ApiProperty( "HeaderAlignment", "Alignment",        false, "Flex `items-*` value on the Header content row. Default: `Alignment.Center`. Shared `Alignment` enum." ),
 				new ApiProperty( "AsideWidth",      "Size",             false, "Aside fixed width via the shared `Size` enum (mapped through `SizeClasses.Width`). Default: `Size.Sm` (`w-48`). Common values: `Sm` (`w-48`), `Md` (`w-56`), `Lg` (`w-72`)." ),
 				new ApiProperty( "AsideBgFilled",     "bool",             false, "Toggles `bg-background` on the Aside wrapper. Default: `true`." ),
 			]
