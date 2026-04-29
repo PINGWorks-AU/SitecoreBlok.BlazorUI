@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
-		<Version>1.1.0.0</Version>
+		<Version>1.2.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -41,6 +41,10 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes>
+			v1.2.0
+			🚨 Chunks feature released, with over 80 new composite components for consistently applying complex arrangements of primitives and CSS style classes with minimal effort
+			✔️ Update the Tooltip primitive component to correctly position and render on top of bounding containers, as well as adding arbitrary delay support and class name overrides
+
 			v1.1.0
 			⭐ Include Tailwind source theme files to allow use of the theme in consuming sites
 			🐛 Remove unused references to Geist font
