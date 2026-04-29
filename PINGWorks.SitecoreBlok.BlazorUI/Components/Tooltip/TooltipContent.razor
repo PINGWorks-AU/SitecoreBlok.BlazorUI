@@ -1,6 +1,6 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-<div data-slot="tooltip-content" role="tooltip" class="@CssClass" @attributes="AdditionalAttributes">
+<div data-slot="tooltip-content" role="tooltip" class="@CssClass" style="@AnchorStyle" @attributes="AdditionalAttributes">
 	@ChildContent
 	<span class="@ArrowCssClass"></span>
 </div>
@@ -10,8 +10,16 @@
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 	[Parameter] public TooltipSide Side { get; set; } = TooltipSide.Bottom;
+	[Parameter] public int Delay { get; set; }
 	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+	// `position: fixed` + CSS anchor positioning lets the tooltip escape any
+	// ancestor `overflow` clipping (e.g. a scrollable nav) while still tracking
+	// the trigger when the container scrolls. The `Tooltip` wrapper exposes the
+	// anchor via `[anchor-name:--blok-tooltip]`; `[position-anchor:--blok-tooltip]`
+	// resolves to the nearest ancestor with that name, so nested usage works.
+	// `position-area` is the modern replacement for `inset-area` (Chrome 125+).
+	//
 	// `text-white` is literal (not `text-inverse-text`) because the tooltip
 	// surface is hardcoded `bg-gray-700` in BOTH modes — it does not flip.
 	// `text-inverse-text` resolves to a near-black token in dark mode (correct
@@ -19,16 +27,39 @@
 	// invisible black-on-dark-grey text inside the tooltip. Always-white is
 	// the only safe choice for an always-dark surface. Do not revert.
 	private string CssClass => CssClassBuilder.Start(
-		"text-white absolute z-50 w-max rounded-md bg-gray-700 px-3 py-1.5 text-xs text-balance",
+		"text-white fixed z-50 w-max rounded-md bg-gray-700 px-3 py-1.5 text-xs text-balance",
 		"opacity-0 pointer-events-none transition-opacity duration-150",
 		"group-hover/tooltip:opacity-100 group-hover/tooltip:pointer-events-auto" )
 											.With( "!opacity-0 !pointer-events-none", Parent?.IsSuppressed ?? false )
-										.With( "top-full left-1/2 -translate-x-1/2 mt-2", Side is TooltipSide.Bottom )
-										.With( "bottom-full left-1/2 -translate-x-1/2 mb-2", Side is TooltipSide.Top )
-										.With( "right-full top-1/2 -translate-y-1/2 mr-2", Side is TooltipSide.Left )
-										.With( "left-full top-1/2 -translate-y-1/2 ml-2", Side is TooltipSide.Right )
+										.With( "[position-area:bottom] mt-2", Side is TooltipSide.Bottom )
+										.With( "[position-area:top] mb-2",    Side is TooltipSide.Top )
+										.With( "[position-area:left] mr-2",   Side is TooltipSide.Left )
+										.With( "[position-area:right] ml-2",  Side is TooltipSide.Right )
+										.With( DelayClass )
 										.With( ClassName )
 										.Build();
+
+	// Tailwind v4 literal-class scanning requires `delay-[Xms]` candidates to
+	// appear as literals in source, so we dispatch over fixed buckets rather
+	// than interpolating the value at runtime. Delay rounds UP to the nearest
+	// bucket; any value above 1500 caps at 2000ms. The `group-hover` variant
+	// makes the delay apply only on hover-in — hover-out remains immediate
+	// (transition-delay reverts to 0 when the hover state ends).
+	private string DelayClass => Delay switch
+	{
+		<= 0    => string.Empty,
+		<= 200  => "group-hover/tooltip:delay-[200ms]",
+		<= 500  => "group-hover/tooltip:delay-[500ms]",
+		<= 700  => "group-hover/tooltip:delay-[700ms]",
+		<= 1000 => "group-hover/tooltip:delay-[1000ms]",
+		<= 1500 => "group-hover/tooltip:delay-[1500ms]",
+		_       => "group-hover/tooltip:delay-[2000ms]"
+	};
+
+	// Anchor binding via inline style — Tailwind v4 cannot generate per-instance
+	// arbitrary classes from runtime values, so we attach `position-anchor`
+	// directly. The unique id comes from the parent `Tooltip` wrapper.
+	private string AnchorStyle => Parent is null ? string.Empty : $"position-anchor: {Parent.AnchorName}";
 
 	private string ArrowCssClass => CssClassBuilder.Start( "absolute size-2.5 rotate-45 rounded-[2px] bg-gray-700" )
 										.With( "bottom-full left-1/2 -translate-x-1/2 translate-y-1/2", Side is TooltipSide.Bottom )

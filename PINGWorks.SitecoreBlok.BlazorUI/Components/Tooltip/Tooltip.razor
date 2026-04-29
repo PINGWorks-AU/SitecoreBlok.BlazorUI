@@ -1,15 +1,23 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
 <CascadingValue Value="this">
-	<div data-slot="tooltip" class="relative inline-flex group/tooltip">
+	<div data-slot="tooltip" class="@CssClass" style="@AnchorStyle">
 		@ChildContent
 	</div>
 </CascadingValue>
 
 @code {
 	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
 
 	internal bool IsSuppressed { get; private set; }
+
+	// Per-instance anchor name keeps multiple Tooltips on the same page from
+	// resolving to each other's wrappers. CSS Anchor Positioning resolves
+	// `position-anchor` against ALL matching `anchor-name` elements, not just
+	// the closest ancestor — so a shared name causes every TooltipContent to
+	// snap to the last one in document order. Unique ids fix that.
+	internal string AnchorName { get; } = $"--blok-tt-{Guid.NewGuid():N}";
 
 	internal async Task Suppress()
 	{
@@ -22,4 +30,10 @@
 		IsSuppressed = false;
 		await InvokeAsync( StateHasChanged );
 	}
+
+	private string CssClass => CssClassBuilder.Start( "relative inline-flex group/tooltip" )
+		.With( ClassName )
+		.Build();
+
+	private string AnchorStyle => $"anchor-name: {AnchorName}";
 }

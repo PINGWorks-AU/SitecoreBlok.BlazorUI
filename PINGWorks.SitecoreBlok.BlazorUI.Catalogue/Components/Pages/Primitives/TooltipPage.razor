@@ -5,7 +5,9 @@
 <ComponentPage Title="Tooltip" Description="A popup that displays information related to an element on hover" Interactivity="ComponentInteractivity.Ssr" ApiElements="@TooltipElements">
 
 	<DivergenceNote>
-		<p><strong>CSS-only hover; no Radix portal or delay configurability.</strong> Blok wraps Radix UI's Tooltip primitive which uses a portal, computed positioning, and a configurable <code>delayDuration</code>. BlazorUI's Tooltip uses a pure CSS <code>group-hover</code> mechanism — no JavaScript, no portal, no delay. Trade-off: simpler and SSR-safe, but the tooltip is positioned relative to the trigger's nearest positioned ancestor (instead of the viewport), so it can be clipped by overflow containers. <code>TooltipProvider</code> is intentionally not implemented (it has no analog without a delay system).</p>
+		<p><strong>CSS-only hover; no Radix portal.</strong> Blok wraps Radix UI's Tooltip primitive which uses a portal and JS-computed positioning. BlazorUI's Tooltip uses a pure CSS <code>group-hover</code> mechanism plus CSS Anchor Positioning (<code>position-anchor</code> + <code>position-area</code>) to anchor a <code>position: fixed</code> tooltip to its trigger. The fixed positioning means the tooltip escapes ancestor <code>overflow</code> clipping — useful for nav menus and other scrollable containers — without needing JS or a portal. Requires a Chromium-based browser (Chrome / Edge 125+); Firefox and Safari support is shipping. <code>TooltipProvider</code> is intentionally not implemented (no central delay coordination is needed — see Delay below).</p>
+		<p><strong>Improvement: per-tooltip <code>Delay</code> on <code>TooltipContent</code>.</strong> Blok / Radix expose a single Provider-level <code>delayDuration</code>. We attach an optional <code>Delay</code> (milliseconds) directly to <code>TooltipContent</code> so each tooltip can opt in to a hover delay independently. The delay applies only on hover-in; hover-out stays instant.</p>
+		<p><strong>Improvement: <code>ClassName</code> on <code>Tooltip</code> root.</strong> Blok's root is a Radix context provider with no DOM. Our root renders the positioning context (<code>relative inline-flex group/tooltip</code>), so we expose <code>ClassName</code> to let consumers tweak its layout without losing the group/tooltip wiring (e.g. <code>flex-1 min-w-0</code> when the trigger needs to fill a flex row).</p>
 		<p><strong>Text colour: <code>text-white</code>, not <code>text-inverse-text</code>.</strong> Blok's source uses <code>text-inverse-text</code> on the <code>bg-gray-700</code> tooltip surface. Our token <code>--color-inverse-text</code> flips to a dark colour in dark mode (which is correct on light surfaces like buttons) — but the tooltip surface is hardcoded gray-700 in <em>both</em> modes, so the inverted token would render dark text on a dark surface. We use <code>text-white</code> literal to keep tooltip text readable in dark mode.</p>
 	</DivergenceNote>
 
@@ -71,6 +73,17 @@
 			</div>
 		</ComponentExample>
 
+		<ComponentExample Title="With 1-second delay" Code="@("<Tooltip>\n    <TooltipTrigger>\n        <Button>Hover and wait</Button>\n    </TooltipTrigger>\n    <TooltipContent Delay=\"1000\">Appears after 1 second; disappears immediately</TooltipContent>\n</Tooltip>")">
+			<div class="flex justify-center py-20">
+				<Tooltip>
+					<TooltipTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Hover and wait</Button>
+					</TooltipTrigger>
+					<TooltipContent Delay="1000">Appears after 1 second; disappears immediately</TooltipContent>
+				</Tooltip>
+			</div>
+		</ComponentExample>
+
 	</ExamplesSection>
 
 </ComponentPage>
@@ -85,6 +98,7 @@
 			Properties:
 			[
 				new ApiProperty( "ChildContent", "RenderFragment?", false, "Must contain a `TooltipTrigger` and a `TooltipContent`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the root wrapper. Useful when the tooltip needs to participate in its parent's layout (e.g. `flex-1 min-w-0` to fill a flex row)." ),
 			]
 		),
 		new ApiElement(
@@ -105,6 +119,7 @@
 			Properties:
 			[
 				new ApiProperty( "Side",                 "TooltipSide",                   false, "Placement relative to the trigger. Default: `TooltipSide.Bottom`. Other values: `Top`, `Left`, `Right`." ),
+				new ApiProperty( "Delay",                "int",                           false, "Hover-in delay in milliseconds before the tooltip appears. Default `0` (immediate). Rounds up to the nearest bucket: `200`, `500`, `700`, `1000`, `1500`, `2000`. Hover-out is always instant." ),
 				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the tooltip body." ),
 				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Tooltip content — plain text or inline markup." ),
 				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the tooltip body." ),

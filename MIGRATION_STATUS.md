@@ -100,19 +100,19 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | Toaster | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`sonner.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/sonner.tsx) | `17d1fb` | Imperative `ToastService.Show(...)` API; `/sonner` stub page |
 | Toggle | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`toggle.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/toggle.tsx) | `2d994e` | Single-toggle button |
 | ToggleGroup | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`toggle-group.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/toggle-group.tsx) | `6255ac` | Segmented toggle group |
-| Tooltip | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`tooltip.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/tooltip.tsx) | `2d994e` | Hover-triggered tooltip |
+| Tooltip | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`tooltip.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/tooltip.tsx) | `2d994e` | Per-tooltip `Delay` on `TooltipContent` (Blok delays via Provider only); `ClassName` on `Tooltip` root; CSS Anchor Positioning (`position: fixed` + `position-anchor`) so tooltips escape ancestor `overflow` clipping without a JS portal |
 | TreeView | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | — | — | Hierarchical collapsible tree |
 
 ## Summary
 
 | Status | Count |
 |---|---|
-| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 53 |
-| ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | 6 |
+| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 52 |
+| ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | 7 |
 | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | 5 |
 | ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 2 |
 | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | 5 |
-| **Total ported** | **59** of **66** Blok primitives |
+| **Total ported** | **59** of **61** Blok primitives (excluding 5 Won't Do) |
 
 ## Notes on classification
 
