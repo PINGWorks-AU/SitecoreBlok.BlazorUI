@@ -12,11 +12,11 @@
 
 	<Popover Id="@Id" OnClose="Close" ClassName="shadow-lg rounded-lg">
 		<Calendar Value="@Value" ValueChanged="OnDateSelected"
-				  RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
-				  RangeEnd="@RangeEnd" RangeEndChanged="OnRangeEndSelected"
-				  MinDate="@MinDate" MaxDate="@MaxDate"
-				  NumberOfMonths="@NumberOfMonths"
-				  ClassName="border-0 shadow-none" />
+				Range="@Range" RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
+				RangeEnd="@RangeEnd" RangeEndChanged="OnRangeEndSelected"
+				MinDate="@MinDate" MaxDate="@MaxDate"
+				NumberOfMonths="@NumberOfMonths"
+				ClassName="border-0 shadow-none" />
 	</Popover>
 </div>
 
@@ -30,6 +30,7 @@
 	[Parameter] public EventCallback<DateTime?> ValueChanged { get; set; }
 
 	// Range mode
+	[Parameter] public bool? Range { get; set; }
 	[Parameter] public DateTime? RangeStart { get; set; }
 	[Parameter] public EventCallback<DateTime?> RangeStartChanged { get; set; }
 	[Parameter] public DateTime? RangeEnd { get; set; }
@@ -45,7 +46,7 @@
 
 	private string? TriggerAriaLabel => AriaLabels?.PopoverTrigger ?? Placeholder;
 
-	private bool IsRange => RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate;
+	private bool IsRange => Range.HasValue ? Range.Value : ( RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate );
 
 	private ElementReference? Trigger;
 	private bool IsOpen;

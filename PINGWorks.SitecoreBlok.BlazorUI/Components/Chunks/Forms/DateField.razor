@@ -12,7 +12,7 @@
 		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
 	}
 	<div @onfocusout="MarkTouched">
-		<DatePicker Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled" />
+		<DatePicker Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled" Range="false" MinDate="MinDate" MaxDate="MaxDate" />
 	</div>
 	@if ( !string.IsNullOrEmpty( HelpText ) )
 	{
@@ -21,4 +21,6 @@
 </div>
 
 @code {
+	[Parameter] public DateTime? MinDate { get; set; }
+	[Parameter] public DateTime? MaxDate { get; set; }
 }

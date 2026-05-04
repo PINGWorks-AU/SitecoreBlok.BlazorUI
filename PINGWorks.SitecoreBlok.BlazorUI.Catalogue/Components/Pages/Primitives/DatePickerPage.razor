@@ -78,6 +78,7 @@
 			[
 				new ApiProperty( "Value",             "DateTime?",                 false, "Selected date in single-date mode. Supports two-way binding via `@bind-Value`." ),
 				new ApiProperty( "ValueChanged",      "EventCallback<DateTime?>",  false, "Fires when the user picks a date in single-date mode." ),
+				new ApiProperty( "Range",             "bool?",                     false, "Override the range-mode auto detection." ),
 				new ApiProperty( "RangeStart",        "DateTime?",                 false, "Start date in range mode. Supports two-way binding via `@bind-RangeStart`." ),
 				new ApiProperty( "RangeStartChanged", "EventCallback<DateTime?>",  false, "Fires when the range start changes. Binding it (or `RangeEndChanged`) switches the picker into range mode." ),
 				new ApiProperty( "RangeEnd",          "DateTime?",                 false, "End date in range mode. Supports two-way binding via `@bind-RangeEnd`." ),

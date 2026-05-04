@@ -1,3 +1,11 @@
 ﻿@import './blok/globals.css';
 
 @source '../../components';
+
+@theme {
+	--container-8xl: 88rem;
+}
+
+.max-w-8xl {
+	max-width: var(--container-8xl);
+}

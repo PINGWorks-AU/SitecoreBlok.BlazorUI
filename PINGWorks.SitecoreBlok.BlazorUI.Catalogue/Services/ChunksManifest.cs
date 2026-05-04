@@ -78,6 +78,7 @@ public static class ChunksManifest
 		new( FormsFamily, "ComboboxField",    "combobox-field",     "Combobox wrapper — Items, Value, Placeholder",                      ComponentInteractivity.Interactive ),
 		new( FormsFamily, "ConfirmDialog",    "confirm-dialog",     "Dialog-based confirm-action wrapper — Tone, ConfirmLabel",          ComponentInteractivity.Interactive ),
 		new( FormsFamily, "DateField",        "date-field",         "DatePicker wrapper — DateTime? Value",                              ComponentInteractivity.Interactive ),
+		new( FormsFamily, "FileUpload",       "file-upload",        "Drop-zone file picker — click or drag-and-drop, IBrowserFile",      ComponentInteractivity.Interactive ),
 		new( FormsFamily, "FilterBar",        "filter-bar",         "Horizontal filter chip row — Filters, ClearAction",                 ComponentInteractivity.Ssr ),
 		new( FormsFamily, "FormActions",      "form-actions",       "Sticky-bottom action row — Start, End slots",                       ComponentInteractivity.Interactive ),
 		new( FormsFamily, "FormGrid",         "form-grid",          "Multi-column field layout — Columns, Gap",                          ComponentInteractivity.Ssr ),

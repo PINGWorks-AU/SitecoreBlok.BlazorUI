@@ -93,6 +93,7 @@
 			[
 				new ApiProperty( "Value",             "DateTime?",                  false, "Single-date selection. Use `@bind-Value` for two-way binding." ),
 				new ApiProperty( "ValueChanged",      "EventCallback<DateTime?>",   false, "Fires when the selected date changes. Supports `@bind-Value`." ),
+				new ApiProperty( "Range",             "bool?",                      false, "Override the range-mode auto detection." ),
 				new ApiProperty( "RangeStart",        "DateTime?",                  false, "Start of the selected range. Wiring `RangeStartChanged` (or using `@bind-RangeStart`) switches the calendar into range-selection mode." ),
 				new ApiProperty( "RangeStartChanged", "EventCallback<DateTime?>",   false, "Fires when the range start changes. Supports `@bind-RangeStart`." ),
 				new ApiProperty( "RangeEnd",          "DateTime?",                  false, "End of the selected range. Set alongside `RangeStart` for range-mode." ),

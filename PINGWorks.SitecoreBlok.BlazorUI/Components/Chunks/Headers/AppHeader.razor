@@ -51,7 +51,7 @@
 	[Parameter] public Alignment HeaderAlignment { get; set; } = Alignment.Center;
 
 	private string HeaderClass
-		=> CssClassBuilder.Start( "z-40" )
+		=> CssClassBuilder.Start( "z-40 flex-1" )
 			.With( "sticky top-0", Sticky )
 			.With( "border-b border-border", Borders )
 			.With( "bg-background/95 backdrop-blur", BgFilled )

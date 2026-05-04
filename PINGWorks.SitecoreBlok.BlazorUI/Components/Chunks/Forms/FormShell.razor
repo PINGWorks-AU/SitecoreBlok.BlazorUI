@@ -8,7 +8,11 @@
 *@
 
 <form @onsubmit="OnSubmit" @onsubmit:preventDefault="true" class="flex flex-col gap-8">
-	<PageHeader Title="@Title" Description="@Description" />
+	@if ( !string.IsNullOrEmpty( Title ) || !string.IsNullOrEmpty( Description ) )
+	{
+		<PageHeader Title="@Title" Description="@Description" />
+	}
+
 	@if ( Sections is not null )
 	{
 		<div class="flex flex-col gap-8">@Sections</div>
