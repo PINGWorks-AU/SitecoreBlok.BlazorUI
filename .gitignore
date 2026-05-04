@@ -364,3 +364,6 @@ FodyWeavers.xsd
 /PINGWorks.SitecoreBlok.BlazorUI.Catalogue/wwwroot/css/catalogue-blok.css
 /PINGWorks.SitecoreBlok.BlazorUI/wwwroot/css/sitecore-blok.css
 tailwindcss-windows-x64.exe
+.copilot/
+
+Publish-nuGet.ps1

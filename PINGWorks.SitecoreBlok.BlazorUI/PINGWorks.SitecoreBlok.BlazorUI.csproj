@@ -5,7 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
-		<Version>1.2.0.0</Version>
+		<Version>1.3.0.0</Version>
+		<VersionTag>rc1</VersionTag>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -18,9 +19,11 @@
 		<EnableDynamicLoading>true</EnableDynamicLoading>
 		<PackageId>PINGWorks.SitecoreBlok.BlazorUI</PackageId>
 		<Title>PING Works Sitecore Blok Blazor UI</Title>
-		<FileVersion>$(Version)</FileVersion>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
+		<FileVersion>$(Version)</FileVersion>
+		<Version Condition="'$(VersionTag)' != ''">$(Version)-$(VersionTag)</Version>
 		<PackageVersion>$(Version)</PackageVersion>
+		<InformationalVersion>$(Version)</InformationalVersion>
 		<Authors>PING Works</Authors>
 		<Company>PING Works</Company>
 		<Product>PING Works dotBRIDGE</Product>
@@ -41,6 +44,14 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes>
+			v1.3.0
+			🎉 Add FileUpload chunk in the Forms family with drag-and-drop support and multi-file handling
+			🎉 Add LocalTime extra that renders times in the user's local time using the browser offsets
+			✔️ Minor updates to Primitives DatePicker, Table to provide some ease-of-use style properties
+			✔️ Minor updates to Chunks overriding of default styling, including CardGrid, Container, DateField, FormShell, AppHeader
+			✔️ Minor updates to Stack component
+			✔️ Add 8XL width support to Container
+
 			v1.2.0
 			🚨 Chunks feature released, with over 80 new composite components for consistently applying complex arrangements of primitives and CSS style classes with minimal effort
 			✔️ Update the Tooltip primitive component to correctly position and render on top of bounding containers, as well as adding arbitrary delay support and class name overrides
