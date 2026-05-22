@@ -17,6 +17,7 @@ The library includes:
 - **Theming** — Light and dark mode support via semantic CSS tokens
 - **Icons** — 300+ Material Design Icons available as static SVG path constants
 - **Catalogue** — A companion Blazor web app for browsing and previewing all components
+- **AI agent manifest** — `tools/ai/components.json` + `llms.txt` ship inside the NuGet so AI coding assistants in consuming projects can pick the right component for a task without network access. The live Catalogue also serves these at `/components.json` and `/llms.txt`.
 
 Note: The Catalogue contains implementation notes valuable for consumers of the project. You
 can also view this online at https://blok-blazor-catalogue.ping-works.com.au. Of particular interest,
@@ -49,6 +50,8 @@ services or scripts. Be sure to review the catalogue for up-to-date information.
 │
 ├── .claude/                                       # Claude Code skills + install scripts
 ├── .github/                                       # Issue / discussion / PR templates
+├── artifacts/                                     # Generated build outputs (gitignored)
+│   └── ai-manifest/                               # components.json + llms.txt; packed into the BlazorUI NuGet
 ├── docs/
 │   └── ui-parity-audit.md                         # UI parity audit notes
 ├── tools/
@@ -86,7 +89,11 @@ services or scripts. Be sure to review the catalogue for up-to-date information.
     │   │   ├── Primitives/                        # Per-primitive demo pages
     │   │   └── Chunks/                            # Per-chunk demo pages, grouped by family
     │   └── Shared/                                # ComponentPage, ComponentExample, DivergenceNote, HostContextNote
-    └── wwwroot/                                   # Catalogue-specific assets
+    ├── Services/
+    │   ├── MigrationStatusService.cs              # Parses MIGRATION_STATUS.md
+    │   ├── ChunksManifest.cs                      # Single source of truth for chunk metadata
+    │   └── ComponentCatalogueExporter.cs          # Emits components.json + llms.txt for AI agents
+    └── wwwroot/                                   # Catalogue-specific assets (including generated llms.txt, components.json)
 ```
 
 ## Getting Started
@@ -129,6 +136,32 @@ builder.Services.AddSitecoreBlokUI();
 cd PINGWorks.SitecoreBlok.BlazorUI.Catalogue
 dotnet run
 ```
+
+### AI Agent Integration
+
+The NuGet package ships a machine-readable catalogue under `tools/ai/` so AI coding assistants (Claude Code, Cursor, Copilot, custom agents) can pick the right component without grepping the source or hitting the network.
+
+**Two files, two consumption modes:**
+
+- `tools/ai/components.json` — structured catalogue (one entry per primitive and chunk: name, slug, description, family, interactivity, status, catalogue URL).
+- `tools/ai/llms.txt` — human + LLM-readable markdown index following the [llmstxt.org](https://llmstxt.org) convention.
+
+**Where to find them after restore:**
+
+```
+%USERPROFILE%\.nuget\packages\pingworks.sitecoreblok.blazorui\<version>\tools\ai\
+~/.nuget/packages/pingworks.sitecoreblok.blazorui/<version>/tools/ai/         # macOS / Linux
+```
+
+Point your AI assistant at this directory (or the specific files) when starting work on a Blazor app that consumes this kit — the agent gets the full component surface in one read.
+
+**Live Catalogue equivalents** — the same files are served by the running Catalogue at:
+
+- `https://blok-blazor-catalogue.ping-works.com.au/llms.txt`
+- `https://blok-blazor-catalogue.ping-works.com.au/components.json`
+- and discoverable via `<link rel="alternate" type="text/markdown" href="/llms.txt">` in the Catalogue head.
+
+Both files are regenerated on every Catalogue build by `Services/ComponentCatalogueExporter.cs` from `MIGRATION_STATUS.md` (primitives) and `Services/ChunksManifest.cs` (chunks), so they always match the package version they ship with.
 
 ## Usage Examples
 
