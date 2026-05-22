@@ -367,3 +367,6 @@ tailwindcss-windows-x64.exe
 .copilot/
 
 Publish-nuGet.ps1
+
+# Generated AI catalogue artefacts
+/artifacts/

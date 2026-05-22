@@ -1,6 +1,17 @@
 using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Components;
 using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services;
 
+// AI manifest export mode: `dotnet run -- --export-manifest <outDir> [--strict]`
+// writes components.json + llms.txt and exits without starting the web host.
+// --strict turns drift mismatches into a non-zero exit code (use in CI).
+if ( args.Length >= 2 && args[ 0 ] == "--export-manifest" )
+{
+	var strict = args.Contains( "--strict" );
+	ComponentCatalogueExporter.Export( args[ 1 ], strict );
+	Console.WriteLine( $"Wrote AI manifest to {args[ 1 ]}" );
+	return;
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()

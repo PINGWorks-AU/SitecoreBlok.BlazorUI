@@ -5,7 +5,10 @@
       "Bash(grep -iE '\\\\.\\(exe|dll|pdb|so|dylib|pfx|snk|key|pem|p12\\)$')",
       "Bash(awk -F/ '{print $1}')",
       "Bash(dotnet build *)",
-      "Bash(dotnet msbuild *)"
+      "Bash(dotnet msbuild *)",
+      "Bash(findstr /n /c:\"Elements = \" \"C:\\\\Projects-Github\\\\PINGWorks-AU\\\\SitecoreBlok.BlazorUI\\\\PINGWorks.SitecoreBlok.BlazorUI.Catalogue\\\\Components\\\\Pages\\\\Primitives\\\\ButtonPage.razor\")",
+      "Bash(echo.)",
+      "PowerShell(dotnet build PINGWorks.SitecoreBlok.BlazorUI.Catalogue\\\\PINGWorks.SitecoreBlok.BlazorUI.Catalogue.csproj -nologo -clp:Summary 2>&1)"
     ]
   }
 }

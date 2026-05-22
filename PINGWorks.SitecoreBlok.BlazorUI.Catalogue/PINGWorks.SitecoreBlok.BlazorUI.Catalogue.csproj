@@ -32,4 +32,20 @@
 		<Exec Command="&quot;$(TailwindCliPath)&quot; -i wwwroot/css/catalogue.css -o wwwroot/css/catalogue-blok.css --minify" WorkingDirectory="$(MSBuildProjectDirectory)" />
 	</Target>
 
+	<!-- AI manifest generation: runs ComponentCatalogueExporter after build, writing
+	     llms.txt + components.json to both wwwroot/ (served by the Catalogue) and to
+	     ../artifacts/ai-manifest/ (packed into the BlazorUI NuGet). -->
+	<PropertyGroup>
+		<AiManifestArtifactsDir>$(MSBuildThisFileDirectory)..\artifacts\ai-manifest</AiManifestArtifactsDir>
+	</PropertyGroup>
+
+	<Target Name="ExportAiManifest" AfterTargets="Build">
+		<MakeDir Directories="$(AiManifestArtifactsDir)" />
+		<Exec Command="dotnet run --no-build --no-launch-profile --project &quot;$(MSBuildProjectFile)&quot; -- --export-manifest &quot;wwwroot&quot;"
+		      WorkingDirectory="$(MSBuildProjectDirectory)" />
+		<Copy SourceFiles="wwwroot\components.json;wwwroot\llms.txt"
+		      DestinationFolder="$(AiManifestArtifactsDir)"
+		      SkipUnchangedFiles="true" />
+	</Target>
+
 </Project>
