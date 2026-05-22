@@ -18,6 +18,8 @@
 	[Parameter] public bool StickyHeader { get; set; } = true;
 	[Parameter] public string? MaxHeight { get; set; }
 	[Parameter] public string? MaxWidth { get; set; }
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Rounded { get; set; } = true;
 
 	internal bool IsStickyHeader => StickyHeader && MaxHeight is not null;
 
@@ -48,7 +50,8 @@
 
 	// `parity-no-text-pair`: the table container has no own text; cells (TableCell,
 	// TableHead) set text colour explicitly.
-	private string ContainerCssClass => CssClassBuilder.Start( "relative w-full overflow-hidden rounded-xl bg-background parity-no-text-pair" )
+	private string ContainerCssClass => CssClassBuilder.Start( "relative w-full overflow-hidden bg-background parity-no-text-pair" )
+										.With( "rounded-xl", Rounded && !CssClassBuilder.ContainsAny( ContainerClassName, "rounded-" ) )
 										.With( "flex flex-col", MaxHeight is not null )
 										.With( ContainerClassName )
 										.Build();
@@ -59,7 +62,9 @@
 										.With( "overflow-x-hidden", MaxHeight is not null && MaxWidth is null )
 										.Build();
 
-	private string CssClass => CssClassBuilder.Start( "w-full caption-bottom text-sm border-separate border-spacing-0" )
+	private string CssClass => CssClassBuilder.Start( "caption-bottom text-sm" )
+										.With( "w-full", !CssClassBuilder.ContainsAny( ClassName, "w-" ) )
+										.With( "border-separate border-spacing-0", !Borders && !CssClassBuilder.ContainsAny( ClassName, "border-" ) )
 										.With( ClassName )
 										.Build();
 }

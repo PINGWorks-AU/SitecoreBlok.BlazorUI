@@ -1,0 +1,67 @@
+@page "/primitives/localtime"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="LocalTime" Description="Renders a DateTimeOffset in the *browser's* local time zone — defeats the server-zone ToLocalTime() no-op trap that bites Blazor Server apps deployed to UTC hosts. Component-isolated JS module rewrites the textContent after render."
+			   Interactivity="ComponentInteractivity.Interactive" ApiElements="@LocalTimeElements">
+
+	<DivergenceNote>
+		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> Server-side <code>DateTimeOffset.ToLocalTime()</code> uses the host's <code>TimeZoneInfo.Local</code>, which is typically UTC in containerised hosting — making the server-rendered conversion a no-op. <code>LocalTime</code> renders the UTC ISO string into a <code>&lt;time&gt;</code> tag and a co-located JS module upgrades it to the user's wall-clock time after render. Each component instance imports its own module reference and disposes it cleanly with the circuit; no global observers, no document-wide scans.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default (date and time)" Code="@("<LocalTime Value=\"DateTimeOffset.UtcNow\" />")">
+			<LocalTime Value="Now" />
+		</ComponentExample>
+
+		<ComponentExample Title="Date only" Code="@("<LocalTime Value=\"DateTimeOffset.UtcNow\" Format=\"yyyy-MM-dd\" />")">
+			<LocalTime Value="Now" Format="yyyy-MM-dd" />
+		</ComponentExample>
+
+		<ComponentExample Title="12-hour clock with AM/PM" Code="@("<LocalTime Value=\"DateTimeOffset.UtcNow\" Format=\"h:mm tt\" />")">
+			<LocalTime Value="Now" Format="h:mm tt" />
+		</ComponentExample>
+
+		<ComponentExample Title="With timezone offset" Code="@("<LocalTime Value=\"DateTimeOffset.UtcNow\" Format=\"yyyy-MM-dd HH:mm:ss K\" />")">
+			<LocalTime Value="Now" Format="yyyy-MM-dd HH:mm:ss K" />
+		</ComponentExample>
+
+		<ComponentExample Title="Compact (2-digit year + padded 12-hour)" Code="@("<LocalTime Value=\"DateTimeOffset.UtcNow\" Format=\"dd/MM/yy hh:mm tt\" />")">
+			<LocalTime Value="Now" Format="dd/MM/yy hh:mm tt" />
+		</ComponentExample>
+
+		<ComponentExample Title="Server-rendered fallback (UTC)" Code="@("@* The text shown until the JS module upgrades it (and in JS-disabled clients) *@\n@* is Value.UtcDateTime.ToString(Format) — i.e. the UTC equivalent of the same instant. *@\n<LocalTime Value=\"DateTimeOffset.UtcNow\" Format=\"yyyy-MM-dd HH:mm:ss K\" />")">
+			<div class="space-y-2 text-sm text-muted-foreground">
+				<p>Until the JS module loads — and in JS-disabled clients — the rendered text is the UTC equivalent of the same instant (using the same <code>Format</code>). Inspect the underlying <code>&lt;time datetime="..."&gt;</code> attribute to see the canonical UTC ISO string the server emitted.</p>
+				<div class="rounded border border-border bg-muted/30 p-3 font-mono text-xs">
+					<div>Now (browser-local): <LocalTime Value="Now" Format="yyyy-MM-dd HH:mm:ss K" /></div>
+					<div>Now (raw UTC):       @Now.UtcDateTime.ToString( "yyyy-MM-dd HH:mm:ss" ) Z</div>
+				</div>
+			</div>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private DateTimeOffset Now;
+
+	protected override void OnInitialized()
+		=> Now = DateTimeOffset.UtcNow;
+
+	private static readonly ApiElement[] LocalTimeElements =
+	[
+		new ApiElement(
+			Name: "LocalTime",
+			Description: "Renders a `DateTimeOffset` in the browser's local time zone via a component-isolated JS module that rewrites the underlying `<time>` element's textContent after render. The server-rendered fallback is the UTC equivalent so JS-disabled clients still see a sensible value.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",  "DateTimeOffset", true,  "The UTC instant to render. Required." ),
+				new ApiProperty( "Format", "string",         false, "Format string. Defaults to `\"yyyy-MM-dd HH:mm:ss\"`. Tokens: `yyyy` / `yy` (year), `MM` (month), `dd` (day), `HH` (24-hour), `hh` / `h` (12-hour padded / unpadded), `mm` (minute), `ss` (second), `tt` (AM/PM), `K` (zone offset, e.g. `+10:00`). Anything else passes through unchanged." ),
+			]
+		),
+	];
+}

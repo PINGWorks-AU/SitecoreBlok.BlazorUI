@@ -120,8 +120,9 @@
 	[Parameter] public int YearRangeStart { get; set; } = DateTime.Today.Year - 10;
 	[Parameter] public int YearRangeEnd { get; set; } = DateTime.Today.Year + 10;
 	[Parameter] public int NumberOfMonths { get; set; } = 1;
+	[Parameter] public bool? Range { get; set; }
 
-	private bool IsRange => RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate;
+	private bool IsRange => Range.HasValue ? Range.Value : ( RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate );
 
 	private DateTime DisplayDate;
 

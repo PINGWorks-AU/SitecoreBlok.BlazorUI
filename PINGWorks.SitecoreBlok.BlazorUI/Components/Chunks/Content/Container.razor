@@ -7,9 +7,16 @@
 	border, background, or gutter behaviour. The MaxWidth parameter is the sole API surface.
 *@
 
-<div class="@($"mx-auto w-full {SizeClasses.MaxWidth( MaxWidth )}")">@ChildContent</div>
+<div class="@CssClass">@ChildContent</div>
 
 @code {
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public Size MaxWidth { get; set; } = Size.Lg;
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "mx-auto" )
+								.With( "w-full", !CssClassBuilder.ContainsAny( ClassName, "w-" ) )
+								.With( SizeClasses.MaxWidth( MaxWidth ), !CssClassBuilder.ContainsAny( ClassName, "max-w-" ) )
+								.With( ClassName )
+								.Build();
 }

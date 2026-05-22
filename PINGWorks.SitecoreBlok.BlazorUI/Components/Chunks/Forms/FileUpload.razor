@@ -1,0 +1,195 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@using Microsoft.AspNetCore.Components.Forms
+
+@*
+	FileUpload — file picker with two display modes.
+
+	`DisplayMode.DropTarget` (default): a dashed-border drop zone with leading
+	icon, primary label, optional helper, drag-over visual state, and an
+	in-zone selected-file indicator. Best when there's space for a prominent
+	"drop a file here" affordance.
+
+	`DisplayMode.Button`: a single outline-button-styled control with an inline
+	file-name strip beside it. Use when space is tight or drag-and-drop is not
+	desirable. The underlying <InputFile> is the same overlay element so click
+	always works; in Button mode the drag-over highlight is suppressed.
+
+	Both modes wrap Blazor's <InputFile> and fire OnFileSelected /
+	OnFilesSelected via native browser file-input behaviour. The chunk owns
+	its visual state (idle / drag-over / file-selected); call Clear() on the
+	component reference to reset programmatically. Selecting another file
+	replaces the displayed indicator without further work.
+*@
+
+@if ( DisplayMode is FileUploadDisplayMode.Button )
+{
+	<div class="inline-flex flex-wrap items-center gap-3">
+		<div class="@ButtonClass"
+			 @ondragenter="HandleDragEnter"
+			 @ondragover:preventDefault="true"
+			 @ondragleave="HandleDragLeave"
+			 @ondrop="HandleDrop">
+			<Icon Svg="@( SelectedFile is null ? IconSvg : SelectedIconSvg )" />
+			<span class="pointer-events-none">@EffectiveLabel</span>
+			<InputFile @key="ResetKey"
+					   OnChange="HandleChange"
+					   accept="@Accept"
+					   multiple="@Multiple"
+					   disabled="@Disabled"
+					   class="@InputClass" />
+		</div>
+		@if ( SelectedFile is not null )
+		{
+			<span class="text-sm text-muted-foreground truncate">
+				@SelectedFile.Name
+				<span class="text-xs">(@FormatSize( SelectedFile.Size ))</span>
+			</span>
+		}
+	</div>
+}
+else
+{
+	<div class="@DropZoneClass"
+		 @ondragenter="HandleDragEnter"
+		 @ondragover:preventDefault="true"
+		 @ondragleave="HandleDragLeave"
+		 @ondrop="HandleDrop">
+
+		<div class="flex flex-col items-center justify-center gap-2 pointer-events-none">
+			@if ( SelectedFile is null )
+			{
+				<Icon Svg="@IconSvg" ClassName="size-8 text-muted-foreground" />
+				<p class="text-sm font-medium text-foreground">@EffectiveLabel</p>
+				@if ( !string.IsNullOrEmpty( HelpText ) )
+				{
+					<p class="text-xs text-muted-foreground">@HelpText</p>
+				}
+			}
+			else
+			{
+				<Icon Svg="@SelectedIconSvg" ClassName="size-6 text-muted-foreground" />
+				<p class="text-sm font-medium text-foreground break-all">@SelectedFile.Name</p>
+				<p class="text-xs text-muted-foreground">@FormatSize( SelectedFile.Size ) · click or drop to replace</p>
+			}
+		</div>
+
+		<InputFile @key="ResetKey"
+				   OnChange="HandleChange"
+				   accept="@Accept"
+				   multiple="@Multiple"
+				   disabled="@Disabled"
+				   class="@InputClass" />
+
+	</div>
+}
+
+@code {
+	public enum FileUploadDisplayMode { DropTarget, Button }
+
+	[Parameter] public string? Label { get; set; }
+	[Parameter] public string? HelpText { get; set; }
+	[Parameter] public string? Accept { get; set; }
+	[Parameter] public long MaxAllowedSize { get; set; } = 512_000;
+	[Parameter] public bool Multiple { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	[Parameter] public string IconSvg { get; set; } = PINGWorks.SitecoreBlok.BlazorUI.IconSvg.Upload;
+	[Parameter] public string SelectedIconSvg { get; set; } = PINGWorks.SitecoreBlok.BlazorUI.IconSvg.FileDocumentOutline;
+
+	[Parameter] public FileUploadDisplayMode DisplayMode { get; set; } = FileUploadDisplayMode.DropTarget;
+
+	[Parameter] public bool Borders { get; set; } = true;
+	[Parameter] public bool Gutters { get; set; } = true;
+
+	[Parameter] public EventCallback<IBrowserFile> OnFileSelected { get; set; }
+	[Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> OnFilesSelected { get; set; }
+
+	[Parameter] public string? ClassName { get; set; }
+
+	private bool DragOver;
+	private IBrowserFile? SelectedFile;
+	private int ResetKey;
+
+	private string EffectiveLabel
+		=> Label
+			?? ( DisplayMode is FileUploadDisplayMode.Button ? "Choose file" : "Drop a file here or click to browse" );
+
+	private string DropZoneClass
+		=> CssClassBuilder.Start( "relative flex flex-col items-center justify-center gap-2 text-center transition-colors rounded-lg" )
+			.With( "p-6", Gutters )
+			.With( "border-2 border-dashed", Borders )
+			.With( "border-input bg-background", Borders && !DragOver && !Disabled )
+			.With( "hover:bg-neutral-bg", !DragOver && !Disabled )
+			.With( "border-primary bg-primary-bg", Borders && DragOver && !Disabled )
+			.With( "opacity-50", Disabled )
+			.With( ClassName )
+			.Build();
+
+	private string ButtonClass
+		=> CssClassBuilder.Start(
+				// Layout & sizing — mirrors Button (Variant=Outline, Size=Default)
+				"relative inline-flex items-center justify-center gap-2 whitespace-nowrap shrink-0 align-middle",
+				"text-md font-semibold transition-all",
+				// Icon styles
+				"[&_svg]:pointer-events-none [&_svg]:w-[1.375rem] [&_svg]:h-[1.375rem] [&_svg]:shrink-0",
+				// Outline + Neutral compound
+				"border text-neutral-fg",
+				// Focus
+				"outline-none focus-within:border-primary focus-within:ring-primary/50 focus-within:ring-[3px]" )
+			.With( "h-10 min-w-10 px-4 rounded-4xl", Gutters )
+			.With( "bg-background hover:bg-neutral-bg active:bg-neutral-bg-active dark:bg-input/30 dark:hover:bg-input/50", !Disabled )
+			.With( "opacity-50 pointer-events-none", Disabled )
+			.With( ClassName )
+			.Build();
+
+	private string InputClass
+		=> CssClassBuilder.Start( "absolute inset-0 size-full opacity-0" )
+			.With( "cursor-pointer", !Disabled )
+			.With( "cursor-not-allowed", Disabled )
+			.Build();
+
+	private void HandleDragEnter()
+		=> DragOver = true;
+
+	private void HandleDragLeave()
+		=> DragOver = false;
+
+	private void HandleDrop()
+		=> DragOver = false;
+
+	private async Task HandleChange( InputFileChangeEventArgs args )
+	{
+		DragOver = false;
+
+		if ( Multiple )
+		{
+			var files = args.GetMultipleFiles( int.MaxValue );
+			SelectedFile = files.Count == 1 ? files[ 0 ] : null;
+			if ( OnFilesSelected.HasDelegate )
+				await OnFilesSelected.InvokeAsync( files );
+		}
+		else
+		{
+			SelectedFile = args.File;
+			if ( OnFileSelected.HasDelegate )
+				await OnFileSelected.InvokeAsync( SelectedFile );
+		}
+	}
+
+	/// <summary>Clear the displayed selection and reset the underlying InputFile state.</summary>
+	public void Clear()
+	{
+		SelectedFile = null;
+		ResetKey++;
+		StateHasChanged();
+	}
+
+	private static string FormatSize( long bytes )
+	{
+		if ( bytes >= 1024L * 1024L )
+			return $"{bytes / 1024.0 / 1024.0:F1} MB";
+		if ( bytes >= 1024 )
+			return $"{bytes / 1024.0:F1} KB";
+		return $"{bytes} B";
+	}
+}

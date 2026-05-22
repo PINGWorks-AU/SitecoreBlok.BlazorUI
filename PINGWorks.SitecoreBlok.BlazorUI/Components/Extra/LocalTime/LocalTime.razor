@@ -1,0 +1,68 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@*
+	LocalTime — renders a UTC instant in the *browser's* local time zone.
+
+	Server-side `DateTimeOffset.ToLocalTime()` uses the host's `TimeZoneInfo.Local`
+	(typically UTC in containerised hosting), so it cannot produce the user's
+	wall clock. This component renders the UTC ISO string into a <time> tag and
+	upgrades the textContent in the browser via a component-isolated JS module —
+	the displayed value reflects the user's zone, not the server's.
+
+	Examples:
+		<LocalTime Value="record.Timestamp" />
+		<LocalTime Value="record.IssuedAt" Format="yyyy-MM-dd" />
+
+	Format tokens supported (.NET-style):
+		yyyy / yy   — 4- and 2-digit year
+		MM          — 2-digit month
+		dd          — 2-digit day
+		HH          — 24-hour clock, 2 digits
+		hh / h      — 12-hour clock, 2 digits / unpadded
+		mm / ss     — 2-digit minute / second
+		tt          — AM/PM designator
+		K           — UTC offset of the *browser* zone, e.g. "+10:00"
+
+	Anything else passes through unchanged. The server-rendered fallback (shown
+	until the JS module loads, and in JS-disabled clients) uses the same Format
+	string but evaluated against UTC.
+*@
+
+@implements IAsyncDisposable
+@inject IJSRuntime Js
+
+<time @ref="TimeRef" datetime="@IsoValue" data-fmt="@Format">@FallbackText</time>
+
+@code {
+	[Parameter, EditorRequired] public DateTimeOffset Value { get; set; }
+	[Parameter] public string Format { get; set; } = "yyyy-MM-dd HH:mm:ss";
+
+	private ElementReference TimeRef;
+	private IJSObjectReference? Module;
+
+	private string IsoValue
+		=> Value.UtcDateTime.ToString( "O" );
+
+	private string FallbackText
+		=> Value.UtcDateTime.ToString( Format );
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( Module is null )
+			Module = await Js.InvokeAsync<IJSObjectReference>( "import", "./_content/PINGWorks.SitecoreBlok.BlazorUI/Components/Extra/LocalTime/LocalTime.razor.js" );
+
+		await Module.InvokeVoidAsync( "format", TimeRef, IsoValue, Format );
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await ( Module?.DisposeAsync() ?? ValueTask.CompletedTask );
+		}
+		catch ( JSDisconnectedException )
+		{
+			// Circuit already torn down — module reference is meaningless.
+		}
+	}
+}

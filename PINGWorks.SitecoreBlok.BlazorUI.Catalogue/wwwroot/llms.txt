@@ -1,0 +1,195 @@
+﻿# PING Works Sitecore Blok BlazorUI
+
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `1.3.0.0`. Generated 2026-05-22T03:22:35Z.
+
+Use this index to pick the right component for a task. Two surfaces:
+
+- **Primitives** — small composable building blocks (Button, Dialog, Tabs, ...). Faithful ports of Blok primitives.
+- **Chunks** — opinionated composite components built from primitives (PageShell, FormShell, KvList, ...) that lock in consistent spacing, headers, and slots.
+
+Prefer the highest-level component that fits the job. If a Chunk covers your layout, reach for it before composing primitives by hand.
+
+## Documentation
+
+- [Theming](/theme.md) — design tokens, dark mode, color schemes
+- [Chunks design](/docs/chunks-design.md) — how Chunks compose primitives
+- [Migration status](/MIGRATION_STATUS.md) — per-primitive port status vs. upstream Blok
+
+## Primitives
+
+- [Accordion](/primitives/accordion): Vertically-stacked collapsible content panels
+- [ActionBar](/primitives/actionbar): Floating multi-action toolbar
+- [Alert](/primitives/alert): Status banner; adds `Closeable` parameter
+- [AlertDialog](/primitives/alertdialog): Modal confirmation dialog
+- [AspectRatio](/primitives/aspectratio): Aspect-ratio preserving container
+- [Avatar](/primitives/avatar): User image with fallback
+- [Badge](/primitives/badge): Inline label / status pill
+- [Breadcrumb](/primitives/breadcrumb): Hierarchical navigation trail
+- [Button](/primitives/button): Clickable button with variants / sizes / colours
+- [Calendar](/primitives/calendar): Month-grid date picker surface
+- [Card](/primitives/card): Container with header / content / footer
+- [Carousel](/primitives/carousel): Horizontal slide scroller
+- [Checkbox](/primitives/checkbox): Binary / tri-state toggle control
+- [CircularProgress](/primitives/circularprogress): Arc-based progress indicator
+- [CodeViewer](/primitives/codeviewer): Syntax-highlighted code block (Prism)
+- [Collapsible](/primitives/collapsible): Single expand / collapse region
+- [Combobox](/primitives/combobox): Filterable select with search, single/multi-select, groups, chips
+- [ContextMenu](/primitives/contextmenu): Right-click menu
+- [CopyableToken](/primitives/copyabletoken): Click-to-copy token label; adds post-click tooltip confirmation, configurable messages, and `Clicked` callback
+- [DatePicker](/primitives/datepicker): Date input with calendar popover
+- [Dialog](/primitives/dialog): Modal dialog container
+- [DropdownMenu](/primitives/dropdownmenu): Popover menu with items and submenus
+- [Editable](/primitives/editable): Inline-editable text with input and textarea modes
+- [EmptyState](/primitives/emptystate): Empty-results placeholder
+- [ErrorState](/primitives/errorstate): Error placeholder; adds HTTP-status variant
+- [Field](/primitives/field): Form-field grouping wrapper
+- [HoverCard](/primitives/hovercard): Hover-triggered popover card
+- [Icon](/primitives/icon): SVG icon renderer (MDI) with `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes)
+- [Input](/primitives/input): Text input control
+- [InputGroup](/primitives/inputgroup): Input with affixed addons
+- [Kbd](/primitives/kbd): Keyboard-key glyph
+- [Label](/primitives/label): Form label element
+- [LocalTime](/primitives/localtime): Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting)
+- [Menubar](/primitives/menubar): App-level horizontal menu bar
+- [Navigation (Side)](/primitives/navigation-(side)): Additional
+- [Navigation (Stack)](/primitives/navigation-(stack)): Additional
+- [NavigationMenu](/primitives/navigationmenu): Multi-level menu with flyout panels
+- [Pagination](/primitives/pagination): Page nav; adds Blazor `Click` callback alongside `Href`
+- [Popover](/primitives/popover): Anchor-positioned popover surface
+- [Progress](/primitives/progress): Linear progress bar
+- [RadioGroup](/primitives/radiogroup): Radio options; adds inline `Label` helper on item
+- [Resizable](/primitives/resizable): Draggable panel splitter
+- [ScrollArea](/primitives/scrollarea): Custom-scrollbar container
+- [SearchInput](/primitives/searchinput): Input with search icon and clear button
+- [Select](/primitives/select): Drop-down value picker (10-component split)
+- [Separator](/primitives/separator): Divider line
+- [Sheet](/primitives/sheet): Edge-sliding panel (side drawer)
+- [Sidebar](/primitives/sidebar): App-level collapsible side navigation
+- [Skeleton](/primitives/skeleton): Loading-placeholder block
+- [Slider](/primitives/slider): Range-value track
+- [Sonner](/primitives/sonner): Additional
+- [Spinner](/primitives/spinner): Spinning loading indicator
+- [Stack](/primitives/stack): Flexbox layout helper (vertical / horizontal)
+- [StackNavigation](/primitives/stacknavigation): Icon-and-label navigation rail with vertical or horizontal orientation
+- [Stepper](/primitives/stepper): Multi-step progress indicator
+- [Switch](/primitives/switch): On / off toggle control
+- [Table](/primitives/table): Tabular data layout
+- [Tabs](/primitives/tabs): Tabbed content switcher
+- [Text](/primitives/text): Typography primitive
+- [Textarea](/primitives/textarea): Multi-line text input
+- [ThemeToggle](/primitives/themetoggle): Light / dark mode switcher
+- [Timeline](/primitives/timeline): Vertical event timeline
+- [TimePicker](/primitives/timepicker): Time input control
+- [Toaster](/primitives/toaster): Imperative `ToastService.Show(...)` API; `/sonner` stub page
+- [Toggle](/primitives/toggle): Single-toggle button
+- [ToggleGroup](/primitives/togglegroup): Segmented toggle group
+- [Tooltip](/primitives/tooltip): Per-tooltip `Delay` on `TooltipContent` (Blok delays via Provider only); `ClassName` on `Tooltip` root; CSS Anchor Positioning (`position: fixed` + `position-anchor`) so tooltips escape ancestor `overflow` clipping without a JS portal
+- [TreeView](/primitives/treeview): Hierarchical collapsible tree
+
+## Chunks — Content
+
+- [ActionCard](/chunks/action-card): Card with click target + trailing arrow — Href / OnClick
+- [Callout](/chunks/callout): Visually distinct aside — Title, Tone, IconSvg, ChildContent
+- [CardGrid](/chunks/card-grid): Responsive grid of cards — Columns, Gap
+- [Container](/chunks/container): Max-width content centerer — MaxWidth: Size
+- [ContentSection](/chunks/content-section): Section header + body in standard padding/spacing
+- [ElevatedCard](/chunks/elevated-card): Card primitive wrapper — Style / Elevation / HoverElevation
+- [EmptyStatePanel](/chunks/empty-state-panel): EmptyState wrapped in section-level chrome
+- [EmptyView](/chunks/empty-view): Full-page empty state
+- [ErrorStatePanel](/chunks/error-state-panel): ErrorState wrapped in section chrome — adds Status (e.g. 404)
+- [ErrorView](/chunks/error-view): Full-page error
+- [FeatureCard](/chunks/feature-card): Icon + Title + Description card; for landing/onboarding
+- [Hero](/chunks/hero): Landing-style intro band — Title, Subtitle, Actions, Media
+- [KpiTile](/chunks/kpi-tile): Single big-number stat tile — Label, Value, Delta, Trend
+- [LoadingPanel](/chunks/loading-panel): Spinner + optional message centered in min-height block
+- [LoadingView](/chunks/loading-view): Full-page loading
+- [MediaCard](/chunks/media-card): Thumbnail-first card — Image + Title/Description + Actions
+- [MetricGroup](/chunks/metric-group): Horizontal arrangement of KpiTiles with dividers
+- [PageContent](/chunks/page-content): Vertical stack of sections with consistent gap
+- [SkeletonCard](/chunks/skeleton-card): Skeleton-of-a-card preset for grid loading
+- [StatCard](/chunks/stat-card): Card-based KPI with Sparkline + Actions slots
+
+## Chunks — Data
+
+- [BulkActionBar](/chunks/bulk-action-bar): Selection-driven action bar above a table
+- [DataPage](/chunks/data-page): Full data-table page envelope — Toolbar, Table, Pagination slots
+- [DataPagination](/chunks/data-pagination): Pagination row with item count + page nav
+- [DataToolbar](/chunks/data-toolbar): Search + filters + view-switcher + actions row above a table
+- [DetailPage](/chunks/detail-page): Record detail layout — Title, Description, Main / Aside / Footer
+- [EmptyTable](/chunks/empty-table): Empty state inside a Table aware of column count
+- [FilterChip](/chunks/filter-chip): Single removable filter chip — Label, OnRemove, IconSvg
+- [KvList](/chunks/kv-list): Label/value definition list — ChildContent of KvListItem
+- [ResultsList](/chunks/results-list): Generic vertical list with selection, optional pagination, Empty
+- [RowActions](/chunks/row-actions): Table-row dropdown action menu — Items slot
+- [SettingsPage](/chunks/settings-page): Side-tabs + content area — Tabs, SelectedTab, Content slot
+
+## Chunks — Forms
+
+- [CheckboxField](/chunks/checkbox-field): Inline checkbox + label-right field wrapper
+- [ComboboxField](/chunks/combobox-field): Combobox wrapper — Items, Value, Placeholder
+- [ConfirmDialog](/chunks/confirm-dialog): Dialog-based confirm-action wrapper — Tone, ConfirmLabel
+- [DateField](/chunks/date-field): DatePicker wrapper — DateTime? Value
+- [FileUpload](/chunks/file-upload): Drop-zone file picker — click or drag-and-drop, IBrowserFile
+- [FilterBar](/chunks/filter-bar): Horizontal filter chip row — Filters, ClearAction
+- [FormActions](/chunks/form-actions): Sticky-bottom action row — Start, End slots
+- [FormGrid](/chunks/form-grid): Multi-column field layout — Columns, Gap
+- [FormLabel](/chunks/form-label): Form-context wrapper around the Label primitive
+- [FormSection](/chunks/form-section): Labelled grouping of fields — Title, Description, ChildContent
+- [FormShell](/chunks/form-shell): Page-level form envelope: PageHeader + Sections + FormActions
+- [InlineForm](/chunks/inline-form): Single-row form for search-and-go / subscribe / quick-add
+- [LoginForm](/chunks/login-form): Opinionated login template — Email/Password + Footer slot
+- [PasswordField](/chunks/password-field): Password Input + show/hide toggle
+- [RadioGroupField](/chunks/radio-group-field): Vertical radio group with label-above
+- [SearchBar](/chunks/search-bar): Toolbar pattern: SearchInput + filter slot + result-count
+- [SearchField](/chunks/search-field): SearchInput wrapper — Query, Placeholder
+- [SelectField](/chunks/select-field): Select wrapper — Items, Value, Placeholder
+- [SliderField](/chunks/slider-field): Slider wrapper — Min, Max, Step, Value
+- [SwitchField](/chunks/switch-field): Inline switch + label-right field wrapper
+- [TextAreaField](/chunks/text-area-field): Textarea wrapper — Rows, Value
+- [TextField](/chunks/text-field): Input wrapper — Type (Text/Email/Number/Tel/Url), Value
+- [TimeField](/chunks/time-field): TimePicker wrapper — TimeSpan? Value
+- [ToggleField](/chunks/toggle-field): Inline toggle + label-right field wrapper
+- [ToggleGroupField](/chunks/toggle-group-field): Horizontal multi-button toggle group — Options
+- [WizardShell](/chunks/wizard-shell): Stepper + per-step body + Back/Next footer
+
+## Chunks — Headers
+
+- [AnnouncementBar](/chunks/announcement-bar): Top-of-app dismissible banner — Message + Tone + optional Action
+- [AppBrand](/chunks/app-brand): Logo + product name + optional version chip
+- [AppHeader](/chunks/app-header): Sticky top bar with backdrop blur — slots: Brand, Nav, Actions
+- [PageHeader](/chunks/page-header): Top of an in-page area: Title, Description, Breadcrumbs, Actions
+- [SectionHeader](/chunks/section-header): Smaller heading band inside a ContentSection
+- [SubHeader](/chunks/sub-header): Context strip below AppHeader (env switcher, ambient breadcrumbs)
+- [Toolbar](/chunks/toolbar): Horizontal action strip — slots: Start, Center, End. Density enum
+
+## Chunks — Layouts
+
+- [AppShell](/chunks/app-shell): Outer dark-mode + popover/toaster mount
+- [BlankShell](/chunks/blank-shell): No-chrome envelope; sets background and font only
+- [CenteredShell](/chunks/centered-shell): Single centered column for auth / error / empty states
+- [DialogShell](/chunks/dialog-shell): Opinionated wrapper around the Dialog primitive
+- [ListDetailShell](/chunks/list-detail-shell): Opinionated SplitShell with selection state
+- [PageShell](/chunks/page-shell): In-app page envelope with header/body/aside/footer slots
+- [SheetShell](/chunks/sheet-shell): Edge-sliding panel; wraps Sheet primitive
+- [SplitShell](/chunks/split-shell): Two-pane (master/detail) layout, optional resizable
+
+## Chunks — Marketplace
+
+- [ContextPanelShell](/chunks/context-panel-shell): XMC Page Builder left context panel shell
+- [CustomFieldShell](/chunks/custom-field-shell): XMC Page Builder Custom Field dialog shell
+- [DashboardWidgetShell](/chunks/dashboard-widget-shell): XMC Dashboard widget shell — Title, Header, Body
+- [FullScreenShell](/chunks/full-screen-shell): XMC Sites full-screen iframe shell — ChildContent
+- [StandaloneShell](/chunks/standalone-shell): Cloud Portal homepage standalone shell — ChildContent
+
+## Chunks — Navigation
+
+- [AccountMenu](/chunks/account-menu): Avatar trigger + DropdownMenu shell — Name, Email, AvatarUrl, Initials
+- [AppSidebar](/chunks/app-sidebar): Pre-wired sidebar with Brand / Nav / Footer slots
+- [BackLink](/chunks/back-link): Single "← Back to X" element — Href, Label
+- [BreadcrumbBar](/chunks/breadcrumb-bar): Declarative breadcrumb — Items: IList<BreadcrumbItem>
+- [NavGroup](/chunks/nav-group): Labelled grouping inside a NavList — Label, Collapsible, DefaultOpen
+- [NavList](/chunks/nav-list): Vertical link list — ChildContent of NavListItem / NavGroup
+- [NavListItem](/chunks/nav-list-item): Single link row — Href, IconSvg, Label, Active, Badge, OnClick
+- [NavRail](/chunks/nav-rail): Narrow icon-only nav rail — Items: IList<NavRailItem>
+- [TabBar](/chunks/tab-bar): Top-of-page tab navigation — Items: IList<TabDefinition>
+

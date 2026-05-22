@@ -6,10 +6,17 @@
 	literal class strings in that file.
 *@
 
-<div class="@($"grid {ColumnsClasses.Grid( Columns )} {SizeClasses.Gap( Gap )}")">@ChildContent</div>
+<div class="@CssClass">@ChildContent</div>
 
 @code {
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public Columns Columns { get; set; } = Columns.Three;
 	[Parameter] public Size Gap { get; set; } = Size.Md;
+	[Parameter] public string? ClassName { get; set; }
+
+	private string CssClass => CssClassBuilder.Start( "grid" )
+									.With( ColumnsClasses.Grid( Columns ) )
+									.With( SizeClasses.Gap( Gap ) )
+									.With( ClassName )
+									.Build();
 }

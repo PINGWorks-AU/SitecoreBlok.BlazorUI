@@ -70,6 +70,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | InputOtp | ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | [`input-otp.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/input-otp.tsx) | `a02fe3` | One-time-password segmented input |
 | Kbd | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`kbd.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/kbd.tsx) | `17d1fb` | Keyboard-key glyph |
 | Label | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`label.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/label.tsx) | `2d994e` | Form label element |
+| LocalTime | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | — | — | Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting) |
 | Menubar | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`menubar.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/menubar.tsx) | `2d994e` | App-level horizontal menu bar |
 | NavigationMenu | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`navigation-menu.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/navigation-menu.tsx) | `2d994e` | Multi-level menu with flyout panels |
 | Pagination | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`pagination.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/pagination.tsx) | `17d1fb` | Page nav; adds Blazor `Click` callback alongside `Href` |
@@ -109,7 +110,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 |---|---|
 | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 52 |
 | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | 7 |
-| ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | 5 |
+| ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | 6 |
 | ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 2 |
 | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | 5 |
 | **Total ported** | **59** of **61** Blok primitives (excluding 5 Won't Do) |

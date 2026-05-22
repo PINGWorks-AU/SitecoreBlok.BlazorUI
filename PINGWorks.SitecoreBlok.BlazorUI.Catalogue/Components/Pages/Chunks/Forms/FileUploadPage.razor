@@ -1,0 +1,97 @@
+@page "/chunks/file-upload"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+
+<ComponentPage Title="FileUpload" Description="Drop-zone file picker supporting click and drag-and-drop. Wraps Blazor's InputFile in a styled region with idle, drag-over, and file-selected visual states." Interactivity="ComponentInteractivity.Interactive" ApiElements="@FileUploadElements">
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Single-file with default labels"
+			Code="@("<FileUpload OnFileSelected=\"HandleFile\" Accept=\".txt,.md\" MaxAllowedSize=\"65536\" HelpText=\".txt or .md, max 64 KB\" />")"
+			Primitives="@("<div class=\"relative flex flex-col items-center justify-center gap-2 text-center rounded-lg p-6 border-2 border-dashed border-input bg-background hover:bg-neutral-bg\">\n    <!-- icon, label, helper -->\n    <input type=\"file\" accept=\".txt,.md\" class=\"absolute inset-0 size-full opacity-0 cursor-pointer\" />\n</div>")">
+			<div class="max-w-md">
+				<FileUpload OnFileSelected="HandleFile" Accept=".txt,.md" MaxAllowedSize="65536" HelpText=".txt or .md, max 64 KB" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Custom label and icon"
+			Code="@("<FileUpload Label=\"Upload your license\" HelpText=\"Drop the .lic file here\"\n            IconSvg=\"@IconSvg.FileDocumentOutline\"\n            Accept=\".lic\" MaxAllowedSize=\"65536\"\n            OnFileSelected=\"HandleFile\" />")"
+			Primitives="@("<!-- same drop-zone shell, with overridden icon and copy -->")">
+			<div class="max-w-md">
+				<FileUpload Label="Upload your license"
+					HelpText="Drop the .lic file here"
+					IconSvg="@IconSvg.FileDocumentOutline"
+					Accept=".lic"
+					MaxAllowedSize="65536"
+					OnFileSelected="HandleFile" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Multiple files"
+			Code="@("<FileUpload Multiple=\"true\" OnFilesSelected=\"HandleFiles\" Label=\"Drop one or more images\" Accept=\"image/*\" />")"
+			Primitives="@("<input type=\"file\" multiple accept=\"image/*\" class=\"...\" />")">
+			<div class="max-w-md">
+				<FileUpload Multiple="true" OnFilesSelected="HandleFiles" Label="Drop one or more images" Accept="image/*" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled"
+			Code="@("<FileUpload Disabled=\"true\" Label=\"Uploads paused — try again later\" />")"
+			Primitives="@("<div class=\"... opacity-50\"><input type=\"file\" disabled class=\"... cursor-not-allowed\" /></div>")">
+			<div class="max-w-md">
+				<FileUpload Disabled="true" Label="Uploads paused — try again later" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Borderless / no padding (compact)"
+			Code="@("<FileUpload Borders=\"false\" Gutters=\"false\" Label=\"Drop a file\" />")"
+			Primitives="@("<div class=\"relative flex flex-col items-center justify-center gap-2 text-center rounded-lg hover:bg-neutral-bg\">\n    ...\n</div>")">
+			<div class="max-w-md">
+				<FileUpload Borders="false" Gutters="false" Label="Drop a file" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Button display mode"
+			Code="@("<FileUpload DisplayMode=\"FileUpload.FileUploadDisplayMode.Button\"\n            Label=\"Choose .lic file\"\n            Accept=\".lic\"\n            OnFileSelected=\"HandleFile\" />")"
+			Primitives="@("<div class=\"inline-flex items-center gap-3\">\n    <div class=\"relative inline-flex items-center justify-center gap-2 ... rounded-4xl border\">\n        <!-- icon, label -->\n        <input type=\"file\" accept=\".lic\" class=\"absolute inset-0 size-full opacity-0 cursor-pointer\" />\n    </div>\n    <span class=\"text-sm text-muted-foreground truncate\">selected.lic</span>\n</div>")">
+			<FileUpload DisplayMode="FileUpload.FileUploadDisplayMode.Button"
+				Label="Choose .lic file"
+				Accept=".lic"
+				OnFileSelected="HandleFile" />
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private void HandleFile( IBrowserFile file ) { }
+	private void HandleFiles( IReadOnlyList<IBrowserFile> files ) { }
+
+	private static readonly ApiElement[] FileUploadElements =
+	[
+		new ApiElement(
+			Name: "FileUpload",
+			Description: "A drop-zone wrapper around `InputFile` with click + drag-and-drop selection, idle / drag-over / file-selected visual states, leading icon, primary label, and optional helper text. Encapsulates the dashed-border / drag-highlight / size-formatting boilerplate consumers would otherwise repeat. Use the `Borders` / `Gutters` flags to control wrapper styling per §5.13.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Label",            "string",                                          false, "Primary text shown in the idle drop zone. Default: \"Drop a file here or click to browse\"." ),
+				new ApiProperty( "HelpText",         "string?",                                         false, "Smaller helper text under the label (e.g. accepted formats and size limit)." ),
+				new ApiProperty( "Accept",           "string?",                                         false, "Forwarded to the underlying `<input type=\"file\">` `accept` attribute (e.g. \".lic\", \"image/*\")." ),
+				new ApiProperty( "MaxAllowedSize",   "long",                                            false, "Forwarded to `IBrowserFile.OpenReadStream(maxAllowedSize)` consumers. Default: `512_000` (Blazor's stock cap). Note: this Chunk does not enforce the cap itself — pass it through when you read the stream." ),
+				new ApiProperty( "Multiple",         "bool",                                            false, "Allow selecting more than one file. Switches the active callback from `OnFileSelected` to `OnFilesSelected`. Default: `false`." ),
+				new ApiProperty( "Disabled",         "bool",                                            false, "Disables click and drop. Visual is dimmed and the cursor flips to `not-allowed`. Default: `false`." ),
+				new ApiProperty( "IconSvg",          "string",                                          false, "Leading SVG path for the idle state. Default: `IconSvg.Upload`." ),
+				new ApiProperty( "SelectedIconSvg",  "string",                                          false, "Leading SVG path for the file-selected state. Default: `IconSvg.FileDocumentOutline`." ),
+				new ApiProperty( "DisplayMode",      "FileUploadDisplayMode",                           false, "Visual layout. `DropTarget` (default) renders a dashed-border drop zone with vertical icon + label + helper. `Button` renders a single outline-button-styled control with an inline file-name strip beside it — use when space is tight or drag-and-drop is undesirable." ),
+				new ApiProperty( "Borders",          "bool",                                            false, "Toggle the dashed border (DropTarget mode) or the outline border (Button mode). Default: `true`." ),
+				new ApiProperty( "Gutters",          "bool",                                            false, "Toggle inner padding (`p-6`). Default: `true`." ),
+				new ApiProperty( "OnFileSelected",   "EventCallback<IBrowserFile>",                     false, "Fires when a single file is selected (click or drop). Used when `Multiple=false`." ),
+				new ApiProperty( "OnFilesSelected",  "EventCallback<IReadOnlyList<IBrowserFile>>",      false, "Fires when one or more files are selected. Used when `Multiple=true`." ),
+				new ApiProperty( "ClassName",        "string?",                                         false, "Escape-hatch extra Tailwind classes appended to the outer wrapper. Prefer the wrapper-styling parameters above first." ),
+			]
+		),
+	];
+}

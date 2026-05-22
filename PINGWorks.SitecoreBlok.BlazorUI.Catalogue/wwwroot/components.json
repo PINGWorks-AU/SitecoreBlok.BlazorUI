@@ -1,0 +1,1180 @@
+﻿{
+  "schema": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/blob/main/docs/components-schema.json",
+  "package": "PINGWorks.SitecoreBlok.BlazorUI",
+  "version": "1.3.0.0",
+  "generatedAt": "2026-05-22T03:22:35Z",
+  "repository": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI",
+  "documentation": {
+    "theme": "/theme.md",
+    "chunksDesign": "/docs/chunks-design.md",
+    "migrationLog": "/MIGRATION_STATUS.md"
+  },
+  "primitives": [
+    {
+      "name": "Accordion",
+      "slug": "accordion",
+      "description": "Vertically-stacked collapsible content panels",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/accordion"
+    },
+    {
+      "name": "ActionBar",
+      "slug": "actionbar",
+      "description": "Floating multi-action toolbar",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/actionbar"
+    },
+    {
+      "name": "Alert",
+      "slug": "alert",
+      "description": "Status banner; adds `Closeable` parameter",
+      "status": "Improved",
+      "catalogueUrl": "/primitives/alert"
+    },
+    {
+      "name": "AlertDialog",
+      "slug": "alertdialog",
+      "description": "Modal confirmation dialog",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/alertdialog"
+    },
+    {
+      "name": "AspectRatio",
+      "slug": "aspectratio",
+      "description": "Aspect-ratio preserving container",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/aspectratio"
+    },
+    {
+      "name": "Avatar",
+      "slug": "avatar",
+      "description": "User image with fallback",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/avatar"
+    },
+    {
+      "name": "Badge",
+      "slug": "badge",
+      "description": "Inline label / status pill",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/badge"
+    },
+    {
+      "name": "Breadcrumb",
+      "slug": "breadcrumb",
+      "description": "Hierarchical navigation trail",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/breadcrumb"
+    },
+    {
+      "name": "Button",
+      "slug": "button",
+      "description": "Clickable button with variants / sizes / colours",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/button"
+    },
+    {
+      "name": "Calendar",
+      "slug": "calendar",
+      "description": "Month-grid date picker surface",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/calendar"
+    },
+    {
+      "name": "Card",
+      "slug": "card",
+      "description": "Container with header / content / footer",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/card"
+    },
+    {
+      "name": "Carousel",
+      "slug": "carousel",
+      "description": "Horizontal slide scroller",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/carousel"
+    },
+    {
+      "name": "Checkbox",
+      "slug": "checkbox",
+      "description": "Binary / tri-state toggle control",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/checkbox"
+    },
+    {
+      "name": "CircularProgress",
+      "slug": "circularprogress",
+      "description": "Arc-based progress indicator",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/circularprogress"
+    },
+    {
+      "name": "CodeViewer",
+      "slug": "codeviewer",
+      "description": "Syntax-highlighted code block (Prism)",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/codeviewer"
+    },
+    {
+      "name": "Collapsible",
+      "slug": "collapsible",
+      "description": "Single expand / collapse region",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/collapsible"
+    },
+    {
+      "name": "Combobox",
+      "slug": "combobox",
+      "description": "Filterable select with search, single/multi-select, groups, chips",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/combobox"
+    },
+    {
+      "name": "ContextMenu",
+      "slug": "contextmenu",
+      "description": "Right-click menu",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/contextmenu"
+    },
+    {
+      "name": "CopyableToken",
+      "slug": "copyabletoken",
+      "description": "Click-to-copy token label; adds post-click tooltip confirmation, configurable messages, and `Clicked` callback",
+      "status": "Improved",
+      "catalogueUrl": "/primitives/copyabletoken"
+    },
+    {
+      "name": "DatePicker",
+      "slug": "datepicker",
+      "description": "Date input with calendar popover",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/datepicker"
+    },
+    {
+      "name": "Dialog",
+      "slug": "dialog",
+      "description": "Modal dialog container",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/dialog"
+    },
+    {
+      "name": "DropdownMenu",
+      "slug": "dropdownmenu",
+      "description": "Popover menu with items and submenus",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/dropdownmenu"
+    },
+    {
+      "name": "Editable",
+      "slug": "editable",
+      "description": "Inline-editable text with input and textarea modes",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/editable"
+    },
+    {
+      "name": "EmptyState",
+      "slug": "emptystate",
+      "description": "Empty-results placeholder",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/emptystate"
+    },
+    {
+      "name": "ErrorState",
+      "slug": "errorstate",
+      "description": "Error placeholder; adds HTTP-status variant",
+      "status": "Improved",
+      "catalogueUrl": "/primitives/errorstate"
+    },
+    {
+      "name": "Field",
+      "slug": "field",
+      "description": "Form-field grouping wrapper",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/field"
+    },
+    {
+      "name": "HoverCard",
+      "slug": "hovercard",
+      "description": "Hover-triggered popover card",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/hovercard"
+    },
+    {
+      "name": "Icon",
+      "slug": "icon",
+      "description": "SVG icon renderer (MDI) with `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes)",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/icon"
+    },
+    {
+      "name": "Input",
+      "slug": "input",
+      "description": "Text input control",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/input"
+    },
+    {
+      "name": "InputGroup",
+      "slug": "inputgroup",
+      "description": "Input with affixed addons",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/inputgroup"
+    },
+    {
+      "name": "Kbd",
+      "slug": "kbd",
+      "description": "Keyboard-key glyph",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/kbd"
+    },
+    {
+      "name": "Label",
+      "slug": "label",
+      "description": "Form label element",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/label"
+    },
+    {
+      "name": "LocalTime",
+      "slug": "localtime",
+      "description": "Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting)",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/localtime"
+    },
+    {
+      "name": "Menubar",
+      "slug": "menubar",
+      "description": "App-level horizontal menu bar",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/menubar"
+    },
+    {
+      "name": "Navigation (Side)",
+      "slug": "navigation-(side)",
+      "description": "",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/navigation-(side)"
+    },
+    {
+      "name": "Navigation (Stack)",
+      "slug": "navigation-(stack)",
+      "description": "",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/navigation-(stack)"
+    },
+    {
+      "name": "NavigationMenu",
+      "slug": "navigationmenu",
+      "description": "Multi-level menu with flyout panels",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/navigationmenu"
+    },
+    {
+      "name": "Pagination",
+      "slug": "pagination",
+      "description": "Page nav; adds Blazor `Click` callback alongside `Href`",
+      "status": "Improved",
+      "catalogueUrl": "/primitives/pagination"
+    },
+    {
+      "name": "Popover",
+      "slug": "popover",
+      "description": "Anchor-positioned popover surface",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/popover"
+    },
+    {
+      "name": "Progress",
+      "slug": "progress",
+      "description": "Linear progress bar",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/progress"
+    },
+    {
+      "name": "RadioGroup",
+      "slug": "radiogroup",
+      "description": "Radio options; adds inline `Label` helper on item",
+      "status": "Improved",
+      "catalogueUrl": "/primitives/radiogroup"
+    },
+    {
+      "name": "Resizable",
+      "slug": "resizable",
+      "description": "Draggable panel splitter",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/resizable"
+    },
+    {
+      "name": "ScrollArea",
+      "slug": "scrollarea",
+      "description": "Custom-scrollbar container",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/scrollarea"
+    },
+    {
+      "name": "SearchInput",
+      "slug": "searchinput",
+      "description": "Input with search icon and clear button",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/searchinput"
+    },
+    {
+      "name": "Select",
+      "slug": "select",
+      "description": "Drop-down value picker (10-component split)",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/select"
+    },
+    {
+      "name": "Separator",
+      "slug": "separator",
+      "description": "Divider line",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/separator"
+    },
+    {
+      "name": "Sheet",
+      "slug": "sheet",
+      "description": "Edge-sliding panel (side drawer)",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/sheet"
+    },
+    {
+      "name": "Sidebar",
+      "slug": "sidebar",
+      "description": "App-level collapsible side navigation",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/sidebar"
+    },
+    {
+      "name": "Skeleton",
+      "slug": "skeleton",
+      "description": "Loading-placeholder block",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/skeleton"
+    },
+    {
+      "name": "Slider",
+      "slug": "slider",
+      "description": "Range-value track",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/slider"
+    },
+    {
+      "name": "Sonner",
+      "slug": "sonner",
+      "description": "",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/sonner"
+    },
+    {
+      "name": "Spinner",
+      "slug": "spinner",
+      "description": "Spinning loading indicator",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/spinner"
+    },
+    {
+      "name": "Stack",
+      "slug": "stack",
+      "description": "Flexbox layout helper (vertical / horizontal)",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/stack"
+    },
+    {
+      "name": "StackNavigation",
+      "slug": "stacknavigation",
+      "description": "Icon-and-label navigation rail with vertical or horizontal orientation",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/stacknavigation"
+    },
+    {
+      "name": "Stepper",
+      "slug": "stepper",
+      "description": "Multi-step progress indicator",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/stepper"
+    },
+    {
+      "name": "Switch",
+      "slug": "switch",
+      "description": "On / off toggle control",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/switch"
+    },
+    {
+      "name": "Table",
+      "slug": "table",
+      "description": "Tabular data layout",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/table"
+    },
+    {
+      "name": "Tabs",
+      "slug": "tabs",
+      "description": "Tabbed content switcher",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/tabs"
+    },
+    {
+      "name": "Text",
+      "slug": "text",
+      "description": "Typography primitive",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/text"
+    },
+    {
+      "name": "Textarea",
+      "slug": "textarea",
+      "description": "Multi-line text input",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/textarea"
+    },
+    {
+      "name": "ThemeToggle",
+      "slug": "themetoggle",
+      "description": "Light / dark mode switcher",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/themetoggle"
+    },
+    {
+      "name": "Timeline",
+      "slug": "timeline",
+      "description": "Vertical event timeline",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/timeline"
+    },
+    {
+      "name": "TimePicker",
+      "slug": "timepicker",
+      "description": "Time input control",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/timepicker"
+    },
+    {
+      "name": "Toaster",
+      "slug": "toaster",
+      "description": "Imperative `ToastService.Show(...)` API; `/sonner` stub page",
+      "status": "Improved",
+      "catalogueUrl": "/primitives/toaster"
+    },
+    {
+      "name": "Toggle",
+      "slug": "toggle",
+      "description": "Single-toggle button",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/toggle"
+    },
+    {
+      "name": "ToggleGroup",
+      "slug": "togglegroup",
+      "description": "Segmented toggle group",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/togglegroup"
+    },
+    {
+      "name": "Tooltip",
+      "slug": "tooltip",
+      "description": "Per-tooltip `Delay` on `TooltipContent` (Blok delays via Provider only); `ClassName` on `Tooltip` root; CSS Anchor Positioning (`position: fixed` + `position-anchor`) so tooltips escape ancestor `overflow` clipping without a JS portal",
+      "status": "Improved",
+      "catalogueUrl": "/primitives/tooltip"
+    },
+    {
+      "name": "TreeView",
+      "slug": "treeview",
+      "description": "Hierarchical collapsible tree",
+      "status": "Additional",
+      "catalogueUrl": "/primitives/treeview"
+    }
+  ],
+  "chunks": [
+    {
+      "family": "Content",
+      "name": "ActionCard",
+      "slug": "action-card",
+      "description": "Card with click target + trailing arrow — Href / OnClick",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/action-card"
+    },
+    {
+      "family": "Content",
+      "name": "Callout",
+      "slug": "callout",
+      "description": "Visually distinct aside — Title, Tone, IconSvg, ChildContent",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/callout"
+    },
+    {
+      "family": "Content",
+      "name": "CardGrid",
+      "slug": "card-grid",
+      "description": "Responsive grid of cards — Columns, Gap",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/card-grid"
+    },
+    {
+      "family": "Content",
+      "name": "Container",
+      "slug": "container",
+      "description": "Max-width content centerer — MaxWidth: Size",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/container"
+    },
+    {
+      "family": "Content",
+      "name": "ContentSection",
+      "slug": "content-section",
+      "description": "Section header + body in standard padding/spacing",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/content-section"
+    },
+    {
+      "family": "Content",
+      "name": "ElevatedCard",
+      "slug": "elevated-card",
+      "description": "Card primitive wrapper — Style / Elevation / HoverElevation",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/elevated-card"
+    },
+    {
+      "family": "Content",
+      "name": "EmptyStatePanel",
+      "slug": "empty-state-panel",
+      "description": "EmptyState wrapped in section-level chrome",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/empty-state-panel"
+    },
+    {
+      "family": "Content",
+      "name": "EmptyView",
+      "slug": "empty-view",
+      "description": "Full-page empty state",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/empty-view"
+    },
+    {
+      "family": "Content",
+      "name": "ErrorStatePanel",
+      "slug": "error-state-panel",
+      "description": "ErrorState wrapped in section chrome — adds Status (e.g. 404)",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/error-state-panel"
+    },
+    {
+      "family": "Content",
+      "name": "ErrorView",
+      "slug": "error-view",
+      "description": "Full-page error",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/error-view"
+    },
+    {
+      "family": "Content",
+      "name": "FeatureCard",
+      "slug": "feature-card",
+      "description": "Icon + Title + Description card; for landing/onboarding",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/feature-card"
+    },
+    {
+      "family": "Content",
+      "name": "Hero",
+      "slug": "hero",
+      "description": "Landing-style intro band — Title, Subtitle, Actions, Media",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/hero"
+    },
+    {
+      "family": "Content",
+      "name": "KpiTile",
+      "slug": "kpi-tile",
+      "description": "Single big-number stat tile — Label, Value, Delta, Trend",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/kpi-tile"
+    },
+    {
+      "family": "Content",
+      "name": "LoadingPanel",
+      "slug": "loading-panel",
+      "description": "Spinner + optional message centered in min-height block",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/loading-panel"
+    },
+    {
+      "family": "Content",
+      "name": "LoadingView",
+      "slug": "loading-view",
+      "description": "Full-page loading",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/loading-view"
+    },
+    {
+      "family": "Content",
+      "name": "MediaCard",
+      "slug": "media-card",
+      "description": "Thumbnail-first card — Image + Title/Description + Actions",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/media-card"
+    },
+    {
+      "family": "Content",
+      "name": "MetricGroup",
+      "slug": "metric-group",
+      "description": "Horizontal arrangement of KpiTiles with dividers",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/metric-group"
+    },
+    {
+      "family": "Content",
+      "name": "PageContent",
+      "slug": "page-content",
+      "description": "Vertical stack of sections with consistent gap",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/page-content"
+    },
+    {
+      "family": "Content",
+      "name": "SkeletonCard",
+      "slug": "skeleton-card",
+      "description": "Skeleton-of-a-card preset for grid loading",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/skeleton-card"
+    },
+    {
+      "family": "Content",
+      "name": "StatCard",
+      "slug": "stat-card",
+      "description": "Card-based KPI with Sparkline + Actions slots",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/stat-card"
+    },
+    {
+      "family": "Data",
+      "name": "BulkActionBar",
+      "slug": "bulk-action-bar",
+      "description": "Selection-driven action bar above a table",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/bulk-action-bar"
+    },
+    {
+      "family": "Data",
+      "name": "DataPage",
+      "slug": "data-page",
+      "description": "Full data-table page envelope — Toolbar, Table, Pagination slots",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/data-page"
+    },
+    {
+      "family": "Data",
+      "name": "DataPagination",
+      "slug": "data-pagination",
+      "description": "Pagination row with item count + page nav",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/data-pagination"
+    },
+    {
+      "family": "Data",
+      "name": "DataToolbar",
+      "slug": "data-toolbar",
+      "description": "Search + filters + view-switcher + actions row above a table",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/data-toolbar"
+    },
+    {
+      "family": "Data",
+      "name": "DetailPage",
+      "slug": "detail-page",
+      "description": "Record detail layout — Title, Description, Main / Aside / Footer",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/detail-page"
+    },
+    {
+      "family": "Data",
+      "name": "EmptyTable",
+      "slug": "empty-table",
+      "description": "Empty state inside a Table aware of column count",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/empty-table"
+    },
+    {
+      "family": "Data",
+      "name": "FilterChip",
+      "slug": "filter-chip",
+      "description": "Single removable filter chip — Label, OnRemove, IconSvg",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/filter-chip"
+    },
+    {
+      "family": "Data",
+      "name": "KvList",
+      "slug": "kv-list",
+      "description": "Label/value definition list — ChildContent of KvListItem",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/kv-list"
+    },
+    {
+      "family": "Data",
+      "name": "ResultsList",
+      "slug": "results-list",
+      "description": "Generic vertical list with selection, optional pagination, Empty",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/results-list"
+    },
+    {
+      "family": "Data",
+      "name": "RowActions",
+      "slug": "row-actions",
+      "description": "Table-row dropdown action menu — Items slot",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/row-actions"
+    },
+    {
+      "family": "Data",
+      "name": "SettingsPage",
+      "slug": "settings-page",
+      "description": "Side-tabs + content area — Tabs, SelectedTab, Content slot",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/settings-page"
+    },
+    {
+      "family": "Forms",
+      "name": "CheckboxField",
+      "slug": "checkbox-field",
+      "description": "Inline checkbox + label-right field wrapper",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/checkbox-field"
+    },
+    {
+      "family": "Forms",
+      "name": "ComboboxField",
+      "slug": "combobox-field",
+      "description": "Combobox wrapper — Items, Value, Placeholder",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/combobox-field"
+    },
+    {
+      "family": "Forms",
+      "name": "ConfirmDialog",
+      "slug": "confirm-dialog",
+      "description": "Dialog-based confirm-action wrapper — Tone, ConfirmLabel",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/confirm-dialog"
+    },
+    {
+      "family": "Forms",
+      "name": "DateField",
+      "slug": "date-field",
+      "description": "DatePicker wrapper — DateTime? Value",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/date-field"
+    },
+    {
+      "family": "Forms",
+      "name": "FileUpload",
+      "slug": "file-upload",
+      "description": "Drop-zone file picker — click or drag-and-drop, IBrowserFile",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/file-upload"
+    },
+    {
+      "family": "Forms",
+      "name": "FilterBar",
+      "slug": "filter-bar",
+      "description": "Horizontal filter chip row — Filters, ClearAction",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/filter-bar"
+    },
+    {
+      "family": "Forms",
+      "name": "FormActions",
+      "slug": "form-actions",
+      "description": "Sticky-bottom action row — Start, End slots",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/form-actions"
+    },
+    {
+      "family": "Forms",
+      "name": "FormGrid",
+      "slug": "form-grid",
+      "description": "Multi-column field layout — Columns, Gap",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/form-grid"
+    },
+    {
+      "family": "Forms",
+      "name": "FormLabel",
+      "slug": "form-label",
+      "description": "Form-context wrapper around the Label primitive",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/form-label"
+    },
+    {
+      "family": "Forms",
+      "name": "FormSection",
+      "slug": "form-section",
+      "description": "Labelled grouping of fields — Title, Description, ChildContent",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/form-section"
+    },
+    {
+      "family": "Forms",
+      "name": "FormShell",
+      "slug": "form-shell",
+      "description": "Page-level form envelope: PageHeader + Sections + FormActions",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/form-shell"
+    },
+    {
+      "family": "Forms",
+      "name": "InlineForm",
+      "slug": "inline-form",
+      "description": "Single-row form for search-and-go / subscribe / quick-add",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/inline-form"
+    },
+    {
+      "family": "Forms",
+      "name": "LoginForm",
+      "slug": "login-form",
+      "description": "Opinionated login template — Email/Password + Footer slot",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/login-form"
+    },
+    {
+      "family": "Forms",
+      "name": "PasswordField",
+      "slug": "password-field",
+      "description": "Password Input + show/hide toggle",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/password-field"
+    },
+    {
+      "family": "Forms",
+      "name": "RadioGroupField",
+      "slug": "radio-group-field",
+      "description": "Vertical radio group with label-above",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/radio-group-field"
+    },
+    {
+      "family": "Forms",
+      "name": "SearchBar",
+      "slug": "search-bar",
+      "description": "Toolbar pattern: SearchInput + filter slot + result-count",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/search-bar"
+    },
+    {
+      "family": "Forms",
+      "name": "SearchField",
+      "slug": "search-field",
+      "description": "SearchInput wrapper — Query, Placeholder",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/search-field"
+    },
+    {
+      "family": "Forms",
+      "name": "SelectField",
+      "slug": "select-field",
+      "description": "Select wrapper — Items, Value, Placeholder",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/select-field"
+    },
+    {
+      "family": "Forms",
+      "name": "SliderField",
+      "slug": "slider-field",
+      "description": "Slider wrapper — Min, Max, Step, Value",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/slider-field"
+    },
+    {
+      "family": "Forms",
+      "name": "SwitchField",
+      "slug": "switch-field",
+      "description": "Inline switch + label-right field wrapper",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/switch-field"
+    },
+    {
+      "family": "Forms",
+      "name": "TextAreaField",
+      "slug": "text-area-field",
+      "description": "Textarea wrapper — Rows, Value",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/text-area-field"
+    },
+    {
+      "family": "Forms",
+      "name": "TextField",
+      "slug": "text-field",
+      "description": "Input wrapper — Type (Text/Email/Number/Tel/Url), Value",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/text-field"
+    },
+    {
+      "family": "Forms",
+      "name": "TimeField",
+      "slug": "time-field",
+      "description": "TimePicker wrapper — TimeSpan? Value",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/time-field"
+    },
+    {
+      "family": "Forms",
+      "name": "ToggleField",
+      "slug": "toggle-field",
+      "description": "Inline toggle + label-right field wrapper",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/toggle-field"
+    },
+    {
+      "family": "Forms",
+      "name": "ToggleGroupField",
+      "slug": "toggle-group-field",
+      "description": "Horizontal multi-button toggle group — Options",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/toggle-group-field"
+    },
+    {
+      "family": "Forms",
+      "name": "WizardShell",
+      "slug": "wizard-shell",
+      "description": "Stepper + per-step body + Back/Next footer",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/wizard-shell"
+    },
+    {
+      "family": "Headers",
+      "name": "AnnouncementBar",
+      "slug": "announcement-bar",
+      "description": "Top-of-app dismissible banner — Message + Tone + optional Action",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/announcement-bar"
+    },
+    {
+      "family": "Headers",
+      "name": "AppBrand",
+      "slug": "app-brand",
+      "description": "Logo + product name + optional version chip",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/app-brand"
+    },
+    {
+      "family": "Headers",
+      "name": "AppHeader",
+      "slug": "app-header",
+      "description": "Sticky top bar with backdrop blur — slots: Brand, Nav, Actions",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/app-header"
+    },
+    {
+      "family": "Headers",
+      "name": "PageHeader",
+      "slug": "page-header",
+      "description": "Top of an in-page area: Title, Description, Breadcrumbs, Actions",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/page-header"
+    },
+    {
+      "family": "Headers",
+      "name": "SectionHeader",
+      "slug": "section-header",
+      "description": "Smaller heading band inside a ContentSection",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/section-header"
+    },
+    {
+      "family": "Headers",
+      "name": "SubHeader",
+      "slug": "sub-header",
+      "description": "Context strip below AppHeader (env switcher, ambient breadcrumbs)",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/sub-header"
+    },
+    {
+      "family": "Headers",
+      "name": "Toolbar",
+      "slug": "toolbar",
+      "description": "Horizontal action strip — slots: Start, Center, End. Density enum",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/toolbar"
+    },
+    {
+      "family": "Layouts",
+      "name": "AppShell",
+      "slug": "app-shell",
+      "description": "Outer dark-mode + popover/toaster mount",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/app-shell"
+    },
+    {
+      "family": "Layouts",
+      "name": "BlankShell",
+      "slug": "blank-shell",
+      "description": "No-chrome envelope; sets background and font only",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/blank-shell"
+    },
+    {
+      "family": "Layouts",
+      "name": "CenteredShell",
+      "slug": "centered-shell",
+      "description": "Single centered column for auth / error / empty states",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/centered-shell"
+    },
+    {
+      "family": "Layouts",
+      "name": "DialogShell",
+      "slug": "dialog-shell",
+      "description": "Opinionated wrapper around the Dialog primitive",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/dialog-shell"
+    },
+    {
+      "family": "Layouts",
+      "name": "ListDetailShell",
+      "slug": "list-detail-shell",
+      "description": "Opinionated SplitShell with selection state",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/list-detail-shell"
+    },
+    {
+      "family": "Layouts",
+      "name": "PageShell",
+      "slug": "page-shell",
+      "description": "In-app page envelope with header/body/aside/footer slots",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/page-shell"
+    },
+    {
+      "family": "Layouts",
+      "name": "SheetShell",
+      "slug": "sheet-shell",
+      "description": "Edge-sliding panel; wraps Sheet primitive",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/sheet-shell"
+    },
+    {
+      "family": "Layouts",
+      "name": "SplitShell",
+      "slug": "split-shell",
+      "description": "Two-pane (master/detail) layout, optional resizable",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/split-shell"
+    },
+    {
+      "family": "Marketplace",
+      "name": "ContextPanelShell",
+      "slug": "context-panel-shell",
+      "description": "XMC Page Builder left context panel shell",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/context-panel-shell"
+    },
+    {
+      "family": "Marketplace",
+      "name": "CustomFieldShell",
+      "slug": "custom-field-shell",
+      "description": "XMC Page Builder Custom Field dialog shell",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/custom-field-shell"
+    },
+    {
+      "family": "Marketplace",
+      "name": "DashboardWidgetShell",
+      "slug": "dashboard-widget-shell",
+      "description": "XMC Dashboard widget shell — Title, Header, Body",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/dashboard-widget-shell"
+    },
+    {
+      "family": "Marketplace",
+      "name": "FullScreenShell",
+      "slug": "full-screen-shell",
+      "description": "XMC Sites full-screen iframe shell — ChildContent",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/full-screen-shell"
+    },
+    {
+      "family": "Marketplace",
+      "name": "StandaloneShell",
+      "slug": "standalone-shell",
+      "description": "Cloud Portal homepage standalone shell — ChildContent",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/standalone-shell"
+    },
+    {
+      "family": "Navigation",
+      "name": "AccountMenu",
+      "slug": "account-menu",
+      "description": "Avatar trigger + DropdownMenu shell — Name, Email, AvatarUrl, Initials",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/account-menu"
+    },
+    {
+      "family": "Navigation",
+      "name": "AppSidebar",
+      "slug": "app-sidebar",
+      "description": "Pre-wired sidebar with Brand / Nav / Footer slots",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/app-sidebar"
+    },
+    {
+      "family": "Navigation",
+      "name": "BackLink",
+      "slug": "back-link",
+      "description": "Single \"← Back to X\" element — Href, Label",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/back-link"
+    },
+    {
+      "family": "Navigation",
+      "name": "BreadcrumbBar",
+      "slug": "breadcrumb-bar",
+      "description": "Declarative breadcrumb — Items: IList<BreadcrumbItem>",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/breadcrumb-bar"
+    },
+    {
+      "family": "Navigation",
+      "name": "NavGroup",
+      "slug": "nav-group",
+      "description": "Labelled grouping inside a NavList — Label, Collapsible, DefaultOpen",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/nav-group"
+    },
+    {
+      "family": "Navigation",
+      "name": "NavList",
+      "slug": "nav-list",
+      "description": "Vertical link list — ChildContent of NavListItem / NavGroup",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/nav-list"
+    },
+    {
+      "family": "Navigation",
+      "name": "NavListItem",
+      "slug": "nav-list-item",
+      "description": "Single link row — Href, IconSvg, Label, Active, Badge, OnClick",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/nav-list-item"
+    },
+    {
+      "family": "Navigation",
+      "name": "NavRail",
+      "slug": "nav-rail",
+      "description": "Narrow icon-only nav rail — Items: IList<NavRailItem>",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/nav-rail"
+    },
+    {
+      "family": "Navigation",
+      "name": "TabBar",
+      "slug": "tab-bar",
+      "description": "Top-of-page tab navigation — Items: IList<TabDefinition>",
+      "interactivity": "Interactive",
+      "catalogueUrl": "/chunks/tab-bar"
+    }
+  ]
+}
