@@ -5,7 +5,7 @@
 
 // Longer alternatives must precede shorter ones (yyyy before yy, hh before h)
 // so the alternation prefers the longer match at each position.
-const FORMAT_TOKENS = /yyyy|yy|MM|dd|HH|hh|h|mm|ss|tt|K/g;
+const FORMAT_TOKENS = /yyyy|yy|MMMM|MMM|MM|dddd|ddd|dd|d|HH|hh|h|mm|ss|tt|K/g;
 
 export function format( el, iso, pattern ) {
 	if ( !el || !iso || !pattern )
@@ -29,8 +29,13 @@ export function format( el, iso, pattern ) {
 	const map = {
 		'yyyy': d.getFullYear(),
 		'yy':   pad( d.getFullYear() % 100 ),
-		'MM':   pad( d.getMonth() + 1 ),
-		'dd':   pad( d.getDate() ),
+		'MMMM': d.toLocaleString(undefined, { month: 'long' }),
+		'MMM':  d.toLocaleString(undefined, { month: 'short' }),
+		'MM':   pad(d.getMonth() + 1),
+		'dddd': d.toLocaleString(undefined, { weekday: 'long' }),
+		'ddd':  d.toLocaleString(undefined, { weekday: 'short' }),
+		'dd':   pad(d.getDate()),
+		'd':    d.getDate(),
 		'HH':   pad( hours24 ),
 		'hh':   pad( hours12 ),
 		'h':    String( hours12 ),

@@ -4,7 +4,7 @@
 	 data-inset="@( Inset ? "" : null )"
 	 data-variant="@Variant.ToString().ToLowerInvariant()"
 	 data-disabled="@( Disabled ? "" : null )"
-	 class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+	 class="@CssClass" @onclick="HandleClick" @attributes="AdditionalAttributes">
 	@ChildContent
 </div>
 
@@ -16,7 +16,7 @@
 	[Parameter] public bool Inset { get; set; }
 	[Parameter] public MenubarItemVariant Variant { get; set; } = MenubarItemVariant.Default;
 	[Parameter] public bool Disabled { get; set; }
-	[Parameter] public EventCallback Click { get; set; }
+	[Parameter] public EventCallback OnClick { get; set; }
 	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
 	private string CssClass => CssClassBuilder.Start(
@@ -30,10 +30,10 @@
 											.With( ClassName )
 											.Build();
 
-	private async Task OnClick()
+	private async Task HandleClick()
 	{
 		if ( Disabled ) return;
-		if ( Click.HasDelegate ) await Click.InvokeAsync();
+		if ( OnClick.HasDelegate ) await OnClick.InvokeAsync();
 		if ( ParentSub is not null ) await ParentSub.Close();
 		if ( ParentMenu is not null ) await ParentMenu.Close();
 	}

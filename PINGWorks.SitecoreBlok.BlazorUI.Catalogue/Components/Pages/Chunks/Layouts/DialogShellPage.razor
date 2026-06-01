@@ -7,16 +7,16 @@
 	<ExamplesSection>
 
 		<ComponentExample Title="Default"
-			Code="@("<Button Click=\"() => Open = true\">Open dialog</Button>\n<DialogShell Open=\"Open\" OpenChanged=\"v => Open = v\" Title=\"Confirm action\" Description=\"Are you sure you want to proceed?\">\n    <Body>\n        <Text Size=\"Size.Sm\">This will affect 12 items.</Text>\n    </Body>\n    <Actions>\n        <Button Variant=\"ButtonVariant.Ghost\" Click=\"() => Open = false\">Cancel</Button>\n        <Button Click=\"() => Open = false\">Confirm</Button>\n    </Actions>\n</DialogShell>\n\n@code {\n    private bool Open = false;\n}")"
-			Primitives="@("<Button Click=\"() => Open = true\">Open dialog</Button>\n<Dialog Open=\"Open\" OpenChanged=\"v => Open = v\">\n    <DialogHeader>\n        <DialogTitle>Confirm action</DialogTitle>\n        <DialogDescription>Are you sure you want to proceed?</DialogDescription>\n    </DialogHeader>\n    <p class=\"text-sm\">This will affect 12 items.</p>\n    <DialogFooter>\n        <Button Variant=\"ButtonVariant.Ghost\" Click=\"() => Open = false\">Cancel</Button>\n        <Button Click=\"() => Open = false\">Confirm</Button>\n    </DialogFooter>\n</Dialog>\n\n@code {\n    private bool Open = false;\n}")">
-			<Button Click="() => Open = true">Open dialog</Button>
+			Code="@("<Button OnClick=\"() => Open = true\">Open dialog</Button>\n<DialogShell Open=\"Open\" OpenChanged=\"v => Open = v\" Title=\"Confirm action\" Description=\"Are you sure you want to proceed?\">\n    <Body>\n        <Text Size=\"Size.Sm\">This will affect 12 items.</Text>\n    </Body>\n    <Actions>\n        <Button Variant=\"ButtonVariant.Ghost\" OnClick=\"() => Open = false\">Cancel</Button>\n        <Button OnClick=\"() => Open = false\">Confirm</Button>\n    </Actions>\n</DialogShell>\n\n@code {\n    private bool Open = false;\n}")"
+			Primitives="@("<Button OnClick=\"() => Open = true\">Open dialog</Button>\n<Dialog Open=\"Open\" OpenChanged=\"v => Open = v\">\n    <DialogHeader>\n        <DialogTitle>Confirm action</DialogTitle>\n        <DialogDescription>Are you sure you want to proceed?</DialogDescription>\n    </DialogHeader>\n    <p class=\"text-sm\">This will affect 12 items.</p>\n    <DialogFooter>\n        <Button Variant=\"ButtonVariant.Ghost\" OnClick=\"() => Open = false\">Cancel</Button>\n        <Button OnClick=\"() => Open = false\">Confirm</Button>\n    </DialogFooter>\n</Dialog>\n\n@code {\n    private bool Open = false;\n}")">
+			<Button OnClick="() => Open = true">Open dialog</Button>
 			<DialogShell Open="Open" OpenChanged="v => Open = v" Title="Confirm action" Description="Are you sure you want to proceed?">
 				<Body>
 					<Text Size="Size.Sm">This will affect 12 items.</Text>
 				</Body>
 				<Actions>
-					<Button Variant="ButtonVariant.Ghost" Click="() => Open = false">Cancel</Button>
-					<Button Click="() => Open = false">Confirm</Button>
+					<Button Variant="ButtonVariant.Ghost" OnClick="() => Open = false">Cancel</Button>
+					<Button OnClick="() => Open = false">Confirm</Button>
 				</Actions>
 			</DialogShell>
 		</ComponentExample>

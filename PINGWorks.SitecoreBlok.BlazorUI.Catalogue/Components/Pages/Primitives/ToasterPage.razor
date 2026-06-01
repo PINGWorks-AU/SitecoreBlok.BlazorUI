@@ -26,29 +26,29 @@
 	<ExamplesSection>
 
 		<ComponentExample Title="Default" Code="@("Toasts.Show( \"Notification\", \"Something happened.\" );")">
-			<Button Click="@(() => Toasts.Show("Notification", "Something happened."))">
+			<Button OnClick="@(() => Toasts.Show("Notification", "Something happened."))">
 				Show Default Toast
 			</Button>
 		</ComponentExample>
 
 		<ComponentExample Title="Variants" Code="@("Toasts.Show( \"Saved!\", \"Your changes have been saved.\", ToastVariant.Success );\nToasts.Show( \"Error\", \"Something went wrong.\", ToastVariant.Error );\nToasts.Show( \"Warning\", \"Please check your input.\", ToastVariant.Warning );\nToasts.Show( \"Info\", \"Here is some information.\", ToastVariant.Info );")">
 			<div class="flex flex-wrap gap-2">
-				<Button Click="@(() => Toasts.Show("Saved!", "Your changes have been saved.", ToastVariant.Success))" ColorScheme="ButtonColor.Success">Success</Button>
-				<Button Click="@(() => Toasts.Show("Error", "Something went wrong.", ToastVariant.Error))" ColorScheme="ButtonColor.Danger">Error</Button>
-				<Button Click="@(() => Toasts.Show("Warning", "Please check your input.", ToastVariant.Warning))" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Warning</Button>
-				<Button Click="@(() => Toasts.Show("Info", "Here is some information.", ToastVariant.Info))" Variant="ButtonVariant.Outline">Info</Button>
+				<Button OnClick="@(() => Toasts.Show("Saved!", "Your changes have been saved.", ToastVariant.Success))" ColorScheme="ButtonColor.Success">Success</Button>
+				<Button OnClick="@(() => Toasts.Show("Error", "Something went wrong.", ToastVariant.Error))" ColorScheme="ButtonColor.Danger">Error</Button>
+				<Button OnClick="@(() => Toasts.Show("Warning", "Please check your input.", ToastVariant.Warning))" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Warning</Button>
+				<Button OnClick="@(() => Toasts.Show("Info", "Here is some information.", ToastVariant.Info))" Variant="ButtonVariant.Outline">Info</Button>
 			</div>
 		</ComponentExample>
 
 		<ComponentExample Title="Closable" Code="@("Toasts.Show( new ToastItem\n{\n    Title = \"Closable Toast\",\n    Description = \"Click the X in the top-right to dismiss.\",\n    Closable = true,\n    Duration = 0 // stays until dismissed\n} );")">
-			<Button Click="@(() => Toasts.Show( new ToastItem { Title = "Closable Toast", Description = "Click the X in the top-right corner to dismiss. This toast stays until you close it.", Closable = true, Duration = 0 } ))">
+			<Button OnClick="@(() => Toasts.Show( new ToastItem { Title = "Closable Toast", Description = "Click the X in the top-right corner to dismiss. This toast stays until you close it.", Closable = true, Duration = 0 } ))">
 				Show Closable Toast
 			</Button>
 		</ComponentExample>
 
-		<ComponentExample Title="With Action Content" Code="@("Toasts.Show( new ToastItem\n{\n    Title = \"File deleted\",\n    Description = \"report-q4.pdf was moved to trash.\",\n    Closable = true,\n    Duration = 0,\n    Content = @<Button Size=\"ButtonSize.Xs\" Variant=\"ButtonVariant.Outline\"\n                      Click=\"...\">Undo</Button>\n} );")">
+		<ComponentExample Title="With Action Content" Code="@("Toasts.Show( new ToastItem\n{\n    Title = \"File deleted\",\n    Description = \"report-q4.pdf was moved to trash.\",\n    Closable = true,\n    Duration = 0,\n    Content = @<Button Size=\"ButtonSize.Xs\" Variant=\"ButtonVariant.Outline\"\n                      OnClick=\"...\">Undo</Button>\n} );")">
 			<div class="flex items-center gap-4">
-				<Button Click="ShowActionToast">
+				<Button OnClick="ShowActionToast">
 					Show Action Toast
 				</Button>
 				@if ( Undone )
@@ -60,7 +60,7 @@
 
 		<ComponentExample Title="With Click Handler" Code="@("Toasts.Show( new ToastItem\n{\n    Title = \"New message\",\n    Description = \"You have a new message from Jane.\",\n    OnClick = () => { /* navigate or handle */ }\n} );")">
 			<div class="flex items-center gap-4">
-				<Button Click="ShowClickableToast">
+				<Button OnClick="ShowClickableToast">
 					Show Clickable Toast
 				</Button>
 				@if ( Clicked )
@@ -89,7 +89,7 @@
 			Closable = true,
 			Duration = 0,
 			Content = @<Button Size="ButtonSize.Xs" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral"
-							   Click="OnUndo">Undo</Button>
+							   OnClick="OnUndo">Undo</Button>
 		};
 		await Toasts.Show( ActionToast );
 	}

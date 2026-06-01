@@ -1,13 +1,13 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-<button type="button" data-slot="dialog-close" class="@CssClass" @onclick="Click">
+<button type="button" data-slot="dialog-close" class="@CssClass" @onclick="OnClick">
 	@ChildContent
 </button>
 
 @code {
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
-	[Parameter] public EventCallback Click { get; set; }
+	[Parameter] public EventCallback OnClick { get; set; }
 
 	private string CssClass => CssClassBuilder.Start("")
 										.With(ClassName)

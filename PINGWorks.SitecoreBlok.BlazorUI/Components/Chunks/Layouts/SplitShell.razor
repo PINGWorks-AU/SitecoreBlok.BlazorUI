@@ -3,31 +3,32 @@
 @*
 	SplitShell — two-pane master/detail layout.
 	Direction uses the shared Orientation enum.
-	IsResizable=true wraps the panes in the ResizablePanelGroup primitive (delegates resize behaviour).
-	Property is named IsResizable (not Resizable) to avoid colliding with the existing
-	Resizable primitive name when consumers have both in scope.
+	Resizable=true wraps the panes in ResizablePanelGroup (drag handle); requires an interactive
+	context (e.g. @rendermode InteractiveServer) for its JSInterop. Resizable=false (default) renders
+	pure markup and is SSR-safe.
 
-	NOTE — interactive-mode requirement: when IsResizable=true the chunk uses
-	ResizablePanelGroup, which depends on JSInterop and therefore requires the
-	consumer to render this chunk inside an interactive context (e.g.
-	@rendermode InteractiveServer). The default IsResizable=false renders pure
-	markup and is SSR-safe.
+	Each pane scrolls its own oversized content (overflow-auto) in BOTH modes — resizing does not
+	change content behaviour.
 
 	Wrapper-styling parameters (per spec §5.13):
-		- Borders   (default true) toggles the divide-x/divide-y line between panes (static mode).
-		- Gutters   (default true) toggles p-4 on each pane wrapper (static mode only).
-		- BgFilled  (default true) toggles bg-background on each pane wrapper (static mode only).
+		- Borders   (default true) toggles the divide-x/divide-y line between panes (static mode; resizable mode uses the drag handle).
+		- Gutters   (default true) toggles p-4 on each pane.
+		- BgFilled  (default true) toggles bg-background on each pane.
 *@
 
-@if ( IsResizable )
+@if ( Resizable )
 {
 	<ResizablePanelGroup Direction="@( Direction is Orientation.Horizontal ? ResizableDirection.Horizontal : ResizableDirection.Vertical )">
 		<ResizablePanel DefaultSize="@( Ratio * 100 )">
-			@if ( Start is not null ) { @Start }
+			<div class="@ResizablePaneClass">
+				@if ( Start is not null ) { @Start }
+			</div>
 		</ResizablePanel>
 		<ResizableHandle />
 		<ResizablePanel DefaultSize="@( ( 1 - Ratio ) * 100 )">
-			@if ( End is not null ) { @End }
+			<div class="@ResizablePaneClass">
+				@if ( End is not null ) { @End }
+			</div>
 		</ResizablePanel>
 	</ResizablePanelGroup>
 }
@@ -48,7 +49,7 @@ else
 	[Parameter] public RenderFragment? End { get; set; }
 
 	[Parameter] public Orientation Direction { get; set; } = Orientation.Horizontal;
-	[Parameter] public bool IsResizable { get; set; } = false;
+	[Parameter] public bool Resizable { get; set; } = false;
 	[Parameter] public double Ratio { get; set; } = 0.5;
 
 	[Parameter] public bool Borders { get; set; } = true;
@@ -63,6 +64,13 @@ else
 
 	private string PaneClass
 		=> CssClassBuilder.Start( "flex-1 min-w-0 min-h-0 overflow-auto" )
+			.With( "bg-background", BgFilled )
+			.With( "p-4", Gutters )
+			.Build();
+
+	// ResizablePanel is overflow-hidden and flex-sized; fill it and scroll the content inside.
+	private string ResizablePaneClass
+		=> CssClassBuilder.Start( "size-full overflow-auto" )
 			.With( "bg-background", BgFilled )
 			.With( "p-4", Gutters )
 			.Build();

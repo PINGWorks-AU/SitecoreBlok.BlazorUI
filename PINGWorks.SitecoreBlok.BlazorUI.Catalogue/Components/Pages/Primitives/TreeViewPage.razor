@@ -74,8 +74,8 @@
 
 		<ComponentExample Title="Custom templates with Expand/Collapse toolbar" Code="@TemplatesCode">
 			<div class="flex items-center gap-2 mb-2">
-				<Button Size="ButtonSize.Sm" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(async () => await TreeRef!.ExpandAllAsync())">Expand all</Button>
-				<Button Size="ButtonSize.Sm" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(async () => await TreeRef!.CollapseAllAsync())">Collapse all</Button>
+				<Button Size="ButtonSize.Sm" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(async () => await TreeRef!.ExpandAllAsync())">Expand all</Button>
+				<Button Size="ButtonSize.Sm" Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(async () => await TreeRef!.CollapseAllAsync())">Collapse all</Button>
 			</div>
 
 			<TreeView TItem="Node"
@@ -95,10 +95,10 @@
 				</LabelTemplate>
 				<ActionsTemplate>
 					<div class="flex items-center gap-1">
-						<Button Size="ButtonSize.IconXs" Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Neutral" Click="@(() => LastAction = $"Edit {context.Name}")">
+						<Button Size="ButtonSize.IconXs" Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Neutral" OnClick="@(() => LastAction = $"Edit {context.Name}")">
 							<Icon Svg="@IconSvg.Information" IconSize="IconSize.Sm" />
 						</Button>
-						<Button Size="ButtonSize.IconXs" Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Danger" Click="@(() => LastAction = $"Delete {context.Name}")">
+						<Button Size="ButtonSize.IconXs" Variant="ButtonVariant.Ghost" ColorScheme="ButtonColor.Danger" OnClick="@(() => LastAction = $"Delete {context.Name}")">
 							<Icon Svg="@IconSvg.Close" IconSize="IconSize.Sm" />
 						</Button>
 					</div>

@@ -7,7 +7,7 @@
 	<ExamplesSection>
 
 		<ComponentExample Title="With initials fallback"
-			Code="@("<AccountMenu Name=\"Richard Hauer\" Email=\"richard@example.com\">\n    <Items>\n        <DropdownMenuItem Click=\"() => {}\">Profile</DropdownMenuItem>\n        <DropdownMenuItem Click=\"() => {}\">Settings</DropdownMenuItem>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\" Click=\"() => {}\">Sign out</DropdownMenuItem>\n    </Items>\n</AccountMenu>")"
+			Code="@("<AccountMenu Name=\"Richard Hauer\" Email=\"richard@example.com\">\n    <Items>\n        <DropdownMenuItem OnClick=\"() => {}\">Profile</DropdownMenuItem>\n        <DropdownMenuItem OnClick=\"() => {}\">Settings</DropdownMenuItem>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\" OnClick=\"() => {}\">Sign out</DropdownMenuItem>\n    </Items>\n</AccountMenu>")"
 			Primitives="@("<button class=\"rounded-full\">\n    <span class=\"relative flex size-8 shrink-0 overflow-hidden rounded-full\">\n        <span class=\"bg-muted flex size-full items-center justify-center rounded-full text-xs font-medium text-foreground\">RH</span>\n    </span>\n</button>\n<!-- Menu opens on click; renders DropdownMenuContent with header + items -->")">
 			<div class="flex justify-end p-4">
 				<AccountMenu Name="Richard Hauer" Email="richard@example.com">

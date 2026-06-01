@@ -5,14 +5,14 @@
 <ComponentPage Title="AlertDialog" Description="A modal dialog that interrupts the user with important content and expects a response" Interactivity="ComponentInteractivity.Interactive" ApiElements="@AlertDialogElements">
 
 	<DivergenceNote>
-		<p><strong>Trigger, Portal, Overlay, and Content are collapsed into a single <code>&lt;AlertDialog Open&gt;</code>.</strong> Blok exports <code>AlertDialogTrigger</code>, <code>AlertDialogPortal</code>, <code>AlertDialogOverlay</code>, and <code>AlertDialogContent</code> as separate sub-components that consumers compose around the root. We bake the overlay and content into the root and drive open/close with <code>Open</code>/<code>OpenChanged</code> two-way binding — trigger the dialog from any button's <code>Click</code> handler. The <code>AlertDialogHeader</code>, <code>AlertDialogFooter</code>, <code>AlertDialogTitle</code>, <code>AlertDialogDescription</code>, <code>AlertDialogAction</code>, <code>AlertDialogCancel</code> splits remain. No focus trap and no <kbd>Esc</kbd>-to-close (Blok gets those via Radix).</p>
+		<p><strong>Trigger, Portal, Overlay, and Content are collapsed into a single <code>&lt;AlertDialog Open&gt;</code>.</strong> Blok exports <code>AlertDialogTrigger</code>, <code>AlertDialogPortal</code>, <code>AlertDialogOverlay</code>, and <code>AlertDialogContent</code> as separate sub-components that consumers compose around the root. We bake the overlay and content into the root and drive open/close with <code>Open</code>/<code>OpenChanged</code> two-way binding — trigger the dialog from any button's <code>OnClick</code> handler. The <code>AlertDialogHeader</code>, <code>AlertDialogFooter</code>, <code>AlertDialogTitle</code>, <code>AlertDialogDescription</code>, <code>AlertDialogAction</code>, <code>AlertDialogCancel</code> splits remain. No focus trap and no <kbd>Esc</kbd>-to-close (Blok gets those via Radix).</p>
 	</DivergenceNote>
 
 	<ExamplesSection>
 
-		<ComponentExample Title="Default" Code="@("<Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Danger\"\n        Click=\"@(() => alertOpen = true)\">Delete Account</Button>\n<AlertDialog @bind-Open=\"alertOpen\">\n    <AlertDialogHeader>\n        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>\n        <AlertDialogDescription>\n            This action cannot be undone. This will permanently\n            delete your account and remove your data from our servers.\n        </AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n        <AlertDialogCancel Click=\"@(() => alertOpen = false)\">Cancel</AlertDialogCancel>\n        <AlertDialogAction Click=\"@(() => alertOpen = false)\">Continue</AlertDialogAction>\n    </AlertDialogFooter>\n</AlertDialog>")">
+		<ComponentExample Title="Default" Code="@("<Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Danger\"\n        OnClick=\"@(() => alertOpen = true)\">Delete Account</Button>\n<AlertDialog @bind-Open=\"alertOpen\">\n    <AlertDialogHeader>\n        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>\n        <AlertDialogDescription>\n            This action cannot be undone. This will permanently\n            delete your account and remove your data from our servers.\n        </AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n        <AlertDialogCancel OnClick=\"@(() => alertOpen = false)\">Cancel</AlertDialogCancel>\n        <AlertDialogAction OnClick=\"@(() => alertOpen = false)\">Continue</AlertDialogAction>\n    </AlertDialogFooter>\n</AlertDialog>")">
 			<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Danger"
-					Click="@(() => AlertOpen = true)">Delete Account</Button>
+					OnClick="@(() => AlertOpen = true)">Delete Account</Button>
 			<AlertDialog @bind-Open="AlertOpen">
 				<AlertDialogHeader>
 					<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -22,8 +22,8 @@
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel Click="@(() => AlertOpen = false)">Cancel</AlertDialogCancel>
-					<AlertDialogAction Click="@(() => AlertOpen = false)">Continue</AlertDialogAction>
+					<AlertDialogCancel OnClick="@(() => AlertOpen = false)">Cancel</AlertDialogCancel>
+					<AlertDialogAction OnClick="@(() => AlertOpen = false)">Continue</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialog>
 		</ComponentExample>
@@ -91,11 +91,11 @@
 		),
 		new ApiElement(
 			Name: "AlertDialogAction",
-			Description: "Primary confirm button inside the `AlertDialogFooter`. Renders as a `Default` `Button` with `ButtonColor.Danger` by default. Wire `Click` to your confirm handler — typically also closes the dialog.",
+			Description: "Primary confirm button inside the `AlertDialogFooter`. Renders as a `Default` `Button` with `ButtonColor.Danger` by default. Wire `OnClick` to your confirm handler — typically also closes the dialog.",
 			Depth: 2,
 			Properties:
 			[
-				new ApiProperty( "Click",        "EventCallback",       false, "Invoked when the action button is clicked." ),
+				new ApiProperty( "OnClick",        "EventCallback",       false, "Invoked when the action button is clicked." ),
 				new ApiProperty( "ColorScheme",  "ButtonColor",         false, "Button colour. Default: `ButtonColor.Danger`." ),
 				new ApiProperty( "Size",         "ButtonSize",          false, "Button size. Default: `ButtonSize.Default`." ),
 				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes passed through to the underlying `Button`." ),
@@ -104,11 +104,11 @@
 		),
 		new ApiElement(
 			Name: "AlertDialogCancel",
-			Description: "Cancel button inside the `AlertDialogFooter`. Renders as a `Ghost` `Button` with `ButtonColor.Neutral` by default. Wire `Click` to close the dialog.",
+			Description: "Cancel button inside the `AlertDialogFooter`. Renders as a `Ghost` `Button` with `ButtonColor.Neutral` by default. Wire `OnClick` to close the dialog.",
 			Depth: 2,
 			Properties:
 			[
-				new ApiProperty( "Click",        "EventCallback",       false, "Invoked when the cancel button is clicked." ),
+				new ApiProperty( "OnClick",        "EventCallback",       false, "Invoked when the cancel button is clicked." ),
 				new ApiProperty( "ColorScheme",  "ButtonColor",         false, "Button colour. Default: `ButtonColor.Neutral`." ),
 				new ApiProperty( "Size",         "ButtonSize",          false, "Button size. Default: `ButtonSize.Default`." ),
 				new ApiProperty( "ClassName",    "string?",             false, "Extra CSS classes passed through to the underlying `Button`." ),

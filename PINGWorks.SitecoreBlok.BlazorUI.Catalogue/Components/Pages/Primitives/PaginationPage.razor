@@ -6,16 +6,16 @@
 
 	<DivergenceNote>
 		<p><strong>Composable parts only — no built-in <code>CurrentPage</code> / <code>TotalPages</code> data-driven mode.</strong> Blok exports 7 separate components (Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis) and the consumer composes them. Compose the page numbers yourself (see examples below) or wrap the composable parts in your own helper component.</p>
-		<p><strong>Additive: <code>Click</code> and <code>Disabled</code> parameters on links.</strong> Blok's <code>PaginationLink</code> takes only <code>href</code> (URL navigation). Our <code>PaginationLink</code> additionally accepts a Blazor <code>EventCallback Click</code> (renders a <code>&lt;button&gt;</code>) and a <code>Disabled</code> flag — natural for SPA-style pagination with no URL changes.</p>
+		<p><strong>Additive: <code>OnClick</code> and <code>Disabled</code> parameters on links.</strong> Blok's <code>PaginationLink</code> takes only <code>href</code> (URL navigation). Our <code>PaginationLink</code> additionally accepts a Blazor <code>EventCallback OnClick</code> (renders a <code>&lt;button&gt;</code>) and a <code>Disabled</code> flag — natural for SPA-style pagination with no URL changes.</p>
 	</DivergenceNote>
 
 	<ExamplesSection>
 
-		<ComponentExample Title="Default" Code="@("<Pagination>\n    <PaginationContent>\n        <PaginationItem>\n            <PaginationPrevious Disabled=\"@(currentPage <= 1)\" Click=\"@(() => currentPage--)\" />\n        </PaginationItem>\n        @foreach (var pageNo in PageNumbers(currentPage, totalPages))\n        {\n            <PaginationItem>\n                @if (pageNo == -1)\n                {\n                    <PaginationEllipsis />\n                }\n                else\n                {\n                    <PaginationLink IsActive=\"@(page == currentPage)\" Click=\"@(() => currentPage = pageNo)\">@pageNo</PaginationLink>\n                }\n            </PaginationItem>\n        }\n        <PaginationItem>\n            <PaginationNext Disabled=\"@(currentPage >= totalPages)\" Click=\"@(() => currentPage++)\" />\n        </PaginationItem>\n    </PaginationContent>\n</Pagination>")">
+		<ComponentExample Title="Default" Code="@("<Pagination>\n    <PaginationContent>\n        <PaginationItem>\n            <PaginationPrevious Disabled=\"@(currentPage <= 1)\" OnClick=\"@(() => currentPage--)\" />\n        </PaginationItem>\n        @foreach (var pageNo in PageNumbers(currentPage, totalPages))\n        {\n            <PaginationItem>\n                @if (pageNo == -1)\n                {\n                    <PaginationEllipsis />\n                }\n                else\n                {\n                    <PaginationLink IsActive=\"@(page == currentPage)\" OnClick=\"@(() => currentPage = pageNo)\">@pageNo</PaginationLink>\n                }\n            </PaginationItem>\n        }\n        <PaginationItem>\n            <PaginationNext Disabled=\"@(currentPage >= totalPages)\" OnClick=\"@(() => currentPage++)\" />\n        </PaginationItem>\n    </PaginationContent>\n</Pagination>")">
 			<Pagination>
 				<PaginationContent>
 					<PaginationItem>
-						<PaginationPrevious Disabled="@(CurrentPage <= 1)" Click="@(() => GoTo(CurrentPage - 1))" />
+						<PaginationPrevious Disabled="@(CurrentPage <= 1)" OnClick="@(() => GoTo(CurrentPage - 1))" />
 					</PaginationItem>
 					@foreach ( var pageNo in PageNumbers( CurrentPage, TotalPages ) )
 					{
@@ -26,12 +26,12 @@
 							}
 							else
 							{
-								<PaginationLink IsActive="@( pageNo == CurrentPage )" Click="@(() => GoTo(pageNo))">@pageNo</PaginationLink>
+								<PaginationLink IsActive="@( pageNo == CurrentPage )" OnClick="@(() => GoTo(pageNo))">@pageNo</PaginationLink>
 							}
 						</PaginationItem>
 					}
 					<PaginationItem>
-						<PaginationNext Disabled="@(CurrentPage >= TotalPages)" Click="@(() => GoTo(CurrentPage + 1))" />
+						<PaginationNext Disabled="@(CurrentPage >= TotalPages)" OnClick="@(() => GoTo(CurrentPage + 1))" />
 					</PaginationItem>
 				</PaginationContent>
 			</Pagination>
@@ -119,12 +119,12 @@
 		),
 		new ApiElement(
 			Name: "PaginationLink",
-			Description: "Clickable page number. Renders as an `<a href>` when `Href` is set (URL navigation) or a `<button>` with `Click` otherwise (SPA-style). Highlights itself when `IsActive` is true.",
+			Description: "Clickable page number. Renders as an `<a href>` when `Href` is set (URL navigation) or a `<button>` with `OnClick` otherwise (SPA-style). Highlights itself when `IsActive` is true.",
 			Depth: 2,
 			Properties:
 			[
 				new ApiProperty( "Href",                 "string?",                       false, "URL for link mode. When set, the control renders as an `<a>`." ),
-				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked on button-mode click. Used when `Href` is not supplied. Additional to Blok." ),
+				new ApiProperty( "OnClick",                "EventCallback",                 false, "Invoked on button-mode click. Used when `Href` is not supplied. Additional to Blok." ),
 				new ApiProperty( "IsActive",             "bool",                          false, "Marks this link as the current page. Emits `aria-current=\"page\"` and applies the active styling. Default: `false`." ),
 				new ApiProperty( "Disabled",             "bool",                          false, "When true in button mode, disables the control. Additional to Blok. Default: `false`." ),
 				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the control." ),
@@ -139,7 +139,7 @@
 			Properties:
 			[
 				new ApiProperty( "Href",                 "string?",                       false, "URL for link mode. When set, the control renders as an `<a>`." ),
-				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked on button-mode click." ),
+				new ApiProperty( "OnClick",                "EventCallback",                 false, "Invoked on button-mode click." ),
 				new ApiProperty( "Disabled",             "bool",                          false, "When true in button mode, disables the control. Default: `false`." ),
 				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the control." ),
 				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the control." ),
@@ -152,7 +152,7 @@
 			Properties:
 			[
 				new ApiProperty( "Href",                 "string?",                       false, "URL for link mode. When set, the control renders as an `<a>`." ),
-				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked on button-mode click." ),
+				new ApiProperty( "OnClick",                "EventCallback",                 false, "Invoked on button-mode click." ),
 				new ApiProperty( "Disabled",             "bool",                          false, "When true in button mode, disables the control. Default: `false`." ),
 				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the control." ),
 				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the control." ),

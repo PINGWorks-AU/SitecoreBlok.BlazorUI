@@ -10,8 +10,8 @@
 
 	<ExamplesSection>
 
-		<ComponentExample Title="Default" Code="@("<Button Click=\"@(() => dialogOpen = true)\">Open Dialog</Button>\n<Dialog @bind-Open=\"dialogOpen\">\n    <DialogHeader>\n        <DialogTitle>Edit profile</DialogTitle>\n        <DialogDescription>Make changes to your profile here.</DialogDescription>\n    </DialogHeader>\n    <div class=\"py-4\">\n        <Input Placeholder=\"Enter your name\" />\n    </div>\n    <DialogFooter>\n        <Button Variant=\"ButtonVariant.Outline\" Click=\"...\">Cancel</Button>\n        <Button Click=\"...\">Save changes</Button>\n    </DialogFooter>\n</Dialog>")">
-			<Button Click="@(() => DialogOpen = true)">Open Dialog</Button>
+		<ComponentExample Title="Default" Code="@("<Button OnClick=\"@(() => dialogOpen = true)\">Open Dialog</Button>\n<Dialog @bind-Open=\"dialogOpen\">\n    <DialogHeader>\n        <DialogTitle>Edit profile</DialogTitle>\n        <DialogDescription>Make changes to your profile here.</DialogDescription>\n    </DialogHeader>\n    <div class=\"py-4\">\n        <Input Placeholder=\"Enter your name\" />\n    </div>\n    <DialogFooter>\n        <Button Variant=\"ButtonVariant.Outline\" OnClick=\"...\">Cancel</Button>\n        <Button OnClick=\"...\">Save changes</Button>\n    </DialogFooter>\n</Dialog>")">
+			<Button OnClick="@(() => DialogOpen = true)">Open Dialog</Button>
 			<Dialog @bind-Open="DialogOpen">
 				<DialogHeader>
 					<DialogTitle>Edit profile</DialogTitle>
@@ -22,18 +22,18 @@
 				</div>
 				<DialogFooter>
 					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral"
-							Click="@(() => DialogOpen = false)">Cancel</Button>
-					<Button Click="@(() => DialogOpen = false)">Save changes</Button>
+							OnClick="@(() => DialogOpen = false)">Cancel</Button>
+					<Button OnClick="@(() => DialogOpen = false)">Save changes</Button>
 				</DialogFooter>
 			</Dialog>
 		</ComponentExample>
 
 		<ComponentExample Title="Sizes" Code="@("<Dialog Size=\"DialogSize.Sm\">...</Dialog>\n<Dialog Size=\"DialogSize.Lg\">...</Dialog>\n<Dialog Size=\"DialogSize.Xl\">...</Dialog>")">
 			<div class="flex gap-3">
-				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogSm = true)">Small</Button>
-				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogMd = true)">Medium</Button>
-				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogLg = true)">Large</Button>
-				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogXl = true)">Extra Large</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(() => SizeDialogSm = true)">Small</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(() => SizeDialogMd = true)">Medium</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(() => SizeDialogLg = true)">Large</Button>
+				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(() => SizeDialogXl = true)">Extra Large</Button>
 			</div>
 			<Dialog @bind-Open="SizeDialogSm" Size="DialogSize.Sm">
 				<DialogHeader>
@@ -41,7 +41,7 @@
 					<DialogDescription>A compact dialog for simple confirmations.</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
-					<Button Click="@(() => SizeDialogSm = false)">OK</Button>
+					<Button OnClick="@(() => SizeDialogSm = false)">OK</Button>
 				</DialogFooter>
 			</Dialog>
 			<Dialog @bind-Open="SizeDialogMd" Size="DialogSize.Md">
@@ -53,7 +53,7 @@
 					<p class="text-sm text-muted-foreground">This dialog uses <code>DialogSize.Md</code> at 50% viewport width.</p>
 				</div>
 				<DialogFooter>
-					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogMd = false)">Close</Button>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(() => SizeDialogMd = false)">Close</Button>
 				</DialogFooter>
 			</Dialog>
 			<Dialog @bind-Open="SizeDialogLg" Size="DialogSize.Lg">
@@ -65,7 +65,7 @@
 					<p class="text-sm text-muted-foreground">This dialog uses <code>DialogSize.Lg</code> for a wider layout.</p>
 				</div>
 				<DialogFooter>
-					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogLg = false)">Close</Button>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(() => SizeDialogLg = false)">Close</Button>
 				</DialogFooter>
 			</Dialog>
 			<Dialog @bind-Open="SizeDialogXl" Size="DialogSize.Xl">
@@ -77,13 +77,13 @@
 					<p class="text-sm text-muted-foreground">This dialog uses <code>DialogSize.Xl</code> for maximum content width.</p>
 				</div>
 				<DialogFooter>
-					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => SizeDialogXl = false)">Close</Button>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(() => SizeDialogXl = false)">Close</Button>
 				</DialogFooter>
 			</Dialog>
 		</ComponentExample>
 
 		<ComponentExample Title="Scrollable with Sticky Footer" Code="@("<Dialog @bind-Open=\"scrollDialogOpen\" Size=\"DialogSize.Lg\">\n    <DialogHeader>\n        <DialogTitle>Terms of Service</DialogTitle>\n        <DialogDescription>Please read and accept the terms.</DialogDescription>\n    </DialogHeader>\n    <div class=\"max-h-64 overflow-y-auto border rounded-md p-4 text-sm\">\n        <!-- Long content here -->\n    </div>\n    <DialogFooter>\n        <Button>I Accept</Button>\n    </DialogFooter>\n</Dialog>")">
-			<Button Click="@(() => ScrollDialogOpen = true)">Open Scrollable Dialog</Button>
+			<Button OnClick="@(() => ScrollDialogOpen = true)">Open Scrollable Dialog</Button>
 			<Dialog @bind-Open="ScrollDialogOpen" Size="DialogSize.Md">
 				<DialogHeader>
 					<DialogTitle>Terms of Service</DialogTitle>
@@ -110,8 +110,8 @@
 				</div>
 				<DialogFooter>
 					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral"
-							Click="@(() => ScrollDialogOpen = false)">Decline</Button>
-					<Button Click="@(() => ScrollDialogOpen = false)">I Accept</Button>
+							OnClick="@(() => ScrollDialogOpen = false)">Decline</Button>
+					<Button OnClick="@(() => ScrollDialogOpen = false)">I Accept</Button>
 				</DialogFooter>
 			</Dialog>
 		</ComponentExample>
@@ -185,11 +185,11 @@
 		),
 		new ApiElement(
 			Name: "DialogClose",
-			Description: "Optional explicit close button for use inside dialog content. Fires `Click` — wire it up to set your `Open` binding to `false`.",
+			Description: "Optional explicit close button for use inside dialog content. Fires `OnClick` — wire it up to set your `Open` binding to `false`.",
 			Depth: 1,
 			Properties:
 			[
-				new ApiProperty( "Click",        "EventCallback",   false, "Invoked when the button is clicked." ),
+				new ApiProperty( "OnClick",        "EventCallback",   false, "Invoked when the button is clicked." ),
 				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the `<button>`." ),
 				new ApiProperty( "ChildContent", "RenderFragment?", false, "Button label." ),
 			]

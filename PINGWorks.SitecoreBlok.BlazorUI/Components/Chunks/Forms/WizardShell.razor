@@ -37,8 +37,8 @@
 
 	@* Back/Next footer *@
 	<div class="flex items-center justify-between border-t border-border pt-4">
-		<Button Variant="ButtonVariant.Outline" Disabled="@( CurrentStep == 0 )" Click="HandleBack">Back</Button>
-		<Button Disabled="@( Steps is null || CurrentStep >= Steps.Count - 1 )" Click="HandleNext">Next</Button>
+		<Button Variant="ButtonVariant.Outline" Disabled="@( CurrentStep == 0 )" OnClick="HandleBack">Back</Button>
+		<Button Disabled="@( Steps is null || CurrentStep >= Steps.Count - 1 )" OnClick="HandleNext">Next</Button>
 	</div>
 
 </div>

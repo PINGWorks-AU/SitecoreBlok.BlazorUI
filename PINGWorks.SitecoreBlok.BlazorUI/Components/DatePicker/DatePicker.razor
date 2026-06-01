@@ -3,7 +3,7 @@
 @inject PopoverService Pops
 
 <div data-slot="date-picker" class="relative inline-block" @ref="Trigger">
-	<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="Toggle" Disabled="@Disabled"
+	<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="Toggle" Disabled="@Disabled"
 			aria-label="@TriggerAriaLabel"
 			ClassName="@( $"gap-2 font-normal {( Value.HasValue ? "" : "text-muted-foreground" )} {ClassName}" )">
 		<Icon Svg="@IconSvg.CalendarBlankOutline" ClassName="size-4 text-muted-foreground" aria-hidden="true" />

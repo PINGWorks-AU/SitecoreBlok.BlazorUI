@@ -3,7 +3,7 @@
 <div data-slot="action-bar" class="@OuterCssClass">
 	<div class="@InnerCssClass">
 		<div class="flex items-center gap-4">
-			<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" ColorScheme="ButtonColor.Neutral" Click="OnCancel" ClassName="hover:bg-neutral-bg">
+			<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" ColorScheme="ButtonColor.Neutral" OnClick="OnCancel" ClassName="hover:bg-neutral-bg">
 				<Icon Svg="@IconSvg.Close" Scale="1" ResetClassName />
 			</Button>
 			<span class="font-semibold text-neutral-fg">@SelectedCount selected</span>

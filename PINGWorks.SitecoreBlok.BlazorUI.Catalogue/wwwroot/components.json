@@ -1,8 +1,8 @@
 ﻿{
   "schema": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/blob/main/docs/components-schema.json",
   "package": "PINGWorks.SitecoreBlok.BlazorUI",
-  "version": "1.3.0.0",
-  "generatedAt": "2026-05-22T03:22:35Z",
+  "version": "1.4.0.0-preview-1",
+  "generatedAt": "2026-06-01T10:31:10Z",
   "repository": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI",
   "documentation": {
     "theme": "/theme.md",
@@ -111,7 +111,7 @@
     {
       "name": "CodeViewer",
       "slug": "codeviewer",
-      "description": "Syntax-highlighted code block (Prism)",
+      "description": "Syntax-highlighted code block (Prism); re-highlights when `Code` changes (`@key` + `Prism.highlightElement`)",
       "status": "Additional",
       "catalogueUrl": "/primitives/codeviewer"
     },
@@ -237,7 +237,7 @@
     {
       "name": "LocalTime",
       "slug": "localtime",
-      "description": "Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting)",
+      "description": "Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting). Format tokens: year/month/day/weekday (incl. localised `MMMM`/`MMM`/`dddd`/`ddd` names and unpadded `d`), 12/24-hour, AM/PM, zone offset `K`",
       "status": "Additional",
       "catalogueUrl": "/primitives/localtime"
     },

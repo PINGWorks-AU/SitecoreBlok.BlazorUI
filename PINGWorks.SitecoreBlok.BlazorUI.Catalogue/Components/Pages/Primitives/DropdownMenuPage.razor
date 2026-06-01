@@ -27,7 +27,7 @@
 			</DropdownMenu>
 		</ComponentExample>
 
-		<ComponentExample Title="With click handlers" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\">Actions</Button>\n    </DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuLabel>My Account</DropdownMenuLabel>\n        <DropdownMenuGroup>\n            <DropdownMenuItem Click=\"@(() => lastAction = \"Profile\")\">Profile</DropdownMenuItem>\n            <DropdownMenuItem Click=\"@(() => lastAction = \"Settings\")\">Settings</DropdownMenuItem>\n        </DropdownMenuGroup>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\" Click=\"@(() => lastAction = \"Log out\")\">Log out</DropdownMenuItem>\n    </DropdownMenuContent>\n</DropdownMenu>")">
+		<ComponentExample Title="With click handlers" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\">Actions</Button>\n    </DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuLabel>My Account</DropdownMenuLabel>\n        <DropdownMenuGroup>\n            <DropdownMenuItem OnClick=\"@(() => lastAction = \"Profile\")\">Profile</DropdownMenuItem>\n            <DropdownMenuItem OnClick=\"@(() => lastAction = \"Settings\")\">Settings</DropdownMenuItem>\n        </DropdownMenuGroup>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\" OnClick=\"@(() => lastAction = \"Log out\")\">Log out</DropdownMenuItem>\n    </DropdownMenuContent>\n</DropdownMenu>")">
 			<div class="flex items-center gap-4">
 				<DropdownMenu>
 					<DropdownMenuTrigger>
@@ -36,11 +36,11 @@
 					<DropdownMenuContent>
 						<DropdownMenuLabel>My Account</DropdownMenuLabel>
 						<DropdownMenuGroup>
-							<DropdownMenuItem Click="@(() => LastAction = "Profile")">Profile</DropdownMenuItem>
-							<DropdownMenuItem Click="@(() => LastAction = "Settings")">Settings</DropdownMenuItem>
+							<DropdownMenuItem OnClick="@(() => LastAction = "Profile")">Profile</DropdownMenuItem>
+							<DropdownMenuItem OnClick="@(() => LastAction = "Settings")">Settings</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive" Click="@(() => LastAction = "Log out")">Log out</DropdownMenuItem>
+						<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive" OnClick="@(() => LastAction = "Log out")">Log out</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 				@if ( LastAction is not null )
@@ -57,27 +57,27 @@
 						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">File</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>
-						<DropdownMenuItem Click="@(() => LastAction = "New File")">New File</DropdownMenuItem>
-						<DropdownMenuItem Click="@(() => LastAction = "Open")">Open</DropdownMenuItem>
+						<DropdownMenuItem OnClick="@(() => LastAction = "New File")">New File</DropdownMenuItem>
+						<DropdownMenuItem OnClick="@(() => LastAction = "Open")">Open</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<DropdownMenuSub>
 							<DropdownMenuSubTrigger>Share</DropdownMenuSubTrigger>
 							<DropdownMenuSubContent>
-								<DropdownMenuItem Click="@(() => LastAction = "Share via Email")">Email</DropdownMenuItem>
-								<DropdownMenuItem Click="@(() => LastAction = "Share via Slack")">Slack</DropdownMenuItem>
-								<DropdownMenuItem Click="@(() => LastAction = "Share via Teams")">Teams</DropdownMenuItem>
+								<DropdownMenuItem OnClick="@(() => LastAction = "Share via Email")">Email</DropdownMenuItem>
+								<DropdownMenuItem OnClick="@(() => LastAction = "Share via Slack")">Slack</DropdownMenuItem>
+								<DropdownMenuItem OnClick="@(() => LastAction = "Share via Teams")">Teams</DropdownMenuItem>
 							</DropdownMenuSubContent>
 						</DropdownMenuSub>
 						<DropdownMenuSub>
 							<DropdownMenuSubTrigger>Export as</DropdownMenuSubTrigger>
 							<DropdownMenuSubContent>
-								<DropdownMenuItem Click="@(() => LastAction = "Export PDF")">PDF</DropdownMenuItem>
-								<DropdownMenuItem Click="@(() => LastAction = "Export CSV")">CSV</DropdownMenuItem>
-								<DropdownMenuItem Click="@(() => LastAction = "Export JSON")">JSON</DropdownMenuItem>
+								<DropdownMenuItem OnClick="@(() => LastAction = "Export PDF")">PDF</DropdownMenuItem>
+								<DropdownMenuItem OnClick="@(() => LastAction = "Export CSV")">CSV</DropdownMenuItem>
+								<DropdownMenuItem OnClick="@(() => LastAction = "Export JSON")">JSON</DropdownMenuItem>
 							</DropdownMenuSubContent>
 						</DropdownMenuSub>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive" Click="@(() => LastAction = "Delete")">Delete</DropdownMenuItem>
+						<DropdownMenuItem Variant="DropdownMenuItemVariant.Destructive" OnClick="@(() => LastAction = "Delete")">Delete</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 				@if ( LastAction is not null )
@@ -175,13 +175,13 @@
 		),
 		new ApiElement(
 			Name: "DropdownMenuItem",
-			Description: "Clickable menu row. On click, fires `Click` and then closes every ancestor menu (including `DropdownMenuSub` and `ContextMenu`) so the whole chain dismisses.",
+			Description: "Clickable menu row. On click, fires `OnClick` and then closes every ancestor menu (including `DropdownMenuSub` and `ContextMenu`) so the whole chain dismisses.",
 			Depth: 2,
 			Properties:
 			[
 				new ApiProperty( "Variant",      "DropdownMenuItemVariant", false, "Visual style. Default: `DropdownMenuItemVariant.Default`. Other value: `Destructive` (red hover + destructive bg tint)." ),
 				new ApiProperty( "Disabled",     "bool",                    false, "When true, the item is muted and ignores clicks. Default: `false`." ),
-				new ApiProperty( "Click",        "EventCallback",           false, "Invoked when the item is clicked, before the menu chain closes." ),
+				new ApiProperty( "OnClick",        "EventCallback",           false, "Invoked when the item is clicked, before the menu chain closes." ),
 				new ApiProperty( "ClassName",    "string?",                 false, "Extra CSS classes appended to the item `<div>`." ),
 				new ApiProperty( "ChildContent", "RenderFragment?",         false, "Item label and optional `Icon` / `DropdownMenuShortcut` children." ),
 			]

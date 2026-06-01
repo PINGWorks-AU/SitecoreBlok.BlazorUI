@@ -239,6 +239,12 @@ Our codebase uses **shadcn/ui naming** (`bg-background`, `bg-card`, `border-bord
 - They're what most components in the library already use
 - They're what the shadcn/ui primitives (ported via Blok) were originally written with
 
+#### Event-callback naming — `OnClick`, not `Click` (intentional deviation, 2026-06)
+
+Click callbacks are named **`OnClick`**, not `Click` (the shadcn/ui `onClick` carried into Blok). This is a deliberate departure from our usual tenet of staying close to the source API, made in favour of **Blazor idioms**: the `On{Event}` prefix is the dominant Blazor convention for action callbacks, it signals an `EventCallback` (vs a value/state), and the rest of this library already uses it (`OnSubmit`, `OnCancel`, `OnClear`, `OnEdit`, `NavListItem.OnClick`). Leaving `Button` as bare `Click` was also a real footgun — because `Button` splats `AdditionalAttributes`, writing `OnClick="..."` (the natural Blazor spelling) silently rendered a literal `onclick` attribute instead of binding the callback.
+
+Renamed `Click` → `OnClick` across all click-callback components: `Button`, `AlertDialogAction`, `AlertDialogCancel`, `DialogClose`, `SheetClose`, `PaginationLink`, `PaginationNext`, `PaginationPrevious`, `ContextMenuItem`, `DropdownMenuItem`, `MenubarItem`. (`MenubarItem`'s private `OnClick()` handler was renamed to `HandleClick()` to avoid the collision.) The `{Prop}Changed` two-way-bind callbacks are unaffected (they must keep that name for `@bind-Prop`).
+
 ## Harness drift findings — final disposition
 
 After all structural refactors and the Group 1-4 cleanup, **32 drift findings remain**, all classified below. Every entry is either an equivalence-aliased token (Group 1, suppressed via the harness's `$equivGroups` map), a deliberate divergence (Groups 2-3, documented here), or a Blok-side typo / non-existent utility we deliberately don't propagate.

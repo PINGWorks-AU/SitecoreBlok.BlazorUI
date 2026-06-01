@@ -29,7 +29,7 @@
 			in this catalogue site.
 		</p>
 		<div class="flex gap-3 pt-2">
-			<Button Click="@(() => Navigation.NavigateTo("/primitives"))">Browse Primitives</Button>
+			<Button OnClick="@(() => Navigation.NavigateTo("/primitives"))">Browse Primitives</Button>
 		</div>
 	</div>
 
@@ -50,7 +50,7 @@
 			copy-paste starting point.
 		</p>
 		<div class="flex gap-3 pt-2">
-			<Button Click="@(() => Navigation.NavigateTo("/chunks"))">Browse Chunks</Button>
+			<Button OnClick="@(() => Navigation.NavigateTo("/chunks"))">Browse Chunks</Button>
 		</div>
 	</div>
 
@@ -338,7 +338,7 @@
 			</div>
 			<div class="flex items-start gap-2">
 				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Button shortcuts</Badge>
-				<span><code>Title</code> (string label), <code>StartIconSvg</code>/<code>EndIconSvg</code> (pass an <code>IconSvg</code> path and the icon + spacing render automatically), <code>Click</code>, and an explicit <code>Disabled</code> parameter. All additive — Blok-style <code>ChildContent</code> composition still works.</span>
+				<span><code>Title</code> (string label), <code>StartIconSvg</code>/<code>EndIconSvg</code> (pass an <code>IconSvg</code> path and the icon + spacing render automatically), <code>OnClick</code>, and an explicit <code>Disabled</code> parameter. All additive — Blok-style <code>ChildContent</code> composition still works.</span>
 			</div>
 			<div class="flex items-start gap-2">
 				<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Checkbox ergonomic helpers</Badge>

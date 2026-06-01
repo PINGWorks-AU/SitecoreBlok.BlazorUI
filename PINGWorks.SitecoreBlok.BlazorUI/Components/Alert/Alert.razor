@@ -10,7 +10,7 @@
 		@if ( Closeable )
 		{
 			@* `Closeable` is a Blazor-side addition (not in Blok). Documented on the Catalogue page. *@
-			<Button Click="Close" Size="ButtonSize.Xs" ColorScheme="ButtonColor.Neutral" Variant="ButtonVariant.Ghost" ClassName="absolute top-2.5 right-3 h-6 shadow-none" Title="✕" />
+			<Button OnClick="Close" Size="ButtonSize.Xs" ColorScheme="ButtonColor.Neutral" Variant="ButtonVariant.Ghost" ClassName="absolute top-2.5 right-3 h-6 shadow-none" Title="✕" />
 		}
 	</div>
 }

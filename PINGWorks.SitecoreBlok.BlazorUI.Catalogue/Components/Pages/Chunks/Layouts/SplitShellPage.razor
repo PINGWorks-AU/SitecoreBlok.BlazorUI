@@ -40,11 +40,11 @@
 		</ComponentExample>
 
 		<ComponentExample Title="Resizable"
-			Code="@("<SplitShell Direction=\"Orientation.Horizontal\" IsResizable=\"true\" Ratio=\"0.4\">\n    <Start>\n        <Text Kind=\"TextKind.Div\" Padding=\"4\" BgFilled FullHeight>List (40%)</Text>\n    </Start>\n    <End>\n        <Text Kind=\"TextKind.Div\" Padding=\"4\" BgFilled FullHeight>Detail (60%)</Text>\n    </End>\n</SplitShell>")"
-			Primitives="@("<ResizablePanelGroup Direction=\"ResizableDirection.Horizontal\">\n    <ResizablePanel DefaultSize=\"40\">\n        <div class=\"p-4 bg-background h-full\">List (40%)</div>\n    </ResizablePanel>\n    <ResizableHandle />\n    <ResizablePanel DefaultSize=\"60\">\n        <div class=\"p-4 bg-background h-full\">Detail (60%)</div>\n    </ResizablePanel>\n</ResizablePanelGroup>")">
-			<Text Size="Size.Sm" Muted ClassName="mb-4">Drag the divider between the panes to resize. <code>Ratio</code> controls the starting split. In resizable mode, style pane content directly — <code>Gutters</code> and <code>BgFilled</code> apply to static mode only.</Text>
+			Code="@("<SplitShell Direction=\"Orientation.Horizontal\" Resizable=\"true\" Ratio=\"0.4\">\n    <Start>\n        <Text Kind=\"TextKind.Div\" Padding=\"4\" BgFilled FullHeight>List (40%)</Text>\n    </Start>\n    <End>\n        <Text Kind=\"TextKind.Div\" Padding=\"4\" BgFilled FullHeight>Detail (60%)</Text>\n    </End>\n</SplitShell>")"
+			Primitives="@("<ResizablePanelGroup Direction=\"ResizableDirection.Horizontal\">\n    <ResizablePanel DefaultSize=\"40\">\n        <div class=\"size-full overflow-auto p-4 bg-background\">List (40%)</div>\n    </ResizablePanel>\n    <ResizableHandle />\n    <ResizablePanel DefaultSize=\"60\">\n        <div class=\"size-full overflow-auto p-4 bg-background\">Detail (60%)</div>\n    </ResizablePanel>\n</ResizablePanelGroup>")">
+			<Text Size="Size.Sm" Muted ClassName="mb-4">Drag the divider between the panes to resize. <code>Ratio</code> controls the starting split. Each pane scrolls its own oversized content, the same as static mode.</Text>
 			<div class="h-64 border rounded-lg overflow-hidden">
-				<SplitShell Direction="Orientation.Horizontal" IsResizable="true" Ratio="0.4">
+				<SplitShell Direction="Orientation.Horizontal" Resizable="true" Ratio="0.4">
 					<Start><Text Kind="TextKind.Div" Padding="4" BgFilled FullHeight>List (40%)</Text></Start>
 					<End><Text Kind="TextKind.Div" Padding="4" BgFilled FullHeight>Detail (60%)</Text></End>
 				</SplitShell>
@@ -60,18 +60,18 @@
 	[
 		new ApiElement(
 			Name: "SplitShell",
-			Description: "Two-pane layout for master/detail or any split-axis arrangement. When `IsResizable` is true, wraps the panes in the `ResizablePanelGroup` primitive so users can drag the splitter; otherwise renders a static flex container. Wrapper-styling: `Borders`, `Gutters`, and `BgFilled` control the static-mode pane appearance so consumers do not need wrapper divs in slot content.",
+			Description: "Two-pane layout for master/detail or any split-axis arrangement. When `Resizable` is true, wraps the panes in the `ResizablePanelGroup` primitive so users can drag the splitter; otherwise renders a static flex container. Wrapper-styling: `Borders`, `Gutters`, and `BgFilled` control pane appearance so consumers do not need wrapper divs in slot content. Each pane scrolls its own oversized content in both modes.",
 			Depth: 0,
 			Properties:
 			[
-				new ApiProperty( "Start",       "RenderFragment?",  false, "Left pane (when `Direction = Horizontal`) or top pane (when `Vertical`). In static mode the chunk owns background and padding via `BgFilled` / `Gutters`." ),
-				new ApiProperty( "End",         "RenderFragment?",  false, "Right pane (when `Direction = Horizontal`) or bottom pane (when `Vertical`). Same ownership rules as `Start`." ),
-				new ApiProperty( "Direction",   "Orientation",      false, "Split axis. Default: `Orientation.Horizontal`. Other values: `Vertical`. Shared `Orientation` enum." ),
-				new ApiProperty( "IsResizable", "bool",             false, "When `true`, the panes are wrapped in `ResizablePanelGroup` and the consumer can drag the divider. Default: `false`. **Interactive-mode requirement:** `IsResizable=true` uses JSInterop — render in an interactive context (e.g. `@rendermode InteractiveServer`). The default `IsResizable=false` is SSR-safe." ),
-				new ApiProperty( "Ratio",       "double",           false, "Initial split ratio between `Start` and `End` when `IsResizable = true`. Range 0.0–1.0; default `0.5` (equal split). Ignored when `IsResizable = false`." ),
-				new ApiProperty( "Borders",     "bool",             false, "Toggles the `divide-x` / `divide-y` divider line between panes (static mode). Default: `true`. When `false`, no separator is rendered." ),
-				new ApiProperty( "Gutters",     "bool",             false, "Toggles `p-4` on each pane wrapper (static mode only). Default: `true`. In resizable mode, style padding inside slot content directly." ),
-				new ApiProperty( "BgFilled",    "bool",             false, "Toggles `bg-background` on each pane wrapper (static mode only). Default: `true`." ),
+				new ApiProperty( "Start",     "RenderFragment?",  false, "Left pane (when `Direction = Horizontal`) or top pane (when `Vertical`). The chunk owns background and padding via `BgFilled` / `Gutters`." ),
+				new ApiProperty( "End",       "RenderFragment?",  false, "Right pane (when `Direction = Horizontal`) or bottom pane (when `Vertical`). Same ownership rules as `Start`." ),
+				new ApiProperty( "Direction", "Orientation",      false, "Split axis. Default: `Orientation.Horizontal`. Other values: `Vertical`. Shared `Orientation` enum." ),
+				new ApiProperty( "Resizable", "bool",             false, "When `true`, the panes are wrapped in `ResizablePanelGroup` and the consumer can drag the divider. Default: `false`. **Interactive-mode requirement:** `Resizable=true` uses JSInterop — render in an interactive context (e.g. `@rendermode InteractiveServer`). The default `Resizable=false` is SSR-safe." ),
+				new ApiProperty( "Ratio",     "double",           false, "Initial split ratio between `Start` and `End` when `Resizable = true`. Range 0.0–1.0; default `0.5` (equal split). Ignored when `Resizable = false`." ),
+				new ApiProperty( "Borders",   "bool",             false, "Toggles the `divide-x` / `divide-y` divider line between panes (static mode; resizable mode uses the drag handle). Default: `true`. When `false`, no separator is rendered." ),
+				new ApiProperty( "Gutters",   "bool",             false, "Toggles `p-4` on each pane. Default: `true`." ),
+				new ApiProperty( "BgFilled",  "bool",             false, "Toggles `bg-background` on each pane. Default: `true`." ),
 			]
 		),
 	];

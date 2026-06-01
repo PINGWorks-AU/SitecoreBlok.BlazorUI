@@ -10,8 +10,8 @@
 
 	<ExamplesSection>
 
-		<ComponentExample Title="Right side (default)" Code="@("<Button Click=\"@(() => rightOpen = true)\">Open Right Sheet</Button>\n<Sheet @bind-Open=\"rightOpen\">\n    <SheetHeader>\n        <SheetTitle>Sheet Title</SheetTitle>\n        <SheetDescription>This is a sheet sliding from the right.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Sheet content goes here. You can put any content inside.</p>\n    </div>\n</Sheet>")">
-			<Button Click="@(() => RightOpen = true)">Open Right Sheet</Button>
+		<ComponentExample Title="Right side (default)" Code="@("<Button OnClick=\"@(() => rightOpen = true)\">Open Right Sheet</Button>\n<Sheet @bind-Open=\"rightOpen\">\n    <SheetHeader>\n        <SheetTitle>Sheet Title</SheetTitle>\n        <SheetDescription>This is a sheet sliding from the right.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Sheet content goes here. You can put any content inside.</p>\n    </div>\n</Sheet>")">
+			<Button OnClick="@(() => RightOpen = true)">Open Right Sheet</Button>
 			<Sheet @bind-Open="RightOpen">
 				<SheetHeader>
 					<SheetTitle>Sheet Title</SheetTitle>
@@ -23,8 +23,8 @@
 			</Sheet>
 		</ComponentExample>
 
-		<ComponentExample Title="Left side" Code="@("<Button Click=\"@(() => leftOpen = true)\">Open Left Sheet</Button>\n<Sheet @bind-Open=\"leftOpen\" Side=\"SheetSide.Left\">\n    <SheetHeader>\n        <SheetTitle>Navigation</SheetTitle>\n        <SheetDescription>Browse through sections.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Navigation content here.</p>\n    </div>\n</Sheet>")">
-			<Button Click="@(() => LeftOpen = true)">Open Left Sheet</Button>
+		<ComponentExample Title="Left side" Code="@("<Button OnClick=\"@(() => leftOpen = true)\">Open Left Sheet</Button>\n<Sheet @bind-Open=\"leftOpen\" Side=\"SheetSide.Left\">\n    <SheetHeader>\n        <SheetTitle>Navigation</SheetTitle>\n        <SheetDescription>Browse through sections.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Navigation content here.</p>\n    </div>\n</Sheet>")">
+			<Button OnClick="@(() => LeftOpen = true)">Open Left Sheet</Button>
 			<Sheet @bind-Open="LeftOpen" Side="SheetSide.Left">
 				<SheetHeader>
 					<SheetTitle>Navigation</SheetTitle>
@@ -36,8 +36,8 @@
 			</Sheet>
 		</ComponentExample>
 
-		<ComponentExample Title="Top" Code="@("<Button Click=\"@(() => topOpen = true)\">Open Top Sheet</Button>\n<Sheet @bind-Open=\"topOpen\" Side=\"SheetSide.Top\">\n    <SheetHeader>\n        <SheetTitle>Notification</SheetTitle>\n        <SheetDescription>A banner from the top of the screen.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Top sheet content. Useful for notifications or alerts.</p>\n    </div>\n    <SheetFooter>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\"\n                Click=\"@(() => topOpen = false)\">Dismiss</Button>\n    </SheetFooter>\n</Sheet>")">
-			<Button Click="@(() => TopOpen = true)">Open Top Sheet</Button>
+		<ComponentExample Title="Top" Code="@("<Button OnClick=\"@(() => topOpen = true)\">Open Top Sheet</Button>\n<Sheet @bind-Open=\"topOpen\" Side=\"SheetSide.Top\">\n    <SheetHeader>\n        <SheetTitle>Notification</SheetTitle>\n        <SheetDescription>A banner from the top of the screen.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4\">\n        <p class=\"text-sm\">Top sheet content. Useful for notifications or alerts.</p>\n    </div>\n    <SheetFooter>\n        <Button Variant=\"ButtonVariant.Outline\" ColorScheme=\"ButtonColor.Neutral\"\n                OnClick=\"@(() => topOpen = false)\">Dismiss</Button>\n    </SheetFooter>\n</Sheet>")">
+			<Button OnClick="@(() => TopOpen = true)">Open Top Sheet</Button>
 			<Sheet @bind-Open="TopOpen" Side="SheetSide.Top">
 				<SheetHeader>
 					<SheetTitle>Notification</SheetTitle>
@@ -47,13 +47,13 @@
 					<p class="text-sm">Top sheet content. Useful for notifications or alerts.</p>
 				</div>
 				<SheetFooter>
-					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Click="@(() => TopOpen = false)">Dismiss</Button>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" OnClick="@(() => TopOpen = false)">Dismiss</Button>
 				</SheetFooter>
 			</Sheet>
 		</ComponentExample>
 
-		<ComponentExample Title="Bottom" Code="@("<Button Click=\"@(() => bottomOpen = true)\">Open Bottom Sheet</Button>\n<Sheet @bind-Open=\"bottomOpen\" Side=\"SheetSide.Bottom\">\n    <SheetHeader>\n        <SheetTitle>Actions</SheetTitle>\n        <SheetDescription>Choose an action from below.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4 space-y-2\">\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Neutral\" ClassName=\"w-full justify-start\">Share</Button>\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Neutral\" ClassName=\"w-full justify-start\">Download</Button>\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Danger\" ClassName=\"w-full justify-start\">Delete</Button>\n    </div>\n</Sheet>")">
-			<Button Click="@(() => BottomOpen = true)">Open Bottom Sheet</Button>
+		<ComponentExample Title="Bottom" Code="@("<Button OnClick=\"@(() => bottomOpen = true)\">Open Bottom Sheet</Button>\n<Sheet @bind-Open=\"bottomOpen\" Side=\"SheetSide.Bottom\">\n    <SheetHeader>\n        <SheetTitle>Actions</SheetTitle>\n        <SheetDescription>Choose an action from below.</SheetDescription>\n    </SheetHeader>\n    <div class=\"p-4 space-y-2\">\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Neutral\" ClassName=\"w-full justify-start\">Share</Button>\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Neutral\" ClassName=\"w-full justify-start\">Download</Button>\n        <Button Variant=\"ButtonVariant.Ghost\" ColorScheme=\"ButtonColor.Danger\" ClassName=\"w-full justify-start\">Delete</Button>\n    </div>\n</Sheet>")">
+			<Button OnClick="@(() => BottomOpen = true)">Open Bottom Sheet</Button>
 			<Sheet @bind-Open="BottomOpen" Side="SheetSide.Bottom">
 				<SheetHeader>
 					<SheetTitle>Actions</SheetTitle>
@@ -138,7 +138,7 @@
 			Depth: 1,
 			Properties:
 			[
-				new ApiProperty( "Click",                "EventCallback",                 false, "Invoked when the close button is clicked. Wire this to set your `Open` flag to `false`." ),
+				new ApiProperty( "OnClick",                "EventCallback",                 false, "Invoked when the close button is clicked. Wire this to set your `Open` flag to `false`." ),
 				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button." ),
 				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Button content — typically an icon or label." ),
 				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<button>`." ),

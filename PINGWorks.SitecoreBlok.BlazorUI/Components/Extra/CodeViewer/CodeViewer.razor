@@ -1,7 +1,9 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 @inject IJSRuntime JS
 
-<pre class="@PreCssClass"><code class="@CodeCssClass">@Code</code></pre>
+@* @key on the code element: when Code changes Blazor builds a fresh node instead of
+   diffing against the spans Prism injected, then we re-highlight the new element. *@
+<pre class="@PreCssClass"><code @key="Code" @ref="CodeElement" class="@CodeCssClass">@Code</code></pre>
 
 @code {
 	[Parameter, EditorRequired] public required string Code { get; set; }
@@ -54,9 +56,15 @@
 
 	private string CodeCssClass => LanguageClass;
 
+	private ElementReference CodeElement;
+	private string? Highlighted;
+
 	protected override async Task OnAfterRenderAsync( bool firstRender )
 	{
-		if ( firstRender )
-			await JS.InvokeVoidAsync( "Prism.highlightAll" );
+		if ( Highlighted == Code )
+			return;
+
+		Highlighted = Code;
+		await JS.InvokeVoidAsync( "Prism.highlightElement", CodeElement );
 	}
 }

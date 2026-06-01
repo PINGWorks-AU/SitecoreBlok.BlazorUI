@@ -171,6 +171,21 @@ The full source — including the Catalogue web app, the UI parity-check tooling
 
 Bug reports and feature requests are welcome via [GitHub Issues](https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/issues).
 
+## Upgrading from v1 to v2 // Breaking Changes
+
+Some small breaking changes were introduced in v2.0 to address consistency issues in the original source. In most cases the names of properties and behaviours were chosen to align to the original ShadCN library. Over time it has become apparent
+that, in some cases, breaking Blazor idioms to match React properties causes more harm than good. For this reason we have chosen to more closely align some very common properties with Blazor standards.
+
+- `Click` event is now `OnClick` for:
+  - Button
+  - PaginationLink, PaginationNext and PaginationPrevious
+  - AlertDialogAction and AlertDialogCancel
+  - ContextMenuItem
+  - DialogClose
+  - DropdownMenuItem
+  - MenuBarItem
+- SplitShell `IsResizable` is now `Resizable`
+
 ## License
 
 Licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). Third-party notices for Sitecore Blok, shadcn/ui, and Tailwind CSS are included in the package under `ThirdPartyNotices/`.

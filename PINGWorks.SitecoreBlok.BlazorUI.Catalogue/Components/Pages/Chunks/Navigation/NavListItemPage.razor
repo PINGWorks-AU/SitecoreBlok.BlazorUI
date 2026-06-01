@@ -30,6 +30,14 @@
 			</div>
 		</ComponentExample>
 
+		<ComponentExample Title="Custom class (ClassName)"
+			Code="@("<NavListItem OnClick=\"Select\" IconSvg=\"@IconSvg.Account\" Label=\"Clickable\" ClassName=\"mb-1 cursor-pointer\" />")"
+			Primitives="@("<button type=\"button\" class=\"flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-neutral-bg no-underline w-full text-left mb-1 cursor-pointer\">\n    <svg class=\"size-4 shrink-0\">...</svg>\n    <span class=\"truncate\">Clickable</span>\n</button>")">
+			<div class="border rounded-lg p-2 max-w-md">
+				<NavListItem IconSvg="@IconSvg.Account" Label="Clickable" ClassName="mb-1 cursor-pointer" />
+			</div>
+		</ComponentExample>
+
 	</ExamplesSection>
 
 </ComponentPage>
@@ -47,8 +55,9 @@
 				new ApiProperty( "IconSvg", "string?",       false, "Leading icon (SVG path string). Use members of the `IconSvg` static class (e.g. `IconSvg.Account`)." ),
 				new ApiProperty( "Label",   "string",        true,  "Visible row text." ),
 				new ApiProperty( "Active",  "bool",          false, "When `true`, the row uses the active-state visual: `bg-neutral-bg text-foreground font-medium`. Default: `false`." ),
-				new ApiProperty( "Badge",   "string?",       false, "Optional trailing badge label rendered via the `Badge` primitive." ),
-				new ApiProperty( "OnClick", "EventCallback", false, "Click handler. When set with no `Href`, the item renders as `<button>`." ),
+				new ApiProperty( "Badge",     "string?",       false, "Optional trailing badge label rendered via the `Badge` primitive." ),
+				new ApiProperty( "ClassName", "string?",       false, "Extra CSS classes merged onto the row after the built-in/active classes — escape hatch for spacing or cursor tweaks (e.g. `mb-1 cursor-pointer`)." ),
+				new ApiProperty( "OnClick",   "EventCallback", false, "Click handler. When set with no `Href`, the item renders as `<button>`." ),
 			]
 		),
 	];

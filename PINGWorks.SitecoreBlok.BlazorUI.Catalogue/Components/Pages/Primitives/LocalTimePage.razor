@@ -31,6 +31,10 @@
 			<LocalTime Value="Now" Format="dd/MM/yy hh:mm tt" />
 		</ComponentExample>
 
+		<ComponentExample Title="Named month and weekday (localised)" Code="@("<LocalTime Value=\"DateTimeOffset.UtcNow\" Format=\"dddd, d MMMM yyyy\" />")">
+			<LocalTime Value="Now" Format="dddd, d MMMM yyyy" />
+		</ComponentExample>
+
 		<ComponentExample Title="Server-rendered fallback (UTC)" Code="@("@* The text shown until the JS module upgrades it (and in JS-disabled clients) *@\n@* is Value.UtcDateTime.ToString(Format) — i.e. the UTC equivalent of the same instant. *@\n<LocalTime Value=\"DateTimeOffset.UtcNow\" Format=\"yyyy-MM-dd HH:mm:ss K\" />")">
 			<div class="space-y-2 text-sm text-muted-foreground">
 				<p>Until the JS module loads — and in JS-disabled clients — the rendered text is the UTC equivalent of the same instant (using the same <code>Format</code>). Inspect the underlying <code>&lt;time datetime="..."&gt;</code> attribute to see the canonical UTC ISO string the server emitted.</p>
@@ -60,7 +64,7 @@
 			Properties:
 			[
 				new ApiProperty( "Value",  "DateTimeOffset", true,  "The UTC instant to render. Required." ),
-				new ApiProperty( "Format", "string",         false, "Format string. Defaults to `\"yyyy-MM-dd HH:mm:ss\"`. Tokens: `yyyy` / `yy` (year), `MM` (month), `dd` (day), `HH` (24-hour), `hh` / `h` (12-hour padded / unpadded), `mm` (minute), `ss` (second), `tt` (AM/PM), `K` (zone offset, e.g. `+10:00`). Anything else passes through unchanged." ),
+				new ApiProperty( "Format", "string",         false, "Format string. Defaults to `\"yyyy-MM-dd HH:mm:ss\"`. Tokens: `yyyy` / `yy` (year), `MMMM` / `MMM` (full / abbreviated month name), `MM` (2-digit month), `dddd` / `ddd` (full / abbreviated weekday name), `dd` / `d` (day, 2-digit / unpadded), `HH` (24-hour), `hh` / `h` (12-hour padded / unpadded), `mm` (minute), `ss` (second), `tt` (AM/PM), `K` (zone offset, e.g. `+10:00`). Month- and weekday-name tokens render in the browser's locale; anything else passes through unchanged." ),
 			]
 		),
 	];

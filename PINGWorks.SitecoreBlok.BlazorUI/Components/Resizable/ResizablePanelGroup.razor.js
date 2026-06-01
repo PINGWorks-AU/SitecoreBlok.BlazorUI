@@ -35,6 +35,13 @@ function getConstraints(panel, totalPx) {
 	return { min: minPct / 100 * totalPx, max: maxPct / 100 * totalPx };
 }
 
+// Percentage basis (not px) so panels keep tracking the group width when the
+// window/container resizes — a fixed px basis freezes the split at drag-time width.
+function setFlexPct(panel, px, totalPx) {
+	const pct = totalPx > 0 ? (px / totalPx) * 100 : 0;
+	panel.style.flex = `0 0 ${pct}%`;
+}
+
 function applyResize(panels, newPrevPx, totalPx) {
 	const pc = getConstraints(panels[0], totalPx);
 	const nc = getConstraints(panels[1], totalPx);
@@ -44,8 +51,8 @@ function applyResize(panels, newPrevPx, totalPx) {
 	let nextPx = clamp(totalPx - prevPx, nc.min, nc.max);
 	prevPx = clamp(totalPx - nextPx, pc.min, pc.max);
 
-	panels[0].style.flex = `0 0 ${prevPx}px`;
-	panels[1].style.flex = `0 0 ${nextPx}px`;
+	setFlexPct(panels[0], prevPx, totalPx);
+	setFlexPct(panels[1], nextPx, totalPx);
 }
 
 function initHandle(handle, cleanups) {
@@ -72,9 +79,9 @@ function initHandle(handle, cleanups) {
 		startTotalPx = startPrevPx + startNextPx;
 		startClientPos = isVert ? e.clientY : e.clientX;
 
-		// Normalize both panels to explicit pixel flex-basis before dragging.
-		panels[0].style.flex = `0 0 ${startPrevPx}px`;
-		panels[1].style.flex = `0 0 ${startNextPx}px`;
+		// Normalize both panels to explicit flex-basis before dragging.
+		setFlexPct(panels[0], startPrevPx, startTotalPx);
+		setFlexPct(panels[1], startNextPx, startTotalPx);
 
 		activePanels = panels;
 		dragging = true;
@@ -120,8 +127,8 @@ function initHandle(handle, cleanups) {
 		const totalPx  = prevPx + nextPx;
 
 		// Normalize to explicit sizes before adjusting.
-		panels[0].style.flex = `0 0 ${prevPx}px`;
-		panels[1].style.flex = `0 0 ${nextPx}px`;
+		setFlexPct(panels[0], prevPx, totalPx);
+		setFlexPct(panels[1], nextPx, totalPx);
 
 		let newPrevPx;
 		if      (goHome) newPrevPx = getConstraints(panels[0], totalPx).min;

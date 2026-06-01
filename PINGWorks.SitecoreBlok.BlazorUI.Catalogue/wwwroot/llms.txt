@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `1.3.0.0`. Generated 2026-05-22T03:22:35Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `1.4.0.0-preview-1`. Generated 2026-06-01T10:31:10Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -31,7 +31,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Carousel](/primitives/carousel): Horizontal slide scroller
 - [Checkbox](/primitives/checkbox): Binary / tri-state toggle control
 - [CircularProgress](/primitives/circularprogress): Arc-based progress indicator
-- [CodeViewer](/primitives/codeviewer): Syntax-highlighted code block (Prism)
+- [CodeViewer](/primitives/codeviewer): Syntax-highlighted code block (Prism); re-highlights when `Code` changes (`@key` + `Prism.highlightElement`)
 - [Collapsible](/primitives/collapsible): Single expand / collapse region
 - [Combobox](/primitives/combobox): Filterable select with search, single/multi-select, groups, chips
 - [ContextMenu](/primitives/contextmenu): Right-click menu
@@ -49,7 +49,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [InputGroup](/primitives/inputgroup): Input with affixed addons
 - [Kbd](/primitives/kbd): Keyboard-key glyph
 - [Label](/primitives/label): Form label element
-- [LocalTime](/primitives/localtime): Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting)
+- [LocalTime](/primitives/localtime): Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting). Format tokens: year/month/day/weekday (incl. localised `MMMM`/`MMM`/`dddd`/`ddd` names and unpadded `d`), 12/24-hour, AM/PM, zone offset `K`
 - [Menubar](/primitives/menubar): App-level horizontal menu bar
 - [Navigation (Side)](/primitives/navigation-(side)): Additional
 - [Navigation (Stack)](/primitives/navigation-(stack)): Additional

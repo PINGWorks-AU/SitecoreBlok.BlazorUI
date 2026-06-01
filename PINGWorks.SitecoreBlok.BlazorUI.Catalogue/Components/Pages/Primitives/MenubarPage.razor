@@ -52,32 +52,32 @@
 				<MenubarMenu>
 					<MenubarTrigger>File</MenubarTrigger>
 					<MenubarContent>
-						<MenubarItem Click="@(() => LastAction = "New File")">New File <MenubarShortcut>Ctrl+N</MenubarShortcut></MenubarItem>
-						<MenubarItem Click="@(() => LastAction = "Open")">Open <MenubarShortcut>Ctrl+O</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "New File")">New File <MenubarShortcut>Ctrl+N</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Open")">Open <MenubarShortcut>Ctrl+O</MenubarShortcut></MenubarItem>
 						<MenubarSeparator />
-						<MenubarItem Click="@(() => LastAction = "Save")">Save <MenubarShortcut>Ctrl+S</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Save")">Save <MenubarShortcut>Ctrl+S</MenubarShortcut></MenubarItem>
 						<MenubarSeparator />
-						<MenubarItem Variant="MenubarItemVariant.Destructive" Click="@(() => LastAction = "Close")">Close</MenubarItem>
+						<MenubarItem Variant="MenubarItemVariant.Destructive" OnClick="@(() => LastAction = "Close")">Close</MenubarItem>
 					</MenubarContent>
 				</MenubarMenu>
 				<MenubarMenu>
 					<MenubarTrigger>Edit</MenubarTrigger>
 					<MenubarContent>
-						<MenubarItem Click="@(() => LastAction = "Undo")">Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut></MenubarItem>
-						<MenubarItem Click="@(() => LastAction = "Redo")">Redo <MenubarShortcut>Ctrl+Y</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Undo")">Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Redo")">Redo <MenubarShortcut>Ctrl+Y</MenubarShortcut></MenubarItem>
 						<MenubarSeparator />
-						<MenubarItem Click="@(() => LastAction = "Cut")">Cut <MenubarShortcut>Ctrl+X</MenubarShortcut></MenubarItem>
-						<MenubarItem Click="@(() => LastAction = "Copy")">Copy <MenubarShortcut>Ctrl+C</MenubarShortcut></MenubarItem>
-						<MenubarItem Click="@(() => LastAction = "Paste")">Paste <MenubarShortcut>Ctrl+V</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Cut")">Cut <MenubarShortcut>Ctrl+X</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Copy")">Copy <MenubarShortcut>Ctrl+C</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Paste")">Paste <MenubarShortcut>Ctrl+V</MenubarShortcut></MenubarItem>
 					</MenubarContent>
 				</MenubarMenu>
 				<MenubarMenu>
 					<MenubarTrigger>View</MenubarTrigger>
 					<MenubarContent>
-						<MenubarItem Click="@(() => LastAction = "Zoom In")">Zoom In <MenubarShortcut>Ctrl++</MenubarShortcut></MenubarItem>
-						<MenubarItem Click="@(() => LastAction = "Zoom Out")">Zoom Out <MenubarShortcut>Ctrl+-</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Zoom In")">Zoom In <MenubarShortcut>Ctrl++</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Zoom Out")">Zoom Out <MenubarShortcut>Ctrl+-</MenubarShortcut></MenubarItem>
 						<MenubarSeparator />
-						<MenubarItem Click="@(() => LastAction = "Full Screen")">Full Screen <MenubarShortcut>F11</MenubarShortcut></MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "Full Screen")">Full Screen <MenubarShortcut>F11</MenubarShortcut></MenubarItem>
 					</MenubarContent>
 				</MenubarMenu>
 			</Menubar>
@@ -116,22 +116,22 @@
 				<MenubarMenu>
 					<MenubarTrigger>File</MenubarTrigger>
 					<MenubarContent>
-						<MenubarItem Click="@(() => LastAction = "New")">New</MenubarItem>
+						<MenubarItem OnClick="@(() => LastAction = "New")">New</MenubarItem>
 						<MenubarSeparator />
 						<MenubarSub>
 							<MenubarSubTrigger>Share</MenubarSubTrigger>
 							<MenubarSubContent>
-								<MenubarItem Click="@(() => LastAction = "Share via Email")">Email Link</MenubarItem>
-								<MenubarItem Click="@(() => LastAction = "Copy Link")">Copy Link</MenubarItem>
-								<MenubarItem Click="@(() => LastAction = "Share via Message")">Message</MenubarItem>
+								<MenubarItem OnClick="@(() => LastAction = "Share via Email")">Email Link</MenubarItem>
+								<MenubarItem OnClick="@(() => LastAction = "Copy Link")">Copy Link</MenubarItem>
+								<MenubarItem OnClick="@(() => LastAction = "Share via Message")">Message</MenubarItem>
 							</MenubarSubContent>
 						</MenubarSub>
 						<MenubarSub>
 							<MenubarSubTrigger>Export As</MenubarSubTrigger>
 							<MenubarSubContent>
-								<MenubarItem Click="@(() => LastAction = "Export PDF")">PDF</MenubarItem>
-								<MenubarItem Click="@(() => LastAction = "Export CSV")">CSV</MenubarItem>
-								<MenubarItem Click="@(() => LastAction = "Export JSON")">JSON</MenubarItem>
+								<MenubarItem OnClick="@(() => LastAction = "Export PDF")">PDF</MenubarItem>
+								<MenubarItem OnClick="@(() => LastAction = "Export CSV")">CSV</MenubarItem>
+								<MenubarItem OnClick="@(() => LastAction = "Export JSON")">JSON</MenubarItem>
 							</MenubarSubContent>
 						</MenubarSub>
 					</MenubarContent>
@@ -236,10 +236,10 @@
 					<MenubarTrigger>Help</MenubarTrigger>
 					<MenubarContent>
 						<MenubarLabel Inset="true">Resources</MenubarLabel>
-						<MenubarItem Inset="true" Click="@(() => LastAction = "Documentation")">Documentation</MenubarItem>
-						<MenubarItem Inset="true" Click="@(() => LastAction = "Release Notes")">Release Notes</MenubarItem>
+						<MenubarItem Inset="true" OnClick="@(() => LastAction = "Documentation")">Documentation</MenubarItem>
+						<MenubarItem Inset="true" OnClick="@(() => LastAction = "Release Notes")">Release Notes</MenubarItem>
 						<MenubarSeparator />
-						<MenubarItem Inset="true" Click="@(() => LastAction = "Report Issue")">Report Issue</MenubarItem>
+						<MenubarItem Inset="true" OnClick="@(() => LastAction = "Report Issue")">Report Issue</MenubarItem>
 					</MenubarContent>
 				</MenubarMenu>
 			</Menubar>
@@ -319,14 +319,14 @@
 		),
 		new ApiElement(
 			Name: "MenubarItem",
-			Description: "Clickable menu row. Fires `Click` then closes the menu chain (sub and parent) on activation.",
+			Description: "Clickable menu row. Fires `OnClick` then closes the menu chain (sub and parent) on activation.",
 			Depth: 3,
 			Properties:
 			[
 				new ApiProperty( "Variant",              "MenubarItemVariant",          false, "Visual style. Default: `MenubarItemVariant.Default`. Other value: `Destructive` (red text + red hover bg)." ),
 				new ApiProperty( "Inset",                "bool",                        false, "Adds `pl-8` left padding so label-only items align with icon items. Default: `false`." ),
 				new ApiProperty( "Disabled",             "bool",                        false, "When true, item is muted and ignores clicks. Default: `false`." ),
-				new ApiProperty( "Click",                "EventCallback",               false, "Invoked when the item is clicked, before the menu closes." ),
+				new ApiProperty( "OnClick",                "EventCallback",               false, "Invoked when the item is clicked, before the menu closes." ),
 				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the item `<div>`." ),
 				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Item label and optional `Icon` / `MenubarShortcut` children." ),
 				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes forwarded to the item `<div>`." ),

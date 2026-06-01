@@ -6,7 +6,7 @@
 			Variant="ButtonVariant.Ghost"
 			Size="ButtonSize.Sm"
 			Disabled="@(Context?.IsDisabled ?? false)"
-			Click="HandleClick"
+			OnClick="HandleClick"
 			ClassName="@ClassName"
 			@attributes="AdditionalAttributes">
 		@if (ChildContent is not null)

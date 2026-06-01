@@ -14,9 +14,9 @@
 			<Stepper Steps="@Steps" ActiveStep="@ActiveStep" />
 			<div class="flex gap-2 mt-6">
 				<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral" Size="ButtonSize.Sm"
-						Disabled="@(ActiveStep <= 0)" Click="@(() => ActiveStep--)">Previous</Button>
+						Disabled="@(ActiveStep <= 0)" OnClick="@(() => ActiveStep--)">Previous</Button>
 				<Button Size="ButtonSize.Sm"
-						Disabled="@(ActiveStep > Steps.Count - 1)" Click="@(() => ActiveStep++)">Next</Button>
+						Disabled="@(ActiveStep > Steps.Count - 1)" OnClick="@(() => ActiveStep++)">Next</Button>
 				<span class="text-sm text-muted-foreground flex items-center ml-2">Step @(ActiveStep + 1) of @Steps.Count</span>
 			</div>
 		</ComponentExample>

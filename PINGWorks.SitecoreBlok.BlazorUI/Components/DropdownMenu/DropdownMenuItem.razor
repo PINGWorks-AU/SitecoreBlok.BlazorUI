@@ -16,7 +16,7 @@
 
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
-	[Parameter] public EventCallback Click { get; set; }
+	[Parameter] public EventCallback OnClick { get; set; }
 	[Parameter] public DropdownMenuItemVariant Variant { get; set; } = DropdownMenuItemVariant.Default;
 	[Parameter] public bool Disabled { get; set; }
 
@@ -34,8 +34,8 @@
 		if ( Disabled )
 			return;
 
-		if ( Click.HasDelegate )
-			await Click.InvokeAsync();
+		if ( OnClick.HasDelegate )
+			await OnClick.InvokeAsync();
 
 		// Close every ancestor menu — sub first, then root — so the chain dismisses.
 		if ( ParentSub is not null )

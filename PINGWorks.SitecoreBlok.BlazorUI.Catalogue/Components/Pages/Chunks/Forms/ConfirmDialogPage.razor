@@ -7,9 +7,9 @@
 	<ExamplesSection>
 
 		<ComponentExample Title="Danger confirm dialog"
-			Code="@("<Button ColorScheme=\"ButtonColor.Danger\" Click=\"() => DeleteOpen = true\">Delete item</Button>\n<ConfirmDialog\n    Open=\"@DeleteOpen\" OpenChanged=\"v => DeleteOpen = v\"\n    Title=\"Delete item?\"\n    Message=\"This action cannot be undone. The item will be permanently removed.\"\n    ConfirmLabel=\"Delete\"\n    Tone=\"Tone.Danger\"\n    OnConfirm=\"HandleDelete\" />\n\n@code {\n    private bool DeleteOpen;\n    private void HandleDelete() { }\n}")"
+			Code="@("<Button ColorScheme=\"ButtonColor.Danger\" OnClick=\"() => DeleteOpen = true\">Delete item</Button>\n<ConfirmDialog\n    Open=\"@DeleteOpen\" OpenChanged=\"v => DeleteOpen = v\"\n    Title=\"Delete item?\"\n    Message=\"This action cannot be undone. The item will be permanently removed.\"\n    ConfirmLabel=\"Delete\"\n    Tone=\"Tone.Danger\"\n    OnConfirm=\"HandleDelete\" />\n\n@code {\n    private bool DeleteOpen;\n    private void HandleDelete() { }\n}")"
 			Primitives="@("<Dialog Open=\"@DeleteOpen\" OpenChanged=\"v => DeleteOpen = v\">\n    <DialogHeader>\n        <DialogTitle>Delete item?</DialogTitle>\n        <DialogDescription>This action cannot be undone. The item will be permanently removed.</DialogDescription>\n    </DialogHeader>\n    <DialogFooter>\n        <button class=\"...\">Cancel</button>\n        <button class=\"bg-danger ...\">Delete</button>\n    </DialogFooter>\n</Dialog>")">
-			<Button ColorScheme="ButtonColor.Danger" Click="() => DeleteOpen = true">Delete item</Button>
+			<Button ColorScheme="ButtonColor.Danger" OnClick="() => DeleteOpen = true">Delete item</Button>
 			<ConfirmDialog
 				Open="@DeleteOpen" OpenChanged="v => DeleteOpen = v"
 				Title="Delete item?"
@@ -20,9 +20,9 @@
 		</ComponentExample>
 
 		<ComponentExample Title="Success confirm dialog"
-			Code="@("<Button Click=\"() => PublishOpen = true\">Publish</Button>\n<ConfirmDialog\n    Open=\"@PublishOpen\" OpenChanged=\"v => PublishOpen = v\"\n    Title=\"Publish changes?\"\n    Message=\"Your changes will be visible to all users immediately.\"\n    ConfirmLabel=\"Publish\"\n    Tone=\"Tone.Success\"\n    OnConfirm=\"HandlePublish\" />\n\n@code {\n    private bool PublishOpen;\n    private void HandlePublish() { }\n}")"
+			Code="@("<Button OnClick=\"() => PublishOpen = true\">Publish</Button>\n<ConfirmDialog\n    Open=\"@PublishOpen\" OpenChanged=\"v => PublishOpen = v\"\n    Title=\"Publish changes?\"\n    Message=\"Your changes will be visible to all users immediately.\"\n    ConfirmLabel=\"Publish\"\n    Tone=\"Tone.Success\"\n    OnConfirm=\"HandlePublish\" />\n\n@code {\n    private bool PublishOpen;\n    private void HandlePublish() { }\n}")"
 			Primitives="@("<Dialog Open=\"@PublishOpen\" OpenChanged=\"v => PublishOpen = v\">\n    <DialogHeader>\n        <DialogTitle>Publish changes?</DialogTitle>\n        <DialogDescription>Your changes will be visible to all users immediately.</DialogDescription>\n    </DialogHeader>\n    <DialogFooter>\n        <button class=\"...\">Cancel</button>\n        <button class=\"bg-success ...\">Publish</button>\n    </DialogFooter>\n</Dialog>")">
-			<Button Click="() => PublishOpen = true">Publish</Button>
+			<Button OnClick="() => PublishOpen = true">Publish</Button>
 			<ConfirmDialog
 				Open="@PublishOpen" OpenChanged="v => PublishOpen = v"
 				Title="Publish changes?"

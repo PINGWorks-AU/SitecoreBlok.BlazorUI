@@ -12,7 +12,7 @@
 
 		<ComponentExample Title="Default" Code="@("<ActionBar Open=\"@barOpen\" SelectedCount=\"3\" OnCancel=\"() => barOpen = false\">\n    <Button Variant=\"ButtonVariant.Outline\" Size=\"ButtonSize.Sm\">Publish</Button>\n    <Button Size=\"ButtonSize.Sm\">Duplicate</Button>\n    <Tooltip>\n        <TooltipTrigger>\n            <DropdownMenu>\n                <DropdownMenuTrigger ClassName=\"hover:bg-neutral-bg rounded-full\">\n                    <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.IconSm\">\n                        <Icon Svg=\"@@IconSvg.DotsHorizontal\" ClassName=\"size-5\" />\n                    </Button>\n                </DropdownMenuTrigger>\n                <DropdownMenuContent>\n                    <DropdownMenuItem>Archive</DropdownMenuItem>\n                    <DropdownMenuItem Variant=\"DropdownMenuItemVariant.Destructive\">Delete</DropdownMenuItem>\n                </DropdownMenuContent>\n            </DropdownMenu>\n        </TooltipTrigger>\n        <TooltipContent Side=\"TooltipSide.Top\">More actions</TooltipContent>\n    </Tooltip>\n</ActionBar>")">
 			<div class="flex gap-3">
-				<Button Click="@(() => BarOpen = !BarOpen)">
+				<Button OnClick="@(() => BarOpen = !BarOpen)">
 					@(BarOpen ? "Hide Action Bar" : "Show Action Bar")
 				</Button>
 			</div>

@@ -16,7 +16,7 @@
 			<PaginationItem>
 				<PaginationPrevious
 					Disabled="@( Page <= 1 )"
-					Click="@(() => HandlePageChange( Page - 1 ))" />
+					OnClick="@(() => HandlePageChange( Page - 1 ))" />
 			</PaginationItem>
 			@for ( int p = 1; p <= TotalPages; p++ )
 			{
@@ -24,13 +24,13 @@
 				<PaginationItem>
 					<PaginationLink
 						IsActive="@( pageNumber == Page )"
-						Click="@(() => HandlePageChange( pageNumber ))">@pageNumber</PaginationLink>
+						OnClick="@(() => HandlePageChange( pageNumber ))">@pageNumber</PaginationLink>
 				</PaginationItem>
 			}
 			<PaginationItem>
 				<PaginationNext
 					Disabled="@( Page >= TotalPages )"
-					Click="@(() => HandlePageChange( Page + 1 ))" />
+					OnClick="@(() => HandlePageChange( Page + 1 ))" />
 			</PaginationItem>
 		</PaginationContent>
 	</Pagination>
