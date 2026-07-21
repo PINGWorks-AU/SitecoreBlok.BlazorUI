@@ -8,7 +8,8 @@
       "Bash(dotnet msbuild *)",
       "Bash(findstr /n /c:\"Elements = \" \"C:\\\\Projects-Github\\\\PINGWorks-AU\\\\SitecoreBlok.BlazorUI\\\\PINGWorks.SitecoreBlok.BlazorUI.Catalogue\\\\Components\\\\Pages\\\\Primitives\\\\ButtonPage.razor\")",
       "Bash(echo.)",
-      "PowerShell(dotnet build PINGWorks.SitecoreBlok.BlazorUI.Catalogue\\\\PINGWorks.SitecoreBlok.BlazorUI.Catalogue.csproj -nologo -clp:Summary 2>&1)"
+      "PowerShell(dotnet build PINGWorks.SitecoreBlok.BlazorUI.Catalogue\\\\PINGWorks.SitecoreBlok.BlazorUI.Catalogue.csproj -nologo -clp:Summary 2>&1)",
+      "mcp__da7be87c-de40-4bbd-8567-c618436b1346__list_balsamiq_projects"
     ]
   }
 }

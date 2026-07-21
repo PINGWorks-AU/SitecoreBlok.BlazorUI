@@ -18,6 +18,7 @@ The library includes:
 - **Icons** — 300+ Material Design Icons available as static SVG path constants
 - **Catalogue** — A companion Blazor web app for browsing and previewing all components
 - **AI agent manifest** — `tools/ai/components.json` + `llms.txt` ship inside the NuGet so AI coding assistants in consuming projects can pick the right component for a task without network access. The live Catalogue also serves these at `/components.json` and `/llms.txt`.
+- **Balsamiq wireframe kit** — a `.bmpr` template with every component drawn to the Blok palette, plus a Claude Code skill (`balsamiq-to-blazor`) that turns boards composed from it into Blazor markup. See [Prototyping UIs with Balsamiq](#prototyping-uis-with-balsamiq).
 
 Note: The Catalogue contains implementation notes valuable for consumers of the project. You
 can also view this online at https://blok-blazor-catalogue.ping-works.com.au. Of particular interest,
@@ -48,6 +49,7 @@ services or scripts. Be sure to review the catalogue for up-to-date information.
 ├── theme.md                                       # Tailwind v4 theme reference
 ├── tailwindcss-windows-x64.exe                    # Downloaded on build (gitignored)
 │
+├── .balsamiq/                                     # Balsamiq wireframe template (Blok UI Kit - Template.bmpr)
 ├── .claude/                                       # Claude Code skills + install scripts
 ├── .github/                                       # Issue / discussion / PR templates
 ├── artifacts/                                     # Generated build outputs (gitignored)
@@ -260,6 +262,47 @@ Chunks are higher-level compositions of Primitives that absorb the Tailwind clas
 ```
 
 The full chunk roster (85 chunks across Layouts, Headers, Navigation, Content, Forms, Data, Marketplace) is browsable at `/chunks` in the Catalogue.
+
+## Prototyping UIs with Balsamiq
+
+The repo ships a Balsamiq wireframe template at [`.balsamiq/Blok UI Kit - Template.bmpr`](.balsamiq/) that renders the full component kit — every primitive and chunk, drawn with the library's design tokens — as a set of reference boards:
+
+- **00 · Index** — linked table of contents for the whole template
+- **Sticker sheets** — primitives and chunks grouped by family, each component labelled with its key variants and states
+- **Full-page boards** — the layout shells and page patterns (AppShell, PageShell, SplitShell, DataPage, FormShell, WizardShell, the XMC Marketplace shells, …) at real page scale
+
+Frequently-reused components that are drawn from loose parts ship as named Balsamiq Symbols (`Blok/<ComponentName>`) so they stay atomic when inserted; everything else is grouped for copy/paste. Non-component chrome on the reference boards (headings, card frames, dividers) is locked, so a drag-select grabs only the component rendering.
+
+### Import the template
+
+1. In **Balsamiq Cloud**, create a project by importing the BMPR file into your space. The file requires Balsamiq Cloud — it is not compatible with Balsamiq for Desktop. (The code-generation step depends on Balsamiq Cloud's AI Connection in any case.)
+2. Treat the imported project as your reference kit. For each prototype, duplicate the project — the Symbols travel with it — or add your own boards alongside the reference boards.
+
+### Compose a prototype
+
+- Insert components from the **Symbols** section of Balsamiq's UI library (all named `Blok/<ComponentName>`), or copy/paste any rendering from the reference boards onto your own boards.
+- Change labels, values, and content freely — text edits carry through into the generated code.
+- Capture intent that isn't visual with sticky notes (e.g. `Blok: WizardShell`, "this table is virtualised") and draw arrows for navigation flow. Sticky notes and arrows are read as design intent and are never rendered as UI.
+
+### Generate Blazor code from a board
+
+Code generation uses the `balsamiq-to-blazor` Claude Code skill shipped in [`.claude/skills/`](.claude/):
+
+1. **Install the skills** from the repo root (see [`.claude/README.md`](.claude/README.md)):
+
+   ```powershell
+   pwsh ./.claude/install-skills.ps1      # Windows / any OS with PowerShell 7+
+   ```
+
+   ```bash
+   ./.claude/install-skills.sh            # macOS / Linux
+   ```
+
+2. **Connect Balsamiq to Claude.** Enable Balsamiq's **AI Connection** for the space that hosts your project (a Balsamiq plan feature) and connect the **Balsamiq MCP server** to your Claude environment — the skill reads boards through it.
+
+3. **Ask for the code.** In a Claude Code session in your app's repo (any project consuming this package), ask, for example: *"Generate the Blazor UI for my Balsamiq board 'Checkout — step 2'"*.
+
+The skill reads the board through the MCP, identifies every element by its Blok fingerprint (Balsamiq component names are not exposed by the API, so identification is based on the palette and structure of the template renderings), maps clusters to library components — chunks before primitives — and writes Razor against the real component APIs, using the packaged AI manifest (`tools/ai/components.json` + `llms.txt`) in consuming projects or the component sources when working inside this repo. Placeholder content becomes bindings rather than hard-coded strings, and drawn states that a runtime component would not render (for example a selection bar with zero selected items) are called out.
 
 ## AI Assisted Component Migration
 
