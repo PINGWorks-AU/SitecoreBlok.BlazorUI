@@ -12,6 +12,12 @@
 	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
 	[Parameter] public bool Disabled { get; set; }
 
+	// The label to show for the current Value, supplied by a parent that already knows it
+	// (e.g. SelectField from its item list). Lets the trigger display the right label without
+	// the popover ever having been opened — items only register while the popover is rendered,
+	// so a preselected value would otherwise show its raw Value until first opened.
+	[Parameter] public string? DisplayLabel { get; set; }
+
 	internal string SelectId { get; } = Guid.NewGuid().ToString();
 	internal bool IsOpen { get; private set; }
 	internal ElementReference? TriggerRef { get; private set; }
@@ -48,6 +54,10 @@
 	internal string? GetDisplayLabel()
 	{
 		if ( Value is null ) return null;
+
+		// A parent-supplied label always reflects the current Value, so it wins over the cached
+		// SelectedLabel (which can be stale if Value changed externally without a click).
+		if ( DisplayLabel is not null ) return DisplayLabel;
 		if ( SelectedLabel is not null ) return SelectedLabel;
 
 		var item = Items.OfType<SelectItem>().FirstOrDefault( i => i.Value == Value );
