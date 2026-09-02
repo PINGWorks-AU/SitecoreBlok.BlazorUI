@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-02T07:15:10Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-02T07:23:04Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -79,7 +79,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Textarea](/primitives/textarea): Multi-line text input
 - [ThemeToggle](/primitives/themetoggle): Light / dark mode switcher
 - [Timeline](/primitives/timeline): Vertical event timeline
-- [TimePicker](/primitives/timepicker): Time input control
+- [TimePicker](/primitives/timepicker): Native `input type=time`, not a port of Blok's Popover + three Selects composite. Status badge under review — see the TimePicker section in docs/ui-parity-audit.md
 - [Toaster](/primitives/toaster): Imperative `ToastService.Show(...)` API; `/sonner` stub page
 - [Toggle](/primitives/toggle): Single-toggle button
 - [ToggleGroup](/primitives/togglegroup): Segmented toggle group

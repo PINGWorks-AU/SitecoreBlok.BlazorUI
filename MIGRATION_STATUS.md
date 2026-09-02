@@ -4,9 +4,9 @@ Component-by-component status of the PINGWorks BlazorUI port of the Sitecore Blo
 
 This file is the **single source of truth** for the [`blok-migration`](https://github.com/Sitecore/blok) skill's `/blok audit` command. The skill reads the `Blok Source` and `Last SHA` columns to decide which components to re-evaluate. A blanket directory scan still identifies new Blok primitives that don't yet have a row here.
 
-- **Last evaluated:** 2026-09-02 (Accordion re-audited to `e10c8d`, Calendar to `a2d44e`, Editable to `c631ca`; 12 rows still drifted upstream and pending re-audit)
+- **Last evaluated:** 2026-09-02 (Accordion `e10c8d`, Calendar `a2d44e`, Editable `c631ca`, TimePicker `931987` re-audited; 11 rows still drifted upstream and pending re-audit)
 - **Blok repo:** [Sitecore/blok](https://github.com/Sitecore/blok) · branch `main`
-- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-02. Per-row `Last SHA` values are authoritative for drift; 12 rows are known-stale against this HEAD.
+- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-02. Per-row `Last SHA` values are authoritative for drift; 11 rows are known-stale against this HEAD.
 - **Audit tooling:** `pwsh ./tools/verify-ui-parity.ps1` — see [docs/ui-parity-audit.md](docs/ui-parity-audit.md)
 
 ## Status legend
@@ -97,7 +97,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | Text | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | — | — | Typography primitive |
 | Textarea | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`textarea.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/textarea.tsx) | `17d1fb` | Multi-line text input |
 | ThemeToggle | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | — | — | Light / dark mode switcher |
-| TimePicker | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`time-picker.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/time-picker.tsx) | `53ab50` | Time input control |
+| TimePicker | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`time-picker.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/time-picker.tsx) | `931987` | Native `input type=time`, not a port of Blok's Popover + three Selects composite. Status badge under review — see the TimePicker section in docs/ui-parity-audit.md |
 | Timeline | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`timeline.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/timeline.tsx) | `17d1fb` | Vertical event timeline |
 | Toaster | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`sonner.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/sonner.tsx) | `17d1fb` | Imperative `ToastService.Show(...)` API; `/sonner` stub page |
 | Toggle | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`toggle.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/toggle.tsx) | `2d994e` | Single-toggle button |

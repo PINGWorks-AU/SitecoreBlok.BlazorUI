@@ -139,7 +139,7 @@ For each component: render in Catalogue dark mode, compare side-by-side to `blok
 | Component | Default | Hover | Active | Focus | Variants | Notes |
 |-----------|---------|-------|--------|-------|----------|-------|
 | DatePicker | ✅ | ✅ | ✅ | ✅ | ✅ | Uses Calendar internally + Popover; inherits theme. |
-| TimePicker | ✅ | ✅ | ✅ | ✅ | ✅ | Uses Input/Select internally; inherits. |
+| TimePicker | ✅ | ✅ | ❌ differs | ✅ | ✅ | **Not a port of Blok's composite picker** — we render a native `<input type="time">`; Blok uses a Popover with three Selects plus Clear/Done. Re-audited 2026-09-02 against `931987`. The previous note ("Uses Input/Select internally") was inaccurate. See the TimePicker section below. |
 | Calendar | ✅ | ✅ | ⚠️ minor | ✅ | ✅ | Re-audited 2026-09-02 against Blok `a2d44e`. `bg-background`, `text-foreground`, `bg-primary text-primary-foreground` for selected — theme-aware. ARIA parity closed; 7 documented Check 3 deviations and one open decision (`InBuiltDropdown`) — see the Calendar section below. |
 | Avatar | ✅ | — | — | — | ✅ | `bg-muted text-muted-foreground` fallback — theme-aware. |
 | Icon | ✅ | — | — | — | ✅ | Now supports `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes) matching Blok. **Structural divergence (Default variant only):** `<svg>` is the root element; `ClassName` lands on the SVG for chevron-rotation animation support. Subtle/Filled variants render a `<span>` wrapper matching Blok exactly. `ColorScheme` is nullable for Default — null means "inherit parent color" (backward-compatible). Blazor extras: `Scale`, `AiGradient`, `ViewBox`, `ResetClassName`. Harness fix: added switch-expression arm pattern to `Get-RazorClassStrings`. |
@@ -491,3 +491,50 @@ I could not pixel-compare against Blok's own error box: their live "Editable wit
 ### Verified in browser (light + dark)
 
 Error element carries `role="alert"` / `aria-live="polite"`; root computes `position: relative` and the error `position: absolute` with `bottom: -30px`, confirming Blok's `bottom-[calc(-100%+var(--spacing)*0.5)]` compiles (Tailwind normalises the missing whitespace around `+` into valid `calc(-100% + var(--spacing) * .5)`). Full `HasError` cycle exercised: empty value starts in edit mode with the message shown; entering a value and blurring clears the error, leaves edit mode, and the preview shows the new value. Input renders at 32px and preview `min-height` at 32px in both themes.
+
+
+## TimePicker re-audit — 2026-09-02 (Blok `53ab50` → `931987`)
+
+Triggered by `/blok update timepicker`. Four upstream commits (`7f64d5`, `c4346e`, `d2f740`, merge `931987`), all accessibility.
+
+### What the upstream change actually was
+
+The audit sweep flagged TimePicker as the highest visual-drift risk on a count of 14 changed `className` lines. That count was misleading: every one of those lines moved only because Biome re-wrapped the JSX when new attributes were added. **No class string changed.** The real diff is:
+
+- `aria-label="Choose time"` on the `PopoverContent`
+- `htmlFor` on each `<label>`, paired with a new `id` on the matching `SelectTrigger` (`time-picker-hour` / `-minute` / `-period`)
+- `aria-label` of `Hour` / `Minute` / `Period` on each `SelectTrigger`
+
+### Why almost none of it is applicable
+
+Our TimePicker is **not a port of Blok's component**. Blok composes a `Popover` → three `Select`s (Hour 1-12, Minute 00-59, Period AM/PM) with `<label>`s, a `:` separator, and Clear / Done buttons, behind a trigger `Button` that renders the formatted time and a clock icon. Ours is a single native `<input type="time">` in a wrapper `<div>` — 30 lines against Blok's ~200.
+
+There is no popover, no `Select`, and no `<label>` in our render tree, so there is nothing for the new `htmlFor`/`id` pairs or the per-select `aria-label`s to attach to.
+
+**Applied:** the one transferable piece — a default accessible name. The input now carries `aria-label`, defaulting to `"Choose time"` (matching Blok's new `PopoverContent` label) via a new `AriaLabel` parameter. Before this the control had no accessible name at all. A `name` attribute can still be supplied through `AdditionalAttributes`; no default is set because an invented one would leak into form posts.
+
+### Two records corrected
+
+Both pre-existing and both wrong:
+
+1. **The `<DivergenceNote>` on `TimePickerPage` described only the value-type difference** and asserted that the component formats 12-hour output "via a `Format` string". There is no `Format` parameter — the component's full parameter set is `Value`, `ValueChanged`, `Disabled`, `ClassName`, `AdditionalAttributes` (now plus `AriaLabel`). Rewritten to lead with the structural divergence and to state that display formatting follows the browser locale.
+2. **This document's status row read "Uses Input/Select internally; inherits."** It uses neither — it is a bare native input. Row corrected and Check 3 downgraded from ✅ to ❌ differs.
+
+### Harness blind spot — this is the clearest case so far
+
+`pwsh ./tools/verify-ui-parity.ps1 -Component TimePicker` reports **PASS, 0 drift findings**, for a component that shares no DOM structure, no sub-components, and no interaction model with its Blok source.
+
+Two filters combine to produce the false clean:
+
+1. Check 3 only reports tokens matching `^(bg-|text-|border-|ring-|hover:|active:|focus:|dark:|rounded-|shadow-)`. Blok's distinguishing classes here are layout and sizing (`w-[70px]`, `flex flex-col gap-2`, `p-4`, `text-xs`, `font-medium`, `mt-6`) — all discarded before comparison.
+2. Of the colour/border tokens that do survive, our single input happens to carry most of them (`border-input`, `rounded-md`, `focus-visible:border-primary`), so the set difference is empty.
+
+Check 3 measures token overlap, not structural correspondence. It cannot detect a wholly different component. Combined with the Accordion finding (layout drift invisible), the rule is: **the harness is a regression guard on class strings, not evidence of parity.** Structural parity needs the export count check from Phase 3 step 2 and a source read.
+
+### Open decision — port Blok's composite picker?
+
+Not started; needs a call before any code.
+
+Rebuilding to Blok's shape means: a `Popover`-hosted panel with three `Select`s, labels, Clear/Done buttons, and a formatted trigger button. It would give Blok-matching DOM and the AM/PM period model, at the cost of the native input's free keyboard entry, platform time UI, and mobile time wheel. It would also add a `<Popovers />` + `AddSitecoreBlokUI()` installation requirement to a component that currently has none, and inherits the same nested-popover consideration flagged for Calendar's `InBuiltDropdown` if a consumer puts a TimePicker inside another popover.
+
+Until that is decided, the `Parity` badge on TimePicker's `MIGRATION_STATUS.md` row overstates the position — by this file's own legend, `Parity` means "class strings & structure match", and the structure does not. Flagged rather than changed, because no existing badge fits a deliberate whole-component substitution and the resolution may be to port it properly.
