@@ -17,6 +17,7 @@
 	[Parameter] public EventCallback Hide { get; set; }
 
 	private IJSObjectReference? Module;
+	private bool Disposed;
 	private ElementReference? PopupContainer;
 
 	private double Top;
@@ -30,9 +31,23 @@
 
 	protected async override Task OnAfterRenderAsync( bool firstRender )
 	{
-		Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
-		await GetPosition( Item );
+		if ( Disposed )
+			return;
+
+		try
+		{
+			Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
+
+			await GetPosition( Item );
+		}
+		catch ( Exception exception ) when ( IsGone( exception ) )
+		{
+		}
 	}
+
+	/// <summary>Whether the exception is the component or the circuit going away during a JS call.</summary>
+	private static bool IsGone( Exception exception )
+		=> exception is ObjectDisposedException or JSDisconnectedException or TaskCanceledException;
 
 	private async Task HidePopoverByOverlay()
 	{
@@ -69,10 +84,16 @@
 
 	public async ValueTask DisposeAsync()
 	{
+		Disposed = true;
+
 		try
 		{
 			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
 		}
 		catch ( JSDisconnectedException ) { }
+		finally
+		{
+			Module = null;
+		}
 	}
 }
