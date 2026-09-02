@@ -12,7 +12,7 @@
 		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
 	}
 	<div @onfocusout="MarkTouched">
-		<Select Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled">
+		<Select Value="@Value" ValueLabel="@LabelForValue" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled">
 			<SelectTrigger>
 				<SelectValue Placeholder="@Placeholder" />
 			</SelectTrigger>
@@ -38,4 +38,8 @@
 
 	[Parameter] public string? Placeholder { get; set; }
 	[Parameter] public IList<SelectFieldItem>? Items { get; set; }
+
+	/// <summary>The label for the current value, taken from <see cref="Items"/>.</summary>
+	private string? LabelForValue
+		=> Value is null ? null : Items?.FirstOrDefault( item => item.Value == Value )?.Label;
 }
