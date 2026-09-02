@@ -140,7 +140,7 @@ For each component: render in Catalogue dark mode, compare side-by-side to `blok
 |-----------|---------|-------|--------|-------|----------|-------|
 | DatePicker | ✅ | ✅ | ✅ | ✅ | ✅ | Uses Calendar internally + Popover; inherits theme. |
 | TimePicker | ✅ | ✅ | ✅ | ✅ | ✅ | Uses Input/Select internally; inherits. |
-| Calendar | ✅ | ✅ | ✅ | ✅ | ✅ | `bg-background`, `text-foreground`, `bg-primary text-primary-foreground` for selected — theme-aware. |
+| Calendar | ✅ | ✅ | ⚠️ minor | ✅ | ✅ | Re-audited 2026-09-02 against Blok `a2d44e`. `bg-background`, `text-foreground`, `bg-primary text-primary-foreground` for selected — theme-aware. ARIA parity closed; 7 documented Check 3 deviations and one open decision (`InBuiltDropdown`) — see the Calendar section below. |
 | Avatar | ✅ | — | — | — | ✅ | `bg-muted text-muted-foreground` fallback — theme-aware. |
 | Icon | ✅ | — | — | — | ✅ | Now supports `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes) matching Blok. **Structural divergence (Default variant only):** `<svg>` is the root element; `ClassName` lands on the SVG for chevron-rotation animation support. Subtle/Filled variants render a `<span>` wrapper matching Blok exactly. `ColorScheme` is nullable for Default — null means "inherit parent color" (backward-compatible). Blazor extras: `Scale`, `AiGradient`, `ViewBox`, `ResetClassName`. Harness fix: added switch-expression arm pattern to `Get-RazorClassStrings`. |
 | Kbd | ✅ | — | — | — | ✅ | `bg-muted text-muted-foreground border-border` — theme-aware. |
@@ -270,7 +270,7 @@ These pairs are now in `$equivGroups` in `verify-ui-parity.ps1` so the harness t
 | **Button** | `bg-backgrounds` | Blok-side typo (plural). Doesn't resolve to any Tailwind utility. We use `bg-background` (singular). |
 | **Button**, **Toggle**, **Input** | `text-md` | Harness false-positive — class IS in our Razor inside CssClassBuilder.Start(...) but the harness's regex misses it inside multi-arg Start calls in some cases. Verified manually present in source. Low priority. |
 | **Button**, **Toggle** | `dark:aria-invalid:ring-destructive/40` | Same harness false-positive — class is present in our source. |
-| **Calendar** | `bg-popover`, `border-collapse`, `text-neutral`, `hover:rounded-md`, `border-solid` | Design choices. We don't use `<table>` for the day grid (so no `border-collapse` / `border-solid`); day cells use semantic foreground tokens, not `text-neutral`; hover state is unconditional `rounded-md`, not hover-only. |
+| **Calendar** | `bg-popover`, `border-collapse`, `hover:rounded-md`, `text-body-text`, `text-inverse-text`, `dark:bg-transparent`, `dark:hover:bg-transparent` | Superseded 2026-09-02 — `text-neutral` and `border-solid` were adopted in the `a2d44e` re-audit and are no longer drift. Full per-token reasoning for the remaining seven is in the Calendar re-audit section at the end of this document. |
 | **Icon** | *(resolved)* | Tile variants (Subtle/Filled) fully implemented; all class-string drift cleared. `rounded-md`, `bg-primary-bg`, `bg-primary-fg`, `text-background`, `text-primary-fg`, `text-neutral-fg` now present. Harness extended to scan switch-expression arms (`=> "..."`) so compound-variant strings in `@code` blocks are detected. |
 | **Input** | `focus:ring-1` | We use `focus-visible:ring-[3px]` — modern accessibility (keyboard-only focus, larger ring). Deliberate. |
 | **Popover** | `bg-popover`, `text-popover-foreground`, `rounded-md`, `shadow-md` | Our `Popover` is positioning-only (delegates to `PopoverService`); consumer-facing components like `DropdownMenuContent`, `SelectContent`, `NavigationMenuItem` apply these classes themselves. Different responsibility split. |
@@ -407,3 +407,49 @@ Cause: `tools/verify-ui-parity.ps1` filters drift candidates through
 Only colour, border and shadow utilities survive. Every **layout** utility — flex/grid alignment, sizing, spacing, `min-w-*`, `shrink-*`, `transition-*` — is discarded before comparison. Check 3 therefore cannot detect structural or layout drift from Blok, which is exactly the category `e10c8d` changed.
 
 Not fixed in this pass — widening the filter needs a review of the false-positive volume across all 60+ components first, and would be its own change. Recorded here so "harness clean" is not read as "matches Blok".
+
+
+## Calendar re-audit — 2026-09-02 (Blok `17d1fb` → `a2d44e`)
+
+Triggered by `/blok update Calendar`. Five upstream commits in range; the substantive ones are `6d5ecd` (in-built dropdown) and the `fcdbb6` / `10eb7d` / `b82ead` / `a2d44e` accessibility sweep.
+
+### Aligned to Blok
+
+| Change | Detail |
+|---|---|
+| `AriaLabels` parameter | New `CalendarAriaLabels` record (`PreviousMonth`, `NextMonth`, `MonthDropdown`, `YearDropdown`), mirroring the subset of react-day-picker's `labels` that Blok exposes plus its `monthDropdownAriaLabel` prop. Follows the existing `DatePickerAriaLabels` convention. |
+| Nav button ARIA | Prev/next now carry `aria-label`, and `aria-disabled="true"` + `tabindex="-1"` when `MinDate`/`MaxDate` leave no month to navigate to. `PreviousMonth()`/`NextMonth()` guard on the same condition, matching Blok's `if (previousMonth) onPreviousClick?.(e)`. |
+| Dropdown ARIA | Month and year `<select>` overlays now carry `aria-label`. |
+| Day button attributes | Added `aria-label` ("Select " + long-form date), `data-day` (`yyyy-MM-dd`), `data-selected`, `data-range-start` / `-end` / `-middle`, and `aria-pressed`. These were present in Blok at `17d1fb` already — pre-existing drift this re-audit closed. |
+| `aria-selected` → `aria-pressed` | The day cell is a `<button>`, which does not support `aria-selected`. Blok's `CalendarDayButton` uses `aria-pressed`; Blok's `aria-selected` lives on the react-day-picker gridcell, which our flat div grid has no equivalent of. No CSS in this library selects on `aria-selected`, so the swap is inert visually. |
+| Nav chevron colour | Added `text-neutral size-4`, matching Blok's `Chevron` component. Verified `--color-neutral` flips (`blackAlpha-500` light → `whiteAlpha-600` dark), so no dark-mode contrast issue. |
+| Day border | `border border-transparent` → `border border-solid border-transparent`, matching Blok. |
+| Range-middle cells | `bg-primary-bg text-foreground rounded-none` → `bg-primary-bg text-primary-fg hover:bg-primary hover:text-inverse-text rounded-none`, matching Blok. **This fixed a real gap:** middle-of-range days previously had no hover state at all. Verified in-browser that hovering a middle day now highlights it. |
+
+### Open decision — Blok's `InBuiltDropdown` is not ported
+
+Commit `6d5ecd` replaced react-day-picker's native `<select>` month/year dropdowns with Blok's own `Select` component (`SelectTrigger` / `SelectContent` / `SelectItem`), exported as `InBuiltDropdown`. We still use a native `<select>` overlaid at `opacity-0`.
+
+Not adopted in this pass because it is an architectural change, not a class-string one, and it carries a specific risk this library has already been bitten by: our `Select` renders through `PopoverService` / the `<Popovers>` host, and `Calendar` is itself rendered **inside** the DatePicker's popover. That nests a `PopoverService` popup inside a `PopoverService` popup, and the documented behaviour is that the `<Popovers>` host does not re-render when the originating component's state changes. It would also add a `<Popovers />` + `AddSitecoreBlokUI()` installation requirement to the otherwise self-contained `Calendar`.
+
+Tracked as a Known Feature Gap on `Home.razor`. Awaiting a decision before implementing.
+
+### Deliberate deviations (remaining Check 3 drift — 4 tokens reported by the harness)
+
+| Blok token | Why not adopted |
+|---|---|
+| `bg-popover` | On Blok's `opacity-0` native select overlay, so visually inert. Our overlay instead sets `dark:[&_option]:bg-background dark:[&_option]:text-foreground`, which is the more robust fix for the dark-mode `<option>` popup bug documented in Common Pitfalls. |
+| `border-collapse` | Blok renders the day grid as a `<table>`; we render a flat div grid. Structural divergence already covered by the `<DivergenceNote>` on `CalendarPage`. |
+| `hover:rounded-md` | Blok puts this on the day-button base. Our rounding is per-state (`rounded-md` / `rounded-l-md` / `rounded-none`), so a base `hover:rounded-md` would round range-middle cells on hover and break the continuous range bar. |
+| `text-body-text` | Not counted by the harness — `$equivGroups` canonicalises it to `text-foreground`, which the file carries. Blok sets a base text token on every day button. We leave the base uncoloured and let the root's `text-card-foreground` cascade, because setting a base `text-*` alongside per-state `text-white` reintroduces the source-order race documented for Button. |
+| `text-inverse-text` | Selected and range-endpoint cells use a literal `text-white`. The surface is a fixed `bg-primary-500` that does not flip, so `text-inverse-text` would resolve dark-on-blue in dark mode. Same class as the Tooltip fix; harness Check 5 enforces it. Anti-revert comment is in `Calendar.razor`. |
+| `dark:bg-transparent`, `dark:hover:bg-transparent` | Belong to `InBuiltDropdown`'s `SelectTrigger` and are below the harness's per-component reporting cap. Contingent on the open decision above. |
+
+### Extras we have that Blok does not
+
+- **Root border and shadow.** Blok's root is `w-fit bg-card` with no border, radius or shadow. Ours adds `rounded-lg border border-border shadow-sm text-card-foreground` so a standalone `<Calendar />` reads as a finished surface rather than floating text. Verified this does not double-border inside `DatePicker`: the picker passes `ClassName="border-0 shadow-none"` and the computed border resolves to `0px`, with the popover supplying `shadow-lg rounded-lg`.
+- **Fixed six-week grid.** `GetWeeksForMonth` always renders 6 rows; Blok renders only the weeks the month needs, so its calendar changes height between months. Ours keeps a stable height (equivalent to react-day-picker's `fixedWeeks`, which Blok does not set). Deliberate — avoids layout jump when navigating months, which matters most inside the DatePicker popover.
+
+### Verified in browser (light + dark)
+
+Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.

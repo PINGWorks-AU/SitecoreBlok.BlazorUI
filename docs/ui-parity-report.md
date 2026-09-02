@@ -1,7 +1,7 @@
 # UI Parity Report
 
-Generated: 2026-09-02 16:49:08  
-Scope: 4 component(s)
+Generated: 2026-09-02 17:04:13  
+Scope: 1 component(s)
 
 ## Check 1 — Compiled-utility coverage
 
@@ -13,7 +13,12 @@ No runtime-composed class names detected.
 
 ## Check 3 — Blok class-string drift
 
-No drift detected.
+| Component | In Blok | In ours |
+|-----------|---------|---------|
+| calendar.tsx (Blok) ↔ 1 Razor file(s) | `bg-popover` | (missing) |
+| calendar.tsx (Blok) ↔ 1 Razor file(s) | `border-collapse` | (missing) |
+| calendar.tsx (Blok) ↔ 1 Razor file(s) | `hover:rounded-md` | (missing) |
+| calendar.tsx (Blok) ↔ 1 Razor file(s) | `text-inverse-text` | (missing) |
 
 ## Check 4 — Surface background without paired text token
 

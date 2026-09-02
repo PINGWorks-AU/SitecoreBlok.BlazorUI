@@ -4,9 +4,9 @@ Component-by-component status of the PINGWorks BlazorUI port of the Sitecore Blo
 
 This file is the **single source of truth** for the [`blok-migration`](https://github.com/Sitecore/blok) skill's `/blok audit` command. The skill reads the `Blok Source` and `Last SHA` columns to decide which components to re-evaluate. A blanket directory scan still identifies new Blok primitives that don't yet have a row here.
 
-- **Last evaluated:** 2026-09-02 (Accordion re-audited to `e10c8d`; 14 rows still drifted upstream and pending re-audit)
+- **Last evaluated:** 2026-09-02 (Accordion re-audited to `e10c8d`, Calendar to `a2d44e`; 13 rows still drifted upstream and pending re-audit)
 - **Blok repo:** [Sitecore/blok](https://github.com/Sitecore/blok) · branch `main`
-- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-02. Per-row `Last SHA` values are authoritative for drift; 14 rows are known-stale against this HEAD.
+- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-02. Per-row `Last SHA` values are authoritative for drift; 13 rows are known-stale against this HEAD.
 - **Audit tooling:** `pwsh ./tools/verify-ui-parity.ps1` — see [docs/ui-parity-audit.md](docs/ui-parity-audit.md)
 
 ## Status legend
@@ -40,7 +40,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | Badge | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`badge.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/badge.tsx) | `2d994e` | Inline label / status pill |
 | Breadcrumb | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`breadcrumb.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/breadcrumb.tsx) | `2d994e` | Hierarchical navigation trail |
 | Button | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`button.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/button.tsx) | `2d994e` | Clickable button with variants / sizes / colours |
-| Calendar | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`calendar.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/calendar.tsx) | `17d1fb` | Month-grid date picker surface |
+| Calendar | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`calendar.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/calendar.tsx) | `a2d44e` | Month-grid date picker surface; `AriaLabels` overrides the nav and dropdown ARIA strings |
 | Card | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`card.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/card.tsx) | `a80708` | Container with header / content / footer |
 | Carousel | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`carousel.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/carousel.tsx) | `17d1fb` | Horizontal slide scroller |
 | Chart | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`chart.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/chart.tsx) | `7c9f7e` | Recharts-backed; React-only. Established Blazor alternatives exist (ApexCharts.Blazor, ChartJs.Blazor, Radzen) — use those instead of porting. |

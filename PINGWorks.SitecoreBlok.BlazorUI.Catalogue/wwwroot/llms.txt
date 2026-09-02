@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-02T06:49:50Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-02T07:04:12Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -26,7 +26,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Badge](/primitives/badge): Inline label / status pill
 - [Breadcrumb](/primitives/breadcrumb): Hierarchical navigation trail
 - [Button](/primitives/button): Clickable button with variants / sizes / colours
-- [Calendar](/primitives/calendar): Month-grid date picker surface
+- [Calendar](/primitives/calendar): Month-grid date picker surface; `AriaLabels` overrides the nav and dropdown ARIA strings
 - [Card](/primitives/card): Container with header / content / footer
 - [Carousel](/primitives/carousel): Horizontal slide scroller
 - [Checkbox](/primitives/checkbox): Binary / tri-state toggle control

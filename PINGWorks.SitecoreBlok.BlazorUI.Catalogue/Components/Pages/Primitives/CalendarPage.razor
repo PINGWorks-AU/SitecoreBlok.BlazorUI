@@ -104,6 +104,19 @@
 				new ApiProperty( "YearRangeEnd",      "int",                        false, "Last year offered in the year dropdown. Default: current year + 10. Overridden by `MaxDate` when present." ),
 				new ApiProperty( "NumberOfMonths",    "int",                        false, "How many month panels to show side-by-side. Default: `1`. Use `2` for a typical range-picker layout." ),
 				new ApiProperty( "ClassName",         "string?",                    false, "Extra CSS classes appended to the outer card." ),
+				new ApiProperty( "AriaLabels",        "CalendarAriaLabels?",        false, "Overrides the built-in ARIA strings for the month navigation buttons and the month/year dropdowns. See `CalendarAriaLabels`." ),
+			]
+		),
+		 new ApiElement(
+			Name: "CalendarAriaLabels",
+			Description: "Record passed to `Calendar`'s `AriaLabels` parameter. Every property is optional; unset properties fall back to the built-in English defaults. Day buttons are always labelled \"Select \" followed by the long-form date.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "PreviousMonth",     "string?",                    false, "`aria-label` on the previous-month button. Default: `Go to previous month`." ),
+				new ApiProperty( "NextMonth",         "string?",                    false, "`aria-label` on the next-month button. Default: `Go to next month`." ),
+				new ApiProperty( "MonthDropdown",     "string?",                    false, "`aria-label` on the month dropdown. Default: `Choose the month`." ),
+				new ApiProperty( "YearDropdown",      "string?",                    false, "`aria-label` on the year dropdown. Default: `Choose the year`." ),
 			]
 		),
 	];
