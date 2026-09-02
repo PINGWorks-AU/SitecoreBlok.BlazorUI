@@ -1,8 +1,8 @@
 ﻿{
   "schema": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/blob/main/docs/components-schema.json",
   "package": "PINGWorks.SitecoreBlok.BlazorUI",
-  "version": "1.4.0.0-preview-1",
-  "generatedAt": "2026-06-01T10:31:10Z",
+  "version": "2.0.0.0-preview-1",
+  "generatedAt": "2026-09-02T06:49:50Z",
   "repository": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI",
   "documentation": {
     "theme": "/theme.md",
@@ -13,7 +13,7 @@
     {
       "name": "Accordion",
       "slug": "accordion",
-      "description": "Vertically-stacked collapsible content panels",
+      "description": "Vertically-stacked collapsible content panels; trigger row supports optional `Actions` content",
       "status": "Parity",
       "catalogueUrl": "/primitives/accordion"
     },
@@ -482,7 +482,7 @@
     {
       "name": "TreeView",
       "slug": "treeview",
-      "description": "Hierarchical collapsible tree",
+      "description": "Generic hierarchical collapsible tree over any `TItem`. Supersedes Blok's narrower `file-tree.tsx` (see the FileTree row) rather than porting it.",
       "status": "Additional",
       "catalogueUrl": "/primitives/treeview"
     }

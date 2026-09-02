@@ -4,9 +4,9 @@ Component-by-component status of the PINGWorks BlazorUI port of the Sitecore Blo
 
 This file is the **single source of truth** for the [`blok-migration`](https://github.com/Sitecore/blok) skill's `/blok audit` command. The skill reads the `Blok Source` and `Last SHA` columns to decide which components to re-evaluate. A blanket directory scan still identifies new Blok primitives that don't yet have a row here.
 
-- **Last evaluated:** 2026-04-22 (DatePicker AriaLabels update)
+- **Last evaluated:** 2026-09-02 (Accordion re-audited to `e10c8d`; 14 rows still drifted upstream and pending re-audit)
 - **Blok repo:** [Sitecore/blok](https://github.com/Sitecore/blok) · branch `main`
-- **Blok main HEAD:** [`26f35d9`](https://github.com/Sitecore/blok/commit/26f35d9cb36906585c1b443ddd799e6a100f2a64)
+- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-02. Per-row `Last SHA` values are authoritative for drift; 14 rows are known-stale against this HEAD.
 - **Audit tooling:** `pwsh ./tools/verify-ui-parity.ps1` — see [docs/ui-parity-audit.md](docs/ui-parity-audit.md)
 
 ## Status legend
@@ -31,7 +31,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 
 | Component | Status | Blok Source | Last SHA | Description |
 |---|---|---|---|---|
-| Accordion | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`accordion.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/accordion.tsx) | `537976` | Vertically-stacked collapsible content panels |
+| Accordion | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`accordion.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/accordion.tsx) | `e10c8d` | Vertically-stacked collapsible content panels; trigger row supports optional `Actions` content |
 | ActionBar | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`action-bar.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/action-bar.tsx) | `7c9f7e` | Floating multi-action toolbar |
 | Alert | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`alert.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/alert.tsx) | `17d1fb` | Status banner; adds `Closeable` parameter |
 | AlertDialog | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`alert-dialog.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/alert-dialog.tsx) | `2d994e` | Modal confirmation dialog |
@@ -61,6 +61,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | EmptyState | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`empty-states.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/empty-states.tsx) | `17d1fb` | Empty-results placeholder |
 | ErrorState | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`error-states.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/error-states.tsx) | `17d1fb` | Error placeholder; adds HTTP-status variant |
 | Field | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`field.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/field.tsx) | `17d1fb` | Form-field grouping wrapper |
+| FileTree | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`file-tree.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/file-tree.tsx) | `36e50d` | Blok models a file/folder browser specifically — fixed `file` / `folder` node kinds, lucide file glyphs, and folder-chevron affordances baked into the primitive. Our `TreeView` is the deliberately more general form: any `TItem`, caller-supplied value / text / children accessors, single or multi select, and arbitrary node content. A UI kit is better served by the generic hierarchy primitive, which composes into a file tree, than by a file-specific one that cannot compose back out. Not ported. |
 | Filter | ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | [`filter.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/filter.tsx) | `0253b9` | Multi-facet filter panel |
 | Form | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`form.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/form.tsx) | `2d994e` | Wraps `react-hook-form`. Superseded by native Blazor `EditForm` + `DataAnnotationsValidator` + `Input*` primitives — paradigm mismatch means a port would fight both frameworks. |
 | HoverCard | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`hover-card.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/hover-card.tsx) | `2d994e` | Hover-triggered popover card |
@@ -102,7 +103,8 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | Toggle | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`toggle.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/toggle.tsx) | `2d994e` | Single-toggle button |
 | ToggleGroup | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`toggle-group.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/toggle-group.tsx) | `6255ac` | Segmented toggle group |
 | Tooltip | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`tooltip.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/tooltip.tsx) | `2d994e` | Per-tooltip `Delay` on `TooltipContent` (Blok delays via Provider only); `ClassName` on `Tooltip` root; CSS Anchor Positioning (`position: fixed` + `position-anchor`) so tooltips escape ancestor `overflow` clipping without a JS portal |
-| TreeView | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | — | — | Hierarchical collapsible tree |
+| TreeView | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | — | — | Generic hierarchical collapsible tree over any `TItem`. Supersedes Blok's narrower `file-tree.tsx` (see the FileTree row) rather than porting it. |
+| VirtualizedSelect | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`virtualized-select.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/virtualized-select.tsx) | `2f60d1` | Wraps `react-window` and `react-select` to windowed-render long option lists. Blazor already manages virtualization natively via the framework's built-in `Virtualize<TItem>` component, which composes over our `Select` / `Combobox` option lists without a new primitive. Porting would reimplement a framework feature. Not ported. |
 
 ## Summary
 
@@ -112,14 +114,14 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | 7 |
 | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | 6 |
 | ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 2 |
-| ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | 5 |
-| **Total ported** | **59** of **61** Blok primitives (excluding 5 Won't Do) |
+| ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | 7 |
+| **Total ported** | **59** of **61** Blok primitives (excluding 7 Won't Do) |
 
 ## Notes on classification
 
 - **Improved rows** also carry a `<DivergenceNote>` on their Catalogue page describing the Blazor-side addition. See [docs/ui-parity-audit.md](docs/ui-parity-audit.md) for the full reasoning.
 - **`sonner` → `Toaster`** is the one deliberate renaming: Blok's `Sonner` wraps the JS-only Sonner library; our idiomatic `ToastService.Show(...)` API is imperative. The Catalogue carries a `/primitives/sonner` cross-reference stub.
-- **Won't Do rationale summary** — Chart (React chart lib; Blazor alternatives exist), Command (cmdk; composable from existing primitives), DnD (@dnd-kit React-only; different Blazor idiom), Drawer (covered by Sheet), Form (native Blazor EditForm supersedes react-hook-form). Re-evaluate only if a business need forces the question.
+- **Won't Do rationale summary** — Chart (React chart lib; Blazor alternatives exist), Command (cmdk; composable from existing primitives), DnD (@dnd-kit React-only; different Blazor idiom), Drawer (covered by Sheet), FileTree (covered by the more generic `TreeView`), Form (native Blazor EditForm supersedes react-hook-form), VirtualizedSelect (Blazor virtualizes natively via `Virtualize<TItem>`). Re-evaluate only if a business need forces the question.
 - **Backlog items** are legitimate ports with no blocking rationale — prioritisation only. Pick the next one for `/blok migrate` based on consumer demand.
 - **Excluded internal Blok files** (not tracked as primitives): `inputOtp.tsx` (typo-duplicate of `input-otp.tsx`), `select-react.tsx` (alternate implementation of `select`).
 

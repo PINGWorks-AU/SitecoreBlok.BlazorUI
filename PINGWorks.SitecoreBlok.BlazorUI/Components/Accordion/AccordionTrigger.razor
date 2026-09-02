@@ -1,22 +1,26 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-<h3 class="flex">
+<div class="flex items-center hover:bg-blackAlpha-50 dark:hover:bg-whiteAlpha-100 transition-colors w-full min-w-0">
 	<button type="button" data-slot="accordion-trigger" data-state="@( Parent.IsOpen ? "open" : "closed" )"
 			class="@CssClass" disabled="@Parent.EffectiveDisabled" @onclick="Parent.Toggle">
 		@ChildContent
-		<Icon Svg="@IconSvg.ChevronDown" Scale="0.9" ClassName="transition-transform duration-200 size-6" />
+		<Icon Svg="@IconSvg.ChevronDown" Scale="0.9" ClassName="transition-transform duration-200 size-6 shrink-0" />
 	</button>
-</h3>
+	@if ( Actions is not null )
+	{
+		<div class="flex items-center shrink-0 py-4 px-2" @onclick:stopPropagation>
+			@Actions
+		</div>
+	}
+</div>
 
 @code {
 	[CascadingParameter] public required AccordionItem Parent { get; set; }
 	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public RenderFragment? Actions { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 
-	// `text-foreground` is explicit so the trigger text stays legible across
-	// light/dark theme flips. Chevron rotation uses `_svg` (descendant) — works
-	// regardless of whether Icon wraps the svg or emits it directly.
-	private string CssClass => CssClassBuilder.Start( "focus-visible:border-ring focus-visible:ring-ring/50 text-md font-normal text-foreground hover:bg-blackAlpha-50 flex flex-1 cursor-pointer items-start justify-between gap-4 text-left transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]_svg]:rotate-180" )
+	private string CssClass => CssClassBuilder.Start( "focus-visible:border-ring focus-visible:ring-ring/50 text-md font-normal text-foreground flex flex-1 cursor-pointer items-center justify-between gap-4 text-left transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180 min-w-0" )
 											.With( "px-2", !CssClassBuilder.ContainsAny( ClassName, "px-", "p-" ) )
 											.With( "py-4", !CssClassBuilder.ContainsAny( ClassName, "py-", "p-" ) )
 											.With( ClassName )

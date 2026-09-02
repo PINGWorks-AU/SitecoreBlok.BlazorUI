@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `1.4.0.0-preview-1`. Generated 2026-06-01T10:31:10Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-02T06:49:50Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -17,7 +17,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 
 ## Primitives
 
-- [Accordion](/primitives/accordion): Vertically-stacked collapsible content panels
+- [Accordion](/primitives/accordion): Vertically-stacked collapsible content panels; trigger row supports optional `Actions` content
 - [ActionBar](/primitives/actionbar): Floating multi-action toolbar
 - [Alert](/primitives/alert): Status banner; adds `Closeable` parameter
 - [AlertDialog](/primitives/alertdialog): Modal confirmation dialog
@@ -84,7 +84,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Toggle](/primitives/toggle): Single-toggle button
 - [ToggleGroup](/primitives/togglegroup): Segmented toggle group
 - [Tooltip](/primitives/tooltip): Per-tooltip `Delay` on `TooltipContent` (Blok delays via Provider only); `ClassName` on `Tooltip` root; CSS Anchor Positioning (`position: fixed` + `position-anchor`) so tooltips escape ancestor `overflow` clipping without a JS portal
-- [TreeView](/primitives/treeview): Hierarchical collapsible tree
+- [TreeView](/primitives/treeview): Generic hierarchical collapsible tree over any `TItem`. Supersedes Blok's narrower `file-tree.tsx` (see the FileTree row) rather than porting it.
 
 ## Chunks — Content
 

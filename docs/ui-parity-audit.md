@@ -125,7 +125,7 @@ For each component: render in Catalogue dark mode, compare side-by-side to `blok
 
 | Component | Default | Hover | Active | Focus | Variants | Notes |
 |-----------|---------|-------|--------|-------|----------|-------|
-| Accordion | ✅ | ✅ | — | ✅ | ✅ | Uses `border-border`, `text-foreground` — theme-aware. |
+| Accordion | ✅ | ✅ | ✅ | ✅ | ✅ | Re-audited 2026-09-02 against Blok `e10c8d`. Uses `border-border`, `text-foreground` — theme-aware. Trigger row restructured to match Blok's heading-level fix; `Actions` slot ported; one deliberate dark-mode divergence — see the Accordion section below. |
 | Carousel | ✅ | — | — | — | ✅ | Uses Button variants for nav; `bg-background` slides. |
 | Collapsible | ✅ | — | — | — | ✅ | Layout only; inherits theme. |
 | Timeline | ✅ | — | — | — | ✅ | Uses `bg-primary`, `text-muted-foreground`, `border-border`. |
@@ -322,3 +322,88 @@ These pairs are now in `$equivGroups` in `verify-ui-parity.ps1` so the harness t
 - **`ResizableHandle` adds `tabindex="0"`, `role="separator"`, `aria-orientation`** — the React library adds these accessibility attributes internally. Our handle sets them as static HTML attributes for equivalent keyboard and screen-reader behaviour.
 
 **Implementation detail (not a divergence):** The resize engine is a colocated JS module (`Resizable.razor.js`) using pointer capture events rather than `react-resizable-panels`. The consumer API (three components, same parameters, same `data-slot` values) is identical.
+
+
+## Upstream primitives deliberately not ported (recorded 2026-09-02)
+
+Both were surfaced by the `/blok audit` blanket scan against Blok `main` @ `e2651dc` as new `src/components/ui/*.tsx` files with no row in `MIGRATION_STATUS.md`. Both are recorded there as `Won't Do`. Neither is blocked by a React-only dependency in the way Chart or Command are — these are *design* decisions about what belongs in a UI kit.
+
+### FileTree (`file-tree.tsx`, `36e50d`, added 2026-05-25) — superseded by `TreeView`
+
+**Decision:** not ported. `Components/Extra/TreeView` stands as the library's hierarchy primitive.
+
+Blok's `FileTree` models a file/folder browser specifically. Its node type is `{ type: "file" | "folder" }`, it hardcodes lucide `File` / `Folder` / `ChevronRight` glyphs, and the folder-expand affordance is baked into the primitive rather than parameterised.
+
+Our `TreeView` is the deliberately more general form of the same idea:
+
+| | Blok `FileTree` | BlazorUI `TreeView` |
+|---|---|---|
+| Node model | fixed `FileTreeNode` with `file` / `folder` kinds | any `TItem`, via `GetItemValue` / `GetItemText` / `GetItemChildren` accessors |
+| Icons | lucide file/folder glyphs baked in | caller-supplied per node |
+| Selection | single | `TreeSelectionMode.Single` or `Multiple` |
+| Node content | filename text | arbitrary content, incl. badges |
+
+The generic primitive **composes into** a file tree — pass file/folder items and file glyphs and you have Blok's component. The file-specific primitive does not compose back out into a generic tree. For a UI kit, the generic form is the more useful shape to ship, so porting `FileTree` alongside it would add a narrower, redundant primitive.
+
+**Consequence for consumers coming from Blok:** there is no `<FileTree>` tag. Use `<TreeView TItem="...">` and supply the accessors and icons. `TreeView`'s Catalogue page carries a `<DivergenceNote>` making this explicit.
+
+**Re-evaluate if:** Blok's `FileTree` grows behaviour that is genuinely file-specific and non-trivial to express through `TreeView`'s accessors (drag-to-move, rename-in-place, lazy directory loading).
+
+### VirtualizedSelect (`virtualized-select.tsx`, `2f60d1`, added 2026-05-20) — Blazor virtualizes natively
+
+**Decision:** not ported.
+
+Blok's `VirtualizedSelect` wraps `react-window` (windowed list rendering) over `react-select` so that long option lists render only the visible rows. In React this needs a dedicated primitive because there is no framework-level virtualization.
+
+Blazor has virtualization in the framework: `Virtualize<TItem>` ships in `Microsoft.AspNetCore.Components.Web` and renders only the items in view, with `ItemsProvider` for paged/remote sourcing. It composes directly inside our existing `SelectContent` / `ComboboxList` option lists, so a consumer with a 50,000-row option set already has the capability without a new component.
+
+Porting `VirtualizedSelect` would mean reimplementing a framework feature as a library primitive, and would additionally fork our `Select` / `Combobox` into virtualized and non-virtualized variants that must then be kept at parity with each other.
+
+**Consequence for consumers coming from Blok:** there is no `<VirtualizedSelect>` tag. Wrap the option list in `<Virtualize>` inside a normal `Select` or `Combobox`.
+
+**Re-evaluate if:** `Virtualize<TItem>` proves incompatible with the popover-hosted option lists in practice — specifically if the fixed-height/scroll-container requirements clash with `ComboboxContent`'s in-place `position:fixed` rendering.
+
+
+## Accordion re-audit — 2026-09-02 (Blok `537976` → `e10c8d`)
+
+Triggered by `/blok update accordion`. Upstream commit `e10c8d` ("Heading levels should only increase by one") restructured `AccordionTrigger`; the re-audit also surfaced four pre-existing gaps the harness cannot see.
+
+### Aligned to Blok
+
+| Change | Before | After |
+|---|---|---|
+| Trigger wrapper element | `<h3 class="flex">` | `<div class="flex items-center hover:bg-blackAlpha-50 transition-colors w-full min-w-0">` — Radix `Header asChild`, matching `e10c8d` |
+| Hover surface | on the `<button>` | on the row wrapper, so the highlight spans the full row including `Actions` |
+| Button cross-axis alignment | `items-start` | `items-center` (pre-existing drift; Blok has always had `items-center`) |
+| Button `min-w-0` | absent | present — allows the label to ellipsize instead of forcing the row wider |
+| Chevron `shrink-0` | absent | present — chevron no longer squashes when the label is long |
+| Chevron rotation selector | `[&[data-state=open]_svg]` (descendant) | `[&[data-state=open]>svg]` (direct child), matching Blok |
+| `Actions` slot | not ported | `RenderFragment? Actions` renders beside the toggle button with `@onclick:stopPropagation` |
+
+The descendant→direct-child selector swap also fixes a latent bug: with `_svg`, any `<svg>` a consumer put inside the trigger label would also rotate on open. Verified in-browser that `rotate: 180deg` applies to the open item's chevron only.
+
+**Heading semantics note.** Blok's fix removes the heading element entirely — accordion triggers are no longer inside an `<h3>`. Confirmed zero `<h3>` inside `[data-slot=accordion-item]` in both our render and Blok's. This resolves the axe "heading levels should only increase by one" violation but leaves the accordion without heading landmarks. We mirror Blok. A `HeadingLevel` parameter would be a superset of both behaviours if this is ever raised as an accessibility requirement.
+
+### Deliberate divergence — dark-mode hover
+
+**Added `dark:hover:bg-whiteAlpha-100` to the trigger row. Blok has no dark-mode hover variant.**
+
+Blok's row hover is `hover:bg-blackAlpha-50` only — a fixed 4%-black tint (`#0000000a`). Measured in the browser, that resolves to `rgba(0, 0, 0, 0.04)` over a `rgb(40, 40, 40)` page in dark mode: effectively invisible. Verified this reproduces on Blok's own live site — hovering an accordion row at `https://blok.sitecore.com/primitives/accordion` in dark mode produces no visible change. It is an upstream bug, not a local port error.
+
+The fix follows the pattern already shipped in this library: `TreeView` and `TreeNode` both use `hover:bg-blackAlpha-50 dark:hover:bg-whiteAlpha-100`. Accordion was the only component using the black-alpha hover without the dark counterpart.
+
+Harness blindness: this class of bug is invisible to all six checks. Check 5 flags fixed-shade *backgrounds* paired with flipping *text* tokens; Check 6 flags alpha-based `--color-X-N` token aliases with no `.dark` override. A direct `hover:bg-blackAlpha-*` utility with no dark variant is neither.
+
+### Harness gap found during this audit
+
+Check 3 (Blok class-string drift) reported **0 findings for Accordion both before and after** these changes, while five Blok utilities were genuinely missing from our markup (`items-center`, `min-w-0`, `w-full`, `shrink-0`, `transition-colors`).
+
+Cause: `tools/verify-ui-parity.ps1` filters drift candidates through
+
+```
+-and ($_ -match '^(bg-|text-|border-|ring-|hover:|active:|focus:|dark:|rounded-|shadow-)')
+```
+
+Only colour, border and shadow utilities survive. Every **layout** utility — flex/grid alignment, sizing, spacing, `min-w-*`, `shrink-*`, `transition-*` — is discarded before comparison. Check 3 therefore cannot detect structural or layout drift from Blok, which is exactly the category `e10c8d` changed.
+
+Not fixed in this pass — widening the filter needs a review of the false-positive volume across all 60+ components first, and would be its own change. Recorded here so "harness clean" is not read as "matches Blok".

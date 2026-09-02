@@ -5,7 +5,8 @@
 <ComponentPage Title="TreeView" Description="A hierarchical list with expansion, selection, checkboxes, search, lazy loading, and item templates." Interactivity="ComponentInteractivity.Interactive" ApiElements="@TreeViewElements">
 
 	<DivergenceNote>
-		<p><strong>Blazor-side addition; no equivalent in the Blok design system.</strong> TreeView fills a real product need (file/asset trees, navigation hierarchies) that Blok does not currently address. The styling follows Blok tokens so it sits naturally alongside the ported primitives.</p>
+		<p><strong>Blazor-side addition. Blok has no generic tree primitive.</strong> TreeView fills a real product need (file/asset trees, navigation hierarchies). The styling follows Blok tokens so it sits naturally alongside the ported primitives.</p>
+		<p><strong>Replaces Blok's <code>FileTree</code>.</strong> Blok ships a <code>file-tree.tsx</code> primitive that models a file/folder browser specifically: fixed <code>file</code> / <code>folder</code> node kinds, baked-in file and folder glyphs, single selection. TreeView is the deliberately more general form &mdash; any <code>TItem</code>, caller-supplied <code>GetItemValue</code> / <code>GetItemText</code> / <code>GetItemChildren</code> accessors, single or multi select, and arbitrary node content. Supply file items and file icons and you have Blok's component; the reverse does not compose. There is no <code>&lt;FileTree&gt;</code> tag in this library.</p>
 	</DivergenceNote>
 
 	<ExamplesSection>
