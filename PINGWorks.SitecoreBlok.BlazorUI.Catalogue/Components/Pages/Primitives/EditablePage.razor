@@ -94,6 +94,14 @@
 			<p class="mt-2 text-sm text-muted-foreground">Current value: <code>@ControlledText</code> | Editing: <code>@IsEditing</code></p>
 		</ComponentExample>
 
+		<ComponentExample Title="Validation error" Code="@CodeError">
+			<Editable @bind-Value="ErrorText" HasError="@IsErrorTextInvalid">
+				<EditablePreview />
+				<EditableInput />
+				<EditableError Errors="@ErrorMessages" />
+			</Editable>
+		</ComponentExample>
+
 	</ExamplesSection>
 
 </ComponentPage>
@@ -106,6 +114,19 @@
 	private string Text5 { get; set; } = "Pre-opened for editing";
 	private string ControlledText { get; set; } = "Externally controlled value";
 	private bool IsEditing { get; set; }
+	private string ErrorText { get; set; } = "";
+
+	private bool IsErrorTextInvalid => string.IsNullOrWhiteSpace( ErrorText );
+
+	private IEnumerable<string> ErrorMessages => IsErrorTextInvalid ? [ "A display name is required" ] : [];
+
+	private static readonly string CodeError = """
+		<Editable @bind-Value="@ErrorText" HasError="@IsErrorTextInvalid">
+		    <EditablePreview />
+		    <EditableInput />
+		    <EditableError Errors="@ErrorMessages" />
+		</Editable>
+		""";
 
 	private static readonly string CodeInput = """
 		<Editable @bind-Value="@text">
@@ -190,6 +211,7 @@
 				new ApiProperty( "IsPreviewFocusable",   "bool",                        false, "Whether `EditablePreview` is keyboard-focusable and clickable. Default: `true`." ),
 				new ApiProperty( "SubmitOnBlur",         "bool",                        false, "Submits the value when the input loses focus. Default: `true`." ),
 				new ApiProperty( "StartWithEditView",    "bool",                        false, "Starts the component in edit mode. Default: `false`." ),
+				new ApiProperty( "HasError",             "bool",                        false, "Keeps the component in edit mode after submit or cancel so the user can correct an invalid value. Also starts it in edit mode. Pair with `EditableError`. Default: `false`." ),
 				new ApiProperty( "SelectAllOnFocus",     "bool",                        false, "Selects all text when the input gains focus. Default: `true`." ),
 				new ApiProperty( "ActivationMode",       "EditableActivationMode",      false, "Whether a single click or double-click activates edit mode. Default: `EditableActivationMode.Click`." ),
 				new ApiProperty( "Size",                 "EditableSize",                false, "Applies a text-size class to the root. Default: `EditableSize.Md`. Other values: `Sm`, `Lg`." ),
@@ -214,6 +236,7 @@
 				new ApiProperty( "Placeholder",          "string",                      false, "Placeholder text when value is empty. Default: `\"Click to edit...\"`." ),
 				new ApiProperty( "IsDisabled",           "bool",                        false, "Prevents editing. Default: `false`." ),
 				new ApiProperty( "IsPreviewFocusable",   "bool",                        false, "Whether `EditablePreview` is clickable and keyboard-focusable. Default: `true`." ),
+				new ApiProperty( "HasError",             "bool",                        false, "Keeps the component in edit mode after submit or cancel so the user can correct an invalid value. Pair with `EditableError`. Default: `false`." ),
 				new ApiProperty( "SubmitOnBlur",         "bool",                        false, "Submits on blur. Default: `true`." ),
 				new ApiProperty( "SelectAllOnFocus",     "bool",                        false, "Selects all text on focus. Default: `true`." ),
 				new ApiProperty( "ActivationMode",       "EditableActivationMode",      false, "Click or double-click activation. Default: `EditableActivationMode.Click`." ),
@@ -234,6 +257,18 @@
 			[
 				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the preview `<span>`." ),
 				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the `<span>` element." ),
+			]
+		),
+		new ApiElement(
+			Name: "EditableError",
+			Description: "Validation message shown beneath the field. Renders nothing when there is no content. Pair with `HasError` on the root so the component stays in edit mode while invalid.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Errors",               "IEnumerable<string>?",        false, "Validation messages. One renders as a single line; several render as a bulleted list. Blank entries are skipped." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "Custom message content. Takes precedence over `Errors`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Forwarded to the root `<div>`." ),
 			]
 		),
 		new ApiElement(

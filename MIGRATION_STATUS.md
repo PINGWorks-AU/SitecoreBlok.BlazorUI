@@ -4,9 +4,9 @@ Component-by-component status of the PINGWorks BlazorUI port of the Sitecore Blo
 
 This file is the **single source of truth** for the [`blok-migration`](https://github.com/Sitecore/blok) skill's `/blok audit` command. The skill reads the `Blok Source` and `Last SHA` columns to decide which components to re-evaluate. A blanket directory scan still identifies new Blok primitives that don't yet have a row here.
 
-- **Last evaluated:** 2026-09-02 (Accordion re-audited to `e10c8d`, Calendar to `a2d44e`; 13 rows still drifted upstream and pending re-audit)
+- **Last evaluated:** 2026-09-02 (Accordion re-audited to `e10c8d`, Calendar to `a2d44e`, Editable to `c631ca`; 12 rows still drifted upstream and pending re-audit)
 - **Blok repo:** [Sitecore/blok](https://github.com/Sitecore/blok) · branch `main`
-- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-02. Per-row `Last SHA` values are authoritative for drift; 13 rows are known-stale against this HEAD.
+- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-02. Per-row `Last SHA` values are authoritative for drift; 12 rows are known-stale against this HEAD.
 - **Audit tooling:** `pwsh ./tools/verify-ui-parity.ps1` — see [docs/ui-parity-audit.md](docs/ui-parity-audit.md)
 
 ## Status legend
@@ -57,7 +57,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | DnD | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`dnd-context.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/dnd-context.tsx) + `draggable` / `droppable` / `sortable` / `drag-overlay` | `17d1fb` | Built on `@dnd-kit` — React-specific hooks and context. Blazor DnD follows the native HTML5 drag-event model with a different idiom; reimplementing would be a large JS-interop project without a parity goal. |
 | Drawer | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`drawer.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/drawer.tsx) | `17d1fb` | Functionality already covered by `Sheet`, which supports side- and bottom-sliding panels. Adding Drawer as a separate primitive would duplicate behaviour. |
 | DropdownMenu | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`dropdown-menu.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/dropdown-menu.tsx) | `7de47e` | Popover menu with items and submenus |
-| Editable | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`editable.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/editable.tsx) | `17d1fb` | Inline-editable text with input and textarea modes |
+| Editable | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`editable.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/editable.tsx) | `c631ca` | Inline-editable text with input and textarea modes; `EditableError` + `HasError` for validation |
 | EmptyState | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`empty-states.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/empty-states.tsx) | `17d1fb` | Empty-results placeholder |
 | ErrorState | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`error-states.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/error-states.tsx) | `17d1fb` | Error placeholder; adds HTTP-status variant |
 | Field | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`field.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/field.tsx) | `17d1fb` | Form-field grouping wrapper |

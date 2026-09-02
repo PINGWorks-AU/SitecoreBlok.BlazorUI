@@ -20,6 +20,7 @@
 	[Parameter] public bool IsPreviewFocusable { get; set; } = true;
 	[Parameter] public bool SubmitOnBlur { get; set; } = true;
 	[Parameter] public bool StartWithEditView { get; set; }
+	[Parameter] public bool HasError { get; set; }
 	[Parameter] public bool SelectAllOnFocus { get; set; } = true;
 	[Parameter] public EditableActivationMode ActivationMode { get; set; } = EditableActivationMode.Click;
 	[Parameter] public EventCallback<string> OnSubmit { get; set; }
@@ -35,7 +36,7 @@
 	{
 		InternalValue = DefaultValue;
 		PreviousValue = DefaultValue;
-		Context.IsEditing = StartWithEditView;
+		Context.IsEditing = StartWithEditView || HasError;
 		SyncContext();
 	}
 
@@ -76,7 +77,7 @@
 			InternalValue = PreviousValue;
 			Context.Value = PreviousValue;
 		}
-		Context.IsEditing = false;
+		Context.IsEditing = HasError;
 		if (OnCancel.HasDelegate) await OnCancel.InvokeAsync(PreviousValue);
 		StateHasChanged();
 	}
@@ -84,7 +85,7 @@
 	private async Task SubmitEditAsync()
 	{
 		var current = IsControlled ? Value! : InternalValue;
-		Context.IsEditing = false;
+		Context.IsEditing = HasError;
 		if (OnSubmit.HasDelegate) await OnSubmit.InvokeAsync(current);
 		StateHasChanged();
 	}
@@ -96,7 +97,7 @@
 		StateHasChanged();
 	}
 
-	private string CssClass => CssClassBuilder.Start("inline-flex flex-col gap-1")
+	private string CssClass => CssClassBuilder.Start("inline-flex flex-col gap-1 relative")
 		.With("text-sm", Size is EditableSize.Sm)
 		.With("text-md", Size is EditableSize.Md)
 		.With("text-lg", Size is EditableSize.Lg)

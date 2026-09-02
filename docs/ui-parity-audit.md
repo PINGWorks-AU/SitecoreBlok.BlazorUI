@@ -114,7 +114,7 @@ For each component: render in Catalogue dark mode, compare side-by-side to `blok
 | CircularProgress | ✅ | — | — | — | ✅ | Same. |
 | Spinner | ✅ | — | — | — | ✅ | `text-primary` or `text-muted-foreground` — theme-aware. |
 | Skeleton | ✅ | — | — | — | ✅ | `bg-muted` animated — theme-aware. |
-| Editable | ✅ | ⚠️ minor | — | — | ✅ | Deliberate deviations: (1) `hover:bg-transparent` not used — instead `hover:bg-neutral-bg` is conditionally omitted when `IsPreviewFocusable=false`, achieving the same visual result. (2) `EditableRootProvider` accepts Blazor parameters (`@bind-IsEditing`, `@bind-Value`) instead of a pre-built hook result (`useEditable` return value) — paradigm translation, no Blazor equivalent of React hooks. (3) `useEditable` / `useEditableContext` hooks omitted — no Blazor hook pattern. |
+| Editable | ✅ | ⚠️ minor | ⚠️ minor | ✅ | ✅ | Re-audited 2026-09-02 against Blok `c631ca` — `EditableError` ported, `HasError` added; see the Editable section below. Deliberate deviations: (1) `hover:bg-transparent` not used — instead `hover:bg-neutral-bg` is conditionally omitted when `IsPreviewFocusable=false`, achieving the same visual result. (2) `EditableRootProvider` accepts Blazor parameters (`@bind-IsEditing`, `@bind-Value`) instead of a pre-built hook result (`useEditable` return value) — paradigm translation, no Blazor equivalent of React hooks. (3) `useEditable` / `useEditableContext` hooks omitted — no Blazor hook pattern. |
 | EmptyState | ✅ | — | — | — | ✅ | `text-muted-foreground` — theme-aware. |
 | ErrorState | ✅ | — | — | — | ✅ | `text-muted-foreground`, illustration SVGs — theme-aware. |
 | Table | ✅ | ✅ | — | — | ✅ | `bg-background`, `text-neutral-fg`, `border-border` — all semantic, hover uses `hover:bg-muted/50` after Phase 1. |
@@ -453,3 +453,41 @@ Tracked as a Known Feature Gap on `Home.razor`. Awaiting a decision before imple
 ### Verified in browser (light + dark)
 
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
+
+
+## Editable re-audit — 2026-09-02 (Blok `17d1fb` → `c631ca`)
+
+Triggered by `/blok update Editable`. Three upstream commits: `cde96b` / `7233c8` (add + refine the error surface) and `c631ca` (empty-state styling).
+
+### Aligned to Blok
+
+| Change | Detail |
+|---|---|
+| **`EditableError` ported** | New 10th export. `<div role="alert" aria-live="polite" data-slot="editable-error">`, absolutely positioned under the field. Renders nothing when it has neither `Errors` nor `ChildContent`; one message renders as a `<span>`, several as a `<ul class="list-disc list-inside space-y-1">`. Restores export parity — Blok exports 10, we had 9. |
+| **`HasError` parameter** | On both `Editable` and `EditableRootProvider`. Mirrors Blok exactly: initial edit state becomes `StartWithEditView \|\| HasError`, and both cancel and submit set the edit state to `HasError` rather than `false`, so an invalid value keeps the field open for correction. |
+| Root wrapper | `inline-flex flex-col gap-1` → `+ relative`. Load-bearing: it is the containing block for the absolutely-positioned error. |
+| `EditablePreview` | `min-h-[2rem]` → `min-h-8`. Empty state no longer uses `text-muted-foreground italic` — Blok now sets `text-foreground` for both empty and filled, so the token is unconditional. |
+| `EditableInput` | `h-10` → `h-8`, matching the `h-8` Blok added to its input class. Verified rendering at 32px. |
+
+**Paradigm translation (not a divergence):** Blok's `EditableError` takes `errors?: { message?: string }[]`, shaped for react-hook-form. Ours takes `IEnumerable<string>?`, which is what Blazor's `EditContext.GetValidationMessages()` already returns, so it drops straight in. Same behavioural surface.
+
+### Deliberate divergence — error surface token
+
+**`bg-white` → `bg-popover`.** Blok's `EditableError` hardcodes `bg-white` alongside `text-destructive`.
+
+`--destructive` flips between modes in this library: `--color-danger-500` (mid red) in light, `--color-danger-200` (pale red) in dark. On a permanently-white surface that yields pale-red-on-white in dark mode — the fixed-shade-bg + flipping-text-token failure that harness Check 5 exists to catch, and the same class as the Tooltip `text-inverse-text` fix. A white box would also read as wrong against the dark page.
+
+`bg-popover` is the library's semantic floating-surface token and is what Tooltip and DropdownMenu already use. Verified in the browser: dark mode renders `rgb(40, 40, 40)` with `rgb(255, 204, 200)` text — legible. Check 4 is satisfied because a `text-*` token is present in the same string; Check 5 does not fire because the background is no longer fixed-shade.
+
+I could not pixel-compare against Blok's own error box: their live "Editable with Error" demo shows the red input border but did not surface the message element during the pass, so the reasoning above rests on the source class string and our token definitions rather than a side-by-side capture.
+
+### Remaining Check 3 drift (2 tokens)
+
+| Blok token | Why not adopted |
+|---|---|
+| `hover:bg-transparent` | Pre-existing and previously documented — we conditionally omit `hover:bg-neutral-bg` when `IsPreviewFocusable=false` instead, which reaches the same visual result. |
+| `bg-white` | The deliberate divergence above. |
+
+### Verified in browser (light + dark)
+
+Error element carries `role="alert"` / `aria-live="polite"`; root computes `position: relative` and the error `position: absolute` with `bottom: -30px`, confirming Blok's `bottom-[calc(-100%+var(--spacing)*0.5)]` compiles (Tailwind normalises the missing whitespace around `+` into valid `calc(-100% + var(--spacing) * .5)`). Full `HasError` cycle exercised: empty value starts in edit mode with the message shown; entering a value and blurring clears the error, leaves edit mode, and the preview shows the new value. Input renders at 32px and preview `min-height` at 32px in both themes.
