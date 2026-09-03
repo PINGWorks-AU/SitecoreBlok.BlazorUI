@@ -20,7 +20,7 @@ public sealed partial class MigrationStatusService
 			: Parse( File.ReadAllText( path ) );
 
 		All = parsed;
-		Ported = parsed.Where( e => e.Status is ComponentStatus.Parity or ComponentStatus.Improved or ComponentStatus.Additional ).ToList();
+		Ported = parsed.Where( e => e.Status is ComponentStatus.Parity or ComponentStatus.Improved or ComponentStatus.Additional or ComponentStatus.Partial ).ToList();
 		Backlog = parsed.Where( e => e.Status == ComponentStatus.Backlog ).ToList();
 		WontDo = parsed.Where( e => e.Status == ComponentStatus.WontDo ).ToList();
 	}
@@ -79,6 +79,7 @@ public sealed partial class MigrationStatusService
 		"Parity" => ComponentStatus.Parity,
 		"Improved" => ComponentStatus.Improved,
 		"Additional" => ComponentStatus.Additional,
+		"Partial" => ComponentStatus.Partial,
 		"Backlog" => ComponentStatus.Backlog,
 		"Won't Do" => ComponentStatus.WontDo,
 		_ => null,
@@ -93,6 +94,10 @@ public enum ComponentStatus
 	Parity,
 	Improved,
 	Additional,
+
+	/// <summary>Ported, but missing one or more Blok exports. What is present is faithful; the row's description names the gap.</summary>
+	Partial,
+
 	Backlog,
 	WontDo,
 }

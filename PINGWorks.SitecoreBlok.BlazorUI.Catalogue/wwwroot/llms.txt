@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T04:58:38Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T05:23:45Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -29,7 +29,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Calendar](/primitives/calendar): Month-grid date picker surface; month/year dropdowns use Blok's `Select`-based `InBuiltDropdown`, so a root `<Popovers />` is required; `AriaLabels` overrides the nav and dropdown ARIA strings
 - [Card](/primitives/card): Container with header / content / footer
 - [Carousel](/primitives/carousel): Horizontal slide scroller
-- [Checkbox](/primitives/checkbox): Binary / tri-state toggle control
+- [Checkbox](/primitives/checkbox): Binary / tri-state toggle control; `AriaLabel` sets the accessible name independently of the visible `Label`
 - [CircularProgress](/primitives/circularprogress): Arc-based progress indicator
 - [CodeViewer](/primitives/codeviewer): Syntax-highlighted code block (Prism); re-highlights when `Code` changes (`@key` + `Prism.highlightElement`)
 - [Collapsible](/primitives/collapsible): Single expand / collapse region
@@ -38,7 +38,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [CopyableToken](/primitives/copyabletoken): Click-to-copy token label; adds post-click tooltip confirmation, configurable messages, and `Clicked` callback
 - [DatePicker](/primitives/datepicker): Date input with calendar popover; trigger drops its `aria-label` once a date shows, and the popup is a named `dialog`
 - [Dialog](/primitives/dialog): Modal dialog container
-- [DropdownMenu](/primitives/dropdownmenu): Popover menu with items and submenus
+- [DropdownMenu](/primitives/dropdownmenu): Popover menu with items and submenus. **Missing exports:** `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup`, `DropdownMenuRadioItem`, `DropdownMenuItemTitle`, `DropdownMenuItemDescription`, `DropdownMenuItemText`. (`DropdownMenuPortal` is Radix plumbing with no Blazor equivalent.)
 - [Editable](/primitives/editable): Inline-editable text with input and textarea modes; `EditableError` + `HasError` for validation
 - [EmptyState](/primitives/emptystate): Empty-results placeholder
 - [ErrorState](/primitives/errorstate): Error placeholder; adds HTTP-status variant
@@ -46,16 +46,16 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [HoverCard](/primitives/hovercard): Hover-triggered popover card
 - [Icon](/primitives/icon): SVG icon renderer (MDI) with `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes)
 - [Input](/primitives/input): Text input control
-- [InputGroup](/primitives/inputgroup): Input with affixed addons
+- [InputGroup](/primitives/inputgroup): Input with affixed addons. **Missing exports:** `InputGroupButton`, `InputGroupTextarea`. The row's upstream drift (`589c0c`) is an `aria-label` passthrough on `InputGroupButton`, so it cannot be closed until that component is ported.
 - [Kbd](/primitives/kbd): Keyboard-key glyph
 - [Label](/primitives/label): Form label element
 - [LocalTime](/primitives/localtime): Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting). Format tokens: year/month/day/weekday (incl. localised `MMMM`/`MMM`/`dddd`/`ddd` names and unpadded `d`), 12/24-hour, AM/PM, zone offset `K`
 - [Menubar](/primitives/menubar): App-level horizontal menu bar
 - [Navigation (Side)](/primitives/navigation-(side)): Additional
 - [Navigation (Stack)](/primitives/navigation-(stack)): Additional
-- [NavigationMenu](/primitives/navigationmenu): Multi-level menu with flyout panels
+- [NavigationMenu](/primitives/navigationmenu): Multi-level menu with flyout panels; the `<nav>` landmark carries a default accessible name
 - [Pagination](/primitives/pagination): Page nav; adds Blazor `Click` callback alongside `Href`
-- [Popover](/primitives/popover): Anchor-positioned popover surface
+- [Popover](/primitives/popover): Headless anchor-positioned popover surface; consumers supply the surface styling via `ClassName`. Optional `Role` / `AriaLabel` for popups that are a dialog in their own right
 - [Progress](/primitives/progress): Linear progress bar
 - [RadioGroup](/primitives/radiogroup): Radio options; adds inline `Label` helper on item
 - [Resizable](/primitives/resizable): Draggable panel splitter

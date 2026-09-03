@@ -187,7 +187,7 @@ Blok exports each component family as a composable set (e.g. `Avatar` + `AvatarI
 | Component | Divergence | Likely reason | Impact | Status |
 |---|---|---|---|---|
 | Avatar | ~~Single file with `@if Src then <img> else <span fallback>`~~ | Easier API | Couldn't pass image+fallback as children; broke `*:data-[slot=avatar-image]` selectors | ✅ FIXED — split into Avatar + AvatarImage + AvatarFallback with cascading `ImageStatus` |
-| Tooltip | ~~Single component with `Content` string param~~ Now Tooltip + TooltipTrigger + TooltipContent (3 components). `TooltipProvider` deliberately not implemented (no Radix portal/delay). `Side` lives on TooltipContent. **Tooltip text colour intentionally diverges**: uses `text-white` literal instead of Blok's `text-inverse-text` (which would render dark text on the always-dark `bg-gray-700` surface in dark mode). | (post-fix) Tooltip-text-color drift is the only Check 3 finding — deliberate. | ✅ FIXED — split into 3 components; TooltipPage rewritten with composable examples + DivergenceNote covering CSS-only hover, missing Provider, and the text-color choice. |
+| Tooltip | ~~Single component with `Content` string param~~ Now Tooltip + TooltipTrigger + TooltipContent (3 components). `TooltipProvider` deliberately not implemented (no Radix portal/delay) — re-audited 2026-09-03 against `b79ded`, which stopped Blok's `Tooltip` auto-wrapping itself in a Provider and pushed that mount onto the consumer's root layout; we still need no Provider at all. `Side` lives on TooltipContent. **Tooltip text colour intentionally diverges**: uses `text-white` literal instead of Blok's `text-inverse-text` (which would render dark text on the always-dark `bg-gray-700` surface in dark mode). | (post-fix) Tooltip-text-color drift is the only Check 3 finding — deliberate. | ✅ FIXED — split into 3 components; TooltipPage rewritten with composable examples + DivergenceNote covering CSS-only hover, missing Provider, and the text-color choice. |
 | DropdownMenu | ~~Trigger via `RenderFragment Trigger` param, content is hardcoded button~~ | (post-fix) Now state-only cascading wrapper; Trigger and Content are real components | ✅ FIXED — split into DropdownMenu + DropdownMenuTrigger + DropdownMenuContent + DropdownMenuSubTrigger + DropdownMenuSubContent. Items auto-close their parent menu chain on click. |
 | ContextMenu | ~~Same shape as DropdownMenu~~ | (post-fix) Mirror refactor with right-click trigger using mouse position | ✅ FIXED — full 15-component split matching Blok: ContextMenu + ContextMenuTrigger + ContextMenuContent + ContextMenuItem + ContextMenuCheckboxItem + ContextMenuRadioItem + ContextMenuRadioGroup + ContextMenuLabel + ContextMenuSeparator + ContextMenuShortcut + ContextMenuGroup + ContextMenuPortal + ContextMenuSub + ContextMenuSubTrigger + ContextMenuSubContent. `ContextMenuPortal` is a no-op passthrough (Blazor uses fixed positioning, no React portal needed). Submenus use hover open/close via `@onmouseenter`/`@onmouseleave` (Radix uses keyboard focus; equivalent visual result). CheckboxItem keeps menu open on toggle. DivergenceNote on ContextMenuPage documents these three differences. Harness passes clean (15/15 components, all 6 checks). |
 | Select | ~~Single file emits everything~~ | (post-fix) State-only wrapper; combobox state via PopoverService; all 10 Blok exports present | ✅ FIXED — 10-component split. Select + SelectTrigger + SelectValue + SelectContent + SelectGroup + SelectItem + SelectLabel + SelectSeparator + SelectScrollUpButton + SelectScrollDownButton. Placeholder moved to SelectValue; Label moved from SelectGroup to standalone SelectLabel. SelectValue caches label so trigger displays correctly after popover closes (items are disposed). |
@@ -463,6 +463,55 @@ Blok's `SelectContent` class string carries a `borde` typo (a non-existent utili
 
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
 
+
+## Accessibility sweep re-audits — 2026-09-03
+
+Blok ran a large accessibility pass across `main` (commits `fcdbb6`, `565e2b`, `589c0c`, `e417e5`, `bc7553`, `10eb7d`, `82a49e`, `b82ead`, `99b9ef`). It changed **no class strings** in any component below — it is entirely ARIA attributes and, in two cases, element choice. Check 3 is therefore blind to all of it, which is why these rows sat drifted while the harness reported clean.
+
+| Component | SHA | Adopted |
+|---|---|---|
+| Checkbox | `2d994e` → `589c0c` | Blok added an explicit `aria-label` prop, separate from any visible label. Ours already put `aria-label` on the control but sourced it from `Label`, which is *also* the visible text — so the accessible name could not be set independently. Added an `AriaLabel` parameter falling back to `Label`, leaving existing usage unchanged. |
+| Combobox | `4a6b44` → `4a6b17` | `TriggerAriaLabel` (default "Open listbox") and `ClearAriaLabel` (default "Clear selection") on `ComboboxInput`; `RemoveButtonAriaLabel` (default "Remove") plus `role="button"` on the chip remove control; `aria-hidden="true"` on the decorative chevron and close icons. `ComboboxClear` is internal to Blok's `ComboboxInput`, not an export, so our file count stays correct. |
+| NavigationMenu | `2d994e` → `b82ead` | The root `<nav>` is a landmark, so two menus on a page need distinct accessible names. Default `aria-label` of "Navigation menu" / "Inline navigation menu" depending on `Viewport`, placed **before** the `@attributes` splat so a consumer-supplied `aria-label` still overrides it — that is Blazor's precedence rule and it reproduces Blok's `ariaLabel ?? default`. `aria-haspopup="true"` on the trigger. |
+| Sidebar | `3c1b7d` → `68c4af` | Rail class string aligned to Blok — `h-full! min-h-0! min-w-0! rounded-none px-0 hover:bg-transparent` added, closing the `rounded-none` Check 3 finding. **Element deliberately NOT changed** — see below. |
+
+### Sidebar rail — why it stays a plain `<button>`
+
+Blok `68c4af` (with `234cfa`) routes `SidebarRail` through the Blok `Button` with `variant="ghost"`, and the six leading utilities above exist purely to neutralise that Button's sizing, radius, padding and hover fill.
+
+Ported literally, this breaks. **Our `Button` has a `Title` parameter that is the button's visible text, not the HTML `title` attribute.** The rail needs `title="Toggle Sidebar"` for its native tooltip; passed to `<Button>`, that attribute binds to the parameter instead of reaching the DOM and renders "Toggle Sidebar" as visible content spilling out of the 16px rail. Verified in-browser before reverting: `scrollWidth` 55 against `clientWidth` 16, with the text visible beside the sidebar.
+
+The rail therefore stays a bare `<button>` and keeps the class string for parity — the neutralising utilities are harmless no-ops without Button's base styles. An anti-revert comment in `SidebarRail.razor` records the reason, because routing it through `Button` looks like an obvious tidy-up.
+
+Worth noting how this was nearly missed: **`SidebarRail` had no Catalogue coverage at all.** It was documented in the API table but rendered by no example, so the regression was invisible to both the harness and the page. A `<SidebarRail />` has been added to the "Leading icons" example (live markup and its `Code` string), and the rail is now confirmed to toggle the sidebar `expanded` → `collapsed`.
+
+### Still outstanding
+
+- **StackNavigation** (`7c9f7e` → `82a49e`) — needs a decision, not just an edit. Blok now renders items with an `onItemClick` as `<button>` rather than `<a>`, with `aria-haspopup` / `aria-expanded`, on the basis that such items are expandable panel controls. Our API lets an item carry **both** a `Path` and an `OnItemClick`, so adopting the rule verbatim would turn genuine links into buttons and lose middle-click / ctrl-click "open in new tab". Options are to key the element off `Path` being empty rather than off `OnItemClick`, or to follow Blok exactly and accept the loss.
+- **DropdownMenu** and **InputGroup** — blocked on the missing exports recorded in `MIGRATION_STATUS.md`; both rows are now `Partial`.
+
+## Popover re-audit — 2026-09-03 (Blok `2d994e` → `4f751c`)
+
+Two commits touched `popover.tsx` in the range — `c8ef1c` ("Fix ARIA labels in popover") and `4f751c` ("fixed the popover forcemount issue") — but **`git diff 2d994e..HEAD -- src/components/ui/popover.tsx` is empty**: the changes were applied and then reverted upstream. The file's content is byte-identical to the revision this row was last audited against, so the row is bumped to the current last-touched SHA with no code change on our side.
+
+The one substantive thing this pass added is unrelated to upstream drift: `Popover` gained optional `Role` / `AriaLabel` passthrough parameters so `DatePicker` could give its popup an accessible dialog name (see the DatePicker section below). Both default to null and no existing consumer is affected.
+
+### Standing Check 3 findings — composition artefacts, not drift
+
+`pwsh ./tools/verify-ui-parity.ps1 -Component Popover` reports 4 findings: `bg-popover`, `text-popover-foreground`, `rounded-md`, `shadow-md`. Blok puts these utilities directly on `PopoverContent`. Ours is a **headless positioning primitive** — `PopoverItem` renders only position, z-index and the popper CSS variables, and every consumer supplies the surface through `ClassName`:
+
+- `SelectContent` → `bg-popover text-popover-foreground … rounded-md border shadow-md`
+- `DatePicker` → `shadow-lg rounded-lg`
+
+The tokens exist in the rendered DOM; they just live in the consumer's file, which the harness does not scan under Popover. Same class of false positive as Calendar's `border-input`. Not fixed — moving the surface onto the shared container would force every consumer to the same look and break `DatePicker`'s larger radius and shadow.
+
+## Tooltip re-audit — 2026-09-03 (Blok `2d994e` → `b79ded`)
+
+One commit: `b79ded` ("Remove tooltip provider from the tooltip"). Blok's `Tooltip` no longer wraps itself in `TooltipProvider`; the Provider is still exported and Blok's own install docs now instruct consumers to mount it once in the root layout.
+
+No change on our side, and the row is bumped. Worth recording precisely, because it is easy to misread as upstream converging on our shape: it did not. We implement **no Provider at all** — hover is CSS `group-hover` and the delay is per-tooltip on `TooltipContent` — so the divergence still stands, it has just changed character. Before `b79ded` Blok's Provider was implicit and per-tooltip; now it is an explicit consumer install step that we do not have. The `<DivergenceNote>` on `TooltipPage` has been reworded to say this rather than implying the Provider simply went away.
+
+No class strings changed in the range. Harness unchanged: the only Check 3 finding remains the deliberate `text-inverse-text` → `text-white` swap documented above.
 
 ## DatePicker re-audit — 2026-09-03 (Blok `6cb4ad` → `c4346e`)
 

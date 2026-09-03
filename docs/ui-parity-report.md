@@ -1,7 +1,7 @@
 # UI Parity Report
 
-Generated: 2026-09-03 14:55:44  
-Scope: 3 component(s)
+Generated: 2026-09-03 15:21:50  
+Scope: 21 component(s)
 
 ## Check 1 — Compiled-utility coverage
 
@@ -13,12 +13,7 @@ No runtime-composed class names detected.
 
 ## Check 3 — Blok class-string drift
 
-| Component | In Blok | In ours |
-|-----------|---------|---------|
-| popover.tsx (Blok) ↔ 3 Razor file(s) | `bg-popover` | (missing) |
-| popover.tsx (Blok) ↔ 3 Razor file(s) | `text-popover-foreground` | (missing) |
-| popover.tsx (Blok) ↔ 3 Razor file(s) | `rounded-md` | (missing) |
-| popover.tsx (Blok) ↔ 3 Razor file(s) | `shadow-md` | (missing) |
+No drift detected.
 
 ## Check 4 — Surface background without paired text token
 

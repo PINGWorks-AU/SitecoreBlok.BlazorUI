@@ -2,7 +2,7 @@
   "schema": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/blob/main/docs/components-schema.json",
   "package": "PINGWorks.SitecoreBlok.BlazorUI",
   "version": "2.0.0.0-preview-1",
-  "generatedAt": "2026-09-03T04:58:38Z",
+  "generatedAt": "2026-09-03T05:23:45Z",
   "repository": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI",
   "documentation": {
     "theme": "/theme.md",
@@ -97,7 +97,7 @@
     {
       "name": "Checkbox",
       "slug": "checkbox",
-      "description": "Binary / tri-state toggle control",
+      "description": "Binary / tri-state toggle control; `AriaLabel` sets the accessible name independently of the visible `Label`",
       "status": "Parity",
       "catalogueUrl": "/primitives/checkbox"
     },
@@ -160,8 +160,8 @@
     {
       "name": "DropdownMenu",
       "slug": "dropdownmenu",
-      "description": "Popover menu with items and submenus",
-      "status": "Parity",
+      "description": "Popover menu with items and submenus. **Missing exports:** `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup`, `DropdownMenuRadioItem`, `DropdownMenuItemTitle`, `DropdownMenuItemDescription`, `DropdownMenuItemText`. (`DropdownMenuPortal` is Radix plumbing with no Blazor equivalent.)",
+      "status": "Partial",
       "catalogueUrl": "/primitives/dropdownmenu"
     },
     {
@@ -216,8 +216,8 @@
     {
       "name": "InputGroup",
       "slug": "inputgroup",
-      "description": "Input with affixed addons",
-      "status": "Parity",
+      "description": "Input with affixed addons. **Missing exports:** `InputGroupButton`, `InputGroupTextarea`. The row's upstream drift (`589c0c`) is an `aria-label` passthrough on `InputGroupButton`, so it cannot be closed until that component is ported.",
+      "status": "Partial",
       "catalogueUrl": "/primitives/inputgroup"
     },
     {
@@ -265,7 +265,7 @@
     {
       "name": "NavigationMenu",
       "slug": "navigationmenu",
-      "description": "Multi-level menu with flyout panels",
+      "description": "Multi-level menu with flyout panels; the `<nav>` landmark carries a default accessible name",
       "status": "Parity",
       "catalogueUrl": "/primitives/navigationmenu"
     },
@@ -279,7 +279,7 @@
     {
       "name": "Popover",
       "slug": "popover",
-      "description": "Anchor-positioned popover surface",
+      "description": "Headless anchor-positioned popover surface; consumers supply the surface styling via `ClassName`. Optional `Role` / `AriaLabel` for popups that are a dialog in their own right",
       "status": "Parity",
       "catalogueUrl": "/primitives/popover"
     },

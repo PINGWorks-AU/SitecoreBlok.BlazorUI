@@ -44,6 +44,10 @@
 					{
 						<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Additional</Badge>
 					}
+					else if ( entry.Status == ComponentStatus.Partial )
+					{
+						<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Partial</Badge>
+					}
 				</NavLink>
 			}
 			@if ( FilteredEntries.Length == 0 )
