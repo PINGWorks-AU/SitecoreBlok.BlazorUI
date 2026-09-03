@@ -4,9 +4,9 @@ Component-by-component status of the PINGWorks BlazorUI port of the Sitecore Blo
 
 This file is the **single source of truth** for the [`blok-migration`](https://github.com/Sitecore/blok) skill's `/blok audit` command. The skill reads the `Blok Source` and `Last SHA` columns to decide which components to re-evaluate. A blanket directory scan still identifies new Blok primitives that don't yet have a row here.
 
-- **Last evaluated:** 2026-09-03 (`/blok audit` run against Blok HEAD `e2651dc`: 11 rows drifted, no new primitives. Calendar's open `InBuiltDropdown` decision closed — adopted; DatePicker re-audited to `c4346e`; Popover (`4f751c`) and Tooltip (`b79ded`) re-audited clean with no code change; Blok's accessibility sweep adopted for Checkbox (`589c0c`), Combobox (`4a6b17`), NavigationMenu (`b82ead`) and Sidebar (`68c4af`). StackNavigation re-audited to `82a49e`; InputGroup completed — `InputGroupButton` and `InputGroupTextarea` ported, row back to Parity at `589c0c`. 2 rows still drifted: DropdownMenu is blocked on missing exports, Filter is Backlog.)
+- **Last evaluated:** 2026-09-03 (`/blok audit` run against Blok HEAD `e2651dc`: 11 rows drifted, no new primitives. Calendar's open `InBuiltDropdown` decision closed — adopted; DatePicker re-audited to `c4346e`; Popover (`4f751c`) and Tooltip (`b79ded`) re-audited clean with no code change; Blok's accessibility sweep adopted for Checkbox (`589c0c`), Combobox (`4a6b17`), NavigationMenu (`b82ead`) and Sidebar (`68c4af`). StackNavigation re-audited to `82a49e`; InputGroup and DropdownMenu completed — all eight missing exports ported, both rows back to Parity (`589c0c`, `82a49e`). 1 row still drifted: Filter, which is Backlog rather than a re-audit.)
 - **Blok repo:** [Sitecore/blok](https://github.com/Sitecore/blok) · branch `main`
-- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-03. Per-row `Last SHA` values are authoritative for drift; 2 rows are known-stale against this HEAD.
+- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-03. Per-row `Last SHA` values are authoritative for drift; 1 row is known-stale against this HEAD.
 - **Audit tooling:** `pwsh ./tools/verify-ui-parity.ps1` — see [docs/ui-parity-audit.md](docs/ui-parity-audit.md)
 
 ## Status legend
@@ -57,7 +57,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | Dialog | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`dialog.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/dialog.tsx) | `2d994e` | Modal dialog container |
 | DnD | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`dnd-context.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/dnd-context.tsx) + `draggable` / `droppable` / `sortable` / `drag-overlay` | `17d1fb` | Built on `@dnd-kit` — React-specific hooks and context. Blazor DnD follows the native HTML5 drag-event model with a different idiom; reimplementing would be a large JS-interop project without a parity goal. |
 | Drawer | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`drawer.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/drawer.tsx) | `17d1fb` | Functionality already covered by `Sheet`, which supports side- and bottom-sliding panels. Adding Drawer as a separate primitive would duplicate behaviour. |
-| DropdownMenu | ![Partial](https://img.shields.io/badge/Partial-f97316?style=flat-square) | [`dropdown-menu.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/dropdown-menu.tsx) | `7de47e` | Popover menu with items and submenus. **Missing exports:** `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup`, `DropdownMenuRadioItem`, `DropdownMenuItemTitle`, `DropdownMenuItemDescription`, `DropdownMenuItemText`. (`DropdownMenuPortal` is Radix plumbing with no Blazor equivalent.) |
+| DropdownMenu | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`dropdown-menu.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/dropdown-menu.tsx) | `82a49e` | Popover menu with items, submenus, checkbox and radio items, and two-line items. `DropdownMenuPortal` is deliberately not ported — Radix plumbing with no Blazor equivalent, since content renders through `PopoverService`. |
 | Editable | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`editable.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/editable.tsx) | `c631ca` | Inline-editable text with input and textarea modes; `EditableError` + `HasError` for validation |
 | EmptyState | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`empty-states.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/empty-states.tsx) | `17d1fb` | Empty-results placeholder |
 | ErrorState | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`error-states.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/error-states.tsx) | `17d1fb` | Error placeholder; adds HTTP-status variant |
@@ -111,13 +111,13 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 
 | Status | Count |
 |---|---|
-| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 51 |
+| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 52 |
 | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | 7 |
 | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | 6 |
-| ![Partial](https://img.shields.io/badge/Partial-f97316?style=flat-square) | 1 |
+| ![Partial](https://img.shields.io/badge/Partial-f97316?style=flat-square) | 0 |
 | ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 2 |
 | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | 7 |
-| **Total ported** | **59** of **61** Blok primitives (excluding 7 Won't Do) — 1 of the 59 is Partial, missing exports named in its row |
+| **Total ported** | **59** of **61** Blok primitives (excluding 7 Won't Do) |
 
 ## Notes on classification
 

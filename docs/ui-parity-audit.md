@@ -464,6 +464,27 @@ Blok's `SelectContent` class string carries a `borde` typo (a non-existent utili
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
 
 
+## DropdownMenu — missing exports ported 2026-09-03 (Blok `7de47e` → `82a49e`)
+
+Clears the last `Partial` row. Six Blok exports were missing; all six are now ported, and the row's upstream drift (`82a49e`, `aria-haspopup` on the trigger and sub-trigger) is closed in the same pass.
+
+| Component | Notes |
+|---|---|
+| `DropdownMenuItemText` / `ItemTitle` / `ItemDescription` | Straight ports of Blok's three presentational divs; `ItemText` stacks the other two into a two-line item body. `text-subtle-text` was already defined in `colors.css` with a `.dark` override, so no token work was needed. |
+| `DropdownMenuCheckboxItem` | `Checked` / `CheckedChanged` two-way binding, `role="menuitemcheckbox"`, `aria-checked` and `data-state`. Indicator is a `Check` icon in the same absolutely-positioned `left-2` span Blok uses. |
+| `DropdownMenuRadioGroup` | Blok's is a bare passthrough because Radix's `RadioGroup` owns the selected value. Blazor has no equivalent, so ours holds `Value` / `ValueChanged` and cascades itself — the same pattern used across this library. |
+| `DropdownMenuRadioItem` | Reads the parent group to decide its checked state, `role="menuitemradio"`, dot indicator. |
+
+`DropdownMenuPortal` is **deliberately not ported**: it is Radix plumbing for escaping overflow containers, and our menu content already renders through `PopoverService` at the layout root, which is the same escape by a different route. Recorded on the row rather than left as an apparent gap.
+
+Both new interactive items close the whole ancestor chain on select — sub, then root dropdown, then context menu — reusing `DropdownMenuItem`'s existing cascade set. That matches Radix's default, which Blok does not override with `preventDefault`.
+
+### Verified in browser
+
+Checkbox items report `role="menuitemcheckbox"` with correct `aria-checked` / `data-state`, the disabled one carries `data-disabled`, toggling updates the bound field (`Sidebar: True · Toolbar: True`) and dismisses the menu. Radio items report `role="menuitemradio"`, selecting `Size` updates the binding and, on reopening, only `Size` is checked and carries the dot. The two-line item stacks in a column with the description at `rgba(0,0,0,0.55)` in light and `rgba(255,255,255,0.68)` in dark — the `--color-subtle-text` override doing its job — on a `rgb(40,40,40)` surface.
+
+Harness: `-Component DropdownMenu` PASS, **0 findings on all six checks**.
+
 ## InputGroup — missing exports ported 2026-09-03 (Blok `37c0d3` → `589c0c`)
 
 Closes the `Partial` status recorded earlier in the day. `InputGroupButton` and `InputGroupTextarea` were the two Blok exports we lacked, and the row's upstream drift (`589c0c`, an `aria-label` passthrough) sat on the former, so the drift could not be closed without the port.

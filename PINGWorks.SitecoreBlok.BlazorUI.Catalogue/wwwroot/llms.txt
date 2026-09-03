@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T05:59:24Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T06:10:31Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -38,7 +38,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [CopyableToken](/primitives/copyabletoken): Click-to-copy token label; adds post-click tooltip confirmation, configurable messages, and `Clicked` callback
 - [DatePicker](/primitives/datepicker): Date input with calendar popover; trigger drops its `aria-label` once a date shows, and the popup is a named `dialog`
 - [Dialog](/primitives/dialog): Modal dialog container
-- [DropdownMenu](/primitives/dropdownmenu): Popover menu with items and submenus. **Missing exports:** `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup`, `DropdownMenuRadioItem`, `DropdownMenuItemTitle`, `DropdownMenuItemDescription`, `DropdownMenuItemText`. (`DropdownMenuPortal` is Radix plumbing with no Blazor equivalent.)
+- [DropdownMenu](/primitives/dropdownmenu): Popover menu with items, submenus, checkbox and radio items, and two-line items. `DropdownMenuPortal` is deliberately not ported — Radix plumbing with no Blazor equivalent, since content renders through `PopoverService`.
 - [Editable](/primitives/editable): Inline-editable text with input and textarea modes; `EditableError` + `HasError` for validation
 - [EmptyState](/primitives/emptystate): Empty-results placeholder
 - [ErrorState](/primitives/errorstate): Error placeholder; adds HTTP-status variant

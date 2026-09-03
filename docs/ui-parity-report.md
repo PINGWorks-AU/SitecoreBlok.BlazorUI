@@ -1,16 +1,11 @@
 # UI Parity Report
 
-Generated: 2026-09-03 15:51:50  
-Scope: 4 component(s)
+Generated: 2026-09-03 16:06:38  
+Scope: 17 component(s)
 
 ## Check 1 — Compiled-utility coverage
 
-| Component | Token missing from compiled CSS |
-|-----------|----------------------------------|
-| InputGroupAddon.razor | `inline-start` |
-| InputGroupAddon.razor | `inline-end` |
-| InputGroupAddon.razor | `block-start` |
-| InputGroupAddon.razor | `block-end` |
+No missing utilities.
 
 ## Check 2 — Runtime-composed class detection
 
@@ -18,10 +13,7 @@ No runtime-composed class names detected.
 
 ## Check 3 — Blok class-string drift
 
-| Component | In Blok | In ours |
-|-----------|---------|---------|
-| input.tsx (Blok) ↔ 5 Razor file(s) | `text-md` | (missing) |
-| input.tsx (Blok) ↔ 5 Razor file(s) | `focus:ring-1` | (missing) |
+No drift detected.
 
 ## Check 4 — Surface background without paired text token
 
