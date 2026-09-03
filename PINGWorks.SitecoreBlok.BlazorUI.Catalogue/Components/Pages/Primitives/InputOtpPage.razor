@@ -1,0 +1,123 @@
+@page "/primitives/inputotp"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="InputOtp"
+			   Description="Segmented one-time-password entry"
+			   Interactivity="ComponentInteractivity.Interactive"
+			   ApiElements="@InputOtpElements">
+
+	<DivergenceNote>
+		<p><strong>Hand-rolled, not a wrapper around the <code>input-otp</code> library.</strong> Blok wraps the React package <code>input-otp</code>, which renders one real <code>&lt;input&gt;</code> stretched invisibly across the slots and publishes a per-slot React context. The same shape is rebuilt here in Blazor: <code>InputOtp</code> owns a single transparent, focusable input and the slots read their character and active state back off it via a cascading value. Keeping one real input is what makes typing, backspace, paste, autofill and <code>one-time-code</code> autocomplete work natively rather than being reimplemented per slot.</p>
+		<p><strong>Caret position is simplified.</strong> The library tracks a full selection range; we place the caret at the first empty slot, which is where typing lands. The practical difference only shows if a user selects a range inside the hidden input.</p>
+		<p><strong>Named <code>InputOtp</code>, not <code>InputOTP</code>.</strong> Casing follows .NET conventions for three-letter acronyms; the component count, roles and markup match Blok exactly.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Default" Code="@("<InputOtp @bind-Value=\"code\" MaxLength=\"6\">\n    <InputOtpGroup>\n        <InputOtpSlot Index=\"0\" />\n        <InputOtpSlot Index=\"1\" />\n        <InputOtpSlot Index=\"2\" />\n    </InputOtpGroup>\n    <InputOtpSeparator />\n    <InputOtpGroup>\n        <InputOtpSlot Index=\"3\" />\n        <InputOtpSlot Index=\"4\" />\n        <InputOtpSlot Index=\"5\" />\n    </InputOtpGroup>\n</InputOtp>")">
+			<div class="space-y-3">
+				<InputOtp @bind-Value="Code" MaxLength="6">
+					<InputOtpGroup>
+						<InputOtpSlot Index="0" />
+						<InputOtpSlot Index="1" />
+						<InputOtpSlot Index="2" />
+					</InputOtpGroup>
+					<InputOtpSeparator />
+					<InputOtpGroup>
+						<InputOtpSlot Index="3" />
+						<InputOtpSlot Index="4" />
+						<InputOtpSlot Index="5" />
+					</InputOtpGroup>
+				</InputOtp>
+				<p class="text-sm text-muted-foreground">Value: <strong>@( string.IsNullOrEmpty( Code ) ? "(empty)" : Code )</strong></p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Digits only, with completion callback" Code="@("<InputOtp @bind-Value=\"pin\" MaxLength=\"4\" Pattern=\"^[0-9]$\" OnComplete=\"@(v => completed = v)\">\n    <InputOtpGroup>\n        <InputOtpSlot Index=\"0\" />\n        <InputOtpSlot Index=\"1\" />\n        <InputOtpSlot Index=\"2\" />\n        <InputOtpSlot Index=\"3\" />\n    </InputOtpGroup>\n</InputOtp>")">
+			<div class="space-y-3">
+				<InputOtp @bind-Value="Pin" MaxLength="4" Pattern="^[0-9]$" OnComplete="@(v => Completed = v)">
+					<InputOtpGroup>
+						<InputOtpSlot Index="0" />
+						<InputOtpSlot Index="1" />
+						<InputOtpSlot Index="2" />
+						<InputOtpSlot Index="3" />
+					</InputOtpGroup>
+				</InputOtp>
+				<p class="text-sm text-muted-foreground">Letters are rejected. Completed: <strong>@( Completed ?? "(not yet)" )</strong></p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<InputOtp Value=\"12\" MaxLength=\"4\" Disabled=\"true\">\n    <InputOtpGroup>\n        <InputOtpSlot Index=\"0\" />\n        <InputOtpSlot Index=\"1\" />\n        <InputOtpSlot Index=\"2\" />\n        <InputOtpSlot Index=\"3\" />\n    </InputOtpGroup>\n</InputOtp>")">
+			<InputOtp Value="12" MaxLength="4" Disabled="true">
+				<InputOtpGroup>
+					<InputOtpSlot Index="0" />
+					<InputOtpSlot Index="1" />
+					<InputOtpSlot Index="2" />
+					<InputOtpSlot Index="3" />
+				</InputOtpGroup>
+			</InputOtp>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Code;
+	private string? Pin;
+	private string? Completed;
+
+	private static readonly ApiElement[] InputOtpElements =
+	[
+		new ApiElement(
+			Name: "InputOtp",
+			Description: "Root of the control. Owns the value and the single hidden `<input>` that captures typing, and cascades per-slot state to `InputOtpSlot`.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                     false, "The entered code. Supports two-way binding via `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",      false, "Fires on every change to the value." ),
+				new ApiProperty( "MaxLength",            "int",                         false, "Number of slots, and the input's `maxlength`. Default: `6`." ),
+				new ApiProperty( "Pattern",              "string?",                     false, "Optional regular expression each typed character must match, e.g. `^[0-9]$`. Non-matching characters are dropped. Default: `null`, which accepts anything." ),
+				new ApiProperty( "OnComplete",           "EventCallback<string>",       false, "Fires once the value reaches `MaxLength`." ),
+				new ApiProperty( "Disabled",             "bool",                        false, "When true, disables the input and dims the slots. Default: `false`." ),
+				new ApiProperty( "InputMode",            "string",                      false, "`inputmode` hint for on-screen keyboards. Default: `\"numeric\"`." ),
+				new ApiProperty( "ContainerClassName",   "string?",                     false, "Extra CSS classes for the wrapper that lays the groups out." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes for the hidden `<input>` itself." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "The `InputOtpGroup`s and `InputOtpSeparator`s." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes, forwarded to the hidden `<input>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "InputOtpGroup",
+			Description: "Visually groups a run of adjacent slots so they share one rounded border. Use two groups either side of an `InputOtpSeparator` for the common 3-3 layout.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "The `InputOtpSlot`s in this group." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the group." ),
+			]
+		),
+		new ApiElement(
+			Name: "InputOtpSlot",
+			Description: "A single character cell. Renders the character at its `Index`, and shows a blinking caret when it is the slot awaiting input.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Index",     "int",     true,  "Zero-based position this slot represents within the value." ),
+				new ApiProperty( "ClassName", "string?", false, "Extra CSS classes appended to the slot." ),
+			]
+		),
+		new ApiElement(
+			Name: "InputOtpSeparator",
+			Description: "Visual divider between two groups. Renders a minus glyph by default; pass content to replace it.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Replaces the default minus glyph." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the separator." ),
+			]
+		),
+	];
+}

@@ -4,7 +4,7 @@ Component-by-component status of the PINGWorks BlazorUI port of the Sitecore Blo
 
 This file is the **single source of truth** for the [`blok-migration`](https://github.com/Sitecore/blok) skill's `/blok audit` command. The skill reads the `Blok Source` and `Last SHA` columns to decide which components to re-evaluate. A blanket directory scan still identifies new Blok primitives that don't yet have a row here.
 
-- **Last evaluated:** 2026-09-03 (`/blok audit` run against Blok HEAD `e2651dc`: 11 rows drifted, no new primitives. Calendar's open `InBuiltDropdown` decision closed — adopted; DatePicker re-audited to `c4346e`; Popover (`4f751c`) and Tooltip (`b79ded`) re-audited clean with no code change; Blok's accessibility sweep adopted for Checkbox (`589c0c`), Combobox (`4a6b17`), NavigationMenu (`b82ead`) and Sidebar (`68c4af`). StackNavigation re-audited to `82a49e`; InputGroup and DropdownMenu completed — all eight missing exports ported, both rows back to Parity (`589c0c`, `82a49e`). 1 row still drifted: Filter, which is Backlog rather than a re-audit.)
+- **Last evaluated:** 2026-09-03 (`/blok audit` run against Blok HEAD `e2651dc`: 11 rows drifted, no new primitives. Calendar's open `InBuiltDropdown` decision closed — adopted; DatePicker re-audited to `c4346e`; Popover (`4f751c`) and Tooltip (`b79ded`) re-audited clean with no code change; Blok's accessibility sweep adopted for Checkbox (`589c0c`), Combobox (`4a6b17`), NavigationMenu (`b82ead`) and Sidebar (`68c4af`). StackNavigation re-audited to `82a49e`; InputGroup and DropdownMenu completed — all eight missing exports ported, both rows back to Parity (`589c0c`, `82a49e`); InputOtp ported from Backlog. Filter is the only remaining Backlog item. **Check 3 coverage changed** — see docs/ui-parity-audit.md: the harness was never comparing hyphenated-source components, and 8 of them now report drift for the first time.)
 - **Blok repo:** [Sitecore/blok](https://github.com/Sitecore/blok) · branch `main`
 - **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-03. Per-row `Last SHA` values are authoritative for drift; 1 row is known-stale against this HEAD.
 - **Audit tooling:** `pwsh ./tools/verify-ui-parity.ps1` — see [docs/ui-parity-audit.md](docs/ui-parity-audit.md)
@@ -69,7 +69,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | Icon | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`icon.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/icon.tsx) | `17d1fb` | SVG icon renderer (MDI) with `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes) |
 | Input | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`input.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/input.tsx) | `cc653d` | Text input control |
 | InputGroup | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`input-group.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/input-group.tsx) | `589c0c` | Input with affixed addons, an inline `InputGroupButton` (four pill sizes) and a multi-line `InputGroupTextarea` |
-| InputOtp | ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | [`input-otp.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/input-otp.tsx) | `a02fe3` | One-time-password segmented input |
+| InputOtp | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`input-otp.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/input-otp.tsx) | `a02fe3` | One-time-password segmented input; one hidden input drives the slots, so paste and `one-time-code` autofill work natively |
 | Kbd | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`kbd.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/kbd.tsx) | `17d1fb` | Keyboard-key glyph |
 | Label | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`label.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/label.tsx) | `2d994e` | Form label element |
 | LocalTime | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | — | — | Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting). Format tokens: year/month/day/weekday (incl. localised `MMMM`/`MMM`/`dddd`/`ddd` names and unpadded `d`), 12/24-hour, AM/PM, zone offset `K` |
@@ -111,11 +111,11 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 
 | Status | Count |
 |---|---|
-| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 52 |
+| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 53 |
 | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | 7 |
 | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | 6 |
 | ![Partial](https://img.shields.io/badge/Partial-f97316?style=flat-square) | 0 |
-| ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 2 |
+| ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 1 |
 | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | 7 |
 | **Total ported** | **59** of **61** Blok primitives (excluding 7 Won't Do) |
 

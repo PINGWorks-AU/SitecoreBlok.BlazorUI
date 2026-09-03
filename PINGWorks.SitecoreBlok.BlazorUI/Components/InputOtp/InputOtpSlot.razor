@@ -1,0 +1,30 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="input-otp-slot" data-active="@( IsActive ? "true" : "false" )" class="@CssClass">
+	@Parent?.CharAt( Index )
+	@if ( Parent?.HasFakeCaret( Index ) ?? false )
+	{
+		<div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+			<div class="h-4 w-px animate-caret-blink bg-foreground duration-1000"></div>
+		</div>
+	}
+</div>
+
+@code {
+	[CascadingParameter] public InputOtp? Parent { get; set; }
+
+	[Parameter, EditorRequired] public required int Index { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+
+	private bool IsActive => Parent?.IsActive( Index ) ?? false;
+
+	private string CssClass => CssClassBuilder.Start(
+		"relative flex h-9 w-9 items-center justify-center border-input border-y border-r text-sm shadow-xs outline-none transition-all",
+		"first:rounded-l-md first:border-l last:rounded-r-md",
+		"aria-invalid:border-destructive",
+		"data-[active=true]:z-10 data-[active=true]:border-ring data-[active=true]:ring-[3px] data-[active=true]:ring-ring/50",
+		"data-[active=true]:aria-invalid:border-destructive data-[active=true]:aria-invalid:ring-destructive/20",
+		"dark:bg-input/30 dark:data-[active=true]:aria-invalid:ring-destructive/40" )
+										.With( ClassName )
+										.Build();
+}

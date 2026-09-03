@@ -4,7 +4,7 @@ Tracking document for the component-by-component UI-parity audit against the Blo
 
 **Automated verification:** `pwsh ./tools/verify-ui-parity.ps1` runs six checks on every Razor file under the component library and writes a transient `docs/ui-parity-report.md` summarising findings for that run. The report file is a build artifact — not tracked in git — and is overwritten on each run. Integrated into the `blok-migration` skill — runs on every component migration / update.
 
-Last automated harness run (133 Razor files across primitives and their sub-components, covering 63 top-level Blok primitives — see [MIGRATION_STATUS.md](../MIGRATION_STATUS.md) for the authoritative per-primitive tally): **35 Check 3 drift findings remain (pre-existing, pending judgement). Checks 1, 2, 4, 5, 6 clean.**
+Last automated harness run, re-baselined 2026-09-03 after two harness fixes (see the triage section below): **Check 3 65 findings across 24 Blok sources · Check 1 41 · Check 4 27 · Checks 2, 5, 6 clean.** The previous header claimed "35 drift, Checks 1/2/4/5/6 clean", which was stale on every count — Checks 1 and 4 were never clean, and Check 3 was only comparing 16 sources. Findings are triaged below; most are artefacts of composition rather than real drift.
 
 ## The six automated checks
 
@@ -463,6 +463,94 @@ Blok's `SelectContent` class string carries a `borde` typo (a non-existent utili
 
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
 
+
+## Check 3 triage — 2026-09-03
+
+Two harness defects were fixed today, and the newly-visible findings triaged. Both defects made the harness report *less* than reality, so nothing here is a regression in the library — it is coverage that never existed.
+
+### Defect 2 — a comment with parentheses blinds a whole file
+
+The `CssClassBuilder` call pattern is `\b(?:Start|With|Reset)\s*\(((?:[^()"]|"[^"]*")*)\)`. The argument block **cannot contain a bare `(`**, so a `//` comment with parentheses inside a builder chain makes the entire `Start(...)` call fail to match, and every class string in that file is dropped — reported as drift against Blok.
+
+Self-inflicted and caught in triage: the comment added to `InputGroup.razor` earlier today ("…addon (which is w-full) stays on the same row…") blinded that file completely, producing 5 phantom findings. Fixed by stripping `//` comments (only outside string literals) before parsing. InputGroup went 5 → 0, and the library total 71 → 65.
+
+This is the more dangerous of the two defects: it fails **silently and retroactively**, so a well-meaning explanatory comment can quietly switch off drift detection for a component.
+
+### Disposition of the newly-visible components
+
+| Component | Findings | Disposition |
+|---|---|---|
+| **InputGroup** | ~~5~~ 0 | Phantom, caused by Defect 2. Resolved. |
+| **DatePicker** | 5 — `border-input`, `border-1`, `rounded-md`, `text-md`, `dark:aria-invalid:ring-destructive/40` | **Composition artefact.** Blok's trigger carries the full input-style class string inline; ours delegates to the `Button` component, which supplies border, radius and invalid states from its own file. Tokens are in the rendered DOM, just not in `DatePicker.razor`. |
+| **TimePicker** | 5 — `border-1`, `text-md`, `dark:aria-invalid:ring-destructive/40`, `dark:bg-input/30`, `dark:hover:bg-input/50` | **Deliberate, already documented.** We render a native `<input type="time">`; Blok renders a Popover with three Selects. The two share no DOM structure, so token-level comparison is meaningless here — see the TimePicker section below. |
+| **ScrollArea** | 5 — `border-l`, `border-l-transparent`, `border-t`, `border-t-transparent`, `bg-border` | **Structural divergence.** Those style Radix's rendered scrollbar/thumb elements. We use the native scrollbar with the library's canonical thin-scrollbar utilities instead of rendering scrollbar DOM, so there is nothing to put them on. |
+| **ContextMenu** | 2 — `focus:bg-accent`, `focus:text-accent-foreground` | **Deliberate token choice.** Our menu items use `hover:bg-neutral-bg` / `focus:text-foreground`, consistent with `DropdownMenuItem`. Changing it would make context menus inconsistent with dropdown menus for the sake of the diff. |
+| **SearchInput** | 1 — `focus:border-0` | **Composition artefact.** Blok wraps `Input`, so it must suppress that component's own border; we render a bare `<input>` with no border to suppress. Same shape as `InputGroupTextarea`. |
+| **StackNavigation** | 1 — `shadow-none` | **False positive on both sides.** In Blok it is `className?.includes("shadow-none")` — a sentinel string in logic, not a rendered class. Ours does the same (`ClassName?.Contains( "shadow-none" )`). Behaviour matches; the harness is reading a string comparison as a utility. |
+| **ToggleGroup** | 1 — `rounded-full` | **Real gap.** Blok has a `rounded` variant (`resolvedVariant === "rounded" ? "rounded-full" : "rounded-md"`); we only ever emit `rounded-md`. The one finding in this batch that is a genuine missing feature. Not yet implemented. |
+
+### What this leaves
+
+Of the 19 findings across the eight newly-compared components, **one is a real gap** (ToggleGroup's `rounded` variant). The rest are composition artefacts, deliberate choices already recorded, or the harness misreading sentinel strings.
+
+That ratio is itself the useful result: Check 3 compares token *sets* between files, so any component that delegates styling to a child component, or diverges structurally, will always report the delegated tokens as missing. The check is a regression guard on class strings within a file — not evidence of parity, and not a to-do list.
+
+### Suggested harness follow-ups
+
+Not done, listed so they are not lost:
+
+- Treat string literals that feed a `data-*` attribute as values, not class names — this is the source of the `icon-xs` / `inline-start` / `block-end` entries in Check 1.
+- Consider resolving tokens across the whole rendered component family rather than per Blok-file name, which would remove the composition-artefact class of false positive entirely.
+- Re-baseline Check 4's 27 findings; they have never been triaged and the header claimed the check was clean.
+
+## Harness fix — Check 3 was silently skipping hyphenated Blok sources
+
+Found while porting InputOtp, and it invalidates some earlier "harness clean" claims in this document.
+
+`verify-ui-parity.ps1` resolves a Razor file to its Blok source by lowercasing the component name and, on a 404, stripping trailing PascalCase words until something resolves. Blok file names are **kebab-case**, so:
+
+- `InputOtp` → `inputotp.tsx` (404) → strip `Otp` → **`input.tsx` (200)** — diffed against the wrong component.
+- `StackNavigation` → `stacknavigation.tsx` (404) → strip `Navigation` → `stack.tsx` (404) → repeats → `$blokSrc` stays null → `continue`. **Check 3 never ran for it at all**, and reported clean by omission.
+
+Fixed by trying the kebab-case form of the full name first (`input-otp.tsx`, `stack-navigation.tsx`) before the word-stripping fallback, which is still needed for genuine sub-components (`AccordionItem` → `accordion`). The related-file aggregation also had to learn that `$baseName` may now contain hyphens while our file names never do.
+
+### Measured effect
+
+| | Before | After |
+|---|---|---|
+| Distinct Blok sources compared | 16 | 24 |
+| Check 3 drift findings | 46 | 71 |
+
+Eight components were being compared for the first time: `context-menu`, `date-picker`, `input-group`, `scroll-area`, `search-input`, `stack-navigation`, `time-picker`, `toggle-group`.
+
+### Corrections to earlier entries in this document
+
+The Check 3 results recorded today for **DatePicker** ("PASS, 0 findings on all six checks"), **StackNavigation** and **TimePicker** ("PASS, 0 drift findings") were **vacuous for Check 3** — their sources were never fetched. Checks 1, 2, 4, 5 and 6 for those components are unaffected and still stand. Re-running now: DatePicker 5 findings, TimePicker 5, StackNavigation 1, ContextMenu 2, ScrollArea 5, SearchInput 1, ToggleGroup 1, InputGroup 11.
+
+None of these have been triaged. They are a new backlog, and some will be the usual composition artefacts and deliberate deviations rather than real drift — the TimePicker note in this document already explains why that component shares no structure with its Blok source at all.
+
+Checks 1 (41 findings) and 4 (27) are untouched by this fix; those counts are library-wide and pre-date it, so the "Checks 1, 2, 4, 5, 6 clean" claim at the top of this document is stale and should be re-baselined.
+
+## InputOtp — ported from Backlog 2026-09-03 (Blok `a02fe3`)
+
+Blok wraps the React package `input-otp`, which renders one real `<input>` stretched invisibly across the slots and publishes a per-slot context. The same shape is rebuilt here: `InputOtp` owns a single transparent, focusable input and cascades itself; `InputOtpSlot` reads its character and active state back off it. Keeping one real input is what makes typing, backspace, paste, autofill and `one-time-code` autocomplete work natively instead of being reimplemented per slot.
+
+Four components, matching Blok's four exports. Named `InputOtp` rather than `InputOTP` — .NET casing for three-letter acronyms, and it matches the existing `MIGRATION_STATUS.md` row; count, roles and markup are unchanged.
+
+### The maxlength trap
+
+The first implementation set `maxlength` on the hidden input and filtered rejected characters in the input handler. That is broken, and the browser test caught it: typing `9x8y77` into a digits-only control produced `98`.
+
+`maxlength` counts the **raw** text. A character rejected by `Pattern` still lands in the element, still consumes the length budget, and leaves the element's text running ahead of the bound value — which is also what the caret position is measured against. Two changes fix it:
+
+- `maxlength` is no longer set on the element; the limit is enforced in `OnInput`.
+- A colocated `InputOtp.razor.js` pushes the accepted value back into the element whenever the two diverge, restoring the caret to the end. Blazor will not do this itself, because when a character is rejected the bound value never changed, so there is nothing for it to re-render.
+
+### Verified in browser
+
+Per-keystroke on a `^[0-9]$` control: `x` rejected with the raw text resynced to `9`; `y` rejected; digits accumulate to `9876`; a further `5` past `MaxLength` refused; `OnComplete` fired with `9876`. Pasting `A1B2C3D4` into a six-slot control truncates to `A1B2C3` and resyncs the raw text. The active slot shows the ring and the blinking caret, and a full value shows none. Dark mode: white characters on `rgba(255,255,255,0.55)` borders.
+
+Harness: `-Component InputOtp` PASS, 0 findings on all six checks — and, with the resolution fix above, that is now measured against the correct `input-otp.tsx`.
 
 ## DropdownMenu — missing exports ported 2026-09-03 (Blok `7de47e` → `82a49e`)
 
