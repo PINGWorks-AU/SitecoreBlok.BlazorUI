@@ -12,7 +12,7 @@
 		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
 	}
 	<div @onfocusout="MarkTouched">
-		<Select Value="@Value" ValueLabel="@LabelForValue" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled">
+		<Select Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled" DisplayLabel="@SelectedItemLabel">
 			<SelectTrigger>
 				<SelectValue Placeholder="@Placeholder" />
 			</SelectTrigger>
@@ -39,7 +39,8 @@
 	[Parameter] public string? Placeholder { get; set; }
 	[Parameter] public IList<SelectFieldItem>? Items { get; set; }
 
-	/// <summary>The label for the current value, taken from <see cref="Items"/>.</summary>
-	private string? LabelForValue
-		=> Value is null ? null : Items?.FirstOrDefault( item => item.Value == Value )?.Label;
+	// The label for the current Value, so the collapsed trigger shows it immediately for a
+	// preselected value rather than the raw Value until the dropdown is first opened.
+	private string? SelectedItemLabel
+		=> Value is null ? null : Items?.FirstOrDefault( i => i.Value == Value )?.Label;
 }
