@@ -55,6 +55,10 @@ public enum FieldOrientation { Vertical, Horizontal }
 public enum InputGroupAlign { InlineStart, InlineEnd, BlockStart, BlockEnd }
 public enum InputGroupButtonSize { Xs, Sm, IconXs, IconSm }
 
+// Filter *************************************************************************************************
+public enum FilterDisplayMode { Text, Badge }
+public enum FilterBarDirection { Horizontal, Vertical }
+
 // Tabs ****************************************************************************************************
 public enum TabsVariant { Line, SoftRounded }
 

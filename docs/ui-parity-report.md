@@ -1,7 +1,7 @@
 # UI Parity Report
 
-Generated: 2026-09-03 17:15:11  
-Scope: 2 component(s)
+Generated: 2026-09-03 17:35:32  
+Scope: 3 component(s)
 
 ## Check 1 — Compiled-utility coverage
 
@@ -13,7 +13,11 @@ No runtime-composed class names detected.
 
 ## Check 3 — Blok class-string drift
 
-No drift detected.
+| Component | In Blok | In ours |
+|-----------|---------|---------|
+| filter.tsx (Blok) ↔ 5 Razor file(s) | `focus:outline-none` | (missing) |
+| filter.tsx (Blok) ↔ 5 Razor file(s) | `focus:ring-1` | (missing) |
+| filter.tsx (Blok) ↔ 5 Razor file(s) | `focus:ring-ring` | (missing) |
 
 ## Check 4 — Surface background without paired text token
 

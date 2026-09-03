@@ -1,0 +1,44 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* Composition-based, unlike Blok. Blok's FilterBar takes a `filters` array of a discriminated
+   union plus a `values` bag keyed by string and an onChange(key, unknown) callback, because TS
+   can express that union and React can splat the props back out. C# has neither, and modelling
+   it would give up type-safe binding on every filter. Children are passed directly instead, so
+   each filter keeps its own @bind-Value. The wrapper's role, direction, gap and Clear all
+   behaviour are unchanged from Blok. *@
+<div role="region" aria-label="@AriaLabel" class="@CssClass" @attributes="AdditionalAttributes">
+	@ChildContent
+	@if ( ShowClearAll && OnClearAll.HasDelegate )
+	{
+		<Button OnClick="OnClearAll" Variant="ButtonVariant.Link" Size="ButtonSize.Sm"
+				ColorScheme="ButtonColor.Primary" ClassName="w-fit">
+			@ClearAllText
+		</Button>
+	}
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	/// <summary>Invoked by the Clear all button. The button only renders when this is bound.</summary>
+	[Parameter] public EventCallback OnClearAll { get; set; }
+
+	[Parameter] public bool ShowClearAll { get; set; } = true;
+	[Parameter] public string ClearAllText { get; set; } = "Clear all";
+	[Parameter] public FilterBarDirection Direction { get; set; } = FilterBarDirection.Horizontal;
+
+	/// <summary>Gap utility applied between filters. Default: <c>gap-3</c>.</summary>
+	[Parameter] public string Gap { get; set; } = "gap-3";
+
+	/// <summary>Accessible name for the filter region. Default: <c>Filters</c>.</summary>
+	[Parameter] public string AriaLabel { get; set; } = "Filters";
+
+	private string CssClass => CssClassBuilder.Start( "flex" )
+										.With( "flex-row flex-wrap items-center", Direction is FilterBarDirection.Horizontal )
+										.With( "flex-col items-start", Direction is FilterBarDirection.Vertical )
+										.With( Gap )
+										.With( ClassName )
+										.Build();
+}
