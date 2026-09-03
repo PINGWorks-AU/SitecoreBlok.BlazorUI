@@ -58,10 +58,12 @@
 	{
 		if ( Value is null ) return null;
 
-		// A parent-supplied label always reflects the current Value, so it wins over the cached
-		// SelectedLabel (which can be stale if Value changed externally without a click).
+		// A parent-supplied label always reflects the current Value, so it wins over anything cached.
+		// The cache is keyed BY VALUE, so it cannot go stale the way a single "last selected label"
+		// field could when Value changes externally without a click.
 		if ( DisplayLabel is not null ) return DisplayLabel;
-		if ( SelectedLabel is not null ) return SelectedLabel;
+		if ( LabelCache.TryGetValue( Value, out var cached ) ) return cached;
+		if ( ValueLabel is not null ) return ValueLabel;
 
 		var item = Items.OfType<SelectItem>().FirstOrDefault( i => i.Value == Value );
 		return item?.Label ?? Value;

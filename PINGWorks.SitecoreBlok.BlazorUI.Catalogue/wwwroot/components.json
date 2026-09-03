@@ -2,7 +2,7 @@
   "schema": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/blob/main/docs/components-schema.json",
   "package": "PINGWorks.SitecoreBlok.BlazorUI",
   "version": "2.0.0.0-preview-1",
-  "generatedAt": "2026-09-03T05:23:45Z",
+  "generatedAt": "2026-09-03T05:44:15Z",
   "repository": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI",
   "documentation": {
     "theme": "/theme.md",
@@ -384,7 +384,7 @@
     {
       "name": "StackNavigation",
       "slug": "stacknavigation",
-      "description": "Icon-and-label navigation rail with vertical or horizontal orientation",
+      "description": "Icon-and-label navigation rail with vertical or horizontal orientation; items with `OnItemClick` render as buttons, and `AriaLabel` promotes the list container to a named `<nav>` landmark",
       "status": "Parity",
       "catalogueUrl": "/primitives/stacknavigation"
     },

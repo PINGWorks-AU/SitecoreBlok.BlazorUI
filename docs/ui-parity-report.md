@@ -1,7 +1,7 @@
 # UI Parity Report
 
-Generated: 2026-09-03 15:21:50  
-Scope: 21 component(s)
+Generated: 2026-09-03 15:41:48  
+Scope: 10 component(s)
 
 ## Check 1 — Compiled-utility coverage
 

@@ -464,6 +464,21 @@ Blok's `SelectContent` class string carries a `borde` typo (a non-existent utili
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
 
 
+## Select — broken merge resolution repaired 2026-09-03
+
+Merge `0224a81` (`fix/selectfield-collapsed-label` into `fix/select-label-and-popover-teardown`) left `Select.razor` not compiling: `GetDisplayLabel` referenced `SelectedLabel`, which the merge had removed.
+
+The two branches had solved the same problem — showing the selected label before the dropdown is first opened — in different ways:
+
+| Branch | Approach |
+|---|---|
+| `fix/selectfield-collapsed-label` (`f15e889`) | `internal string? SelectedLabel`, a single "last selected label" field set in `Register` / `SetValue`, plus a `DisplayLabel` parameter |
+| `fix/select-label-and-popover-teardown` (`02bd0e6`) | `ValueLabel` parameter plus `LabelCache`, a dictionary keyed by value |
+
+The merge kept this branch's storage but the other branch's method body, leaving the dangling reference. Resolved by preserving both intents: `DisplayLabel` stays the highest-priority parameter, then the value-keyed cache, then `ValueLabel`, then a registered item's label, then the raw value. The cache is the right primitive for the middle step — being keyed by value it cannot go stale when `Value` changes externally without a click, which is precisely the hazard the other branch's own comment described.
+
+**Follow-up worth a decision:** `DisplayLabel` and `ValueLabel` are now two parameters covering nearly the same ground. They should probably be one, but collapsing them is an API change on a shipped component, so it is left alone here.
+
 ## Accessibility sweep re-audits — 2026-09-03
 
 Blok ran a large accessibility pass across `main` (commits `fcdbb6`, `565e2b`, `589c0c`, `e417e5`, `bc7553`, `10eb7d`, `82a49e`, `b82ead`, `99b9ef`). It changed **no class strings** in any component below — it is entirely ARIA attributes and, in two cases, element choice. Check 3 is therefore blind to all of it, which is why these rows sat drifted while the harness reported clean.
@@ -487,8 +502,21 @@ Worth noting how this was nearly missed: **`SidebarRail` had no Catalogue covera
 
 ### Still outstanding
 
-- **StackNavigation** (`7c9f7e` → `82a49e`) — needs a decision, not just an edit. Blok now renders items with an `onItemClick` as `<button>` rather than `<a>`, with `aria-haspopup` / `aria-expanded`, on the basis that such items are expandable panel controls. Our API lets an item carry **both** a `Path` and an `OnItemClick`, so adopting the rule verbatim would turn genuine links into buttons and lose middle-click / ctrl-click "open in new tab". Options are to key the element off `Path` being empty rather than off `OnItemClick`, or to follow Blok exactly and accept the loss.
 - **DropdownMenu** and **InputGroup** — blocked on the missing exports recorded in `MIGRATION_STATUS.md`; both rows are now `Partial`.
+
+### StackNavigation (`7c9f7e` → `82a49e`) — adopted 2026-09-03, following Blok exactly
+
+Three changes, all structural rather than visual (Check 3 stayed clean throughout):
+
+1. **Root `<aside>` → `<div>`** (`99b9ef`). `<aside>` is a landmark and the rail is routinely placed inside another landmark, which is a violation.
+2. **The list container is a `<nav>` only when it can be named.** New `AriaLabel` parameter: set, the container renders as `<nav aria-label="…">`; unset, a plain `<div>`. An unnamed nav landmark — or several — is the finding the audit raised. The item markup is shared between both branches via a `RenderItems` fragment so it exists once.
+3. **Items with `OnItemClick` render as `<button>`, not `<a>`**, with `aria-haspopup="true"` and `aria-expanded` bound to the active state. Blok's reasoning is that such items are expandable controls, not links.
+
+**The trade-off was put to the user and Blok's rule was chosen deliberately.** Our API allows an item to carry both a `Path` and an `OnItemClick`; under Blok's rule those are no longer anchors, so middle-click and ctrl-click no longer open them in a new tab. Items without `OnItemClick` remain real links. The `<DivergenceNote>` on `StackNavigationPage` has been rewritten to state this consequence.
+
+A welcome side effect: the old `data-enhance-nav="false"` workaround is gone. It existed because Blazor's enhanced navigation fetched the next page before `@onclick:preventDefault` could run. A `<button>` has no browser default to prevent, so the whole class of problem disappears — `HandleItemClick` still navigates via `NavigationManager` when the consumer leaves `PreventDefault` false.
+
+Verified in browser: 6 button items (`aria-haspopup="true"`, `aria-expanded`, no `href`) alongside 27 anchors on the same page; no `<aside>` from this component; clicking a button item updates both the active path and the last-clicked label; layout unchanged.
 
 ## Popover re-audit — 2026-09-03 (Blok `2d994e` → `4f751c`)
 
