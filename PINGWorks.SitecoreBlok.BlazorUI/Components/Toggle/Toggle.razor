@@ -17,14 +17,19 @@
 	[Parameter] public ToggleVariant Variant { get; set; } = ToggleVariant.Default;
 	[Parameter] public ToggleSize Size { get; set; } = ToggleSize.Default;
 
-	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors outline-none cursor-pointer",
+	@* Rounding lives on the variant arms, not the base string. CssClassBuilder concatenates
+	   without resolving Tailwind conflicts, so a base rounded-md alongside the Rounded variant's
+	   rounded-full would be settled by CSS rule order rather than by intent. *@
+	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors outline-none cursor-pointer",
 		"hover:bg-neutral-bg hover:text-muted-foreground",
 		"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
 		"disabled:pointer-events-none disabled:opacity-50",
 		"data-[state=on]:bg-primary-bg data-[state=on]:text-primary-fg",
 		"[&_svg]:pointer-events-none [&_svg]:shrink-0" )
-										.With( "bg-transparent", Variant is ToggleVariant.Default )
-										.With( "border border-input bg-transparent", Variant is ToggleVariant.Outline )
+										.With( "bg-transparent rounded-md", Variant is ToggleVariant.Default )
+										.With( "border border-input bg-transparent rounded-md", Variant is ToggleVariant.Outline )
+										.With( "bg-transparent rounded-md", Variant is ToggleVariant.Square )
+										.With( "bg-transparent rounded-full", Variant is ToggleVariant.Rounded )
 										.With( "h-9 min-w-9 px-2", Size is ToggleSize.Default )
 										.With( "h-8 min-w-8 px-1.5", Size is ToggleSize.Sm )
 										.With( "h-11 min-w-11 px-3", Size is ToggleSize.Lg )

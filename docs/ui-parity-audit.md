@@ -464,6 +464,36 @@ Blok's `SelectContent` class string carries a `borde` typo (a non-existent utili
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
 
 
+## ToggleGroup / Toggle — `Square` and `Rounded` variants added 2026-09-03
+
+Closes the single real gap found in the Check 3 triage below. `ToggleGroup` reported `rounded-full` as missing because Blok has a `rounded` variant we never ported.
+
+Reading the source turned up more than the one token. Blok's `toggleVariants` has **four** shapes — `default`, `outline`, `square`, `rounded` — where we had two:
+
+| | Blok | Ours (before) |
+|---|---|---|
+| Variants | `default`, `outline`, `square`, `rounded` | `Default`, `Outline` |
+| Sizes | `default` `h-10 px-4`, `sm` `h-8 px-3`, `xs` `h-6 px-2` | `Default` `h-9 px-2`, `Sm` `h-8 px-1.5`, `Lg` `h-11 px-3` |
+
+Check 3 only ever saw `rounded-full` because the size utilities are layout tokens and its filter discards those — the same blind spot recorded for the Accordion re-audit.
+
+### What was done
+
+`ToggleVariant` gains `Square` and `Rounded`. `Square` renders identically to `Default` (both `rounded-md`), exactly as in Blok, and exists so code written against Blok ports across unchanged. `Rounded` is `rounded-full` on both the group wrapper and its items.
+
+Rounding moved out of the base class string and onto the variant arms in `Toggle`, `ToggleGroupItem` and `ToggleGroup`. It had to: `CssClassBuilder` concatenates without resolving Tailwind conflicts, so a base `rounded-md` sitting alongside `Rounded`'s `rounded-full` would have been settled by CSS rule order rather than intent. Verified in browser — rounded group and items compute `9999px`, default groups stay at `6px`.
+
+### What was deliberately not done
+
+- **The size scale is left alone.** Aligning it would rename `Lg` out of existence and change the default height from `h-9` to `h-10` — a breaking change for consumers, and not something to fold into a variant addition. Recorded on `TogglePage`'s `<DivergenceNote>` as an open decision.
+- **Blok coerces `outline` to `default` inside a group**; we do not. Adopting that would remove the only way to get a bordered toggle group and would silently change behaviour for existing consumers. Documented on `ToggleGroupPage`.
+
+### Note on a false alarm
+
+While verifying, `getComputedStyle` reported `rgba(0, 0, 0, 0)` for the background of a pressed `Toggle`, which looked like the pressed state failing to render. It is not: a synthetic `<button>` carrying the identical class list computed the expected tint, and the screenshot shows the pressed `Rounded` toggle with its background clearly drawn. Treated as a measurement artefact — the same pattern that produced two earlier false alarms today when computed styles were sampled too soon after a state or theme change. Worth remembering: read the pixels before believing `getComputedStyle` on a just-changed element.
+
+Harness: ToggleGroup PASS clean. Toggle still reports its 5 pre-existing findings (`text-md`, `text-neutral-fg`, `hover:text-neutral-fg`, `dark:aria-invalid:ring-destructive/40`, `bg-backgrounds`), unchanged by this work and part of the same size/token scale divergence above.
+
 ## Check 3 triage — 2026-09-03
 
 Two harness defects were fixed today, and the newly-visible findings triaged. Both defects made the harness report *less* than reality, so nothing here is a regression in the library — it is coverage that never existed.

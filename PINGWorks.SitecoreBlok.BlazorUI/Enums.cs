@@ -43,7 +43,7 @@ public enum SpinnerVariant { Default, Primary }
 public enum SwitchVariant { Primary, Danger, Success }
 
 // Toggle **************************************************************************************************
-public enum ToggleVariant { Default, Outline }
+public enum ToggleVariant { Default, Outline, Square, Rounded }
 public enum ToggleSize { Default, Sm, Lg }
 public enum ToggleGroupType { Single, Multiple }
 

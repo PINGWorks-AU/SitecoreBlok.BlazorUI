@@ -6,6 +6,7 @@
 
 	<DivergenceNote>
 		<p><strong>Explicit <code>ToggleGroupType</code> enum and separate single/multi bindings, instead of Blok's union-type <code>type</code> discriminator.</strong> Blok uses Radix's <code>type="single"</code>/<code>type="multiple"</code> discriminated union where the <code>value</code> prop type shifts between <code>string</code> and <code>string[]</code>. Blazor doesn't handle discriminated unions cleanly, so we expose <code>ToggleGroupType.Single</code>/<code>ToggleGroupType.Multiple</code> and use <code>Value</code>/<code>ValueChanged</code> (single) or <code>Values</code>/<code>ValuesChanged</code> (multiple) depending on the chosen type. Behaviour, keyboard mechanics, and visuals match Blok — just the binding API differs.</p>
+		<p><strong><code>ToggleVariant.Outline</code> is allowed inside a group.</strong> Blok deliberately coerces <code>outline</code> to <code>default</code> for grouped items. We do not, because doing so would remove the only way to get a bordered toggle group and would silently change behaviour for existing consumers. Pass <code>Variant="ToggleVariant.Outline"</code> if you want borders; pass <code>Default</code> to match Blok exactly.</p>
 	</DivergenceNote>
 
 	<ExamplesSection>
@@ -34,11 +35,20 @@
 			}
 		</ComponentExample>
 
+		<ComponentExample Title="Rounded variant" Code="@("<ToggleGroup Variant=\"ToggleVariant.Rounded\" @bind-Value=\"roundedValue\">\n    <ToggleGroupItem Value=\"day\">Day</ToggleGroupItem>\n    <ToggleGroupItem Value=\"week\">Week</ToggleGroupItem>\n    <ToggleGroupItem Value=\"month\">Month</ToggleGroupItem>\n</ToggleGroup>")">
+			<ToggleGroup Variant="ToggleVariant.Rounded" @bind-Value="RoundedValue">
+				<ToggleGroupItem Value="day">Day</ToggleGroupItem>
+				<ToggleGroupItem Value="week">Week</ToggleGroupItem>
+				<ToggleGroupItem Value="month">Month</ToggleGroupItem>
+			</ToggleGroup>
+		</ComponentExample>
+
 	</ExamplesSection>
 
 </ComponentPage>
 
 @code {
+	private string? RoundedValue = "week";
 	private string? SingleValue = "bold";
 	private List<string> MultiValues = [];
 
@@ -51,7 +61,7 @@
 			Properties:
 			[
 				new ApiProperty( "Type",                 "ToggleGroupType",               false, "Selection mode. Default: `ToggleGroupType.Single` (one item active at a time). Other value: `Multiple` (independent on/off per item)." ),
-				new ApiProperty( "Variant",              "ToggleVariant",                 false, "Visual style shared by child `ToggleGroupItem`s. Default: `ToggleVariant.Default`. Other value: `Outline`." ),
+				new ApiProperty( "Variant",              "ToggleVariant",                 false, "Visual style shared by child `ToggleGroupItem`s. Default: `ToggleVariant.Default`. Other values: `Outline`, `Square`, `Rounded` — `Rounded` makes both the group and its items pill-shaped. Note Blok coerces `outline` to `default` inside a group; we allow it, see the DivergenceNote." ),
 				new ApiProperty( "Size",                 "ToggleSize",                    false, "Size token shared by child `ToggleGroupItem`s. Default: `ToggleSize.Default`. Other values: `Sm`, `Lg`." ),
 				new ApiProperty( "Disabled",             "bool",                          false, "Disables every item. Item-level `Disabled` is unioned with this. Default: `false`." ),
 				new ApiProperty( "Value",                "string?",                       false, "Active item's `Value` in single mode. Use with `@bind-Value`." ),
