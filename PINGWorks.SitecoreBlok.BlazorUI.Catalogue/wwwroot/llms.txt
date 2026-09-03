@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T04:48:16Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T04:58:38Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -36,7 +36,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Combobox](/primitives/combobox): Filterable select with search, single/multi-select, groups, chips
 - [ContextMenu](/primitives/contextmenu): Right-click menu
 - [CopyableToken](/primitives/copyabletoken): Click-to-copy token label; adds post-click tooltip confirmation, configurable messages, and `Clicked` callback
-- [DatePicker](/primitives/datepicker): Date input with calendar popover
+- [DatePicker](/primitives/datepicker): Date input with calendar popover; trigger drops its `aria-label` once a date shows, and the popup is a named `dialog`
 - [Dialog](/primitives/dialog): Modal dialog container
 - [DropdownMenu](/primitives/dropdownmenu): Popover menu with items and submenus
 - [Editable](/primitives/editable): Inline-editable text with input and textarea modes; `EditableError` + `HasError` for validation

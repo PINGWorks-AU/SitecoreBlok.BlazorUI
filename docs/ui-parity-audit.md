@@ -138,7 +138,7 @@ For each component: render in Catalogue dark mode, compare side-by-side to `blok
 
 | Component | Default | Hover | Active | Focus | Variants | Notes |
 |-----------|---------|-------|--------|-------|----------|-------|
-| DatePicker | ✅ | ✅ | ✅ | ✅ | ✅ | Uses Calendar internally + Popover; inherits theme. |
+| DatePicker | ✅ | ✅ | ✅ | ✅ | ✅ | Re-audited 2026-09-03 against Blok `c4346e`. Uses Calendar internally + Popover; inherits theme. Harness clean on all 6 checks. See the DatePicker section below. |
 | TimePicker | ✅ | ✅ | ❌ differs | ✅ | ✅ | **Not a port of Blok's composite picker** — we render a native `<input type="time">`; Blok uses a Popover with three Selects plus Clear/Done. Re-audited 2026-09-02 against `931987`. The previous note ("Uses Input/Select internally") was inaccurate. See the TimePicker section below. |
 | Calendar | ✅ | ✅ | ⚠️ minor | ✅ | ✅ | Re-audited 2026-09-02 against Blok `a2d44e`; `InBuiltDropdown` adopted 2026-09-03. `bg-background`, `text-foreground`, `bg-primary text-primary-foreground` for selected — theme-aware. ARIA parity closed; 5 documented Check 3 deviations, two of them composition artefacts of the Select-based dropdowns — see the Calendar section below. |
 | Avatar | ✅ | — | — | — | ✅ | `bg-muted text-muted-foreground` fallback — theme-aware. |
@@ -464,7 +464,7 @@ Blok's `SelectContent` class string carries a `borde` typo (a non-existent utili
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
 
 
-## DatePicker — single-date range-mode defect fixed 2026-09-03
+## DatePicker re-audit — 2026-09-03 (Blok `6cb4ad` → `c4346e`)
 
 Found while verifying the Calendar `InBuiltDropdown` port; confirmed pre-existing by reproducing it against unmodified `d165b64` code, so it is not a regression from that port.
 
@@ -474,7 +474,31 @@ Cause: `DatePicker` always wires `RangeStartChanged` / `RangeEndChanged` when it
 
 Fix: pass `Range="@IsRange"` — the already-correct resolved value — with an anti-revert comment, since `Range="@Range"` looks like the obvious form and reintroduces the bug.
 
-Note this closes a **local defect only**. DatePicker remains drifted upstream (`6cb4ad` → `c4346e`); the `CustomDropdown` half of that drift is now moot because Blok moved that export into `calendar.tsx` and we have followed, but the trigger `aria-label` change and the remaining commits in the range have not been audited. The row's `Last SHA` is deliberately left at `6cb4ad`.
+### Upstream changes in the range
+
+Four commits touch `date-picker.tsx`; **no class string changed anywhere in the range**. The substance is three edits:
+
+| Commit | Change | Disposition |
+|---|---|---|
+| `6d5ecd` | `CustomDropdown` export deleted and `components={{ Dropdown: CustomDropdown }}` dropped — the month/year dropdown moved into `calendar.tsx` as `InBuiltDropdown`. | Already resolved. Our `Calendar` port put the `Select` composite in the same place, so `DatePicker` correctly owns none of it. |
+| `149679` | Trigger `aria-label` becomes undefined once a date (or `range.from`) is displayed, so the visible formatted date is the accessible name rather than being overridden by the placeholder. The `DatePickerAriaLabels.popoverTrigger` doc comment was rewritten to say so. | Adopted. `TriggerAriaLabel` now returns null when `ShowsDate`; the XML doc on `DatePickerAriaLabels.PopoverTrigger` mirrors Blok's wording. Blazor omits null attributes entirely, so the attribute is absent rather than empty. |
+| `c4346e` | `PopoverContent` gains `aria-label="Choose date"` — axe flagged dialog nodes without an accessible name. | Adopted, with a Blazor-side prerequisite (below). |
+
+### Popover needed a role before the name could mean anything
+
+Blok's `PopoverContent` is a Radix dialog and already carries `role="dialog"`, so upstream only had to add the name. Our popup container had **no role at all** — `aria-label` on a role-less element is ignored by assistive technology, so copying just the label would have produced dead markup that looks correct in a diff.
+
+`Popover` therefore gains two optional passthrough parameters, `Role` and `AriaLabel`, forwarded by `PopoverItem` onto the popup container. Both default to null, so every existing consumer is unaffected — importantly `SelectContent`, which must stay role-less on the container because it renders its own `role="listbox"` inside. `DatePicker` sets `Role="dialog" AriaLabel="Choose date"`. Documented on the Popover Catalogue page.
+
+### Verified in browser
+
+Empty triggers expose `aria-label` from the placeholder ("Pick a date", "Choose a date...", "Pick a date range"). After selecting 15 Sept the single-date trigger reads `15 Sept 2026` with the `aria-label` attribute **absent**, and the popup closes. The range trigger after picking a start date reads `8 Sept 2026 — ...`, `aria-label` absent, popup still open awaiting the end date. While open the popup container reports `role="dialog"`, `aria-label="Choose date"`.
+
+Harness: DatePicker PASS, 0 findings on all six checks.
+
+### Not addressed — pre-existing Popover drift
+
+`pwsh ./tools/verify-ui-parity.ps1 -Component Popover` reports 4 Check 3 findings (`bg-popover`, `text-popover-foreground`, `rounded-md`, `shadow-md`). These pre-date this work and are a composition artefact: our `Popover` is a headless positioning primitive and each consumer supplies the surface through `ClassName` (`SelectContent` passes `bg-popover text-popover-foreground … rounded-md border shadow-md`; `DatePicker` passes `shadow-lg rounded-lg`). Blok puts those utilities directly on `PopoverContent`. Left alone — the Popover row's own re-audit is still outstanding, though its upstream diff `2d994e..HEAD` is empty (see the audit backlog).
 
 ## Editable re-audit — 2026-09-02 (Blok `17d1fb` → `c631ca`)
 
