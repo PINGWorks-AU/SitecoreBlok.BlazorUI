@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T05:44:15Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T05:59:24Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -46,7 +46,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [HoverCard](/primitives/hovercard): Hover-triggered popover card
 - [Icon](/primitives/icon): SVG icon renderer (MDI) with `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes)
 - [Input](/primitives/input): Text input control
-- [InputGroup](/primitives/inputgroup): Input with affixed addons. **Missing exports:** `InputGroupButton`, `InputGroupTextarea`. The row's upstream drift (`589c0c`) is an `aria-label` passthrough on `InputGroupButton`, so it cannot be closed until that component is ported.
+- [InputGroup](/primitives/inputgroup): Input with affixed addons, an inline `InputGroupButton` (four pill sizes) and a multi-line `InputGroupTextarea`
 - [Kbd](/primitives/kbd): Keyboard-key glyph
 - [Label](/primitives/label): Form label element
 - [LocalTime](/primitives/localtime): Renders a `DateTimeOffset` in the *browser's* local time zone (component-isolated JS module rewrites textContent after render — defeats the server-zone `ToLocalTime()` no-op trap in containerised hosting). Format tokens: year/month/day/weekday (incl. localised `MMMM`/`MMM`/`dddd`/`ddd` names and unpadded `d`), 12/24-hour, AM/PM, zone offset `K`

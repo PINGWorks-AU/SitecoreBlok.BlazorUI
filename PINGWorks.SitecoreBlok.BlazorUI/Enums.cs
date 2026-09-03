@@ -53,6 +53,7 @@ public enum FieldOrientation { Vertical, Horizontal }
 
 // InputGroup **********************************************************************************************
 public enum InputGroupAlign { InlineStart, InlineEnd, BlockStart, BlockEnd }
+public enum InputGroupButtonSize { Xs, Sm, IconXs, IconSm }
 
 // Tabs ****************************************************************************************************
 public enum TabsVariant { Line, SoftRounded }

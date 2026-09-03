@@ -464,6 +464,45 @@ Blok's `SelectContent` class string carries a `borde` typo (a non-existent utili
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
 
 
+## InputGroup — missing exports ported 2026-09-03 (Blok `37c0d3` → `589c0c`)
+
+Closes the `Partial` status recorded earlier in the day. `InputGroupButton` and `InputGroupTextarea` were the two Blok exports we lacked, and the row's upstream drift (`589c0c`, an `aria-label` passthrough) sat on the former, so the drift could not be closed without the port.
+
+### InputGroupButton
+
+Wraps `Button`, as Blok does, with its own pill size scale — `Xs`, `Sm`, `IconXs`, `IconSm` (new `InputGroupButtonSize` enum) — emitted as `data-size` and as class strings copied from `inputGroupButtonVariants`.
+
+Wrapping `Button` is safe here for a specific reason worth recording: **`Button` gates every one of its own size utilities on `CssClassBuilder.ContainsAny( ClassName, ... )`**, so the `h-`/`px-`/`rounded-`/`size-` utilities passed down suppress Button's built-ins rather than colliding with them. `CssClassBuilder` is plain concatenation with no twMerge equivalent, so without that gate the override would be decided by Tailwind's emitted rule order. Verified in browser: xs 24px high with 8px padding, sm 32px with 10px, icon-xs 24×24, icon-sm 32×32, all `rounded-full` — matching Blok's variant table exactly.
+
+`AriaLabel` is a first-class parameter rather than a splatted attribute, and the component carries an anti-trap comment: **do not pass `title` through to it.** `Button.Title` is the button's visible text, so a splatted `title` renders as content — the same trap that bit `SidebarRail` earlier today. This is now the second component to hit it; `Button.Title` shadowing the HTML `title` attribute is worth revisiting as an API question.
+
+### InputGroupTextarea
+
+Renders a bare `<textarea>` rather than wrapping our `Textarea`, matching how the sibling `InputGroupInput` renders a bare `<input>` instead of wrapping `Input`. Blok wraps `Textarea` and strips its chrome with `border-0` / `rounded-none` / `bg-transparent`, which works there because `cn()` is twMerge and physically removes the conflicting base utilities. Ours would keep both `border` and `border-0` on the element. Owning the full class string keeps it deterministic.
+
+One consequence caught in the browser: Blok's version inherits `w-full` from the `Textarea` it wraps, so rendering bare dropped it and the control collapsed to the intrinsic `cols=20` width (168px). `w-full` added explicitly.
+
+### Pre-existing bug this port exposed
+
+The multi-line example rendered as a squashed strip because **`InputGroup` was missing four of Blok's alignment variant groups**:
+
+```
+has-[>[data-align=inline-start]]:[&>input]:pl-2
+has-[>[data-align=inline-end]]:[&>input]:pr-2
+has-[>[data-align=block-start]]:h-auto  ...:flex-col  ...:[&>input]:pb-3
+has-[>[data-align=block-end]]:h-auto    ...:flex-col  ...:[&>input]:pt-3
+```
+
+The `flex-col` pair is load-bearing: a block-start/block-end addon is `w-full`, so without it the addon stays on the control's row and squeezes it to nothing. Also added Blok's `has-[button:focus-visible]` focus ring and the `[.border-t]` / `group-has-[>input]` padding refinements on the addon.
+
+**Check 3 could not have caught this.** Every one of those tokens ends in a layout utility (`flex-col`, `h-auto`, `pl-2`), and the harness filters drift candidates down to colour, border and shadow utilities — the blind spot already documented for the Accordion re-audit. It took rendering a block-end addon for the first time to surface it.
+
+### Harness
+
+`-Component InputGroup` reports 6 Check 1 findings and 2 Check 3. Measured against a baseline taken with the two new files moved aside, **the port adds exactly two Check 1 entries and no drift**: `icon-xs` and `icon-sm`, which are `data-size` attribute *values* the harness mistakes for class names — the same false positive as the pre-existing `inline-start` / `inline-end` / `block-start` / `block-end` on `InputGroupAddon`, which are `data-align` values. The 2 Check 3 findings (`text-md`, `focus:ring-1`) are pre-existing and attributed to `input.tsx`.
+
+Worth a future fix in the harness: string literals in `switch` arms feeding a `data-*` attribute should not be treated as class names.
+
 ## Select — broken merge resolution repaired 2026-09-03
 
 Merge `0224a81` (`fix/selectfield-collapsed-label` into `fix/select-label-and-popover-teardown`) left `Select.razor` not compiling: `GetDisplayLabel` referenced `SelectedLabel`, which the merge had removed.
