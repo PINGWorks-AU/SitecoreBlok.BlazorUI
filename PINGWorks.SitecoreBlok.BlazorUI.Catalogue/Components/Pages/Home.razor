@@ -194,10 +194,6 @@
 		<h2 class="text-xl font-semibold">Known Feature Gaps</h2>
 		<div class="space-y-3 text-sm text-muted-foreground">
 			<div class="flex items-start gap-2">
-				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Calendar</Badge>
-				<span>Month and year pickers are native <code>&lt;select&gt;</code> overlays. Blok replaced these with its own <code>Select</code> component (<code>InBuiltDropdown</code>) in August 2026. Not ported: our <code>Select</code> renders through <code>PopoverService</code>, and <code>Calendar</code> already sits inside the DatePicker popover, so adopting it would nest a popover inside a popover.</span>
-			</div>
-			<div class="flex items-start gap-2">
 				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Dropdown / ContextMenu</Badge>
 				<span>No keyboard navigation (arrow keys, Enter, Escape). The Blok source includes full keyboard support via Radix primitives.</span>
 			</div>

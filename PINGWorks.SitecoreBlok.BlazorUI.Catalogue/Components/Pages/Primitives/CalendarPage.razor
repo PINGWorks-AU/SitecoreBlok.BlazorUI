@@ -4,6 +4,21 @@
 
 <ComponentPage Title="Calendar" Description="A date field component that allows users to enter and edit a date" Interactivity="ComponentInteractivity.Interactive" ApiElements="@CalendarElements">
 
+	<InstallationNote>
+		<p>The month and year dropdowns are built from <code>Select</code>, which opens through the shared Popover infrastructure, so the same setup applies:</p>
+		<ol class="list-decimal pl-5 space-y-1">
+			<li>
+				Register the BlazorUI services in <code class="text-xs bg-muted px-1 py-0.5 rounded">Program.cs</code>:
+				<CodeViewer Code="@("builder.Services.AddSitecoreBlokUI();")" Language="CodeLanguage.CSharp" ClassName="!mt-2" />
+			</li>
+			<li>
+				Place a single <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Popovers /&gt;</code> container in your root layout:
+				<CodeViewer Code="@("<Popovers @rendermode=\"InteractiveServer\" />")" Language="CodeLanguage.Razor" ClassName="!mt-2" />
+			</li>
+		</ol>
+		<p class="mt-2">Without these the calendar still renders and the arrows still change month, but the month and year dropdowns will not open.</p>
+	</InstallationNote>
+
 	<DivergenceNote>
 		<p><strong>Hand-rolled Calendar, not a <code>react-day-picker</code> wrapper.</strong> Blok's Calendar is a thin wrapper around <code>react-day-picker</code> exposing <code>captionLayout</code>, <code>formatters</code>, <code>buttonVariant</code>, <code>showOutsideDays</code>, and a <code>components</code> override prop. We implement the calendar from scratch with Blazor-native parameters: <code>Value</code>, <code>RangeStart</code>/<code>RangeEnd</code>, <code>MinDate</code>/<code>MaxDate</code>, <code>YearRangeStart</code>, and <code>NumberOfMonths</code>. There is no <code>react-day-picker</code> compatibility layer — Blok-style props will not work. Range selection, min/max bounds, and multi-month panels are supported out of the box.</p>
 	</DivergenceNote>

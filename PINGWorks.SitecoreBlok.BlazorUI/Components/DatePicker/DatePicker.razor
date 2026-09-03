@@ -11,8 +11,12 @@
 	</Button>
 
 	<Popover Id="@Id" OnClose="Close" ClassName="shadow-lg rounded-lg">
+		@* Pass the resolved IsRange, not the raw Range parameter. Calendar falls back to
+		   "is RangeStartChanged bound?" when Range is null, and the handlers below are always
+		   wired — so a null Range would make every DatePicker a range picker, and @bind-Value
+		   would never set Value. DO NOT change this back to Range="@Range". *@
 		<Calendar Value="@Value" ValueChanged="OnDateSelected"
-				Range="@Range" RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
+				Range="@IsRange" RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
 				RangeEnd="@RangeEnd" RangeEndChanged="OnRangeEndSelected"
 				MinDate="@MinDate" MaxDate="@MaxDate"
 				NumberOfMonths="@NumberOfMonths"

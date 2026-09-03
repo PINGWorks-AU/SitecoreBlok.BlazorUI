@@ -140,7 +140,7 @@ For each component: render in Catalogue dark mode, compare side-by-side to `blok
 |-----------|---------|-------|--------|-------|----------|-------|
 | DatePicker | ✅ | ✅ | ✅ | ✅ | ✅ | Uses Calendar internally + Popover; inherits theme. |
 | TimePicker | ✅ | ✅ | ❌ differs | ✅ | ✅ | **Not a port of Blok's composite picker** — we render a native `<input type="time">`; Blok uses a Popover with three Selects plus Clear/Done. Re-audited 2026-09-02 against `931987`. The previous note ("Uses Input/Select internally") was inaccurate. See the TimePicker section below. |
-| Calendar | ✅ | ✅ | ⚠️ minor | ✅ | ✅ | Re-audited 2026-09-02 against Blok `a2d44e`. `bg-background`, `text-foreground`, `bg-primary text-primary-foreground` for selected — theme-aware. ARIA parity closed; 7 documented Check 3 deviations and one open decision (`InBuiltDropdown`) — see the Calendar section below. |
+| Calendar | ✅ | ✅ | ⚠️ minor | ✅ | ✅ | Re-audited 2026-09-02 against Blok `a2d44e`; `InBuiltDropdown` adopted 2026-09-03. `bg-background`, `text-foreground`, `bg-primary text-primary-foreground` for selected — theme-aware. ARIA parity closed; 5 documented Check 3 deviations, two of them composition artefacts of the Select-based dropdowns — see the Calendar section below. |
 | Avatar | ✅ | — | — | — | ✅ | `bg-muted text-muted-foreground` fallback — theme-aware. |
 | Icon | ✅ | — | — | — | ✅ | Now supports `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes) matching Blok. **Structural divergence (Default variant only):** `<svg>` is the root element; `ClassName` lands on the SVG for chevron-rotation animation support. Subtle/Filled variants render a `<span>` wrapper matching Blok exactly. `ColorScheme` is nullable for Default — null means "inherit parent color" (backward-compatible). Blazor extras: `Scale`, `AiGradient`, `ViewBox`, `ResetClassName`. Harness fix: added switch-expression arm pattern to `Get-RazorClassStrings`. |
 | Kbd | ✅ | — | — | — | ✅ | `bg-muted text-muted-foreground border-border` — theme-aware. |
@@ -426,24 +426,33 @@ Triggered by `/blok update Calendar`. Five upstream commits in range; the substa
 | Day border | `border border-transparent` → `border border-solid border-transparent`, matching Blok. |
 | Range-middle cells | `bg-primary-bg text-foreground rounded-none` → `bg-primary-bg text-primary-fg hover:bg-primary hover:text-inverse-text rounded-none`, matching Blok. **This fixed a real gap:** middle-of-range days previously had no hover state at all. Verified in-browser that hovering a middle day now highlights it. |
 
-### Open decision — Blok's `InBuiltDropdown` is not ported
+### Resolved 2026-09-03 — Blok's `InBuiltDropdown` is now ported
 
-Commit `6d5ecd` replaced react-day-picker's native `<select>` month/year dropdowns with Blok's own `Select` component (`SelectTrigger` / `SelectContent` / `SelectItem`), exported as `InBuiltDropdown`. We still use a native `<select>` overlaid at `opacity-0`.
+Commit `6d5ecd` replaced react-day-picker's native `<select>` month/year dropdowns with Blok's own `Select` composite (`SelectTrigger` / `SelectContent` / `SelectItem`), exported as `InBuiltDropdown`. We now render the same composite.
 
-Not adopted in this pass because it is an architectural change, not a class-string one, and it carries a specific risk this library has already been bitten by: our `Select` renders through `PopoverService` / the `<Popovers>` host, and `Calendar` is itself rendered **inside** the DatePicker's popover. That nests a `PopoverService` popup inside a `PopoverService` popup, and the documented behaviour is that the `<Popovers>` host does not re-render when the originating component's state changes. It would also add a `<Popovers />` + `AddSitecoreBlokUI()` installation requirement to the otherwise self-contained `Calendar`.
+**The blocker recorded in the previous revision of this section was wrong, and the correction is worth keeping.** It claimed the port was unsafe because our `Select` renders through `PopoverService` / the `<Popovers>` host while `Calendar` itself sits inside the DatePicker's popover — nesting a PopoverService popup inside a PopoverService popup, where the host is documented not to re-render on originating-component state changes. Two things were conflated:
 
-Tracked as a Known Feature Gap on `Home.razor`. Awaiting a decision before implementing.
+- **The staleness rule applies to captured fragments, not to component instances.** `<Popovers>` renders the `RenderFragment` it captured, so markup the *originating* component re-renders into that fragment goes stale. `Calendar` is a component instance living in `PopoverItem`'s render tree; its own `StateHasChanged` re-renders it like any other component, wherever it sits.
+- **The two popups are DOM siblings, not nested.** Both are rendered by the `Popovers` host, so the outer popup's `transform` never captures the inner popup's `position: fixed`, and the inner overlay (later in DOM at the same `z-50`) correctly takes clicks without dismissing the outer popover.
 
-### Deliberate deviations (remaining Check 3 drift — 4 tokens reported by the harness)
+Verified in-browser across six scenarios before adopting: standalone open/select; the nested Select inside the DatePicker popover; month change while nested (grid re-renders inside the still-open outer popover); date selection after using the dropdown; dark mode nested year dropdown; and the two-month panel (four `Select` instances, per-panel offset maths — picking Dec on panel 2 gives Nov + Dec).
+
+**Accepted cost:** `Calendar` is no longer self-contained — it now requires `AddSitecoreBlokUI()` and a root-level `<Popovers />`. `CalendarPage` carries an `<InstallationNote>` saying so, and noting that without them the grid and arrows still work while the dropdowns will not open. The Known Feature Gap entry on `Home.razor` has been removed.
+
+Blok's `SelectContent` class string carries a `borde` typo (a non-existent utility). Not propagated, per the standing rule on Blok-side typos.
+
+### Deliberate deviations (remaining Check 3 drift — 5 tokens reported by the harness)
 
 | Blok token | Why not adopted |
 |---|---|
-| `bg-popover` | On Blok's `opacity-0` native select overlay, so visually inert. Our overlay instead sets `dark:[&_option]:bg-background dark:[&_option]:text-foreground`, which is the more robust fix for the dark-mode `<option>` popup bug documented in Common Pitfalls. |
+| `bg-popover` | Was on Blok's `opacity-0` native select overlay. Since the `InBuiltDropdown` port the surface comes from our `SelectContent`, which sets `bg-popover text-popover-foreground` in its own file — the harness does not scan it under Calendar, so the token reads as missing here. Composition artefact, not drift. |
 | `border-collapse` | Blok renders the day grid as a `<table>`; we render a flat div grid. Structural divergence already covered by the `<DivergenceNote>` on `CalendarPage`. |
 | `hover:rounded-md` | Blok puts this on the day-button base. Our rounding is per-state (`rounded-md` / `rounded-l-md` / `rounded-none`), so a base `hover:rounded-md` would round range-middle cells on hover and break the continuous range bar. |
 | `text-body-text` | Not counted by the harness — `$equivGroups` canonicalises it to `text-foreground`, which the file carries. Blok sets a base text token on every day button. We leave the base uncoloured and let the root's `text-card-foreground` cascade, because setting a base `text-*` alongside per-state `text-white` reintroduces the source-order race documented for Button. |
 | `text-inverse-text` | Selected and range-endpoint cells use a literal `text-white`. The surface is a fixed `bg-primary-500` that does not flip, so `text-inverse-text` would resolve dark-on-blue in dark mode. Same class as the Tooltip fix; harness Check 5 enforces it. Anti-revert comment is in `Calendar.razor`. |
-| `dark:bg-transparent`, `dark:hover:bg-transparent` | Belong to `InBuiltDropdown`'s `SelectTrigger` and are below the harness's per-component reporting cap. Contingent on the open decision above. |
+| `border-input` | Previously on our own month/year wrapper `<div>`s, which the `InBuiltDropdown` port removed. The token now lives in `SelectTrigger.razor`, outside the harness's Calendar scope. Composition artefact, not drift — same class of false positive as `bg-popover` above. |
+
+`dark:bg-transparent` and `dark:hover:bg-transparent` are no longer drift: both were contingent on the `InBuiltDropdown` decision and are now genuinely present on the ported `SelectTrigger` class string.
 
 ### Extras we have that Blok does not
 
@@ -454,6 +463,18 @@ Tracked as a Known Feature Gap on `Home.razor`. Awaiting a decision before imple
 
 Nav labels, dropdown labels and 42 day buttons carry the expected ARIA; the min/max example correctly reports `aria-disabled="true"` / `tabindex="-1"` on the previous-month button with 3 disabled days. Dark mode: calendar surface `rgb(40,40,40)`, range-middle `bg rgba(217,212,255,0.12)` with `text-primary-fg` `rgb(217,212,255)`, range endpoints `rgb(110,63,255)` with literal white, nav chevrons `rgba(255,255,255,0.68)`. All legible; no dark-mode contrast failures.
 
+
+## DatePicker — single-date range-mode defect fixed 2026-09-03
+
+Found while verifying the Calendar `InBuiltDropdown` port; confirmed pre-existing by reproducing it against unmodified `d165b64` code, so it is not a regression from that port.
+
+`<DatePicker @bind-Value="..." />` behaved as a **range** picker: clicking a day set `RangeStart` instead of `Value`, the trigger rendered `"10 Sept 2026 — ..."`, and the popover never closed. The Catalogue's own "Default" example demonstrated it.
+
+Cause: `DatePicker` always wires `RangeStartChanged` / `RangeEndChanged` when it renders `Calendar`, and `Calendar.IsRange` falls back to `RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate` whenever its `Range` parameter is null. `DatePicker` passed its own raw `Range` parameter (null unless the consumer set it) rather than its resolved `IsRange`, so the fallback made every DatePicker a range picker.
+
+Fix: pass `Range="@IsRange"` — the already-correct resolved value — with an anti-revert comment, since `Range="@Range"` looks like the obvious form and reintroduces the bug.
+
+Note this closes a **local defect only**. DatePicker remains drifted upstream (`6cb4ad` → `c4346e`); the `CustomDropdown` half of that drift is now moot because Blok moved that export into `calendar.tsx` and we have followed, but the trigger `aria-label` change and the remaining commits in the range have not been audited. The row's `Last SHA` is deliberately left at `6cb4ad`.
 
 ## Editable re-audit — 2026-09-02 (Blok `17d1fb` → `c631ca`)
 
