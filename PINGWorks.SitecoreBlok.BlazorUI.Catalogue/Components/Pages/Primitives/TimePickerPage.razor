@@ -4,9 +4,25 @@
 
 <ComponentPage Title="TimePicker" Description="A time selection input" Interactivity="ComponentInteractivity.Interactive" ApiElements="@TimePickerElements">
 
+	<InstallationNote>
+		<p>The picker renders its panel through the shared Popover infrastructure, so the same setup applies:</p>
+		<ol class="list-decimal pl-5 space-y-1">
+			<li>
+				Register the BlazorUI services in <code class="text-xs bg-muted px-1 py-0.5 rounded">Program.cs</code>:
+				<CodeViewer Code="@("builder.Services.AddSitecoreBlokUI();")" Language="CodeLanguage.CSharp" ClassName="!mt-2" />
+			</li>
+			<li>
+				Place a single <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Popovers /&gt;</code> container in your root layout:
+				<CodeViewer Code="@("<Popovers @rendermode=\"InteractiveServer\" />")" Language="CodeLanguage.Razor" ClassName="!mt-2" />
+			</li>
+		</ol>
+		<p>The panel's Hour, Minute and Period dropdowns are <code>Select</code>s, which use the same host — so this one requirement covers the whole component.</p>
+	</InstallationNote>
+
 	<DivergenceNote>
-		<p><strong>This is a native <code>&lt;input type="time"&gt;</code>, not a port of Blok's composite picker.</strong> Blok builds its TimePicker from a <code>Popover</code> containing three <code>Select</code> dropdowns (Hour, Minute, Period) plus Clear and Done buttons, behind a trigger button that shows the formatted time. We render a single native time input instead, so the browser supplies the spinner, keyboard entry, and platform time-entry UI. The rendered DOM, the sub-component surface, and the interaction model all differ from Blok &mdash; there are no Blok-equivalent sub-components to compose.</p>
-		<p><strong>Value type is <code>TimeSpan?</code> (24-hour), not Blok's <code>TimeValue &#123; hour, minute, period: AM/PM &#125;</code>.</strong> Blok models time as a structured object with an AM/PM period flag. <code>TimeSpan</code> is naturally 24-hour and is what the native input round-trips. Consumers migrating from Blok need to convert their <code>TimeValue</code> to a <code>TimeSpan</code> on binding; the period is implied by the hour. Display formatting follows the browser locale for <code>input type="time"</code> &mdash; this component exposes no format parameter.</p>
+		<p><strong>Ported to Blok's composite picker on 2026-09-04.</strong> This was a native <code>&lt;input type="time"&gt;</code>, which shared no DOM, no sub-components and no interaction model with Blok. It is now Blok's shape: a trigger button showing the formatted time and a clock icon, opening a popover with Hour, Minute and Period <code>Select</code>s and Clear / Done buttons. The trade is deliberate and worth stating — you lose the browser's native time entry, including the mobile time wheel and free keyboard typing, and gain Blok-matching structure and the AM/PM model.</p>
+		<p><strong>The value stays <code>TimeSpan?</code>.</strong> Blok models time as <code>TimeValue &#123; hour, minute, period &#125;</code> — three strings — because TypeScript has no time type. .NET does, and <code>TimeSpan</code> round-trips to the 12-hour parts without loss, so the API keeps it. This is a paradigm translation, not a behavioural difference: the rendered control and everything the user does with it match Blok. It also means the change was not breaking for anyone already bound to <code>TimeSpan?</code>.</p>
+		<p><strong>The panel is a separate internal component.</strong> Blok keeps the whole picker in one function. A <code>Popover</code> renders its content through the popover host, and that host does not re-render when the originating component's state changes — so a panel whose dropdowns must reflect the current selection has to own that state itself. <code>TimePickerPanel</code> is that component. It is implementation detail, not a second export to compose.</p>
 	</DivergenceNote>
 
 	<ExamplesSection>
@@ -14,11 +30,20 @@
 		<ComponentExample Title="Default" Code="@("<TimePicker @bind-Value=\"selectedTime\" />")">
 			<div class="space-y-4">
 				<TimePicker @bind-Value="SelectedTime" />
-				@if ( SelectedTime is not null )
-				{
-					<p class="text-sm text-muted-foreground">Selected: @SelectedTime.Value.ToString(@"hh\:mm")</p>
-				}
+				<p class="text-sm text-muted-foreground">Selected: <strong>@( SelectedTime is null ? "(none)" : SelectedTime.Value.ToString( @"hh\:mm" ) )</strong></p>
 			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Preselected" Code="@("<TimePicker @bind-Value=\"meetingTime\" />")">
+			<TimePicker @bind-Value="MeetingTime" />
+		</ComponentExample>
+
+		<ComponentExample Title="Custom placeholder and labels" Code="@("<TimePicker @bind-Value=\"reminderTime\"\n            Placeholder=\"When should we remind you?\"\n            HourLabel=\"Hr\"\n            MinuteLabel=\"Min\"\n            DoneText=\"Set reminder\" />")">
+			<TimePicker @bind-Value="ReminderTime"
+						Placeholder="When should we remind you?"
+						HourLabel="Hr"
+						MinuteLabel="Min"
+						DoneText="Set reminder" />
 		</ComponentExample>
 
 		<ComponentExample Title="Disabled" Code="@("<TimePicker Disabled=\"true\" />")">
@@ -31,20 +56,29 @@
 
 @code {
 	private TimeSpan? SelectedTime;
+	private TimeSpan? MeetingTime = new( 14, 30, 0 );
+	private TimeSpan? ReminderTime;
 
 	private static readonly ApiElement[] TimePickerElements =
 	[
 		new ApiElement(
 			Name: "TimePicker",
-			Description: "Wraps a native `<input type=\"time\">` styled to match Blok. Two-way bindable via `@bind-Value` to a `TimeSpan?`.",
+			Description: "Trigger button plus a popover holding Hour, Minute and Period `Select`s. Two-way bindable via `@bind-Value` to a `TimeSpan?`.",
 			Depth: 0,
 			Properties:
 			[
-				new ApiProperty( "Value",                "TimeSpan?",                     false, "Selected time as a 24-hour `TimeSpan`. Null when unset or the underlying input is cleared." ),
-				new ApiProperty( "ValueChanged",         "EventCallback<TimeSpan?>",      false, "Invoked when the user edits the time." ),
-				new ApiProperty( "Disabled",             "bool",                          false, "When true, the input is read-only and visually muted. Default: `false`." ),
-				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the outer wrapper." ),
-				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the underlying `<input>`." ),
+				new ApiProperty( "Value",                "TimeSpan?",                   false, "Selected time as a 24-hour `TimeSpan`. Null when unset or cleared." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<TimeSpan?>",    false, "Fires whenever an Hour, Minute or Period field changes, and when Clear is pressed." ),
+				new ApiProperty( "Placeholder",          "string",                      false, "Shown on the trigger until a time is picked. Default: `\"Pick a time\"`." ),
+				new ApiProperty( "Disabled",             "bool",                        false, "Disables the trigger so the panel cannot open. Default: `false`." ),
+				new ApiProperty( "PanelAriaLabel",       "string",                      false, "Accessible name for the popover, which is a `dialog`. Default: `\"Choose time\"`." ),
+				new ApiProperty( "HourLabel",            "string",                      false, "Label above the hour dropdown, and its accessible name. Default: `\"Hour\"`." ),
+				new ApiProperty( "MinuteLabel",          "string",                      false, "Label above the minute dropdown, and its accessible name. Default: `\"Minute\"`." ),
+				new ApiProperty( "PeriodLabel",          "string",                      false, "Label above the AM/PM dropdown, and its accessible name. Default: `\"Period\"`." ),
+				new ApiProperty( "ClearText",            "string",                      false, "Label on the button that clears the value and closes the panel. Default: `\"Clear\"`." ),
+				new ApiProperty( "DoneText",             "string",                      false, "Label on the button that closes the panel. Default: `\"Done\"`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the outer wrapper." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes, forwarded to the wrapper." ),
 			]
 		),
 	];

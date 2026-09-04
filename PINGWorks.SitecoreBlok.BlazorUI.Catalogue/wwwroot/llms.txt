@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-04T04:39:55Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-04T07:24:28Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -73,7 +73,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Spinner](/primitives/spinner): Spinning loading indicator
 - [Stack](/primitives/stack): Flexbox layout helper (vertical / horizontal)
 - [StackNavigation](/primitives/stacknavigation): Icon-and-label navigation rail with vertical or horizontal orientation; items with `OnItemClick` render as buttons, and `AriaLabel` promotes the list container to a named `<nav>` landmark
-- [Stepper](/primitives/stepper): Multi-step progress indicator
+- [Stepper](/primitives/stepper): Multi-step progress indicator; horizontal orientation renders in Blok's muted `bg-muted/30` panel. `Size` (`Sm`/`Default`/`Lg`). Step state is inferred from `ActiveStep` rather than Blok's per-step `status` field
 - [Switch](/primitives/switch): On / off toggle control
 - [Table](/primitives/table): Tabular data layout
 - [Tabs](/primitives/tabs): Tabbed content switcher
@@ -81,7 +81,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Textarea](/primitives/textarea): Multi-line text input
 - [ThemeToggle](/primitives/themetoggle): Light / dark mode switcher
 - [Timeline](/primitives/timeline): Vertical event timeline
-- [TimePicker](/primitives/timepicker): Native `input type=time`, not a port of Blok's Popover + three Selects composite. Status badge under review — see the TimePicker section in docs/ui-parity-audit.md
+- [TimePicker](/primitives/timepicker): Trigger button plus a popover with Hour / Minute / Period selects and Clear / Done, matching Blok. Value stays `TimeSpan?` rather than Blok's `{hour, minute, period}` string triple. Requires a root `<Popovers />`
 - [Toaster](/primitives/toaster): Imperative `ToastService.Show(...)` API; `/sonner` stub page
 - [Toggle](/primitives/toggle): Single-toggle button; Blok size scale (`Xs`/`Sm`/`Default`). No pressed-state icon swap — Blok inspects its children, which Blazor cannot do
 - [ToggleGroup](/primitives/togglegroup): Segmented toggle group; shares `ToggleSize` and the item class chain with `Toggle`

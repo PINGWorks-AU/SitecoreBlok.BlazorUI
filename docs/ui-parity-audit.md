@@ -485,7 +485,7 @@ Rounding moved out of the base class string and onto the variant arms in `Toggle
 
 ### What was deliberately not done
 
-- **The size scale is left alone.** Aligning it would rename `Lg` out of existence and change the default height from `h-9` to `h-10` — a breaking change for consumers, and not something to fold into a variant addition. Recorded on `TogglePage`'s `<DivergenceNote>` as an open decision.
+- ~~**The size scale is left alone.**~~ **Closed 2026-09-04** — the scale was aligned to Blok (`Xs`/`Sm`/`Default`), `ToggleSize.Lg` removed and the default height changed from `h-9` to `h-10`. It was a breaking change, taken deliberately. See "Toggle / ToggleGroup aligned to Blok" below.
 - **Blok coerces `outline` to `default` inside a group**; we do not. Adopting that would remove the only way to get a bordered toggle group and would silently change behaviour for existing consumers. Documented on `ToggleGroupPage`.
 
 ### Note on a false alarm
@@ -831,7 +831,7 @@ Two filters combine to produce the false clean:
 
 Check 3 measures token overlap, not structural correspondence. It cannot detect a wholly different component. Combined with the Accordion finding (layout drift invisible), the rule is: **the harness is a regression guard on class strings, not evidence of parity.** Structural parity needs the export count check from Phase 3 step 2 and a source read.
 
-### Open decision — port Blok's composite picker?
+### Open decision — port Blok's composite picker? — CLOSED 2026-09-04
 
 Not started; needs a call before any code.
 
@@ -1110,3 +1110,186 @@ Worth noting for the same reason as the Toggle font-size bug: **Check 3 was clea
 ### One transition artefact, not a bug
 
 Blok's circle variants carry `transition-colors`, which we now match. Screenshotting immediately after a theme flip catches the circles mid-animation and they read as solid dark fills. The settled light-mode state is correct: completed `rgb(110,63,255)` with white glyph, active white fill with primary border and primary number, pending white fill with a subtle border and muted number.
+
+## Check 3 — final pass, 2026-09-04
+
+Drift 33 to 26; library total 67. Everything remaining is now either a documented deliberate divergence or a composition artefact — there are no unexplained findings left.
+
+### Prefix-aware canonicalisation
+
+The equivalence map only ever held bare utilities, so a variant-prefixed token never matched it. `focus:text-accent-foreground` reported as drift even though `text-accent-foreground` was mapped, and the only workaround would have been restating every equivalence once per prefix.
+
+The normaliser now splits at the last `:`, canonicalises the utility, and re-attaches the prefix. Arbitrary values are untouched — the segment after the final `:` in `[&::-webkit-scrollbar]:w-1.5` is `w-1.5`, which is simply not in the map and falls through.
+
+This cleared 7 findings, not the 2 expected: ContextMenu's `focus:text-accent-foreground` and StackNavigation's false positive, plus all five DatePicker composition artefacts, which had been prefixed forms of tokens already mapped.
+
+Also merged two conflicting groups. `text-foreground` and `text-accent-foreground` each separately claimed `text-body-text` as an alias, so whichever was processed last silently won. Verified they are genuinely one colour — `--foreground` and `--accent-foreground` both resolve to `blackAlpha-900` in light and `white` in dark — and merged into a single group.
+
+### Blok-side predicates are no longer read as classes
+
+`stack-navigation.tsx` contains `className?.includes("shadow-none")` — a runtime test of a caller-supplied class, not a class Blok applies. The Blok-side extractor pulls any string literal containing Tailwind-ish text, so it read that as a class we were missing, and no change to our code could ever have satisfied it.
+
+Comparison forms are now stripped before extraction: `.includes(...)`, `.startsWith`, `.endsWith`, `.indexOf`, `.match`, `.split`, `.replace`, and `===` / `!==` / `==` / `!=` against a string literal.
+
+### Kbd inside a Tooltip
+
+Blok styles a nested Kbd through a descendant selector on the tooltip slot: `bg-background/20` with `text-background`, and `bg-background/10` in dark. We had none of it, so a Kbd in a Tooltip rendered with its default `bg-muted text-muted-foreground` — a light grey chip with grey text on our dark tooltip.
+
+Adopted with the values adapted, because our Tooltip surface is a fixed `bg-gray-700` in **both** modes rather than a theme-aware token. A translucent-white chip with literal white text is correct against a surface that never flips, and needs no dark variant: `[[data-slot=tooltip-content]_&]:bg-white/20` and `[[data-slot=tooltip-content]_&]:text-white`. Same reasoning as the Tooltip's own `text-white`, and the reason Blok's `dark:` form stays listed as drift.
+
+Verified by hovering the new example on `KbdPage` — the chips render as light translucent pills with white text on the dark tooltip.
+
+### Editable's error tooltip
+
+Blok uses `bg-white`, which does not flip; ours uses `bg-popover`, which does. Blok's error tooltip is therefore white-on-dark in dark mode with `text-destructive` on top. Ours is deliberately better and stays as it is — recorded rather than adopted.
+
+### Final disposition of the 26
+
+| Component | Count | Disposition |
+|---|---|---|
+| Calendar | 5 | Documented under the Calendar re-audit — three deliberate, two composition artefacts. |
+| ScrollArea | 5 | Blok styles a Radix custom scrollbar; we use the library-wide native thin-scrollbar treatment. |
+| TimePicker | 5 | Whole-component substitution, open decision recorded. |
+| Popover | 4 | Deliberately headless; consumers supply the surface via `ClassName`. |
+| Editable | 2 | `hover:bg-transparent` and `bg-white`, both deliberate. |
+| Button | 1 | `text-primary-foreground` removed to end the source-order race. |
+| Tooltip | 1 | `text-inverse-text` replaced by literal `text-white`, enforced by Check 5. |
+| Kbd | 1 | Blok's `dark:` tooltip variant, unnecessary against a non-flipping surface. |
+| SearchInput | 1 | `focus:border-0`, pre-existing. |
+| Input | 1 | `focus:ring-1` — raised as a decision here, aligned to Blok later the same day. |
+
+### Input's focus ring — closed 2026-09-04
+
+Blok sets `focus:ring-1`; we set `focus-visible:ring-[3px]`, the shadcn default — three times thicker on every input in the library, with `Input` composed into `SearchInput`, `InputGroup`, `Combobox` and `Filter`. Raised here as a decision rather than changed unilaterally, then aligned to Blok's 1px on the same day. See the section below.
+
+### Input focus ring aligned — 2026-09-04
+
+`focus-visible:ring-[3px]` (the shadcn default) to `focus-visible:ring-1`, matching Blok's `focus:ring-1`. Input is composed into SearchInput, InputGroup, Combobox, Filter and more, so this was the most visible remaining difference in the library.
+
+Only `Input` changes. Button, Toggle, Checkbox, Switch, RadioGroupItem, ScrollArea and the rest keep `ring-[3px]` because Blok specifies that width for them too — `input.tsx` is the only source asking for 1px.
+
+Ours stays on the `focus-visible:` prefix rather than Blok's `focus:`. That is the established convention here — the map already paired `focus-visible:border-primary` with `focus:border-primary` and `focus-visible:ring-primary/50` with `focus:ring-primary`; the third pair was added for `ring-1`. The practical difference is that our ring does not appear on mouse click for non-text controls, which is the behaviour `focus-visible` exists to provide.
+
+Verified in the browser with a real click, since programmatic `.focus()` does not satisfy `:focus-visible` in this environment: `:focus-visible` matches, the border resolves to `rgb(110, 63, 255)`, and `--tw-ring-shadow` computes to `0 0 0 calc(1px + 0px)` in primary at 50%. The compiled stylesheet carries `ring-1:focus-visible` at `calc(1px + …)` and still carries the 3px form for the components that use it.
+
+Drift is now **25**, library total **66**.
+
+## Check 1 — all 41 findings were false positives, 2026-09-04
+
+Check 1 goes **41 to 0**, and the library total **66 to 25**. Nothing in any component changed; every finding was noise, and had been for as long as the check has existed.
+
+### 35 Prism grammar classes
+
+`CodeViewer` applies `language-yaml`, `language-sql`, `language-razor` and so on to its `<code>` element so Prism can select a highlighter. They are not Tailwind utilities and never will be in the compiled CSS. Added to Check 1's existing ignore chain alongside the `parity-*` marker namespace.
+
+### 6 enum-to-attribute values, and a rule that did not do what it claimed
+
+The remaining six came from `InputGroupAddon` and `InputGroupButton`:
+
+```csharp
+InputGroupAlign.InlineStart   => "inline-start"   // feeds data-align
+InputGroupButtonSize.IconXs   => "icon-xs"        // feeds data-size
+```
+
+Extraction rule 5 harvests `=> "literal"` arms, and its own comment says it captures *class* strings from switch expressions, naming `TileClass` and `ColorSchemeClass` as the examples. It never enforced that — it matched every arrow-returned literal in the file, so attribute values were pulled in as class names and duly reported as missing utilities. They were missing, because they are not utilities.
+
+The comment also asserted that `Get-TailwindTokens` "will filter out any non-Tailwind strings naturally". That is not true and could not be: nothing in a bare hyphenated word distinguishes a class name from an attribute value.
+
+Rule 5 is now scoped to members whose **name contains "Class"**, which is what it always meant. Verified the scoping did not blind it the way the nested-call defect did — `Icon.ColorSchemeClass` and `TreeView.GetRowClass` both still match and their arms are still harvested, confirmed by Icon staying clean on Check 3 rather than reporting its whole token set as drift.
+
+### Where the harness now stands
+
+| Check | Start of day | Now |
+|---|---|---|
+| 1 — compiled utilities | 41 | **0** |
+| 2 — runtime-composed classes | 0 | 0 |
+| 3 — Blok class-string drift | 59 | **25** |
+| 4 — surface bg without text pair | 27 | **0** |
+| 5 — fixed bg + flipping text | 0 | 0 |
+| 6 — token light/dark symmetry | 0 | 0 |
+| **Total** | **127** | **25** |
+
+All 25 remaining are itemised deliberate divergences or composition artefacts. There is no unexplained finding left in the report.
+
+That changes what the harness is for. Until today it emitted enough noise that a clean run was not a meaningful state, so `--strict` in CI was never realistic. The 25 are now a stable, documented baseline — a new finding means something actually moved. Worth considering an allowlist of the 25 so the harness can gate a build.
+
+### A caution to keep with it
+
+Four defects found today were invisible to this harness by construction: SearchInput's lost `min-w-0` (Blok put it in the base component we flattened), Toggle's font-size race (both classes present, compile order picked the wrong winner), Stepper's flex-distribution regression (a property of the markup tree, not the class list), and Toggle's absent check-icon behaviour (not expressible as a class at all). Each had every Blok token present and correct while rendering wrongly.
+
+A green harness means no class-string regression. It does not mean parity. The browser pass is where all four of those surfaced.
+
+## The harness can now gate a build — 2026-09-04
+
+`pwsh ./tools/verify-ui-parity.ps1` exits 0 on a clean tree for the first time. It is a CI gate rather than a report to read and interpret.
+
+### How it works
+
+Check 3 findings listed in `tools/parity-known-drift.json` are reported as **accepted** and do not fail the run. Anything unlisted fails. The other five checks are unchanged — Check 1 has its ignore chain, Checks 4 and 5 have the inline `parity-no-text-pair` marker, and Check 3 was the only one with no way to record a decision.
+
+The file is data, not code, so an addition shows up as a reviewable diff. Each entry carries `source`, `token` and a `reason`; the reason is a summary and the argument stays in this document.
+
+### Stale entries fail too
+
+An entry that no longer matches any finding is reported as stale and fails the run. Without that, a closed divergence leaves a dead exception behind and the list stops describing the codebase — which is how a baseline becomes a place to hide things rather than a record of decisions.
+
+Staleness is only evaluated on a full run. A scoped run (`-Component Toggle`) legitimately never reaches most entries, so checking there would fail every scoped invocation.
+
+### Both failure paths were tested, not assumed
+
+An untested gate is worse than none, so both were exercised against the real tree by temporarily corrupting the list:
+
+- Removing the `tooltip.tsx` / `text-inverse-text` entry surfaced it under "Unexpected — these fail the run" and exited 1.
+- Adding a `nonexistent.tsx` / `bogus-token` entry surfaced it under "Stale accepted-drift entries" and exited 1.
+- Both together: `1 unexpected, 24 accepted`, `Stale accepted-drift: 1`, exit 1.
+- Restored: `0 unexpected, 25 accepted`, exit 0. Scoped run of a component with an accepted entry also exits 0.
+
+### What a green run does and does not mean
+
+It means no class-string regression against Blok, and no new undocumented divergence. It does **not** mean parity — four defects found today were invisible to this harness by construction, each with every Blok token present and correct while rendering wrongly. Keep the browser pass in the loop for anything structural, and treat the gate as a floor rather than a ceiling.
+
+## TimePicker — the substitution is closed, 2026-09-04 (Blok `931987`)
+
+The long-standing open decision recorded above is resolved: Blok's composite picker is ported, and TimePicker's `Parity` badge is now accurate rather than aspirational.
+
+It was a bare `<input type="time">` sharing no DOM, no sub-components and no interaction model with Blok. It is now Blok's shape — a trigger button showing the formatted time beside a clock icon, opening a popover with Hour, Minute and Period selects and Clear / Done buttons.
+
+### What was given up, deliberately
+
+The native input's free keyboard entry, the platform time UI and the mobile time wheel. That is a real loss and the reason this sat open. It was taken because the row claims Parity and the legend defines that as structure matching, which a native input never did.
+
+It also adds an install requirement to a component that previously had none — `AddSitecoreBlokUI()` plus a root `<Popovers />`. `TimePickerPage` now carries an `<InstallationNote>` it never needed before.
+
+### The value type stayed `TimeSpan?`
+
+Blok models time as `TimeValue { hour, minute, period }` — three strings — because TypeScript has no time type. .NET does, and `TimeSpan` round-trips to the 12-hour parts without loss, so the API keeps it.
+
+This was raised as a breaking change when the work was scoped, and it turned out not to need to be. Porting the string triple would import a TypeScript workaround as though it were behaviour, which is the paradigm-translation trap this document already warns about for `Improved` badges. The rendered control and everything the user does with it match Blok; only the binding type is idiomatic .NET. Nothing bound to `TimeSpan?` broke.
+
+### Why there is a second component
+
+`TimePickerPanel` is internal, not a second export. `Popover` renders its content through the popover host, and that host does not re-render when the originating component's state changes — the failure documented for `PopoverService` elsewhere in this file. A panel whose three selects must show the current selection has to own that state itself, exactly as `Calendar` does inside `DatePicker`.
+
+This was the load-bearing design decision, and the browser confirmed it works: selecting hour `3` updated the trigger to `03:00 AM` **and** the panel's own selects to `03 / 00 / AM`, which is the re-render that a state-owning child makes possible and a captured fragment does not.
+
+### Verified in browser
+
+Conversion checked at the boundaries rather than the happy path, since 12-hour arithmetic is where these break:
+
+| Action | Trigger | Bound `TimeSpan?` |
+|---|---|---|
+| hour 3 | `03:00 AM` | `03:00` |
+| period PM | `03:00 PM` | `15:00` |
+| minute 45 | `03:45 PM` | `15:45` |
+| 12 AM | `12:00 AM` | `00:00` |
+| 12 PM | `12:00 PM` | `12:00` |
+
+Done closes the panel and keeps the value; Clear resets to the placeholder, nulls the value and closes. Both themes.
+
+### Two things the port surfaced
+
+**Popover is headless, and copying Blok's `className` is not enough.** The panel first rendered with no background at all. Blok's `PopoverContent` supplies `bg-popover text-popover-foreground rounded-md border shadow-md` itself; ours deliberately does not, leaving the surface to the consumer. The fix is the same one `DatePicker` already makes — pass the surface classes through `ClassName`. Worth remembering for the next component that composes `Popover` directly.
+
+**The accepted-drift list needed rewriting, and the gate caught it.** All five `time-picker.tsx` entries were justified as "whole-component substitution", a reason that no longer exists. After the port the run reported one unexpected finding and one stale entry — `shadow-xs` became satisfied because the trigger is now a `Button`, while `border-input` started reporting for the same reason. All five are re-justified as composition artefacts: the trigger is a `Button` with the Outline variant, so those tokens live in `Button.razor`, outside TimePicker's file scope. Identical to `DatePicker`, and the mirror image of Blok inlining what we compose.
+
+That is the gate working as intended on its first real test — a deliberate change moved the baseline, and the run refused to pass until the record was brought back in line with the code.
