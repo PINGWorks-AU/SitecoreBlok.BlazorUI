@@ -4,9 +4,9 @@ Component-by-component status of the PINGWorks BlazorUI port of the Sitecore Blo
 
 This file is the **single source of truth** for the [`blok-migration`](https://github.com/Sitecore/blok) skill's `/blok audit` command. The skill reads the `Blok Source` and `Last SHA` columns to decide which components to re-evaluate. A blanket directory scan still identifies new Blok primitives that don't yet have a row here.
 
-- **Last evaluated:** 2026-09-03 (`/blok audit` run against Blok HEAD `e2651dc`: 11 rows drifted, no new primitives. Calendar's open `InBuiltDropdown` decision closed — adopted; DatePicker re-audited to `c4346e`; Popover (`4f751c`) and Tooltip (`b79ded`) re-audited clean with no code change; Blok's accessibility sweep adopted for Checkbox (`589c0c`), Combobox (`4a6b17`), NavigationMenu (`b82ead`) and Sidebar (`68c4af`). StackNavigation re-audited to `82a49e`; InputGroup and DropdownMenu completed — all eight missing exports ported, both rows back to Parity (`589c0c`, `82a49e`); InputOtp ported from Backlog. Filter is the only remaining Backlog item. **Check 3 coverage changed** — see docs/ui-parity-audit.md: the harness was never comparing hyphenated-source components, and 8 of them now report drift for the first time.)
+- **Last evaluated:** 2026-09-04 (Filter completed and moved out of Backlog: all four Blok exports ported, Catalogue page added at `/primitives/filter`, and `FilterMultiSelect` gained the bindable `Open` / `OpenChanged` state Blok exposes as `open` / `onOpenChange`. Row re-audited to `0eb293`, the current last-touched SHA of `filter.tsx`. Parity harness clean on all six checks. No Backlog items remain.)
 - **Blok repo:** [Sitecore/blok](https://github.com/Sitecore/blok) · branch `main`
-- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-03. Per-row `Last SHA` values are authoritative for drift; 1 row is known-stale against this HEAD.
+- **Blok main HEAD:** [`e2651dc`](https://github.com/Sitecore/blok/commit/e2651dc774bd9a75c116c865145645bc359d02b7) — audited 2026-09-03. Per-row `Last SHA` values are authoritative for drift; no row is known-stale against this HEAD.
 - **Audit tooling:** `pwsh ./tools/verify-ui-parity.ps1` — see [docs/ui-parity-audit.md](docs/ui-parity-audit.md)
 
 ## Status legend
@@ -63,7 +63,7 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 | ErrorState | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | [`error-states.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/error-states.tsx) | `17d1fb` | Error placeholder; adds HTTP-status variant |
 | Field | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`field.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/field.tsx) | `17d1fb` | Form-field grouping wrapper |
 | FileTree | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`file-tree.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/file-tree.tsx) | `36e50d` | Blok models a file/folder browser specifically — fixed `file` / `folder` node kinds, lucide file glyphs, and folder-chevron affordances baked into the primitive. Our `TreeView` is the deliberately more general form: any `TItem`, caller-supplied value / text / children accessors, single or multi select, and arbitrary node content. A UI kit is better served by the generic hierarchy primitive, which composes into a file tree, than by a file-specific one that cannot compose back out. Not ported. |
-| Filter | ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | [`filter.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/filter.tsx) | `0253b9` | Multi-facet filter panel |
+| Filter | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`filter.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/filter.tsx) | `0eb293` | Search, single-select and multi-select filter controls plus the bar that lays them out. `FilterBar` takes the filters as child content rather than Blok's `filters` array of a discriminated union, so each filter keeps its own two-way binding. |
 | Form | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | [`form.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/form.tsx) | `2d994e` | Wraps `react-hook-form`. Superseded by native Blazor `EditForm` + `DataAnnotationsValidator` + `Input*` primitives — paradigm mismatch means a port would fight both frameworks. |
 | HoverCard | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`hover-card.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/hover-card.tsx) | `2d994e` | Hover-triggered popover card |
 | Icon | ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | [`icon.tsx`](https://github.com/Sitecore/blok/blob/main/src/components/ui/icon.tsx) | `17d1fb` | SVG icon renderer (MDI) with `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes) |
@@ -111,20 +111,20 @@ Rows with status `Additional` have no Blok source and are skipped by the drift c
 
 | Status | Count |
 |---|---|
-| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 53 |
+| ![Parity](https://img.shields.io/badge/Parity-22c55e?style=flat-square) | 54 |
 | ![Improved](https://img.shields.io/badge/Improved-3b82f6?style=flat-square) | 7 |
 | ![Additional](https://img.shields.io/badge/Additional-8b5cf6?style=flat-square) | 6 |
 | ![Partial](https://img.shields.io/badge/Partial-f97316?style=flat-square) | 0 |
-| ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 1 |
+| ![Backlog](https://img.shields.io/badge/Backlog-f59e0b?style=flat-square) | 0 |
 | ![Won't Do](https://img.shields.io/badge/Won%27t%20Do-6b7280?style=flat-square) | 7 |
-| **Total ported** | **59** of **61** Blok primitives (excluding 7 Won't Do) |
+| **Total ported** | **61** of **61** Blok primitives (excluding 7 Won't Do) |
 
 ## Notes on classification
 
 - **Improved rows** also carry a `<DivergenceNote>` on their Catalogue page describing the Blazor-side addition. See [docs/ui-parity-audit.md](docs/ui-parity-audit.md) for the full reasoning.
 - **`sonner` → `Toaster`** is the one deliberate renaming: Blok's `Sonner` wraps the JS-only Sonner library; our idiomatic `ToastService.Show(...)` API is imperative. The Catalogue carries a `/primitives/sonner` cross-reference stub.
 - **Won't Do rationale summary** — Chart (React chart lib; Blazor alternatives exist), Command (cmdk; composable from existing primitives), DnD (@dnd-kit React-only; different Blazor idiom), Drawer (covered by Sheet), FileTree (covered by the more generic `TreeView`), Form (native Blazor EditForm supersedes react-hook-form), VirtualizedSelect (Blazor virtualizes natively via `Virtualize<TItem>`). Re-evaluate only if a business need forces the question.
-- **Backlog items** are legitimate ports with no blocking rationale — prioritisation only. Pick the next one for `/blok migrate` based on consumer demand.
+- **No Backlog items remain.** Every Blok primitive is either ported or carries a `Won't Do` rationale. New primitives arrive through `/blok audit`'s blanket scan.
 - **Excluded internal Blok files** (not tracked as primitives): `inputOtp.tsx` (typo-duplicate of `input-otp.tsx`), `select-react.tsx` (alternate implementation of `select`).
 
 ---

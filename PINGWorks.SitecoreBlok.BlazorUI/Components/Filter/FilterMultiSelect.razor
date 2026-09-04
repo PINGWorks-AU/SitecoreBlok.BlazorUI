@@ -1,7 +1,7 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 @inherits FilterSelectBase
 
-<div class="@RootCssClass" @attributes="AdditionalAttributes">
+<div class="@RootCssClass" @onkeydown="OnKeyDown" @attributes="AdditionalAttributes">
 	@if ( Name is not null )
 	{
 		<input type="hidden" name="@Name" value="@string.Join( ",", SelectedValues )" />
@@ -46,7 +46,8 @@
 									<span>@label</span>
 									<span role="button" tabindex="0" aria-label="@( $"Remove {label}" )"
 										  class="cursor-pointer rounded-full p-0 hover:bg-neutral-bg-active flex items-center justify-center -mr-1 pointer-events-auto focus:outline-none focus:ring-1 focus:ring-ring"
-										  @onclick="@( () => ToggleValue( current ) )" @onclick:stopPropagation="true">
+										  @onclick="@( () => ToggleValue( current ) )" @onclick:stopPropagation="true"
+										  @onkeydown="@( args => OnBadgeKeyDown( args, current ) )">
 										<Icon Svg="@IconSvg.Close" Scale="0.6" />
 									</span>
 								</Badge>
@@ -77,7 +78,7 @@
 
 	@if ( IsOpen )
 	{
-		<div class="fixed inset-0 z-40" @onclick="Close"></div>
+		<div class="fixed inset-0 z-40" @onclick="CloseDropdown"></div>
 	}
 
 	@* Anti-revert: see FilterSelectBase — this dropdown is rendered in place with `fixed`, not via
@@ -154,6 +155,12 @@
 	/// <summary>Optional pixel cap on the trigger width; the selected labels truncate within it.</summary>
 	[Parameter] public int? MaxButtonWidth { get; set; }
 
+	/// <summary>Controls the dropdown's open state. Leave unset to let the trigger own it; supports two-way binding via <c>@bind-Open</c>.</summary>
+	[Parameter] public bool? Open { get; set; }
+
+	/// <summary>Fires whenever the dropdown opens or closes. Nullable so it pairs with <c>Open</c> under <c>@bind-Open</c>; the value raised is never null.</summary>
+	[Parameter] public EventCallback<bool?> OpenChanged { get; set; }
+
 	private List<string> SelectedValues => Values ?? [];
 
 	private bool HasValues => SelectedValues.Count > 0;
@@ -189,6 +196,20 @@
 						.Where( g => g.Options.Count > 0 )
 						.ToList();
 		}
+	}
+
+	protected override void OnParametersSet()
+	{
+		if ( Open is bool open )
+			IsOpen = open;
+	}
+
+	protected override async Task NotifyOpenChanged( bool open )
+	{
+		Open = open;
+
+		if ( OpenChanged.HasDelegate )
+			await OpenChanged.InvokeAsync( open );
 	}
 
 	protected override void OnAfterRender( bool firstRender )
@@ -275,6 +296,13 @@
 			await ValuesChanged.InvokeAsync( Values );
 
 		await InvokeAsync( StateHasChanged );
+	}
+
+	/// <summary>Enter and Space remove the badge, matching the keyboard handler Blok puts on the same control.</summary>
+	private async Task OnBadgeKeyDown( KeyboardEventArgs args, string value )
+	{
+		if ( args.Key is "Enter" or " " )
+			await ToggleValue( value );
 	}
 
 	private async Task Clear()

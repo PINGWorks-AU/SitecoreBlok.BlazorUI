@@ -1,7 +1,7 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 @inherits FilterSelectBase
 
-<div class="@RootCssClass" @attributes="AdditionalAttributes">
+<div class="@RootCssClass" @onkeydown="OnKeyDown" @attributes="AdditionalAttributes">
 	<div class="relative inline-flex w-fit">
 		@* The trigger is the positioning anchor; FilterSelectBase measures it on open. *@
 		<button @ref="AnchorRef" type="button" data-slot="filter-single-select-trigger"
@@ -36,7 +36,7 @@
 
 	@if ( IsOpen )
 	{
-		<div class="fixed inset-0 z-40" @onclick="Close"></div>
+		<div class="fixed inset-0 z-40" @onclick="CloseDropdown"></div>
 	}
 
 	@* Anti-revert: `fixed` must stay in the class string or the inline left/top are inert and the
@@ -172,7 +172,7 @@
 		if ( ValueChanged.HasDelegate )
 			await ValueChanged.InvokeAsync( Value );
 
-		await Close();
+		await CloseDropdown();
 	}
 
 	private async Task Clear()

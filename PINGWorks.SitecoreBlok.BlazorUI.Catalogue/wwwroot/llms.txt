@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-04T00:12:25Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-04T00:55:05Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -43,6 +43,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [EmptyState](/primitives/emptystate): Empty-results placeholder
 - [ErrorState](/primitives/errorstate): Error placeholder; adds HTTP-status variant
 - [Field](/primitives/field): Form-field grouping wrapper
+- [Filter](/primitives/filter): Search, single-select and multi-select filter controls plus the bar that lays them out. `FilterBar` takes the filters as child content rather than Blok's `filters` array of a discriminated union, so each filter keeps its own two-way binding.
 - [HoverCard](/primitives/hovercard): Hover-triggered popover card
 - [Icon](/primitives/icon): SVG icon renderer (MDI) with `Variant` (Default/Subtle/Filled) and `ColorScheme` (11 schemes)
 - [Input](/primitives/input): Text input control

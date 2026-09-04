@@ -838,3 +838,45 @@ Not started; needs a call before any code.
 Rebuilding to Blok's shape means: a `Popover`-hosted panel with three `Select`s, labels, Clear/Done buttons, and a formatted trigger button. It would give Blok-matching DOM and the AM/PM period model, at the cost of the native input's free keyboard entry, platform time UI, and mobile time wheel. It would also add a `<Popovers />` + `AddSitecoreBlokUI()` installation requirement to a component that currently has none, and inherits the same nested-popover consideration flagged for Calendar's `InBuiltDropdown` if a consumer puts a TimePicker inside another popover.
 
 Until that is decided, the `Parity` badge on TimePicker's `MIGRATION_STATUS.md` row overstates the position — by this file's own legend, `Parity` means "class strings & structure match", and the structure does not. Flagged rather than changed, because no existing badge fits a deliberate whole-component substitution and the resolution may be to port it properly.
+
+## Filter — ported from Backlog 2026-09-04 (Blok `0eb293`)
+
+Clears the last `Backlog` row. All four Blok exports are present: `FilterBar`, `FilterInput`, `FilterSingleSelect`, `FilterMultiSelect`, plus the `FilterOption` / `FilterSelectGroup` / `FilterAriaLabels` records that carry their data.
+
+### Structural divergence — `FilterBar` composes, it does not take a filter array
+
+Blok's `FilterBar` takes `filters: FilterDefinition[]` — a discriminated union of `{ type, key, props }` — a `values` bag keyed by string, and `onChange(key, unknown)`. React can splat those props back onto the right component; C# can express neither the union nor the untyped prop bag without giving up type-safe binding on every filter. The filters are passed as child content instead, so each keeps its own `@bind-Value`. The wrapper's `role="region"`, `AriaLabel`, direction, gap and clear-all behaviour are unchanged. Recorded on the Catalogue page as a `<DivergenceNote>`.
+
+Blok's `defaultValue` props are not ported. They exist to separate React's controlled and uncontrolled modes; a Blazor parameter left unbound already keeps whatever `Value` was set to.
+
+### Both selects render their dropdown in place, not through `PopoverService`
+
+`FilterSelectBase` holds the open state, the measured anchor coordinates and the search query for both selects, and both render the dropdown with `position: fixed` plus computed `left`/`top`. This is the Combobox pattern and it is load-bearing: the dropdown contains a search box, so its option list must re-render as the query changes, and the `Popovers` host renders the fragment it captured when the popup opened. An anti-revert note sits on the class in both files and on the base type.
+
+### Three gaps closed during this pass
+
+| Gap | Fix |
+|---|---|
+| `FilterMultiSelect` had no bindable open state; Blok's `FilterMultiSelectProps` exposes `open` / `onOpenChange` | Added `Open` (`bool?` — null leaves the trigger in charge) and `OpenChanged`. `OpenChanged` is `EventCallback<bool?>` so `@bind-Open` type-checks against a `bool?` field; the raised value is never null. A guarded post-render measure positions the dropdown when it is opened by a parameter change rather than by a click. |
+| Escape did not close either dropdown. Blok builds on Radix `Popover`, whose dismissable layer closes on Escape | `OnKeyDown` on each select's root closes the dropdown and returns focus to the trigger. Scope differs from Radix, which listens at document level: ours fires while focus is inside the component, which covers the click-then-Escape path but not Escape after focus has left the component entirely. |
+| The badge remove control had no keyboard activation. Blok gives the same `role="button"` span an `onKeyDown` for Enter and Space | `OnBadgeKeyDown` wired on the span. Blok also calls `preventDefault` for those two keys; Blazor's `@onkeydown:preventDefault` is a static, per-element flag that cannot be scoped to a key, and setting it unconditionally would swallow Tab, so it is left off. Space therefore also scrolls the page. |
+
+### Real bug found in `SearchInput`, not in Filter
+
+The in-dropdown search box pushed its clear button outside the 216px dropdown panel — measured at 5px past the right edge. Cause: Blok's `SearchInputField` renders their `Input` component and inherits its `min-w-0`; ours re-implements the class string standalone and dropped it, so the input could not shrink below its intrinsic width and the flex row overflowed. Blok's own dropdown measures the control shrinking to 128px in the same space. Fixed by adding `min-w-0` to `SearchInputField`'s base class string.
+
+Check 3 could never have caught this: it diffs our Razor against `search-input.tsx`, which does not contain `min-w-0` either — the class lives in the `Input` component Blok composes. **Where Blok composes a base primitive and we re-implement its class string inline, the harness is blind to anything the base contributed.** Worth a sweep of the other places we flattened a Blok composition.
+
+### Not a bug — single-select flattens groups
+
+`FilterSingleSelect` renders `Groups` as one flat list with no headings, while `FilterMultiSelect` renders the headings. That looks like an omission and is not: Blok's single-select computes `allOptions = groups ? groups.flatMap(g => g.options) : options` and maps that, with no group rendering anywhere in its popover body. Ours matches. The Catalogue's "Grouped options" example now shows both side by side so the difference reads as intentional, and the `Groups` API description says so.
+
+### Verified in browser (light + dark)
+
+Every example on the page was exercised, not just the resting state: filter bar (type, select, multi-select, Clear all, applied-state readout), search with helper text, single select, grouped options in both selects, the three multi-select display modes, searchable multi-select with overflow, controlled open state (external button opens it and the trigger's own click flows back through `OpenChanged`), vertical bar, and disabled. Escape-to-close, badge keyboard removal and live search filtering with empty groups dropped were each confirmed. Dark mode: dropdown surface `rgb(40,40,40)` with white text, badge text at 76% white on 6% white — no Check 4 class of regression.
+
+Harness: `-Component Filter` PASS, 0 findings on all six checks.
+
+### Left open
+
+`-Component SearchInput` reports one drift finding — `focus:border-0` present in Blok, missing in ours. It pre-dates this work (confirmed by re-running against the unmodified file) and is untouched here; it belongs to a `/blok verify SearchInput` pass.

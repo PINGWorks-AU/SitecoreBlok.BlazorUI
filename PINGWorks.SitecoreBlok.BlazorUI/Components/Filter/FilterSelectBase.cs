@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace PINGWorks.SitecoreBlok.BlazorUI;
@@ -48,6 +49,9 @@ public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 	protected IJSObjectReference? Module;
 
 	protected bool IsOpen { get; set; }
+
+	/// <summary>Guards the post-render measure so an open triggered by a parameter change positions the dropdown exactly once.</summary>
+	private bool MeasuredWhileOpen;
 	protected string SearchQuery { get; set; } = string.Empty;
 
 	protected double X { get; private set; }
@@ -88,24 +92,48 @@ public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 			return;
 
 		if ( IsOpen )
-			await Close();
+			await CloseDropdown();
 		else
-			await Open();
+			await OpenDropdown();
 	}
 
-	protected async Task Open()
+	protected async Task OpenDropdown()
 	{
 		IsOpen = true;
 		await UpdateAnchorPosition();
+		await NotifyOpenChanged( true );
 		await InvokeAsync( StateHasChanged );
 	}
 
 	/// <summary>Closing always clears the query, so reopening starts from the full list as in Blok.</summary>
-	protected virtual async Task Close()
+	protected virtual async Task CloseDropdown()
 	{
 		IsOpen = false;
 		SearchQuery = string.Empty;
+		await NotifyOpenChanged( false );
 		await InvokeAsync( StateHasChanged );
+	}
+
+	/// <summary>Raised whenever the dropdown opens or closes. Overridden by filters that expose a bindable open state.</summary>
+	protected virtual Task NotifyOpenChanged( bool open )
+		=> Task.CompletedTask;
+
+	/// <summary>Closes the dropdown on Escape and returns focus to the trigger, matching the Radix popover Blok builds on.</summary>
+	protected async Task OnKeyDown( KeyboardEventArgs args )
+	{
+		if ( args.Key is not "Escape" || !IsOpen )
+			return;
+
+		await CloseDropdown();
+
+		try
+		{
+			if ( HasAnchorRef )
+				await AnchorRef.FocusAsync();
+		}
+		catch ( Exception exception ) when ( IsGone( exception ) )
+		{
+		}
 	}
 
 	protected async Task OnSearchChanged( string? query )
@@ -117,15 +145,17 @@ public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 	protected override async Task OnAfterRenderAsync( bool firstRender )
 	{
 		if ( !IsOpen )
+		{
+			MeasuredWhileOpen = false;
+			return;
+		}
+
+		if ( MeasuredWhileOpen )
 			return;
 
-		try
-		{
-			Module ??= await Js.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
-		}
-		catch ( Exception exception ) when ( IsGone( exception ) )
-		{
-		}
+		MeasuredWhileOpen = true;
+		await UpdateAnchorPosition();
+		await InvokeAsync( StateHasChanged );
 	}
 
 	/// <summary>The trigger is <c>w-fit</c>, so it can resize as the selection changes — re-measure on open.</summary>
