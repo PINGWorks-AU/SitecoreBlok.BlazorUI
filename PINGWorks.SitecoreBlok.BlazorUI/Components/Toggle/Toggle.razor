@@ -3,6 +3,27 @@
 <button data-slot="toggle" type="button" aria-pressed="@( Pressed ? "true" : "false" )"
 		data-state="@( Pressed ? "on" : "off" )" disabled="@Disabled" class="@CssClass"
 		@onclick="OnToggle" @attributes="AdditionalAttributes">
+	@if ( Icon is not null && ChildContent is not null )
+	{
+		<span class="relative inline-flex items-center justify-center w-4 h-4">
+			<span class="@IconLayerCssClass( !Pressed )">
+				<Icon Svg="@Icon" />
+			</span>
+			<span class="@IconLayerCssClass( Pressed )">
+				<Icon Svg="@IconSvg.Check" />
+			</span>
+		</span>
+	}
+	else if ( Icon is not null )
+	{
+		<Icon Svg="@Icon" />
+	}
+	else if ( Pressed )
+	{
+		<span class="inline-flex items-center justify-center transition-all duration-200 opacity-100 scale-100">
+			<Icon Svg="@IconSvg.Check" />
+		</span>
+	}
 	@ChildContent
 </button>
 
@@ -17,22 +38,36 @@
 	[Parameter] public ToggleVariant Variant { get; set; } = ToggleVariant.Default;
 	[Parameter] public ToggleSize Size { get; set; } = ToggleSize.Default;
 
+	/// <summary>
+	/// SVG path for a leading icon, e.g. <c>IconSvg.FormatBold</c>. Supplied alongside
+	/// <see cref="ChildContent"/> it crossfades to a check mark while pressed; supplied on its own
+	/// it renders unchanged.
+	/// </summary>
+	[Parameter] public string? Icon { get; set; }
+
+	private static string IconLayerCssClass( bool visible )
+		=> CssClassBuilder.Start( "absolute inset-0 flex items-center justify-center transition-all duration-200" )
+										.With( "opacity-100 scale-100", visible )
+										.With( "opacity-0 scale-[0.8]", !visible )
+										.Build();
+
 	@* Rounding lives on the variant arms, not the base string. CssClassBuilder concatenates
 	   without resolving Tailwind conflicts, so a base rounded-md alongside the Rounded variant's
 	   rounded-full would be settled by CSS rule order rather than by intent. *@
-	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors outline-none cursor-pointer",
-		"hover:bg-neutral-bg hover:text-muted-foreground",
+	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 font-medium whitespace-nowrap transition-[color,box-shadow] outline-none cursor-pointer",
+		"text-neutral-fg hover:bg-neutral-bg hover:text-neutral-fg",
 		"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+		"aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
 		"disabled:pointer-events-none disabled:opacity-50",
 		"data-[state=on]:bg-primary-bg data-[state=on]:text-primary-fg",
-		"[&_svg]:pointer-events-none [&_svg]:shrink-0" )
+		"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4" )
 										.With( "bg-transparent rounded-md", Variant is ToggleVariant.Default )
-										.With( "border border-input bg-transparent rounded-md", Variant is ToggleVariant.Outline )
+										.With( "border bg-background hover:bg-neutral-bg hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md", Variant is ToggleVariant.Outline )
 										.With( "bg-transparent rounded-md", Variant is ToggleVariant.Square )
 										.With( "bg-transparent rounded-full", Variant is ToggleVariant.Rounded )
-										.With( "h-9 min-w-9 px-2", Size is ToggleSize.Default )
-										.With( "h-8 min-w-8 px-1.5", Size is ToggleSize.Sm )
-										.With( "h-11 min-w-11 px-3", Size is ToggleSize.Lg )
+										.With( "h-10 min-w-10 px-4 text-md", Size is ToggleSize.Default )
+										.With( "h-8 min-w-8 px-3 text-md", Size is ToggleSize.Sm )
+										.With( "h-6 min-w-6 px-2 text-xs [&>svg]:!size-3", Size is ToggleSize.Xs )
 										.With( ClassName )
 										.Build();
 

@@ -20,19 +20,20 @@
 
 	@* See Toggle.razor: rounding is per-variant so the Rounded variant is not fighting a base
 	   rounded-md through CSS ordering. *@
-	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors outline-none cursor-pointer",
-		"hover:bg-neutral-bg hover:text-muted-foreground",
+	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 font-medium whitespace-nowrap transition-[color,box-shadow] outline-none cursor-pointer",
+		"text-neutral-fg hover:bg-neutral-bg hover:text-neutral-fg",
+		"aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
 		"disabled:pointer-events-none disabled:opacity-50",
 		"data-[state=on]:bg-primary-bg data-[state=on]:text-primary-fg",
-		"[&_svg]:pointer-events-none [&_svg]:shrink-0",
+		"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 		"min-w-0 flex-1 shrink-0 shadow-none focus:z-10 focus-visible:z-10" )
 										.With( "bg-transparent rounded-md", Parent.Variant is ToggleVariant.Default )
-										.With( "border border-input bg-transparent rounded-md", Parent.Variant is ToggleVariant.Outline )
+										.With( "border bg-background hover:bg-neutral-bg hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md", Parent.Variant is ToggleVariant.Outline )
 										.With( "bg-transparent rounded-md", Parent.Variant is ToggleVariant.Square )
 										.With( "bg-transparent rounded-full", Parent.Variant is ToggleVariant.Rounded )
-										.With( "h-9 min-w-9 px-2", Parent.Size is ToggleSize.Default )
-										.With( "h-8 min-w-8 px-1.5", Parent.Size is ToggleSize.Sm )
-										.With( "h-11 min-w-11 px-3", Parent.Size is ToggleSize.Lg )
+										.With( "h-10 min-w-10 px-4 text-md", Parent.Size is ToggleSize.Default )
+										.With( "h-8 min-w-8 px-3 text-md", Parent.Size is ToggleSize.Sm )
+										.With( "h-6 min-w-6 px-2 text-xs [&>svg]:!size-3", Parent.Size is ToggleSize.Xs )
 										.With( ClassName )
 										.Build();
 

@@ -62,7 +62,7 @@
 			[
 				new ApiProperty( "Type",                 "ToggleGroupType",               false, "Selection mode. Default: `ToggleGroupType.Single` (one item active at a time). Other value: `Multiple` (independent on/off per item)." ),
 				new ApiProperty( "Variant",              "ToggleVariant",                 false, "Visual style shared by child `ToggleGroupItem`s. Default: `ToggleVariant.Default`. Other values: `Outline`, `Square`, `Rounded` — `Rounded` makes both the group and its items pill-shaped. Note Blok coerces `outline` to `default` inside a group; we allow it, see the DivergenceNote." ),
-				new ApiProperty( "Size",                 "ToggleSize",                    false, "Size token shared by child `ToggleGroupItem`s. Default: `ToggleSize.Default`. Other values: `Sm`, `Lg`." ),
+				new ApiProperty( "Size",                 "ToggleSize",                    false, "Size token shared by child `ToggleGroupItem`s. Default: `ToggleSize.Default`. Other values: `Sm`, `Xs`." ),
 				new ApiProperty( "Disabled",             "bool",                          false, "Disables every item. Item-level `Disabled` is unioned with this. Default: `false`." ),
 				new ApiProperty( "Value",                "string?",                       false, "Active item's `Value` in single mode. Use with `@bind-Value`." ),
 				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Fires when the active item changes in single mode." ),

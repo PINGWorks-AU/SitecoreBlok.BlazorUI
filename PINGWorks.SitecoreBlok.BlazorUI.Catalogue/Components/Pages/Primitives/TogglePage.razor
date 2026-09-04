@@ -6,8 +6,8 @@
 
 	<DivergenceNote>
 		<p><strong>Variant shapes now match Blok.</strong> <code>Default</code>, <code>Outline</code>, <code>Square</code> and <code>Rounded</code> are all available as of 2026-09-03. <code>Square</code> and <code>Default</code> render identically (both <code>rounded-md</code>), matching Blok, where they are also the same shape — <code>Square</code> exists so code written against Blok ports across unchanged.</p>
-		<p><strong>The size scale still differs, and it is a naming and value difference.</strong> Blok exposes <code>xs</code> (<code>h-6</code>), <code>sm</code> (<code>h-8</code>) and <code>default</code> (<code>h-10</code>). We expose <code>Sm</code> (<code>h-8</code>), <code>Default</code> (<code>h-9</code>) and <code>Lg</code> (<code>h-11</code>) — an older shadcn scale. Aligning it would rename <code>Lg</code> out of existence and change the default height, so it is a breaking change left for a deliberate decision rather than folded into a variant addition.</p>
-		<p><strong>No pressed-state icon swap.</strong> Blok ships a helper-driven animation (<code>hasTextContent</code>, <code>isFirstChildIcon</code>, <code>extractFirstIcon</code> replace the child icon with a check mark when pressed) — we don't implement it. Basic on/off toggling, styling, and <code>Pressed</code>/<code>PressedChanged</code> binding match Blok.</p>
+		<p><strong>The size scale now matches Blok.</strong> <code>Xs</code> (<code>h-6</code>), <code>Sm</code> (<code>h-8</code>) and <code>Default</code> (<code>h-10</code>), aligned 2026-09-04. This replaced an older shadcn scale — <code>ToggleSize.Lg</code> no longer exists, and <code>Default</code> is now <code>h-10</code> rather than <code>h-9</code>, so toggles render slightly taller than before. <code>ToggleGroup</code> shares the enum and changed with it.</p>
+		<p><strong>The pressed-state check mark uses an explicit <code>Icon</code> slot, not child inspection.</strong> Blok reads its own children at render time (<code>hasTextContent</code>, <code>isFirstChildIcon</code>, <code>extractFirstIcon</code>) to decide whether to swap a leading icon for a check mark, prepend one, or leave an icon-only toggle alone. Blazor cannot introspect a <code>RenderFragment</code>, so the same three cases are selected from the parameters you pass instead: <code>Icon</code> plus content crossfades the icon to a check while pressed; <code>Icon</code> on its own renders unchanged; content on its own gets a check prepended while pressed. The rendered result matches Blok — put your leading icon in <code>Icon</code> rather than inside the content, or the component cannot tell it apart from text.</p>
 	</DivergenceNote>
 
 	<ExamplesSection>
@@ -27,10 +27,18 @@
 			<Toggle Variant="ToggleVariant.Outline" Pressed="@Pressed2" PressedChanged="@(v => Pressed2 = v)">Outline</Toggle>
 		</ComponentExample>
 
-		<ComponentExample Title="Sizes" Code="@("<Toggle Size=\"ToggleSize.Sm\" Pressed=\"@pressed3\" PressedChanged=\"@(v => pressed3 = v)\">Small</Toggle>\n<Toggle Size=\"ToggleSize.Default\" Pressed=\"@pressed4\" PressedChanged=\"@(v => pressed4 = v)\">Default</Toggle>\n<Toggle Size=\"ToggleSize.Lg\" Pressed=\"@pressed5\" PressedChanged=\"@(v => pressed5 = v)\">Large</Toggle>")">
-			<Toggle Size="ToggleSize.Sm" Pressed="@Pressed3" PressedChanged="@(v => Pressed3 = v)">Small</Toggle>
-			<Toggle Size="ToggleSize.Default" Pressed="@Pressed4" PressedChanged="@(v => Pressed4 = v)">Default</Toggle>
-			<Toggle Size="ToggleSize.Lg" Pressed="@Pressed5" PressedChanged="@(v => Pressed5 = v)">Large</Toggle>
+		<ComponentExample Title="Sizes" Code="@("<Toggle Size=\"ToggleSize.Xs\" Pressed=\"@pressed3\" PressedChanged=\"@(v => pressed3 = v)\">Extra small</Toggle>\n<Toggle Size=\"ToggleSize.Sm\" Pressed=\"@pressed4\" PressedChanged=\"@(v => pressed4 = v)\">Small</Toggle>\n<Toggle Size=\"ToggleSize.Default\" Pressed=\"@pressed5\" PressedChanged=\"@(v => pressed5 = v)\">Default</Toggle>")">
+			<Toggle Size="ToggleSize.Xs" Pressed="@Pressed3" PressedChanged="@(v => Pressed3 = v)">Extra small</Toggle>
+			<Toggle Size="ToggleSize.Sm" Pressed="@Pressed4" PressedChanged="@(v => Pressed4 = v)">Small</Toggle>
+			<Toggle Size="ToggleSize.Default" Pressed="@Pressed5" PressedChanged="@(v => Pressed5 = v)">Default</Toggle>
+		</ComponentExample>
+
+		<ComponentExample Title="Pressed-state check mark" Code="@("<Toggle Icon=\"@IconSvg.FormatBold\" Pressed=\"@bold\" PressedChanged=\"@(v => bold = v)\">Bold</Toggle>\n<Toggle Pressed=\"@wrap\" PressedChanged=\"@(v => wrap = v)\">Wrap lines</Toggle>\n<Toggle Icon=\"@IconSvg.FormatItalic\" Pressed=\"@italic\" PressedChanged=\"@(v => italic = v)\" aria-label=\"Italic\" />")">
+			<div class="flex items-center gap-3">
+				<Toggle Icon="@IconSvg.FormatBold" Pressed="@Bold" PressedChanged="@(v => Bold = v)">Bold</Toggle>
+				<Toggle Pressed="@Wrap" PressedChanged="@(v => Wrap = v)">Wrap lines</Toggle>
+				<Toggle Icon="@IconSvg.FormatItalic" Pressed="@Italic" PressedChanged="@(v => Italic = v)" aria-label="Italic" />
+			</div>
 		</ComponentExample>
 
 		<ComponentExample Title="Disabled" Code="@("<Toggle Disabled>Disabled</Toggle>\n<Toggle Disabled Pressed=\"true\">Disabled On</Toggle>")">
@@ -50,6 +58,9 @@
 	private bool Pressed3;
 	private bool Pressed4;
 	private bool Pressed5;
+	private bool Bold;
+	private bool Wrap;
+	private bool Italic;
 
 	private static readonly ApiElement[] ToggleElements =
 	[
@@ -62,7 +73,8 @@
 				new ApiProperty( "Pressed",              "bool",                          false, "Current on/off state. Supports two-way binding via `@bind-Pressed`. Default: `false`." ),
 				new ApiProperty( "PressedChanged",       "EventCallback<bool>",           false, "Fires when the toggle is clicked with the new pressed value." ),
 				new ApiProperty( "Variant",              "ToggleVariant",                 false, "Visual style. Default: `ToggleVariant.Default`. Other values: `Outline`, `Square` (same rounding as Default, kept as a distinct name to match Blok), `Rounded` (pill-shaped, `rounded-full`)." ),
-				new ApiProperty( "Size",                 "ToggleSize",                    false, "Size token. Default: `ToggleSize.Default`. Other values: `Sm`, `Lg`." ),
+				new ApiProperty( "Size",                 "ToggleSize",                    false, "Size token. Default: `ToggleSize.Default`. Other values: `Sm`, `Xs`." ),
+				new ApiProperty( "Icon",                 "string?",                       false, "SVG path for a leading icon, e.g. `IconSvg.FormatBold`. With `ChildContent` it crossfades to a check mark while pressed; on its own it renders unchanged." ),
 				new ApiProperty( "Disabled",             "bool",                          false, "When true, the toggle is non-interactive and visually muted. Default: `false`." ),
 				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the button." ),
 				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Button contents — typically an icon, short text, or both." ),

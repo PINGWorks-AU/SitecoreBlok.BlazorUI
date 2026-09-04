@@ -4,9 +4,8 @@
 @inject GlobalTheme Theme
 @inject IJSRuntime Js
 
-<Toggle Pressed="@IsDark" PressedChanged="OnToggle" Size="ToggleSize.Sm" ClassName="@ClassName" aria-label="Toggle theme" title="@TitleText">
-	<Icon Svg="@IconPath" />
-</Toggle>
+<Toggle Pressed="@IsDark" PressedChanged="OnToggle" Size="ToggleSize.Sm" Icon="@IconPath"
+		ClassName="@ClassName" aria-label="Toggle theme" title="@TitleText" />
 
 @code {
 	[Parameter] public string? ClassName { get; set; }

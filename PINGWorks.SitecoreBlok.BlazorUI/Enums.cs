@@ -44,7 +44,7 @@ public enum SwitchVariant { Primary, Danger, Success }
 
 // Toggle **************************************************************************************************
 public enum ToggleVariant { Default, Outline, Square, Rounded }
-public enum ToggleSize { Default, Sm, Lg }
+public enum ToggleSize { Default, Sm, Xs }
 public enum ToggleGroupType { Single, Multiple }
 
 // Field ****************************************************************************************************

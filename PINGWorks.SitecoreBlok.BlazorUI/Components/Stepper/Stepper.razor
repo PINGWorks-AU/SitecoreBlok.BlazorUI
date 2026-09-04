@@ -60,8 +60,8 @@
 	// class inside would be reported as drift from the Blok source.
 	private static string StepCircleClass( string state ) => CssClassBuilder.Start( "flex items-center justify-center size-8 rounded-full border-2 shrink-0" )
 										.With( "border-primary bg-primary text-white", state is "completed" )
-										.With( "border-primary text-primary", state is "active" )
-										.With( "border-border text-muted-foreground", state is not "completed" and not "active" )
+										.With( "border-primary bg-background text-primary", state is "active" )
+										.With( "border-border bg-background text-muted-foreground", state is not "completed" and not "active" )
 										.Build();
 
 	private static string StepLabelClass( string state ) => CssClassBuilder.Start( "text-sm font-medium" )

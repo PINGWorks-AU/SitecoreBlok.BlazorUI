@@ -86,14 +86,14 @@
 		=> CssClassBuilder.Start( "shrink-0 h-full overflow-y-auto" )
 			.With( SizeClasses.Width( SidebarWidth ) )
 			.With( "border-r border-border", Borders )
-			.With( "bg-background", SidebarBgFilled )
+			.With( "bg-background text-foreground", SidebarBgFilled )
 			.With( "p-4", Gutters )
 			.Build();
 
 	private string HeaderClass
 		=> CssClassBuilder.Start( "sticky top-0 z-40" )
 			.With( "border-b border-border", Borders )
-			.With( "bg-background/95 backdrop-blur", HeaderBgFilled )
+			.With( "bg-background/95 text-foreground backdrop-blur", HeaderBgFilled )
 			.Build();
 
 	private string HeaderRowClass
@@ -108,7 +108,7 @@
 			.Build();
 
 	private string FooterClass
-		=> CssClassBuilder.Start( "bg-background" )
+		=> CssClassBuilder.Start( "bg-background text-foreground" )
 			.With( "border-t border-border", Borders )
 			.With( "p-4", Gutters )
 			.Build();

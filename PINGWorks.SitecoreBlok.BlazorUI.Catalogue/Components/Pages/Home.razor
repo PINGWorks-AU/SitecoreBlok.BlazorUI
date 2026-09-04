@@ -214,8 +214,8 @@
 				<span>Trigger, Portal, Overlay, and (for Dialog/Sheet) Content sub-components are collapsed into the root component with built-in overlay and close button. Blok exports them as separate siblings so consumers can swap portals or layer overlays manually.</span>
 			</div>
 			<div class="flex items-start gap-2">
-				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">DropdownMenu items</Badge>
-				<span>No <code>DropdownMenuCheckboxItem</code>, <code>DropdownMenuRadioGroup</code>, <code>DropdownMenuRadioItem</code>, or <code>DropdownMenuPortal</code>. Consumers roll their own toggle state on top of <code>DropdownMenuItem</code>.</span>
+				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">DropdownMenuPortal</Badge>
+				<span>Not ported, deliberately. It is Radix plumbing for escaping overflow containers, and our menu content already renders through <code>PopoverService</code> at the layout root — the same escape by a different route. <code>DropdownMenuCheckboxItem</code>, <code>DropdownMenuRadioGroup</code> and <code>DropdownMenuRadioItem</code> are all present.</span>
 			</div>
 			<div class="flex items-start gap-2">
 				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">NavigationMenu</Badge>
@@ -248,10 +248,6 @@
 			<div class="flex items-start gap-2">
 				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">CircularProgress</Badge>
 				<span>No indeterminate mode, no size presets (<code>xs</code>/<code>sm</code>/<code>md</code>/<code>lg</code>/<code>xl</code>), no <code>thickness</code> or <code>min</code> props. Blok's Chakra-based version exposes all of these.</span>
-			</div>
-			<div class="flex items-start gap-2">
-				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Toggle</Badge>
-				<span>No <code>square</code> or <code>rounded</code> shape variants, no <code>xs</code> size, and no pressed-state icon swap (Blok replaces the child icon with a check mark when pressed).</span>
 			</div>
 			<div class="flex items-start gap-2">
 				<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Calendar / DatePicker</Badge>

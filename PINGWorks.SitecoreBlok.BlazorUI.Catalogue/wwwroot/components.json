@@ -2,7 +2,7 @@
   "schema": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/blob/main/docs/components-schema.json",
   "package": "PINGWorks.SitecoreBlok.BlazorUI",
   "version": "2.0.0.0-preview-1",
-  "generatedAt": "2026-09-04T00:55:05Z",
+  "generatedAt": "2026-09-04T03:53:00Z",
   "repository": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI",
   "documentation": {
     "theme": "/theme.md",
@@ -475,14 +475,14 @@
     {
       "name": "Toggle",
       "slug": "toggle",
-      "description": "Single-toggle button",
+      "description": "Single-toggle button; Blok size scale (`Xs`/`Sm`/`Default`). No pressed-state icon swap — Blok inspects its children, which Blazor cannot do",
       "status": "Parity",
       "catalogueUrl": "/primitives/toggle"
     },
     {
       "name": "ToggleGroup",
       "slug": "togglegroup",
-      "description": "Segmented toggle group",
+      "description": "Segmented toggle group; shares `ToggleSize` and the item class chain with `Toggle`",
       "status": "Parity",
       "catalogueUrl": "/primitives/togglegroup"
     },

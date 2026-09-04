@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-04T00:55:05Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-04T03:53:00Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -83,8 +83,8 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [Timeline](/primitives/timeline): Vertical event timeline
 - [TimePicker](/primitives/timepicker): Native `input type=time`, not a port of Blok's Popover + three Selects composite. Status badge under review — see the TimePicker section in docs/ui-parity-audit.md
 - [Toaster](/primitives/toaster): Imperative `ToastService.Show(...)` API; `/sonner` stub page
-- [Toggle](/primitives/toggle): Single-toggle button
-- [ToggleGroup](/primitives/togglegroup): Segmented toggle group
+- [Toggle](/primitives/toggle): Single-toggle button; Blok size scale (`Xs`/`Sm`/`Default`). No pressed-state icon swap — Blok inspects its children, which Blazor cannot do
+- [ToggleGroup](/primitives/togglegroup): Segmented toggle group; shares `ToggleSize` and the item class chain with `Toggle`
 - [Tooltip](/primitives/tooltip): Per-tooltip `Delay` on `TooltipContent` (Blok delays via Provider only); `ClassName` on `Tooltip` root; CSS Anchor Positioning (`position: fixed` + `position-anchor`) so tooltips escape ancestor `overflow` clipping without a JS portal
 - [TreeView](/primitives/treeview): Generic hierarchical collapsible tree over any `TItem`. Supersedes Blok's narrower `file-tree.tsx` (see the FileTree row) rather than porting it.
 

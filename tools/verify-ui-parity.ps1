@@ -142,9 +142,24 @@ function Get-RazorClassStrings {
     $chainPattern = '(?:CssClassBuilder\.Start|\bCssClassBuilder\b\.With|(?<=Start\s*\([^)]*)\s*,\s*"[^"]*")|(\.With|\.Reset)\s*\(\s*(?:[^"]*?"([^"]*)")'
     # Simpler: match every `.Start(...)` / `.With(...)` / `.Reset(...)` block
     # and pull strings from inside the parens (scoped to that call).
-    $callPattern = '\b(?:Start|With|Reset)\s*\(((?:[^()"]|"[^"]*")*)\)'
+    # Balanced-paren match so a NESTED CALL inside the argument block doesn't kill the match.
+    # The earlier flat pattern could not contain a bare "(", so a guard like
+    # .With( "rounded-xl", Rounded && !CssClassBuilder.ContainsAny( ClassName, "rounded-" ) )
+    # failed to match and silently dropped that class — the same class of silent, retroactive
+    # blindness as the comment defect above, and it affected 21 primitive files (Alert, Button,
+    # Card, Dialog, Table ...). .NET balancing groups let the block span nested parens.
+    $callPattern = '\b(?:Start|With|Reset)\s*\((?<body>(?:[^()"]|"[^"]*"|\((?<Depth>)|\)(?<-Depth>))*(?(Depth)(?!)))\)'
     [regex]::Matches($content, $callPattern) | ForEach-Object {
-        $argBlock = $_.Groups[1].Value
+        $argBlock = $_.Groups['body'].Value
+
+        # Drop nested call expressions before harvesting literals. Their arguments are guard
+        # probes, not class names — ContainsAny( ClassName, "rounded-" ) passes the PREFIX
+        # "rounded-", which is not a utility and would report as missing from the compiled CSS.
+        # Strip innermost calls repeatedly so only the .With/.Start literals remain.
+        while ($argBlock -match '[A-Za-z_][\w.]*\s*\([^()]*\)') {
+            $argBlock = [regex]::Replace($argBlock, '[A-Za-z_][\w.]*\s*\([^()]*\)', '')
+        }
+
         [regex]::Matches($argBlock, '"([^"]*)"') | ForEach-Object { $found.Add($_.Groups[1].Value) }
     }
 
@@ -310,6 +325,13 @@ if (-not $SkipDrift) {
         @('focus-visible:border-primary', 'focus:border-primary'),
         @('focus-visible:ring-primary/50', 'focus:ring-primary'),
         @('text-muted-foreground', 'text-subtle-text'),
+        # Chakra-era alias: typography.css defines --text-md and --text-base as the same
+        # 0.875rem, so `text-md` and `text-base` compile to an identical font-size. Note this
+        # does NOT extend to `text-sm` (0.8125rem), which is genuinely one step smaller.
+        @('text-base', 'text-md'),
+        # `border` and `border-1` both compile to border-width:1px in Tailwind v4. Blok mixes
+        # the two spellings across files (timeline.tsx uses border-1, most others use border).
+        @('border', 'border-1'),
         @('text-accent-foreground', 'text-body-text'),
         # Semantic hover/active aliases — `--primary-hover` resolves to `--color-primary-600`
         # in globals.css, so `bg-primary-hover` and `bg-primary-600` paint the same colour.
@@ -327,7 +349,12 @@ if (-not $SkipDrift) {
         @('dark:[&>svg]:text-danger-200', 'dark:[&_svg]:text-danger-200'),
         @('dark:[&>svg]:text-warning-200', 'dark:[&_svg]:text-warning-200'),
         @('dark:[&>svg]:text-success-200', 'dark:[&_svg]:text-success-200'),
-        @('dark:[&>svg]:text-info-200', 'dark:[&_svg]:text-info-200')
+        @('dark:[&>svg]:text-info-200', 'dark:[&_svg]:text-info-200'),
+        # `bg-backgrounds` (plural) is a typo in Blok's own source — button.tsx and toggle.tsx
+        # Outline variants. No such token exists, so Tailwind emits nothing for it and Blok's
+        # Outline buttons fall through to transparent in light mode. Ours spell it correctly.
+        # Mapped so the correct spelling doesn't report as drift against Blok's mistake.
+        @('bg-background', 'bg-backgrounds')
     )
     $canonicalMap = @{}
     foreach ($group in $equivGroups) {
@@ -337,6 +364,13 @@ if (-not $SkipDrift) {
 
     # Track which components we've already audited (aggregated with sub-components)
     $auditedBlokNames = @{}
+
+    # Chunks are PINGWorks compositions with no Blok source (MIGRATION_STATUS tracks them as
+    # Extras with no rows). Comparing them to Blok primitives is meaningless, and the prefix
+    # match below pools them into the wrong component: FormActions strips to `form` and diffs
+    # against Blok's form.tsx — a Won't Do row — while FilterChip and SkeletonCard pollute the
+    # Filter and Skeleton token sets. Check 3 only.
+    $razorFiles = $razorFiles | Where-Object { $_.Replace('\', '/') -notmatch '/Chunks/' }
 
     foreach ($file in $razorFiles) {
         $fileName = Split-Path $file -Leaf
@@ -389,6 +423,7 @@ if (-not $SkipDrift) {
         # We search the full Components tree here (not just $razorFiles) because sub-components
         # may be outside the scope explicitly passed via -Component / -Components.
         $relatedFiles = Get-ChildItem -Path $componentsDir -Filter *.razor -File -Recurse |
+                        Where-Object { $_.FullName.Replace('\', '/') -notmatch '/Chunks/' } |
                         Where-Object {
                             $n = [IO.Path]::GetFileNameWithoutExtension($_.Name).ToLowerInvariant()
                             # $baseName may be kebab-case (input-otp) while our file names are not

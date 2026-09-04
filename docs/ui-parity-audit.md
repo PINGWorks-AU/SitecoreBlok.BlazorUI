@@ -880,3 +880,197 @@ Harness: `-Component Filter` PASS, 0 findings on all six checks.
 ### Left open
 
 `-Component SearchInput` reports one drift finding — `focus:border-0` present in Blok, missing in ours. It pre-dates this work (confirmed by re-running against the unmodified file) and is untouched here; it belongs to a `/blok verify SearchInput` pass.
+
+## Check 4 cleared library-wide — 2026-09-04
+
+All 27 outstanding Check 4 findings are resolved. Library-wide harness now reports **0 unpaired surface backgrounds**, down from 27; the total falls from 127 findings to 100.
+
+Every finding was the same shape and every one was genuine — not the conditional-`.With` false positive the check is known for:
+
+```csharp
+CssClassBuilder.Start( "<layout classes, no text token>" )
+    .With( "bg-background", BgFilled )
+    .Build();
+```
+
+No `text-*` token anywhere in the chain, so the foreground came entirely from cascade. Inside the Catalogue that is invisible, because `MainLayout`'s `data-dark-mode-target` wrapper carries `text-foreground` and the computed colour flows down. It is a real defect for a consumer, because 26 of the 27 are Chunks and the worst of them — `AppShell`, `PageShell`, `SplitShell`, `ListDetailShell`, `ContextPanelShell`, `AppSidebar`, `NavRail` — are layout roots by design. A consumer using one as their outermost themed surface, without knowing about the `text-foreground`-on-the-wrapper requirement, gets a surface that flips to dark and text that does not.
+
+### Paired (24 sites across 20 files)
+
+`text-foreground` added to the same class string as the surface background. `bg-background/95` variants keep the slash opacity and take the same token.
+
+ActionCard, FeatureCard, KpiTile, MediaCard, MetricGroup, StatCard, ResultsList, FileUpload (×2), FormActions, AppHeader, Toolbar, AppShell (×3), ListDetailShell, PageShell, SplitShell (×2), ContextPanelShell, CustomFieldShell, DashboardWidgetShell, AppSidebar, NavRail.
+
+The cards already set `text-foreground` on their own heading and value elements, so those specific strings were never at risk — but descriptions and consumer-supplied `ChildContent` were, which is what the wrapper pairing covers.
+
+### Suppressed with `parity-no-text-pair` (3 sites)
+
+The marker is not an escape hatch here; each reflects the actual render.
+
+| Site | Why the marker is correct |
+|---|---|
+| `SkeletonCard` wrapper | Renders `Skeleton` bars only. There is no text in the component at any configuration, so there is no foreground to pair. |
+| `Slider` thumb | Decorative circle. Explicitly named in the Phase 2 guidance as a suppression case alongside progress fills and indicator dots. |
+| `Text` `BgFilled` wrapper | The component owns its own colour: `text-muted-foreground` when `Muted`, otherwise deliberate inheritance. Adding `text-foreground` to the same string would put two `text-*` utilities at equal specificity and create the source-order race documented for Button's Default variant — where the winner flipped between light and dark mode. |
+
+Per the repo's no-inline-comment rule these justifications live here rather than beside the class strings; the table is the record a future editor should find when they wonder why the marker is there.
+
+### Verified in browser
+
+`AppShell` and `StatCard` in both modes. The regression worth checking was whether a wrapper-level `text-foreground` would override nested muted text — it does not: StatCard's "Active subscriptions" label stays muted grey in light and dark, while the value renders at full contrast. Wrapper token and element token sit on different elements, so the element wins without a specificity contest.
+
+### Re-baselined counts
+
+The "Checks 1, 2, 4, 5, 6 clean" claim at the top of this document has been stale since the Check 3 harness fix. Current library-wide state:
+
+| Check | Findings |
+|---|---|
+| 1 — compiled-utility coverage | 41 |
+| 2 — runtime-composed classes | 0 |
+| 3 — Blok class-string drift | 59 |
+| 4 — surface bg without text pair | **0** |
+| 5 — fixed-shade bg + flipping text | 0 |
+| 6 — token light/dark symmetry | 0 |
+
+Check 3's 59 remain untriaged and are concentrated: Toggle, TimePicker, Stepper, ScrollArea, DatePicker, Calendar and Button carry 5 each; Popover 4; Table and Card 3. Some will be deliberate deviations rather than defects. Note also that `form.tsx` — a `Won't Do` row — draws a finding against 5 Razor files, which suggests the source-resolution step is matching files it should not.
+
+## Check 3 triage — 2026-09-04
+
+Drift went **59 to 42** and the library total **127 to 83**. Almost all of that came from fixing the harness rather than the components: 17 of the findings were phantoms.
+
+### Harness defects fixed
+
+**1. Nested calls blinded class strings — the same silent failure as the comment defect, still live.**
+
+The extractor's call pattern could not contain a bare `(` inside the argument block. So any guard like
+
+```csharp
+.With( "rounded-xl", Rounded && !CssClassBuilder.ContainsAny( ContainerClassName, "rounded-" ) )
+```
+
+failed to match, and that class was dropped and reported as drift. **21 primitive files** use `ContainsAny(` in a builder chain — Alert, Button, Card, Dialog, Table and others. Replaced with a .NET balancing-group pattern that spans nested parens. Alert, Card, Dialog and Table went to zero findings outright; drift fell 57 to 46.
+
+The comment fix recorded earlier only addressed `//` comments containing parentheses. It treated the symptom. The argument block could never hold a nested call either, and that half went unnoticed because no one had looked for it.
+
+Seeing more class strings also raised Check 1 from 41 to 59, because the newly-visible strings included the guards' own arguments — `ContainsAny( ClassName, "p-" )` passes the prefix `"p-"`, which is not a utility. Nested call expressions are now stripped from the argument block before literals are harvested, and Check 1 returned to its 41 baseline.
+
+**2. Chunks were being diffed against Blok primitives.**
+
+The related-files matcher is a prefix match over the whole `Components` tree, and it included `Chunks/`. Chunks are PINGWorks compositions with no Blok lineage. `FormActions` stripped to `form` and diffed against Blok's `form.tsx` — a `Won't Do` row — inventing a `text-destructive` finding, while `FilterChip` and `SkeletonCard` pooled their tokens into the Filter and Skeleton comparisons. Check 3 now excludes `Chunks/`; the other five checks still scan them, which is what caught the 27 Check 4 findings.
+
+### Equivalences added
+
+| Pair | Why |
+|---|---|
+| `bg-background` / `bg-backgrounds` | `bg-backgrounds` is a **typo in Blok's own source** — `button.tsx` and `toggle.tsx` Outline variants. No such token exists, so Tailwind emits nothing and Blok's Outline buttons fall through to transparent in light mode. Ours spell it correctly. Mapping it stopped the correct spelling reporting as drift against Blok's mistake — and exposed a true positive underneath, since our Toggle genuinely has no background on that variant. |
+| `text-base` / `text-md` | `typography.css` defines both as `0.875rem`. Does **not** extend to `text-sm` (`0.8125rem`), which is one step smaller — relevant because Toggle uses it where Blok uses `text-md`. |
+| `border` / `border-1` | Both compile to `border-width:1px`. Blok mixes the spellings across files. |
+
+### Fixes applied
+
+- **Stepper** — active and pending step circles were missing `bg-background`, which Blok sets on both. Without it the circle is transparent and shows whatever sits behind it, so the ring reads wrong on any non-page-coloured surface.
+- **ContextMenuItem** — added `focus:bg-accent`. Ours highlighted on hover only and set `focus:text-foreground` with no focus background, so a keyboard-focused item had no visible highlight. Blok sets `focus:bg-accent focus:text-accent-foreground`.
+
+### The 42 that remain
+
+**Documented deliberate divergences or composition artefacts — 25, no action.**
+
+| Component | Count | Disposition |
+|---|---|---|
+| Calendar | 5 | Already itemised under the Calendar re-audit section — two are composition artefacts (tokens now living in `SelectTrigger.razor`), three are deliberate. |
+| DatePicker | 5 | Composition artefact. Our trigger is a `Button` with the Outline variant, so `border-input`, `rounded-md`, `text-md` and the `aria-invalid` ring all live in `Button.razor`, outside the harness's file scope. Blok inlines the whole trigger class string instead of composing a Button, which is why the tokens appear in their file and not ours. |
+| ScrollArea | 5 | Blok styles a Radix custom scrollbar (bordered track, `bg-border` thumb). We use the library-wide native thin-scrollbar treatment, where the thumb colour is set through a `::-webkit-scrollbar-thumb` variant — present, but not as a bare token. |
+| TimePicker | 5 | Whole-component substitution, already recorded with an open decision. |
+| Popover | 4 | Ours is deliberately headless; consumers supply the surface via `ClassName`, which is why `bg-popover`, `text-popover-foreground`, `rounded-md` and `shadow-md` are absent. Filter's dropdown is the worked example. |
+| Button | 1 | `text-primary-foreground` was removed deliberately to end the source-order race with the compound variant's `text-inverse-text`. |
+| Editable | 1 | `hover:bg-transparent` — already documented. |
+| Tooltip | 1 | `text-inverse-text` replaced by literal `text-white`; enforced by Check 5. |
+| SearchInput | 1 | `focus:border-0` — pre-existing, untouched. |
+
+**Real gaps needing a decision — 8.**
+
+| Component | Finding |
+|---|---|
+| Toggle (5) | The biggest one. Base is `text-sm` (13px) where Blok is `text-md` (14px); no base `text-neutral-fg`; `hover:text-muted-foreground` where Blok has `hover:text-neutral-fg`; no `aria-invalid` ring treatment; no sized-svg selector. The Outline variant is `border border-input bg-transparent` against Blok's `border bg-background hover:bg-neutral-bg hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50`. And the size scale differs outright — Blok has default/sm/**xs**, we have Default/Sm/**Lg**, with different heights and padding at every step. Aligning it is a `/blok update Toggle`, and the enum change is breaking for consumers, since `ToggleGroup` shares `ToggleSize`. |
+| Stepper (4) | No size variants at all — `size-8` is hardcoded, where Blok has default/sm/lg. `text-muted-foreground/70` on pending descriptions and the `rounded-lg bg-muted/30` container variant are also unported. |
+| Input (1) | `focus:ring-1` — Blok's focus ring is 1px, ours is a 3px ring, the shadcn default. Three times thicker than Blok on every input in the library. |
+| Kbd (1) | Blok gives a Kbd nested in a Tooltip a translucent treatment via a `data-slot=tooltip-content` descendant selector, light and dark. We have neither. Interacts with our Tooltip divergence — ours is a fixed `bg-gray-700`, so Blok's token would not carry over unchanged. |
+| ContextMenu (1) | `focus:text-accent-foreground` vs our `focus:text-foreground`. Probably an equivalence, but the map only canonicalises bare tokens, not prefixed ones. |
+
+**Harness false positive — 1.**
+
+`stack-navigation.tsx` `shadow-none` is not a class Blok applies. It is a runtime predicate — the source tests whether a caller-supplied `className` contains that string. The Blok-side extractor pulls string literals containing Tailwind-ish text from anywhere in the file, with no way to tell a class string from a string being tested against. Worth a follow-up; it likely inflates other components too.
+
+### The pattern worth naming
+
+Three separate false-positive classes here all come from the same root: **the harness compares one Blok file against files whose names prefix that component, and neither side of that is a reliable boundary.** Blok inlines what we compose (DatePicker, Calendar), we compose what Blok inlines (SearchInput's lost `min-w-0`, found the same day), and either side may contain strings that are not classes at all (StackNavigation). Token overlap is a regression guard, not evidence of parity — consistent with the TimePicker finding recorded earlier.
+
+## Toggle / ToggleGroup aligned to Blok — 2026-09-04 (Blok `2d994e` / `6255ac`)
+
+Both rows were already on the current upstream SHA. The drift was never upstream change — the port had simply never matched, and Check 3 had been reporting it for some time.
+
+Toggle went 5 findings to 0. `ToggleGroupItem` duplicates the same class chain (Blok's `toggle-group.tsx` imports `toggleVariants` from `toggle.tsx`), so every change was applied to both.
+
+### Base class string
+
+| Was | Now | Why |
+|---|---|---|
+| `text-sm` | `text-md` on the size arms | 13px against Blok's 14px. See the size-arm note below for why it is not on the base. |
+| no base text colour | `text-neutral-fg` | The toggle inherited its resting colour rather than setting it. |
+| `hover:text-muted-foreground` | `hover:text-neutral-fg` | Ours dimmed on hover; Blok holds the resting colour. |
+| `transition-colors` | `transition-[color,box-shadow]` | Focus ring did not animate. |
+| — | `whitespace-nowrap` | Multi-word labels could wrap inside a fixed-height control. |
+| — | `aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive` | No invalid-state treatment at all. |
+| — | `[&_svg:not([class*='size-'])]:size-4` | Unsized child icons rendered at their intrinsic 24px instead of 16px. |
+
+### Outline variant
+
+Was `border border-input bg-transparent rounded-md`. Now Blok's `border bg-background hover:bg-neutral-bg hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md`. The visible change is in dark mode, where the variant now has the translucent `input/30` fill instead of being fully transparent.
+
+### Size scale — breaking
+
+Blok's scale is `default` / `sm` / `xs`; ours was `Default` / `Sm` / `Lg`, an older shadcn scale with different values at every step. Now aligned:
+
+| Size | Was | Now |
+|---|---|---|
+| `Default` | `h-9 min-w-9 px-2` | `h-10 min-w-10 px-4` |
+| `Sm` | `h-8 min-w-8 px-1.5` | `h-8 min-w-8 px-3` |
+| `Xs` (new) | — | `h-6 min-w-6 px-2 text-xs [&>svg]:!size-3` |
+| `Lg` | `h-11 min-w-11 px-3` | removed |
+
+`ToggleSize.Lg` no longer exists and `Default` is 4px taller. `ToggleGroup` shares the enum, so grouped items change with it. Inside the repo only the Catalogue's own demo page used `Lg`; the breakage risk is external consumers of the published package.
+
+### The font-size conflict this exposed
+
+Blok puts `text-md` on the base and `text-xs` on the `xs` size. That works there because `cn()` runs tailwind-merge, which *removes* the losing class before it reaches the DOM. `CssClassBuilder` concatenates, so both survive, they sit at equal specificity, and compile order decides the winner.
+
+Measured in the browser: the `Xs` toggle rendered at **14px, not 12px** — the base `text-md` was winning. Fixed by keeping the font size off the base entirely and putting `text-md` on the `Default` and `Sm` arms alongside `text-xs` on `Xs`, which is the same treatment the file already applies to rounding for the same reason.
+
+This is worth generalising: **any Tailwind utility Blok sets on both a base and a variant is a latent conflict for us, and the harness cannot see it** — both classes are present, so Check 3 is satisfied while the rendered result is wrong. It is the same failure mode as the Button `text-primary-foreground` race. Only a browser measurement catches it.
+
+### Verified in browser
+
+Heights and font sizes measured rather than eyeballed: `Xs` 24px/12px, `Sm` 32px/14px, `Default` 40px/14px. Outline carries the translucent fill in dark mode. `ToggleGroup` single-selection tested live — clicking an item moves `data-state="on"` and the primary background to it and clears the previous one. Both themes.
+
+### Pressed-state icon swap — ported via an explicit slot (approved divergence)
+
+Blok inspects its children at render time (`hasTextContent`, `isFirstChildIcon`, `extractFirstIcon`) and, when pressed, either crossfades a leading icon into a check mark or prepends a check to a text-only toggle, leaving icon-only toggles alone. Blazor cannot introspect a `RenderFragment`, so the child inspection has no equivalent.
+
+Approved approach: a `string? Icon` parameter carrying an SVG path. The same three cases fall out of the parameters rather than the children:
+
+| Blok case | Our signal | Result |
+|---|---|---|
+| Text toggle with a leading icon | `Icon` + `ChildContent` | Two absolutely-positioned layers in a `w-4 h-4` box crossfade between the icon and the check, matching Blok's opacity/scale animation. |
+| Text-only toggle | `ChildContent` alone | Check prepended while pressed. |
+| Icon-only toggle | `Icon` alone | Renders unchanged, no check. |
+
+Verified in the browser by reading the SVG path data rather than trusting the screenshot — at 16px the bold glyph and the check are easy to confuse. Pressed `Icon`+text: layer one is the FormatBold path at `opacity: 0`, layer two the mdi check at `opacity: 1`. Icon-only: exactly one path, the italic glyph, no check. The crossfade animates through the CSS `scale` property (0.8 to 1 over 0.2s) — Tailwind v4 sets `scale` rather than `transform`, so a `getComputedStyle().transform` reading of `none` is expected and not a fault.
+
+**The cost of the trade-off, and it bit immediately.** An icon-only toggle that puts its icon in `ChildContent` instead of `Icon` is indistinguishable from text, so it gets a check prepended. Our own `ThemeToggle` did exactly that and grew a stray check mark next to the sun the moment this landed. Fixed by passing `Icon="@IconPath"` and dropping the child content — which is also the correct usage now. Any consumer with the same shape needs the same one-line change; the `<DivergenceNote>` on `TogglePage` says so explicitly.
+
+### Three stale Home entries corrected
+
+All predate today and were misleading on the public Home page:
+
+- **Toggle** claimed no `square`/`rounded` variants and no `xs` size. The variants landed in `405b46b`; `xs` landed today. With the icon swap now ported the entry has no remaining content, so it is removed from Known Feature Gaps — the API-shape difference lives on `TogglePage`'s `<DivergenceNote>`, which is where a divergence belongs rather than a gap list.
+- **DropdownMenu items** claimed `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup` and `DropdownMenuRadioItem` were all absent. All three were ported in `7087080`. Rewritten to cover only `DropdownMenuPortal`, which is a deliberate non-port rather than a gap.

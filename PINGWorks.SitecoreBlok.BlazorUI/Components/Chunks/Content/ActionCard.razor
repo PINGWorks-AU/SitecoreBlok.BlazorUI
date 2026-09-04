@@ -48,7 +48,7 @@ else
 	private string CardClass
 		=> CssClassBuilder.Start( "flex flex-col group" )
 			.With( "border border-border rounded-lg", Borders )
-			.With( "bg-background", BgFilled )
+			.With( "bg-background text-foreground", BgFilled )
 			.With( "p-6 gap-4", Gutters )
 			.With( "hover:border-primary/50 hover:bg-subtle-bg cursor-pointer transition-colors no-underline", IsInteractive )
 			.Build();
