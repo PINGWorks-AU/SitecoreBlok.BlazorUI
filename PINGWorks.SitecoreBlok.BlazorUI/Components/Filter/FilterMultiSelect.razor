@@ -45,7 +45,7 @@
 								<Badge ColorScheme="BadgeColor.Neutral" Size="BadgeSize.Sm" ClassName="overflow-visible! shrink-0" style="min-height:1.5rem">
 									<span>@label</span>
 									<span role="button" tabindex="0" aria-label="@( $"Remove {label}" )"
-										  class="ml-1 cursor-pointer opacity-70 hover:opacity-100"
+										  class="cursor-pointer rounded-full p-0 hover:bg-neutral-bg-active flex items-center justify-center -mr-1 pointer-events-auto focus:outline-none focus:ring-1 focus:ring-ring"
 										  @onclick="@( () => ToggleValue( current ) )" @onclick:stopPropagation="true">
 										<Icon Svg="@IconSvg.Close" Scale="0.6" />
 									</span>

@@ -1,6 +1,6 @@
 ﻿# PING Works Sitecore Blok BlazorUI
 
-> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-03T07:35:04Z.
+> Blazor UI Kit — an unofficial Blazor port of Sitecore's Blok design system. Package version `2.0.0.0-preview-1`. Generated 2026-09-04T00:12:25Z.
 
 Use this index to pick the right component for a task. Two surfaces:
 
@@ -119,6 +119,7 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [DetailPage](/chunks/detail-page): Record detail layout — Title, Description, Main / Aside / Footer
 - [EmptyTable](/chunks/empty-table): Empty state inside a Table aware of column count
 - [FilterChip](/chunks/filter-chip): Single removable filter chip — Label, OnRemove, IconSvg
+- [FilterChipBar](/chunks/filter-chip-bar): Row of applied-filter chips — Filters, ClearAction
 - [KvList](/chunks/kv-list): Label/value definition list — ChildContent of KvListItem
 - [ResultsList](/chunks/results-list): Generic vertical list with selection, optional pagination, Empty
 - [RowActions](/chunks/row-actions): Table-row dropdown action menu — Items slot
@@ -131,7 +132,6 @@ Prefer the highest-level component that fits the job. If a Chunk covers your lay
 - [ConfirmDialog](/chunks/confirm-dialog): Dialog-based confirm-action wrapper — Tone, ConfirmLabel
 - [DateField](/chunks/date-field): DatePicker wrapper — DateTime? Value
 - [FileUpload](/chunks/file-upload): Drop-zone file picker — click or drag-and-drop, IBrowserFile
-- [FilterBar](/chunks/filter-bar): Horizontal filter chip row — Filters, ClearAction
 - [FormActions](/chunks/form-actions): Sticky-bottom action row — Start, End slots
 - [FormGrid](/chunks/form-grid): Multi-column field layout — Columns, Gap
 - [FormLabel](/chunks/form-label): Form-context wrapper around the Label primitive

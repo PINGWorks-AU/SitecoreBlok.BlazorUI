@@ -1,16 +1,16 @@
-@page "/chunks/filter-bar"
+@page "/chunks/filter-chip-bar"
 @rendermode InteractiveServer
 @using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
 
-<ComponentPage Title="FilterBar" Description="Horizontal filter-chip row with an optional trailing clear-all action" Interactivity="ComponentInteractivity.Interactive" ApiElements="@FilterBarElements">
+<ComponentPage Title="FilterChipBar" Description="Row of chips representing filters that are already applied, with an optional trailing clear-all action" Interactivity="ComponentInteractivity.Interactive" ApiElements="@FilterChipBarElements">
 
 	<ExamplesSection>
 
 		<ComponentExample Title="Filter bar with active chips"
-			Code="@("<FilterBar>\n    <Filters>\n        @foreach ( var filter in BasicFilters )\n        {\n            var name = filter;\n            <FilterChip Label=\"@name\" OnRemove=\"@(() => BasicFilters.Remove( name ))\" />\n        }\n    </Filters>\n</FilterBar>")"
+			Code="@("<FilterChipBar>\n    <Filters>\n        @foreach ( var filter in BasicFilters )\n        {\n            var name = filter;\n            <FilterChip Label=\"@name\" OnRemove=\"@(() => BasicFilters.Remove( name ))\" />\n        }\n    </Filters>\n</FilterChipBar>")"
 			Primitives="@("<div class=\"flex items-center gap-2 flex-wrap\">\n    <span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\"><span>Status: Active</span><button aria-label=\"Remove\">×</button></span>\n    <span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\"><span>Type: Admin</span><button aria-label=\"Remove\">×</button></span>\n</div>")">
 			<div class="space-y-2">
-				<FilterBar>
+				<FilterChipBar>
 					<Filters>
 						@foreach ( var filter in BasicFilters )
 						{
@@ -18,19 +18,19 @@
 							<FilterChip Label="@name" OnRemove="@(() => BasicFilters.Remove( name ))" />
 						}
 					</Filters>
-				</FilterBar>
+				</FilterChipBar>
 				@if ( BasicFilters.Count == 0 )
 				{
-					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm" @onclick="ResetBasicFilters">Reset</Button>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm" OnClick="ResetBasicFilters">Reset</Button>
 				}
 			</div>
 		</ComponentExample>
 
 		<ComponentExample Title="Filter bar with clear-all action"
-			Code="@("<FilterBar>\n    <Filters>\n        @foreach ( var filter in ClearableFilters )\n        {\n            var name = filter;\n            <FilterChip Label=\"@name\" OnRemove=\"@(() => ClearableFilters.Remove( name ))\" />\n        }\n    </Filters>\n    <ClearAction>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\" @onclick=\"@(() => ClearableFilters.Clear())\">Clear filters</Button>\n    </ClearAction>\n</FilterBar>")"
+			Code="@("<FilterChipBar>\n    <Filters>\n        @foreach ( var filter in ClearableFilters )\n        {\n            var name = filter;\n            <FilterChip Label=\"@name\" OnRemove=\"@(() => ClearableFilters.Remove( name ))\" />\n        }\n    </Filters>\n    <ClearAction>\n        <Button Variant=\"ButtonVariant.Ghost\" Size=\"ButtonSize.Sm\" OnClick=\"@(() => ClearableFilters.Clear())\">Clear filters</Button>\n    </ClearAction>\n</FilterChipBar>")"
 			Primitives="@("<div class=\"flex items-center gap-2 flex-wrap\">\n    <span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\"><span>Region: APAC</span><button aria-label=\"Remove\">×</button></span>\n    <span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\"><span>Role: Editor</span><button aria-label=\"Remove\">×</button></span>\n    <span class=\"inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs\"><span>Status: Active</span><button aria-label=\"Remove\">×</button></span>\n    <div class=\"ml-auto\">\n        <button class=\"...\">Clear filters</button>\n    </div>\n</div>")">
 			<div class="space-y-2">
-				<FilterBar>
+				<FilterChipBar>
 					<Filters>
 						@foreach ( var filter in ClearableFilters )
 						{
@@ -39,12 +39,12 @@
 						}
 					</Filters>
 					<ClearAction>
-						<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm" @onclick="@(() => ClearableFilters.Clear())">Clear filters</Button>
+						<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm" OnClick="@(() => ClearableFilters.Clear())">Clear filters</Button>
 					</ClearAction>
-				</FilterBar>
+				</FilterChipBar>
 				@if ( ClearableFilters.Count == 0 )
 				{
-					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm" @onclick="ResetClearableFilters">Reset</Button>
+					<Button Variant="ButtonVariant.Outline" Size="ButtonSize.Sm" OnClick="ResetClearableFilters">Reset</Button>
 				}
 			</div>
 		</ComponentExample>
@@ -64,10 +64,10 @@
 	private void ResetClearableFilters()
 		=> ClearableFilters = ["Region: APAC", "Role: Editor", "Status: Active"];
 
-	private static readonly ApiElement[] FilterBarElements =
+	private static readonly ApiElement[] FilterChipBarElements =
 	[
 		new ApiElement(
-			Name: "FilterBar",
+			Name: "FilterChipBar",
 			Description: "A horizontal filter-chip row. Renders a `flex items-center gap-2 flex-wrap` container. The `Filters` slot holds `FilterChip` chunks or other badge elements; the optional `ClearAction` slot renders at the trailing end (e.g. a ghost \"Clear filters\" button). Wire each `FilterChip`'s `OnRemove` to remove the corresponding filter from state.",
 			Depth: 0,
 			Properties:
