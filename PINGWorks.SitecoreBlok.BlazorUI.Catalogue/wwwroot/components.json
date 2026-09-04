@@ -1,8 +1,8 @@
 ﻿{
   "schema": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/blob/main/docs/components-schema.json",
   "package": "PINGWorks.SitecoreBlok.BlazorUI",
-  "version": "1.4.0.0-preview-1",
-  "generatedAt": "2026-06-01T10:31:10Z",
+  "version": "2.0.0.0-preview-1",
+  "generatedAt": "2026-09-04T00:55:05Z",
   "repository": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI",
   "documentation": {
     "theme": "/theme.md",
@@ -13,7 +13,7 @@
     {
       "name": "Accordion",
       "slug": "accordion",
-      "description": "Vertically-stacked collapsible content panels",
+      "description": "Vertically-stacked collapsible content panels; trigger row supports optional `Actions` content",
       "status": "Parity",
       "catalogueUrl": "/primitives/accordion"
     },
@@ -76,7 +76,7 @@
     {
       "name": "Calendar",
       "slug": "calendar",
-      "description": "Month-grid date picker surface",
+      "description": "Month-grid date picker surface; month/year dropdowns use Blok's `Select`-based `InBuiltDropdown`, so a root `<Popovers />` is required; `AriaLabels` overrides the nav and dropdown ARIA strings",
       "status": "Parity",
       "catalogueUrl": "/primitives/calendar"
     },
@@ -97,7 +97,7 @@
     {
       "name": "Checkbox",
       "slug": "checkbox",
-      "description": "Binary / tri-state toggle control",
+      "description": "Binary / tri-state toggle control; `AriaLabel` sets the accessible name independently of the visible `Label`",
       "status": "Parity",
       "catalogueUrl": "/primitives/checkbox"
     },
@@ -146,7 +146,7 @@
     {
       "name": "DatePicker",
       "slug": "datepicker",
-      "description": "Date input with calendar popover",
+      "description": "Date input with calendar popover; trigger drops its `aria-label` once a date shows, and the popup is a named `dialog`",
       "status": "Parity",
       "catalogueUrl": "/primitives/datepicker"
     },
@@ -160,14 +160,14 @@
     {
       "name": "DropdownMenu",
       "slug": "dropdownmenu",
-      "description": "Popover menu with items and submenus",
+      "description": "Popover menu with items, submenus, checkbox and radio items, and two-line items. `DropdownMenuPortal` is deliberately not ported — Radix plumbing with no Blazor equivalent, since content renders through `PopoverService`.",
       "status": "Parity",
       "catalogueUrl": "/primitives/dropdownmenu"
     },
     {
       "name": "Editable",
       "slug": "editable",
-      "description": "Inline-editable text with input and textarea modes",
+      "description": "Inline-editable text with input and textarea modes; `EditableError` + `HasError` for validation",
       "status": "Parity",
       "catalogueUrl": "/primitives/editable"
     },
@@ -193,6 +193,13 @@
       "catalogueUrl": "/primitives/field"
     },
     {
+      "name": "Filter",
+      "slug": "filter",
+      "description": "Search, single-select and multi-select filter controls plus the bar that lays them out. `FilterBar` takes the filters as child content rather than Blok's `filters` array of a discriminated union, so each filter keeps its own two-way binding.",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/filter"
+    },
+    {
       "name": "HoverCard",
       "slug": "hovercard",
       "description": "Hover-triggered popover card",
@@ -216,9 +223,16 @@
     {
       "name": "InputGroup",
       "slug": "inputgroup",
-      "description": "Input with affixed addons",
+      "description": "Input with affixed addons, an inline `InputGroupButton` (four pill sizes) and a multi-line `InputGroupTextarea`",
       "status": "Parity",
       "catalogueUrl": "/primitives/inputgroup"
+    },
+    {
+      "name": "InputOtp",
+      "slug": "inputotp",
+      "description": "One-time-password segmented input; one hidden input drives the slots, so paste and `one-time-code` autofill work natively",
+      "status": "Parity",
+      "catalogueUrl": "/primitives/inputotp"
     },
     {
       "name": "Kbd",
@@ -265,7 +279,7 @@
     {
       "name": "NavigationMenu",
       "slug": "navigationmenu",
-      "description": "Multi-level menu with flyout panels",
+      "description": "Multi-level menu with flyout panels; the `<nav>` landmark carries a default accessible name",
       "status": "Parity",
       "catalogueUrl": "/primitives/navigationmenu"
     },
@@ -279,7 +293,7 @@
     {
       "name": "Popover",
       "slug": "popover",
-      "description": "Anchor-positioned popover surface",
+      "description": "Headless anchor-positioned popover surface; consumers supply the surface styling via `ClassName`. Optional `Role` / `AriaLabel` for popups that are a dialog in their own right",
       "status": "Parity",
       "catalogueUrl": "/primitives/popover"
     },
@@ -384,7 +398,7 @@
     {
       "name": "StackNavigation",
       "slug": "stacknavigation",
-      "description": "Icon-and-label navigation rail with vertical or horizontal orientation",
+      "description": "Icon-and-label navigation rail with vertical or horizontal orientation; items with `OnItemClick` render as buttons, and `AriaLabel` promotes the list container to a named `<nav>` landmark",
       "status": "Parity",
       "catalogueUrl": "/primitives/stacknavigation"
     },
@@ -447,7 +461,7 @@
     {
       "name": "TimePicker",
       "slug": "timepicker",
-      "description": "Time input control",
+      "description": "Native `input type=time`, not a port of Blok's Popover + three Selects composite. Status badge under review — see the TimePicker section in docs/ui-parity-audit.md",
       "status": "Parity",
       "catalogueUrl": "/primitives/timepicker"
     },
@@ -482,7 +496,7 @@
     {
       "name": "TreeView",
       "slug": "treeview",
-      "description": "Hierarchical collapsible tree",
+      "description": "Generic hierarchical collapsible tree over any `TItem`. Supersedes Blok's narrower `file-tree.tsx` (see the FileTree row) rather than porting it.",
       "status": "Additional",
       "catalogueUrl": "/primitives/treeview"
     }
@@ -706,6 +720,14 @@
     },
     {
       "family": "Data",
+      "name": "FilterChipBar",
+      "slug": "filter-chip-bar",
+      "description": "Row of applied-filter chips — Filters, ClearAction",
+      "interactivity": "Ssr",
+      "catalogueUrl": "/chunks/filter-chip-bar"
+    },
+    {
+      "family": "Data",
       "name": "KvList",
       "slug": "kv-list",
       "description": "Label/value definition list — ChildContent of KvListItem",
@@ -775,14 +797,6 @@
       "description": "Drop-zone file picker — click or drag-and-drop, IBrowserFile",
       "interactivity": "Interactive",
       "catalogueUrl": "/chunks/file-upload"
-    },
-    {
-      "family": "Forms",
-      "name": "FilterBar",
-      "slug": "filter-bar",
-      "description": "Horizontal filter chip row — Filters, ClearAction",
-      "interactivity": "Ssr",
-      "catalogueUrl": "/chunks/filter-bar"
     },
     {
       "family": "Forms",

@@ -18,14 +18,18 @@
 
 	private bool IsPressed => Parent.IsItemPressed( Value );
 
-	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors outline-none cursor-pointer",
+	@* See Toggle.razor: rounding is per-variant so the Rounded variant is not fighting a base
+	   rounded-md through CSS ordering. *@
+	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors outline-none cursor-pointer",
 		"hover:bg-neutral-bg hover:text-muted-foreground",
 		"disabled:pointer-events-none disabled:opacity-50",
 		"data-[state=on]:bg-primary-bg data-[state=on]:text-primary-fg",
 		"[&_svg]:pointer-events-none [&_svg]:shrink-0",
 		"min-w-0 flex-1 shrink-0 shadow-none focus:z-10 focus-visible:z-10" )
-										.With( "bg-transparent", Parent.Variant is ToggleVariant.Default )
-										.With( "border border-input bg-transparent", Parent.Variant is ToggleVariant.Outline )
+										.With( "bg-transparent rounded-md", Parent.Variant is ToggleVariant.Default )
+										.With( "border border-input bg-transparent rounded-md", Parent.Variant is ToggleVariant.Outline )
+										.With( "bg-transparent rounded-md", Parent.Variant is ToggleVariant.Square )
+										.With( "bg-transparent rounded-full", Parent.Variant is ToggleVariant.Rounded )
 										.With( "h-9 min-w-9 px-2", Parent.Size is ToggleSize.Default )
 										.With( "h-8 min-w-8 px-1.5", Parent.Size is ToggleSize.Sm )
 										.With( "h-11 min-w-11 px-3", Parent.Size is ToggleSize.Lg )

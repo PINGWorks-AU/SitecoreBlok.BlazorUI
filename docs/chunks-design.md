@@ -373,7 +373,6 @@ Bindings are unified — every `*Field` exposes `Value` / `ValueChanged`, regard
 | `InlineForm` | Single-row form for search-and-go / subscribe / quick-add. | Props: `OnSubmit`. ChildContent. |
 | `WizardShell` | Stepper header + per-step body + Back/Next footer. | Props: `Steps`, `CurrentStep`, `CurrentStepChanged`. Slot: `StepContent`. Scoped service `WizardState` (see §10.2). |
 | `SearchBar` | Toolbar pattern: `SearchInput` + filter slot + result-count slot. | Props: `Query`, `QueryChanged`, `ResultCount`. Slot: `Filters`. |
-| `FilterBar` | Horizontal filter chip row. | Slots: `Filters`, `ClearAction`. |
 | `LoginForm` | Opinionated login template (email/password/submit + footer slot). | Props: `OnSubmit`, `Title`, `Description`. Slots: `Footer`. |
 | `ConfirmDialog` | `Dialog`-based confirm-action wrapper. | Props: `Title`, `Message`, `ConfirmLabel`, `CancelLabel`, `Tone` (shared `Tone` enum — typically `Danger` or `Warning`), `Open`, `OpenChanged`, `OnConfirm`. |
 
@@ -391,6 +390,7 @@ Bindings are unified — every `*Field` exposes `Value` / `ValueChanged`, regard
 | `BulkActionBar` | Selection-driven action bar appearing above a table when rows selected. | Props: `SelectedCount`, `OnClear`. Slot: `Actions`. |
 | `RowActions` | Table-row dropdown action menu pattern. | Slot: `Items` (DropdownMenuItem children). Props: `IconSvg` (defaults to MoreHorizontal). |
 | `FilterChip` | Single removable filter chip with label and ✕. | Props: `Label`, `OnRemove`, `IconSvg`. |
+| `FilterChipBar` | Row of applied-filter chips; pairs with `FilterChip`. Not Blok's `FilterBar` primitive, which holds the live controls. | Slots: `Filters`, `ClearAction`. |
 | `EmptyTable` | Empty state inside a `Table` aware of column count. | Props: `ColumnCount`, `Message`, `IconSvg`. Slot: `Action`. |
 
 ### 7.7 Marketplace/ — 5

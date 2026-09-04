@@ -14,6 +14,20 @@
 	[Parameter] public EventCallback OnClose { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 
+	/// <summary>
+	/// ARIA role for the popup container. Null (the default) leaves the container role-less, which
+	/// is correct when the content supplies its own role — <c>SelectContent</c> renders
+	/// <c>role="listbox"</c> inside it. Set to <c>dialog</c> for popups that are a dialog in their
+	/// own right, and pair it with <see cref="AriaLabel"/> so the dialog has an accessible name.
+	/// </summary>
+	[Parameter] public string? Role { get; set; }
+
+	/// <summary>
+	/// <c>aria-label</c> for the popup container. Only meaningful alongside <see cref="Role"/> —
+	/// <c>aria-label</c> on a role-less element is ignored by assistive technology.
+	/// </summary>
+	[Parameter] public string? AriaLabel { get; set; }
+
 	public ElementReference? Anchor { get; set; }
 
 	override protected void OnInitialized()

@@ -43,7 +43,7 @@ public enum SpinnerVariant { Default, Primary }
 public enum SwitchVariant { Primary, Danger, Success }
 
 // Toggle **************************************************************************************************
-public enum ToggleVariant { Default, Outline }
+public enum ToggleVariant { Default, Outline, Square, Rounded }
 public enum ToggleSize { Default, Sm, Lg }
 public enum ToggleGroupType { Single, Multiple }
 
@@ -53,6 +53,11 @@ public enum FieldOrientation { Vertical, Horizontal }
 
 // InputGroup **********************************************************************************************
 public enum InputGroupAlign { InlineStart, InlineEnd, BlockStart, BlockEnd }
+public enum InputGroupButtonSize { Xs, Sm, IconXs, IconSm }
+
+// Filter *************************************************************************************************
+public enum FilterDisplayMode { Text, Badge }
+public enum FilterBarDirection { Horizontal, Vertical }
 
 // Tabs ****************************************************************************************************
 public enum TabsVariant { Line, SoftRounded }

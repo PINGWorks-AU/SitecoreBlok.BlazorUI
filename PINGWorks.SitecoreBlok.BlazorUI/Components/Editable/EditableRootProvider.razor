@@ -19,6 +19,7 @@
 	[Parameter] public string Placeholder { get; set; } = "Click to edit...";
 	[Parameter] public bool IsDisabled { get; set; }
 	[Parameter] public bool IsPreviewFocusable { get; set; } = true;
+	[Parameter] public bool HasError { get; set; }
 	[Parameter] public bool SubmitOnBlur { get; set; } = true;
 	[Parameter] public bool SelectAllOnFocus { get; set; } = true;
 	[Parameter] public EditableActivationMode ActivationMode { get; set; } = EditableActivationMode.Click;
@@ -63,13 +64,13 @@
 	private async Task CancelEditAsync()
 	{
 		if (ValueChanged.HasDelegate) await ValueChanged.InvokeAsync(PreviousValue);
-		if (IsEditingChanged.HasDelegate) await IsEditingChanged.InvokeAsync(false);
+		if (IsEditingChanged.HasDelegate) await IsEditingChanged.InvokeAsync(HasError);
 		if (OnCancel.HasDelegate) await OnCancel.InvokeAsync(PreviousValue);
 	}
 
 	private async Task SubmitEditAsync()
 	{
-		if (IsEditingChanged.HasDelegate) await IsEditingChanged.InvokeAsync(false);
+		if (IsEditingChanged.HasDelegate) await IsEditingChanged.InvokeAsync(HasError);
 		if (OnSubmit.HasDelegate) await OnSubmit.InvokeAsync(Value);
 	}
 
@@ -78,7 +79,7 @@
 		if (ValueChanged.HasDelegate) await ValueChanged.InvokeAsync(value);
 	}
 
-	private string CssClass => CssClassBuilder.Start("inline-flex flex-col gap-1")
+	private string CssClass => CssClassBuilder.Start("inline-flex flex-col gap-1 relative")
 		.With("text-sm", Size is EditableSize.Sm)
 		.With("text-md", Size is EditableSize.Md)
 		.With("text-lg", Size is EditableSize.Lg)

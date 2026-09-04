@@ -12,8 +12,10 @@
 				<div class="flex items-center justify-between w-full relative px-1">
 					@if ( isFirst )
 					{
-						<button type="button" class="inline-flex items-center justify-center size-8 rounded-md bg-transparent opacity-50 hover:opacity-100 cursor-pointer" @onclick="PreviousMonth">
-							<Icon Svg="@IconSvg.ChevronLeft" Scale="0.9" ResetClassName />
+						<button type="button" class="inline-flex items-center justify-center size-8 rounded-md bg-transparent opacity-50 hover:opacity-100 cursor-pointer"
+								aria-label="@PreviousMonthLabel" aria-disabled="@PreviousDisabledAttr" tabindex="@PreviousTabIndexAttr"
+								@onclick="PreviousMonth">
+							<Icon Svg="@IconSvg.ChevronLeft" Scale="0.9" ClassName="text-neutral size-4" ResetClassName />
 						</button>
 					}
 					else
@@ -25,43 +27,39 @@
 						var offset = mi;
 					}
 					<div class="flex items-center gap-1.5">
-						<div class="relative border border-input rounded-md h-8 flex items-center px-2">
-							<span class="text-sm font-medium select-none flex items-center gap-1">
-								@( monthDate.ToString( "MMM" ) )
-								<Icon Svg="@IconSvg.ChevronDown" ClassName="size-3.5 text-muted-foreground" />
-							</span>
-							@* Native <select> popup styling in dark mode is unreliable across browsers
-							   when the element is `opacity-0` — Edge and some Chrome versions ignore
-							   `color-scheme` on transparent form controls. Style `<option>` elements
-							   directly: Chromium browsers honour bg-color/color set on options for the
-							   open popup. (Firefox is less consistent but still readable.) *@
-							<select value="@monthDate.Month" name="calendar-month" @onchange="e => OnMonthChangeForPanel( e, offset )"
-									class="absolute inset-0 opacity-0 cursor-pointer w-full dark:[color-scheme:dark] dark:[&_option]:bg-background dark:[&_option]:text-foreground">
+						<Select Value="@monthDate.Month.ToString()" ValueLabel="@( monthDate.ToString( "MMM" ) )" ValueChanged="v => OnMonthSelected( v, offset )">
+							<SelectTrigger Sm="true" aria-label="@MonthDropdownLabel"
+										   ClassName="z-50 px-3 text-sm [&_svg:not([class*='text-'])]:text-accent-foreground bg-transparent dark:bg-transparent dark:hover:bg-transparent">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent ClassName="rounded-md p-0 min-w-20">
 								@for ( var m = 1; m <= 12; m++ )
 								{
-									<option value="@m" selected="@( m == monthDate.Month )">@( new DateTime( 2000, m, 1 ).ToString( "MMM" ) )</option>
+									var monthLabel = new DateTime( 2000, m, 1 ).ToString( "MMM" );
+									<SelectItem Value="@m.ToString()" Label="@monthLabel" ClassName="cursor-pointer px-3 py-1.5 text-sm" />
 								}
-							</select>
-						</div>
-						<div class="relative border border-input rounded-md h-8 flex items-center px-2">
-							<span class="text-sm font-medium select-none flex items-center gap-1">
-								@monthDate.Year
-								<Icon Svg="@IconSvg.ChevronDown" ClassName="size-3.5 text-muted-foreground" />
-							</span>
-							<select value="@monthDate.Year" name="calendar-year" @onchange="e => OnYearChangeForPanel( e, offset )"
-									class="absolute inset-0 opacity-0 cursor-pointer w-full dark:[color-scheme:dark] dark:[&_option]:bg-background dark:[&_option]:text-foreground">
+							</SelectContent>
+						</Select>
+						<Select Value="@monthDate.Year.ToString()" ValueLabel="@monthDate.Year.ToString()" ValueChanged="v => OnYearSelected( v, offset )">
+							<SelectTrigger Sm="true" aria-label="@YearDropdownLabel"
+										   ClassName="z-50 px-3 text-sm [&_svg:not([class*='text-'])]:text-accent-foreground bg-transparent dark:bg-transparent dark:hover:bg-transparent">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent ClassName="rounded-md p-0 min-w-20">
 								@for ( var y = YearStart; y <= YearEnd; y++ )
 								{
-									<option value="@y" selected="@( y == monthDate.Year )">@y</option>
+									<SelectItem Value="@y.ToString()" Label="@y.ToString()" ClassName="cursor-pointer px-3 py-1.5 text-sm" />
 								}
-							</select>
-						</div>
+							</SelectContent>
+						</Select>
 					</div>
 
 					@if ( isLast )
 					{
-						<button type="button" class="inline-flex items-center justify-center size-8 rounded-md bg-transparent opacity-50 hover:opacity-100 cursor-pointer" @onclick="NextMonth">
-							<Icon Svg="@IconSvg.ChevronRight" Scale="0.9" ResetClassName />
+						<button type="button" class="inline-flex items-center justify-center size-8 rounded-md bg-transparent opacity-50 hover:opacity-100 cursor-pointer"
+								aria-label="@NextMonthLabel" aria-disabled="@NextDisabledAttr" tabindex="@NextTabIndexAttr"
+								@onclick="NextMonth">
+							<Icon Svg="@IconSvg.ChevronRight" Scale="0.9" ClassName="text-neutral size-4" ResetClassName />
 						</button>
 					}
 					else
@@ -94,7 +92,13 @@
 
 								<button type="button" @onclick="() => SelectDate( date )"
 										disabled="@( isDisabled )"
-										aria-selected="@( isSelected || isRangeStart || isRangeEnd || isRangeMiddle ? "true" : "false" )"
+										aria-label="@DayAriaLabel( date )"
+										aria-pressed="@( isSelected || isRangeStart || isRangeEnd || isRangeMiddle ? "true" : "false" )"
+										data-day="@DayIso( date )"
+										data-selected="@( isSelected || isRangeStart || isRangeEnd || isRangeMiddle ? "true" : "false" )"
+										data-range-start="@( isRangeStart ? "true" : null )"
+										data-range-end="@( isRangeEnd ? "true" : null )"
+										data-range-middle="@( isRangeMiddle ? "true" : null )"
 										class="@DayCssClass( isCurrent, isSelected, isToday, isDisabled, isRangeStart, isRangeEnd, isRangeMiddle )">
 									@date.Day
 								</button>
@@ -121,6 +125,45 @@
 	[Parameter] public int YearRangeEnd { get; set; } = DateTime.Today.Year + 10;
 	[Parameter] public int NumberOfMonths { get; set; } = 1;
 	[Parameter] public bool? Range { get; set; }
+	[Parameter] public CalendarAriaLabels? AriaLabels { get; set; }
+
+	private string PreviousMonthLabel => AriaLabels?.PreviousMonth ?? "Go to previous month";
+	private string NextMonthLabel => AriaLabels?.NextMonth ?? "Go to next month";
+	private string MonthDropdownLabel => AriaLabels?.MonthDropdown ?? "Choose the month";
+	private string YearDropdownLabel => AriaLabels?.YearDropdown ?? "Choose the year";
+
+	private string? PreviousDisabledAttr => CanGoPrevious ? null : "true";
+	private string? NextDisabledAttr => CanGoNext ? null : "true";
+	private string? PreviousTabIndexAttr => CanGoPrevious ? null : "-1";
+	private string? NextTabIndexAttr => CanGoNext ? null : "-1";
+
+	private bool CanGoPrevious
+	{
+		get
+		{
+			if ( !MinDate.HasValue )
+				return true;
+
+			var lastDayOfPreviousMonth = DisplayDate.AddDays( -1 );
+			return lastDayOfPreviousMonth.Date >= MinDate.Value.Date;
+		}
+	}
+
+	private bool CanGoNext
+	{
+		get
+		{
+			if ( !MaxDate.HasValue )
+				return true;
+
+			var firstDayAfterLastPanel = DisplayDate.AddMonths( NumberOfMonths );
+			return firstDayAfterLastPanel.Date <= MaxDate.Value.Date;
+		}
+	}
+
+	private static string DayAriaLabel( DateTime date ) => $"Select {date:D}";
+
+	private static string DayIso( DateTime date ) => date.ToString( "yyyy-MM-dd" );
 
 	private bool IsRange => Range.HasValue ? Range.Value : ( RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate );
 
@@ -149,12 +192,12 @@
 	private static string DayCssClass( bool isCurrentMonth, bool isSelected, bool isToday, bool isDisabled,
 									   bool isRangeStart, bool isRangeEnd, bool isRangeMiddle )
 	{
-		return CssClassBuilder.Start( "inline-flex items-center justify-center size-8 text-sm font-normal flex-1 border border-transparent cursor-pointer" )
+		return CssClassBuilder.Start( "inline-flex items-center justify-center size-8 text-sm font-normal flex-1 border border-solid border-transparent cursor-pointer" )
 										.With( "bg-primary-500 text-white hover:bg-primary-600 rounded-md", isSelected )
 										.With( "bg-primary-500 text-white hover:bg-primary-600 rounded-l-md rounded-r-none", isRangeStart && !isRangeEnd )
 										.With( "bg-primary-500 text-white hover:bg-primary-600 rounded-md", isRangeStart && isRangeEnd )
 										.With( "bg-primary-500 text-white hover:bg-primary-600 rounded-r-md rounded-l-none", isRangeEnd && !isRangeStart )
-										.With( "bg-primary-bg text-foreground rounded-none", isRangeMiddle )
+										.With( "bg-primary-bg text-primary-fg hover:bg-primary hover:text-inverse-text rounded-none", isRangeMiddle )
 										.With( "hover:bg-primary hover:text-inverse-text rounded-md", !isSelected && !isRangeStart && !isRangeEnd && !isRangeMiddle && isCurrentMonth && !isDisabled )
 										.With( "bg-accent text-accent-foreground rounded-md", isToday && !isSelected && !isRangeStart && !isRangeEnd && !isRangeMiddle && isCurrentMonth )
 										.With( "text-muted-foreground", !isCurrentMonth )
@@ -227,26 +270,41 @@
 		}
 	}
 
-	private void OnMonthChangeForPanel( ChangeEventArgs e, int panelOffset )
+	private void OnMonthSelected( string? value, int panelOffset )
 	{
-		if ( !int.TryParse( e.Value?.ToString(), out var month ) ) return;
+		if ( !int.TryParse( value, out var month ) )
+			return;
 
 		var panelDate = DisplayDate.AddMonths( panelOffset );
 		var targetDate = new DateTime( panelDate.Year, month, 1 );
 		DisplayDate = targetDate.AddMonths( -panelOffset );
 	}
 
-	private void OnYearChangeForPanel( ChangeEventArgs e, int panelOffset )
+	private void OnYearSelected( string? value, int panelOffset )
 	{
-		if ( !int.TryParse( e.Value?.ToString(), out var year ) ) return;
+		if ( !int.TryParse( value, out var year ) )
+			return;
 
 		var panelDate = DisplayDate.AddMonths( panelOffset );
 		var targetDate = new DateTime( year, panelDate.Month, 1 );
 		DisplayDate = targetDate.AddMonths( -panelOffset );
 	}
 
-	private void PreviousMonth() => DisplayDate = DisplayDate.AddMonths( -1 );
-	private void NextMonth() => DisplayDate = DisplayDate.AddMonths( 1 );
+	private void PreviousMonth()
+	{
+		if ( !CanGoPrevious )
+			return;
+
+		DisplayDate = DisplayDate.AddMonths( -1 );
+	}
+
+	private void NextMonth()
+	{
+		if ( !CanGoNext )
+			return;
+
+		DisplayDate = DisplayDate.AddMonths( 1 );
+	}
 
 	private static List<DateTime[]> GetWeeksForMonth( DateTime monthDate )
 	{

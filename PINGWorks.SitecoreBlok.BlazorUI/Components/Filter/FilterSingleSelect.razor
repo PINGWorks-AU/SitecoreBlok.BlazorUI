@@ -1,0 +1,187 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+@inherits FilterSelectBase
+
+<div class="@RootCssClass" @onkeydown="OnKeyDown" @attributes="AdditionalAttributes">
+	<div class="relative inline-flex w-fit">
+		@* The trigger is the positioning anchor; FilterSelectBase measures it on open. *@
+		<button @ref="AnchorRef" type="button" data-slot="filter-single-select-trigger"
+				data-state="@( IsOpen ? "open" : "closed" )"
+				aria-haspopup="listbox" aria-expanded="@( IsOpen ? "true" : "false" )"
+				aria-label="@TriggerLabel" aria-describedby="@DescribedBy"
+				disabled="@Disabled" name="@Name"
+				class="@TriggerCssClass" @onclick="Toggle">
+			<span class="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden text-left pointer-events-none">
+				<span class="@LabelCssClass">@Placeholder</span>
+				@if ( SelectedLabel is not null )
+				{
+					<span class="@StateTextCssClass">:</span>
+					<span class="@( $"font-normal truncate min-w-0 ml-0.5 {StateTextCssClass}" )">@SelectedLabel</span>
+				}
+			</span>
+			@if ( !( HasValue && ShowClear ) )
+			{
+				<Icon Svg="@IconSvg.ChevronDown" ClassName="size-4 shrink-0 pointer-events-none text-current" />
+			}
+		</button>
+
+		@if ( ShowClear && HasValue )
+		{
+			<Button OnClick="Clear" Variant="ButtonVariant.Ghost" Size="ButtonSize.IconXs" ColorScheme="ButtonColor.Neutral"
+					aria-label="@( AriaLabels?.ClearSelection ?? "Clear selection" )"
+					ClassName="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-auto text-neutral-fg hover:bg-neutral-bg-active">
+				<Icon Svg="@IconSvg.Close" Scale="0.75" />
+			</Button>
+		}
+	</div>
+
+	@if ( IsOpen )
+	{
+		<div class="fixed inset-0 z-40" @onclick="CloseDropdown"></div>
+	}
+
+	@* Anti-revert: `fixed` must stay in the class string or the inline left/top are inert and the
+	   dropdown flows in document order. Same pattern as ComboboxContent and DropdownMenuContent. *@
+	<div data-slot="filter-single-select-content" data-state="@( IsOpen ? "open" : "closed" )"
+		 class="@DropdownCssClass" style="@DropdownStyle">
+		@if ( Searchable && ShowSearch )
+		{
+			<div class="mb-2">
+				<SearchInput ClassName="h-10 border-border has-[[data-slot=search-input-control]:focus-visible]:border-primary">
+					<SearchInputLeftElement>
+						<Icon Svg="@IconSvg.Magnify" Scale="0.9" ClassName="text-muted-foreground" />
+					</SearchInputLeftElement>
+					<SearchInputField Value="@SearchQuery" ValueChanged="OnSearchChanged"
+									  Placeholder="@SearchPlaceholder" ClassName="placeholder:text-muted-foreground"
+									  aria-label="@( AriaLabels?.SearchInput ?? SearchPlaceholder )" />
+					@if ( SearchQuery.Length > 0 )
+					{
+						<SearchInputRightElement>
+							<SearchInputClearButton OnClear="@( () => OnSearchChanged( string.Empty ) )" AriaLabel="Clear search" />
+						</SearchInputRightElement>
+					}
+				</SearchInput>
+			</div>
+		}
+
+		<div class="max-h-80 w-full -mx-1 px-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
+			 style="scrollbar-width:thin;scrollbar-color:var(--border) transparent;">
+			<div class="py-0.5" role="listbox" aria-label="@ListboxLabel">
+				@if ( FilteredOptions.Count == 0 )
+				{
+					<div class="py-6 text-center text-sm text-muted-foreground">@NoResultsText</div>
+				}
+				else
+				{
+					@foreach ( var option in FilteredOptions )
+					{
+						var current = option;
+						<button type="button" role="option"
+								aria-selected="@( Value == current.Value ? "true" : "false" )"
+								disabled="@current.Disabled"
+								class="@OptionCssClass( current )"
+								@onclick="@( () => SelectOption( current ) )">
+							<span class="min-w-0 truncate">
+								@if ( RenderOption is not null )
+								{
+									@RenderOption( current )
+								}
+								else if ( current.Description is not null )
+								{
+									<span class="flex flex-col gap-0.5">
+										<span>@current.Label</span>
+										<span class="text-xs text-muted-foreground">@current.Description</span>
+									</span>
+								}
+								else
+								{
+									@current.Label
+								}
+							</span>
+							@if ( Value == current.Value )
+							{
+								<Icon Svg="@IconSvg.Check" Scale="0.9" ClassName="size-4 shrink-0 text-primary-fg" />
+							}
+						</button>
+					}
+				}
+			</div>
+		</div>
+	</div>
+
+	@if ( HelperText is not null )
+	{
+		<p id="@HelperId" class="mt-1 text-xs text-muted-foreground">@HelperText</p>
+	}
+</div>
+
+@code {
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+	private bool HasValue => !string.IsNullOrEmpty( Value );
+
+	private string? SelectedLabel
+		=> HasValue ? AllOptions.FirstOrDefault( o => o.Value == Value )?.Label : null;
+
+	private string StateTextCssClass => IsOpen ? "text-primary-fg" : "text-neutral-fg";
+
+	private string LabelCssClass => $"font-semibold truncate {StateTextCssClass}";
+
+	protected override void OnAfterRender( bool firstRender )
+	{
+		if ( firstRender )
+			HasAnchorRef = true;
+	}
+
+	private string RootCssClass => CssClassBuilder.Start( "relative inline-flex w-fit flex-col" )
+										.With( ClassName )
+										.Build();
+
+	private string TriggerCssClass => CssClassBuilder.Start(
+		"border-border text-md text-neutral-fg font-semibold outline-none focus-visible:ring-1 focus-visible:ring-ring/50",
+		"aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+		"bg-body-bg hover:bg-neutral-bg dark:bg-input/30 dark:hover:bg-input/50",
+		"flex w-fit min-w-0 max-w-full items-center justify-between gap-2 rounded-md border-1 px-3 py-2 whitespace-nowrap transition-[color] h-10 cursor-pointer",
+		"disabled:cursor-not-allowed disabled:opacity-50",
+		"data-[state=open]:border-primary data-[state=open]:border-2 data-[state=open]:bg-primary-bg data-[state=open]:text-primary-fg data-[state=open]:hover:bg-primary-bg",
+		"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&>svg]:!text-current [&>svg]:!opacity-100" )
+										.With( "pr-8 overflow-hidden", HasValue && ShowClear )
+										.Build();
+
+	private string DropdownCssClass => CssClassBuilder.Start(
+		"fixed z-50 w-54 min-w-54 rounded-lg border border-border bg-popover text-popover-foreground shadow-md outline-none p-2" )
+										.With( DropdownClassName )
+										.Build();
+
+	private string DropdownStyle
+		=> IsOpen ? $"left:{X}px;top:{Y}px;" : "display:none";
+
+	private string OptionCssClass( FilterOption option ) => CssClassBuilder.Start(
+		"h-auto min-h-0 w-full flex items-center justify-between rounded-sm px-2 py-1 text-left text-sm font-normal cursor-pointer",
+		"hover:bg-accent/50 focus-visible:bg-accent/50 outline-none" )
+										.With( "opacity-50 cursor-not-allowed pointer-events-none", option.Disabled )
+										.Build();
+
+	private async Task SelectOption( FilterOption option )
+	{
+		if ( option.Disabled )
+			return;
+
+		Value = option.Value;
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+
+		await CloseDropdown();
+	}
+
+	private async Task Clear()
+	{
+		Value = string.Empty;
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+
+		await InvokeAsync( StateHasChanged );
+	}
+}

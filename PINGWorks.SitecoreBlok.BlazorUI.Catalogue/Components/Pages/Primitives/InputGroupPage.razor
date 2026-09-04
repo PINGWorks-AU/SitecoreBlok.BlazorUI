@@ -40,6 +40,39 @@
 			</InputGroup>
 		</ComponentExample>
 
+		<ComponentExample Title="With an inline button" Code="@("<InputGroup>\n    <InputGroupInput Placeholder=\"Search...\" />\n    <InputGroupAddon Align=\"InputGroupAlign.InlineEnd\">\n        <InputGroupButton Size=\"InputGroupButtonSize.IconXs\" AriaLabel=\"Clear search\">\n            <Icon Svg=\"@IconSvg.Close\" />\n        </InputGroupButton>\n    </InputGroupAddon>\n</InputGroup>")">
+			<InputGroup>
+				<InputGroupInput Placeholder="Search..." />
+				<InputGroupAddon Align="InputGroupAlign.InlineEnd">
+					<InputGroupButton Size="InputGroupButtonSize.IconXs" AriaLabel="Clear search">
+						<Icon Svg="@IconSvg.Close" />
+					</InputGroupButton>
+				</InputGroupAddon>
+			</InputGroup>
+		</ComponentExample>
+
+		<ComponentExample Title="Button sizes" Code="@("<InputGroupButton Size=\"InputGroupButtonSize.Xs\">Xs</InputGroupButton>\n<InputGroupButton Size=\"InputGroupButtonSize.Sm\">Sm</InputGroupButton>\n<InputGroupButton Size=\"InputGroupButtonSize.IconXs\" AriaLabel=\"Add\">\n    <Icon Svg=\"@IconSvg.Plus\" />\n</InputGroupButton>\n<InputGroupButton Size=\"InputGroupButtonSize.IconSm\" AriaLabel=\"Add\">\n    <Icon Svg=\"@IconSvg.Plus\" />\n</InputGroupButton>")">
+			<div class="flex items-center gap-3">
+				<InputGroupButton Size="InputGroupButtonSize.Xs">Xs</InputGroupButton>
+				<InputGroupButton Size="InputGroupButtonSize.Sm">Sm</InputGroupButton>
+				<InputGroupButton Size="InputGroupButtonSize.IconXs" AriaLabel="Add">
+					<Icon Svg="@IconSvg.Plus" />
+				</InputGroupButton>
+				<InputGroupButton Size="InputGroupButtonSize.IconSm" AriaLabel="Add">
+					<Icon Svg="@IconSvg.Plus" />
+				</InputGroupButton>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Multi-line control" Code="@("<InputGroup>\n    <InputGroupTextarea Placeholder=\"Leave a comment...\" Rows=\"4\" />\n    <InputGroupAddon Align=\"InputGroupAlign.BlockEnd\">\n        <InputGroupButton Size=\"InputGroupButtonSize.Sm\">Send</InputGroupButton>\n    </InputGroupAddon>\n</InputGroup>")">
+			<InputGroup>
+				<InputGroupTextarea Placeholder="Leave a comment..." Rows="4" />
+				<InputGroupAddon Align="InputGroupAlign.BlockEnd">
+					<InputGroupButton Size="InputGroupButtonSize.Sm">Send</InputGroupButton>
+				</InputGroupAddon>
+			</InputGroup>
+		</ComponentExample>
+
 	</ExamplesSection>
 
 </ComponentPage>
@@ -81,6 +114,37 @@
 				new ApiProperty( "Disabled",             "bool",                          false, "When true, disables the input. Default: `false`." ),
 				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<input>`." ),
 				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<input>`." ),
+			]
+		),
+		new ApiElement(
+			Name: "InputGroupButton",
+			Description: "Inline action button for an `InputGroupAddon` — clear, submit, reveal-password and similar. Wraps `Button` with a pill-shaped size scale of its own.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Size",                 "InputGroupButtonSize",          false, "Size scale. Default: `InputGroupButtonSize.Xs`. Other values: `Sm`, `IconXs`, `IconSm` — the two icon sizes are square and drop horizontal padding." ),
+				new ApiProperty( "Variant",              "ButtonVariant",                 false, "Passed through to `Button`. Default: `ButtonVariant.Ghost`." ),
+				new ApiProperty( "AriaLabel",            "string?",                       false, "Accessible name. Needed in practice for the icon-only sizes. Use this rather than a `title` attribute — `Button.Title` is the button's visible text, so a `title` would render as content." ),
+				new ApiProperty( "OnClick",              "EventCallback",                 false, "Invoked when the button is clicked." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, disables the button. Default: `false`." ),
+				new ApiProperty( "ChildContent",         "RenderFragment?",               false, "Button content — a label, an `Icon`, or both." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes. `Button` suppresses its own size utilities when yours set the same property, so passing `h-`, `px-`, `rounded` or `size-` here overrides cleanly." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the underlying `Button`." ),
+			]
+		),
+		new ApiElement(
+			Name: "InputGroupTextarea",
+			Description: "Multi-line editable control inside an `InputGroup`, for comment boxes and prompt inputs. Pairs with an `InputGroupAddon` aligned to `BlockEnd` to place actions beneath the text.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                       false, "Two-way bindable current value." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",        false, "Invoked on input. Pair with `Value` via `@bind-Value`." ),
+				new ApiProperty( "Placeholder",          "string?",                       false, "Placeholder text shown when the value is empty." ),
+				new ApiProperty( "Rows",                 "int",                           false, "Visible row count. Default: `3`." ),
+				new ApiProperty( "Disabled",             "bool",                          false, "When true, disables the textarea. Default: `false`." ),
+				new ApiProperty( "ClassName",            "string?",                       false, "Extra CSS classes appended to the `<textarea>`." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",   false, "Captured unmatched attributes, forwarded to the `<textarea>`." ),
 			]
 		),
 		new ApiElement(

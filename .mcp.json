@@ -1,11 +1,8 @@
 {
-  "mcpServers": {
-    "shadcn": {
-      "command": "npx",
-      "args": ["-y", "shadcn@latest"],
-      "registries": {
-        "@blok": "https://blok.sitecore.com/r/{name}.json"
-      }
-    }
-  }
+	"mcpServers": {
+		"shadcn": {
+			"command": "npx",
+			"args": ["-y", "shadcn@latest", "mcp"]
+		}
+	}
 }

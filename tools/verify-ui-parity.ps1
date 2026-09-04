@@ -118,6 +118,22 @@ function Get-RazorClassStrings {
 
     $content = Get-Content -Path $Path -Raw
 
+    # Strip // line comments before parsing. The CssClassBuilder call pattern below cannot match
+    # a bare "(" inside the argument block, so a comment containing parentheses — e.g.
+    # "// addon (which is w-full) stays on the same row" — makes the whole Start(...) call fail to
+    # match, silently dropping EVERY class string in the file and reporting them all as drift.
+    # Only cut at a // that sits outside a string literal, so class strings are left intact.
+    $strippedLines = foreach ($line in ($content -split "`r?`n")) {
+        $idx = -1
+        $inString = $false
+        for ($c = 0; $c -lt $line.Length; $c++) {
+            if ($line[$c] -eq '"') { $inString = -not $inString }
+            elseif (-not $inString -and $c -lt $line.Length - 1 -and $line[$c] -eq '/' -and $line[$c + 1] -eq '/') { $idx = $c; break }
+        }
+        if ($idx -ge 0) { $line.Substring(0, $idx) } else { $line }
+    }
+    $content = $strippedLines -join "`n"
+
     $found = [System.Collections.Generic.List[string]]::new()
 
     # 1) CssClassBuilder chain — every "literal" passed to .Start/.With/.Reset
@@ -332,14 +348,30 @@ if (-not $SkipDrift) {
         # until we hit a Blok source file.
         $baseName = $compName
         $blokSrc = $null
-        $candidate = $baseName
-        for ($i = 0; $i -lt 4; $i++) {
+
+        # Blok file names are kebab-case (input-otp.tsx, stack-navigation.tsx), so try the
+        # kebab form of the FULL component name before falling back to word-stripping.
+        # Without this, InputOtp lowercases to "inputotp" (404), strips "Otp", and resolves to
+        # input.tsx — silently diffing a component against the wrong Blok source. InputGroup hit
+        # the same trap. Word-stripping still runs afterwards for genuine sub-components
+        # (AccordionItem -> accordion).
+        $kebab = [regex]::Replace([IO.Path]::GetFileNameWithoutExtension($fileName), '(?<!^)([A-Z])', '-$1').ToLowerInvariant()
+        $candidate = if ($kebab -ne $compName) { $kebab } else { $baseName }
+        $triedKebab = $false
+        for ($i = 0; $i -lt 5; $i++) {
             $blokUrl = "https://raw.githubusercontent.com/Sitecore/blok/main/src/components/ui/$candidate.tsx"
             try {
                 $blokSrc = Invoke-WebRequest -Uri $blokUrl -UseBasicParsing -ErrorAction Stop -TimeoutSec 10
                 $baseName = $candidate
                 break
             } catch {
+                # The kebab attempt is the extra first pass; fall back to the plain lowercase
+                # name before word-stripping begins.
+                if (-not $triedKebab -and $candidate -eq $kebab) {
+                    $triedKebab = $true
+                    $candidate = $compName
+                    continue
+                }
                 # Strip trailing PascalCase word from original name
                 $candidate = [IO.Path]::GetFileNameWithoutExtension($fileName)
                 $m = [regex]::Match($candidate, '^(.+?)[A-Z][a-z]+$')
@@ -359,7 +391,10 @@ if (-not $SkipDrift) {
         $relatedFiles = Get-ChildItem -Path $componentsDir -Filter *.razor -File -Recurse |
                         Where-Object {
                             $n = [IO.Path]::GetFileNameWithoutExtension($_.Name).ToLowerInvariant()
-                            $n -eq $baseName -or $n -like "$baseName*"
+                            # $baseName may be kebab-case (input-otp) while our file names are not
+                            # (InputOtpSlot -> inputotpslot), so match on both forms.
+                            $flat = $baseName -replace '-', ''
+                            $n -eq $baseName -or $n -like "$baseName*" -or $n -eq $flat -or $n -like "$flat*"
                         } | ForEach-Object { $_.FullName }
 
         $ourTokens = $relatedFiles |

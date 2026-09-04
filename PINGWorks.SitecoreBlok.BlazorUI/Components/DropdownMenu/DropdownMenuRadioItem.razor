@@ -1,0 +1,53 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="dropdown-menu-radio-item" role="menuitemradio"
+	 aria-checked="@( IsChecked ? "true" : "false" )"
+	 data-state="@( IsChecked ? "checked" : "unchecked" )"
+	 data-disabled="@( Disabled ? "" : null )"
+	 class="@CssClass" @onclick="HandleClick">
+	<span class="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+		@if ( IsChecked )
+		{
+			<Icon Svg="@IconSvg.Circle" Scale="0.45" ResetClassName />
+		}
+	</span>
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] public DropdownMenuRadioGroup? ParentRadioGroup { get; set; }
+	[CascadingParameter] public DropdownMenu? ParentDropdownMenu { get; set; }
+	[CascadingParameter] public ContextMenu? ParentContextMenu { get; set; }
+	[CascadingParameter] public DropdownMenuSub? ParentSub { get; set; }
+
+	[Parameter, EditorRequired] public required string? Value { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	private bool IsChecked => ParentRadioGroup?.IsSelected( Value ) ?? false;
+
+	private string CssClass => CssClassBuilder.Start(
+		"focus:bg-accent focus:text-accent-foreground relative flex cursor-pointer items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+		"hover:bg-neutral-bg",
+		"data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+		"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4" )
+										.With( ClassName )
+										.Build();
+
+	private async Task HandleClick()
+	{
+		if ( Disabled )
+			return;
+
+		if ( ParentRadioGroup is not null )
+			await ParentRadioGroup.SetValue( Value );
+
+		if ( ParentSub is not null )
+			await ParentSub.Close();
+		if ( ParentDropdownMenu is not null )
+			await ParentDropdownMenu.Close();
+		if ( ParentContextMenu is not null )
+			await ParentContextMenu.Close();
+	}
+}
