@@ -1074,3 +1074,39 @@ All predate today and were misleading on the public Home page:
 
 - **Toggle** claimed no `square`/`rounded` variants and no `xs` size. The variants landed in `405b46b`; `xs` landed today. With the icon swap now ported the entry has no remaining content, so it is removed from Known Feature Gaps — the API-shape difference lives on `TogglePage`'s `<DivergenceNote>`, which is where a divergence belongs rather than a gap list.
 - **DropdownMenu items** claimed `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup` and `DropdownMenuRadioItem` were all absent. All three were ported in `7087080`. Rewritten to cover only `DropdownMenuPortal`, which is a deliberate non-port rather than a gap.
+
+## Stepper aligned to Blok — 2026-09-04
+
+Stepper went 4 findings to 0; drift 37 to 33.
+
+### Size scale added
+
+Blok has `stepIconVariants` with `default` / `sm` / `lg`; ours hardcoded `size-8`. Added `StepperSize` and a `Size` parameter — `size-6 text-xs` / `size-8 text-sm` / `size-10 text-base`. Measured in the browser: 24px/12px, 32px/13px, 40px/14px.
+
+The step number was a `<span class="text-xs font-medium">` inside the circle, which pinned it at 12px regardless of size. The span is gone; `font-medium` moved to the circle and the font size now comes from the size arm, as in Blok. Same base-versus-variant conflict rule the Toggle pass surfaced — the font size lives only on the size arms, never on the base.
+
+### Description gained status variants
+
+Was a flat `text-xs text-muted-foreground`. Blok has `stepDescriptionVariants`: `text-sm` with `text-muted-foreground` for completed and active, `text-muted-foreground/70` for pending. Pending descriptions now recede as they should. The label likewise drops its `text-sm` to match Blok's `font-medium transition-colors`, inheriting size from the container.
+
+### The horizontal container — a visible change for existing consumers
+
+Blok's horizontal root is `flex items-center p-6 rounded-lg bg-muted/30 w-full gap-4`; ours had no padding, background or gap at all. The vertical root is `flex flex-col gap-4 h-full` against our `flex flex-col gap-0`.
+
+Adopting Blok's horizontal container means every existing horizontal Stepper picks up a muted rounded panel it did not have before. That is Blok's design and the row claims Parity, so it is adopted rather than skipped, but it is called out on `StepperPage`'s `<DivergenceNote>` because a consumer supplying their own container will now be nesting two.
+
+`bg-muted/30` carries `parity-no-text-pair`: the panel's own text comes from the label and description spans, which set their tokens explicitly per status.
+
+### The regression the container change caused, and the structural fix
+
+Adding `p-6` and `gap-4` while descriptions grew from `text-xs` to `text-sm` made every label wrap — "Create your account" broke across three lines.
+
+The cause is structural, not a token. Blok emits each step as **two siblings of the root**: a `shrink-0` block holding the circle and label column, then a separate `flex-1` connector. The step can never be squeezed; the connector absorbs all the slack. Ours wraps the step and its connector together in one per-step div with no `shrink-0`, so the flex algorithm compressed the labels instead of the connectors.
+
+Fixed without restructuring the markup: the per-step wrapper takes `flex-1 last:flex-none` and the circle-plus-label block takes `shrink-0`, which reproduces Blok's distribution. Verified — all four labels and descriptions now sit on single lines.
+
+Worth noting for the same reason as the Toggle font-size bug: **Check 3 was clean before and after this regression.** Every token Blok has was present the whole time. Flex distribution is a property of the markup tree, not the class list, and the harness compares class lists.
+
+### One transition artefact, not a bug
+
+Blok's circle variants carry `transition-colors`, which we now match. Screenshotting immediately after a theme flip catches the circles mid-animation and they read as solid dark fills. The settled light-mode state is correct: completed `rgb(110,63,255)` with white glyph, active white fill with primary border and primary number, pending white fill with a subtle border and muted number.

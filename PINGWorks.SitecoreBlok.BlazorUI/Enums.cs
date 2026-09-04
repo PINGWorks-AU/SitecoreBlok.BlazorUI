@@ -123,6 +123,7 @@ public enum TableSize { Sm, Md, Lg }
 
 // Stepper *************************************************************************************************
 public enum StepperOrientation { Horizontal, Vertical }
+public enum StepperSize { Default, Sm, Lg }
 public record StepperStep( string Label, string? Description = null );
 
 // Timeline ************************************************************************************************

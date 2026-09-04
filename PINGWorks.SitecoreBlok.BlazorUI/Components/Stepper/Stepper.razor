@@ -6,8 +6,8 @@
 		var step = Steps[i];
 		var state = i < ActiveStep ? "completed" : i == ActiveStep ? "active" : "pending";
 
-		<div class="@( Orientation is StepperOrientation.Horizontal ? "flex items-center" : "flex flex-col" )">
-			<div class="flex items-center gap-3">
+		<div class="@( Orientation is StepperOrientation.Horizontal ? "flex items-center flex-1 last:flex-none" : "flex flex-col" )">
+			<div class="flex items-center gap-3 shrink-0">
 				<div class="@StepCircleClass( state )">
 					@if ( state is "completed" )
 					{
@@ -15,14 +15,14 @@
 					}
 					else
 					{
-						<span class="text-xs font-medium">@( i + 1 )</span>
+						@( i + 1 )
 					}
 				</div>
 				<div class="flex flex-col">
 					<span class="@StepLabelClass( state )">@step.Label</span>
 					@if ( step.Description is not null )
 					{
-						<span class="text-xs text-muted-foreground">@step.Description</span>
+						<span class="@StepDescriptionClass( state )">@step.Description</span>
 					}
 				</div>
 			</div>
@@ -42,9 +42,12 @@
 	[Parameter] public EventCallback<int> ActiveStepChanged { get; set; }
 	[Parameter] public StepperOrientation Orientation { get; set; } = StepperOrientation.Horizontal;
 
+	/// <summary>Diameter and number size of the step circles. Default: <c>StepperSize.Default</c>.</summary>
+	[Parameter] public StepperSize Size { get; set; } = StepperSize.Default;
+
 	private string CssClass => CssClassBuilder.Start()
-										.With( "flex items-start gap-0", Orientation is StepperOrientation.Horizontal )
-										.With( "flex flex-col gap-0", Orientation is StepperOrientation.Vertical )
+										.With( "flex items-center p-6 rounded-lg bg-muted/30 parity-no-text-pair w-full gap-4", Orientation is StepperOrientation.Horizontal )
+										.With( "flex flex-col gap-4 h-full", Orientation is StepperOrientation.Vertical )
 										.With( ClassName )
 										.Build();
 
@@ -58,13 +61,21 @@
 	// extraction only scans CssClassBuilder.Start/With/Reset calls. A switch
 	// returning class strings would be invisible to the harness and every
 	// class inside would be reported as drift from the Blok source.
-	private static string StepCircleClass( string state ) => CssClassBuilder.Start( "flex items-center justify-center size-8 rounded-full border-2 shrink-0" )
+	private string StepCircleClass( string state ) => CssClassBuilder.Start( "flex items-center justify-center rounded-full border-2 shrink-0 font-medium transition-colors" )
 										.With( "border-primary bg-primary text-white", state is "completed" )
 										.With( "border-primary bg-background text-primary", state is "active" )
 										.With( "border-border bg-background text-muted-foreground", state is not "completed" and not "active" )
+										.With( "size-8 text-sm", Size is StepperSize.Default )
+										.With( "size-6 text-xs", Size is StepperSize.Sm )
+										.With( "size-10 text-base", Size is StepperSize.Lg )
 										.Build();
 
-	private static string StepLabelClass( string state ) => CssClassBuilder.Start( "text-sm font-medium" )
+	private static string StepDescriptionClass( string state ) => CssClassBuilder.Start( "text-sm transition-colors" )
+										.With( "text-muted-foreground", state is "completed" or "active" )
+										.With( "text-muted-foreground/70", state is not "completed" and not "active" )
+										.Build();
+
+	private static string StepLabelClass( string state ) => CssClassBuilder.Start( "font-medium transition-colors" )
 										.With( "text-foreground", state is "completed" or "active" )
 										.With( "text-muted-foreground", state is not "completed" and not "active" )
 										.Build();

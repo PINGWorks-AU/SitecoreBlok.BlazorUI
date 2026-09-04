@@ -1,6 +1,6 @@
 # UI Parity Report
 
-Generated: 2026-09-04 13:55:24  
+Generated: 2026-09-04 14:42:26  
 Scope: 274 component(s)
 
 ## Check 1 — Compiled-utility coverage
@@ -84,10 +84,6 @@ No runtime-composed class names detected.
 | scroll-area.tsx (Blok) ↔ 1 Razor file(s) | `bg-border` | (missing) |
 | search-input.tsx (Blok) ↔ 5 Razor file(s) | `focus:border-0` | (missing) |
 | stack-navigation.tsx (Blok) ↔ 1 Razor file(s) | `shadow-none` | (missing) |
-| stepper.tsx (Blok) ↔ 1 Razor file(s) | `text-base` | (missing) |
-| stepper.tsx (Blok) ↔ 1 Razor file(s) | `text-muted-foreground/70` | (missing) |
-| stepper.tsx (Blok) ↔ 1 Razor file(s) | `rounded-lg` | (missing) |
-| stepper.tsx (Blok) ↔ 1 Razor file(s) | `bg-muted/30` | (missing) |
 | time-picker.tsx (Blok) ↔ 1 Razor file(s) | `text-base` | (missing) |
 | time-picker.tsx (Blok) ↔ 1 Razor file(s) | `dark:aria-invalid:ring-destructive/40` | (missing) |
 | time-picker.tsx (Blok) ↔ 1 Razor file(s) | `dark:bg-input/30` | (missing) |

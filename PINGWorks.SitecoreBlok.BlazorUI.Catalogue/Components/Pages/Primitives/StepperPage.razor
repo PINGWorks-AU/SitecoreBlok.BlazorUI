@@ -5,7 +5,8 @@
 <ComponentPage Title="Stepper" Description="Displays a sequence of steps with status indicators" Interactivity="ComponentInteractivity.Ssr" ApiElements="@StepperElements">
 
 	<DivergenceNote>
-		<p>Only minor API differences: (1) we use <code>ActiveStep</code> (an int index) where Blok uses a per-step <code>status: "completed" | "active" | "pending"</code> field — Blok lets you mark individual steps independently; we infer the three states from the index relative to <code>ActiveStep</code>. (2) we don't yet expose a <code>Size</code> parameter (Blok has sm/default/lg); add this when needed.</p>
+		<p>One API difference: we use <code>ActiveStep</code> (an int index) where Blok uses a per-step <code>status: "completed" | "active" | "pending"</code> field. Blok lets you mark individual steps independently; we infer the three states from the index relative to <code>ActiveStep</code>.</p>
+		<p><strong>The horizontal container gained Blok's muted panel on 2026-09-04.</strong> Blok's horizontal stepper renders inside <code>p-6 rounded-lg bg-muted/30 w-full</code>; ours had no padding or background at all. Existing layouts will see the stepper pick up a grey rounded panel — pass <code>ClassName</code> to override if you were supplying your own container. The vertical orientation is unchanged apart from gaining Blok's <code>gap-4 h-full</code>. <code>Size</code> (<code>Sm</code>/<code>Default</code>/<code>Lg</code>) was added in the same pass.</p>
 	</DivergenceNote>
 
 	<ExamplesSection>
@@ -18,6 +19,14 @@
 				<Button Size="ButtonSize.Sm"
 						Disabled="@(ActiveStep > Steps.Count - 1)" OnClick="@(() => ActiveStep++)">Next</Button>
 				<span class="text-sm text-muted-foreground flex items-center ml-2">Step @(ActiveStep + 1) of @Steps.Count</span>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Sizes" Code="@("<Stepper Steps=\"@steps\" ActiveStep=\"1\" Size=\"StepperSize.Sm\" />\n<Stepper Steps=\"@steps\" ActiveStep=\"1\" Size=\"StepperSize.Default\" />\n<Stepper Steps=\"@steps\" ActiveStep=\"1\" Size=\"StepperSize.Lg\" />")">
+			<div class="flex flex-col gap-4">
+				<Stepper Steps="@Steps" ActiveStep="1" Size="StepperSize.Sm" />
+				<Stepper Steps="@Steps" ActiveStep="1" Size="StepperSize.Default" />
+				<Stepper Steps="@Steps" ActiveStep="1" Size="StepperSize.Lg" />
 			</div>
 		</ComponentExample>
 
@@ -52,6 +61,7 @@
 				new ApiProperty( "ActiveStep",        "int",                    false, "Zero-based index of the current step. Steps before it are `completed`, it is `active`, steps after it are `pending`. Default: `0`." ),
 				new ApiProperty( "ActiveStepChanged", "EventCallback<int>",     false, "Invoked when the active index changes. Use with `@bind-ActiveStep` for two-way binding." ),
 				new ApiProperty( "Orientation",       "StepperOrientation",     false, "Layout direction. Default: `StepperOrientation.Horizontal`. Other value: `Vertical`." ),
+				new ApiProperty( "Size",              "StepperSize",            false, "Diameter and number size of the step circles. Default: `StepperSize.Default` (`size-8`). Other values: `Sm` (`size-6`), `Lg` (`size-10`)." ),
 				new ApiProperty( "ClassName",         "string?",                false, "Extra CSS classes appended to the stepper container." ),
 			]
 		),
