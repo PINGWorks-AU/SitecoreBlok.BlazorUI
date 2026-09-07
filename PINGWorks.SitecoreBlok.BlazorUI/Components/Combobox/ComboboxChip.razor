@@ -11,12 +11,13 @@
 	}
 	@if ( ShowRemove )
 	{
-		<button type="button" data-slot="combobox-chip-remove"
+		<button type="button" data-slot="combobox-chip-remove" role="button"
 				class="-ml-1 opacity-50 hover:opacity-100 focus-visible:outline-none rounded-sm"
+				aria-label="@RemoveButtonAriaLabel"
 				@onclick="OnRemoveClick"
 				@onclick:stopPropagation="true">
 			<Icon Svg="@IconSvg.Close" Scale="0.7"
-				ClassName="pointer-events-none" />
+				ClassName="pointer-events-none" aria-hidden="true" />
 		</button>
 	}
 </span>
@@ -27,6 +28,9 @@
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 	[Parameter] public bool ShowRemove { get; set; } = true;
+
+	/// <summary>Accessible name for the chip's remove control. Default: "Remove".</summary>
+	[Parameter] public string RemoveButtonAriaLabel { get; set; } = "Remove";
 
 	private string CssClass => CssClassBuilder.Start(
 		"bg-primary-background text-foreground flex h-[calc(--spacing(5.5))] w-fit items-center justify-center gap-1 rounded-sm px-1.5 text-xs font-medium whitespace-nowrap",

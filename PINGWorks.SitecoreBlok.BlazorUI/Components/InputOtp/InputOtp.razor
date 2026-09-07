@@ -1,0 +1,164 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@using System.Text.RegularExpressions
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime Js
+
+@* Blok wraps the `input-otp` React library, which renders one real <input> stretched invisibly
+   over the slots and exposes a per-slot context. There is no Blazor equivalent, so the same
+   shape is built here: the wrapper positions a transparent, focusable <input> across the whole
+   control and the slots read their character and active state back off this component.
+
+   Keeping a real <input> (rather than per-slot inputs) is what makes typing, backspace, paste,
+   autofill and one-time-code autocomplete work natively instead of being reimplemented. *@
+<div class="@ContainerCssClass">
+	<CascadingValue Value="this">
+		@ChildContent
+	</CascadingValue>
+	<input @ref="InputRef" data-slot="input-otp" class="@CssClass"
+		   value="@Value" disabled="@Disabled"
+		   inputmode="@InputMode" autocomplete="one-time-code" autocorrect="off" spellcheck="false"
+		   @oninput="OnInput" @onfocus="OnFocus" @onblur="OnBlur"
+		   @attributes="AdditionalAttributes" />
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? ContainerClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+	/// <summary>
+	/// Total number of slots, and the maximum accepted length. Enforced in code rather than via a
+	/// <c>maxlength</c> attribute — see the note on <c>OnAfterRenderAsync</c>.
+	/// </summary>
+	[Parameter] public int MaxLength { get; set; } = 6;
+
+	[Parameter] public bool Disabled { get; set; }
+
+	/// <summary>
+	/// Optional regular expression each typed character must match, mirroring the `pattern` prop
+	/// Blok passes through to the library. Characters that do not match are dropped.
+	/// </summary>
+	[Parameter] public string? Pattern { get; set; }
+
+	/// <summary>Invoked once the value reaches <see cref="MaxLength"/>.</summary>
+	[Parameter] public EventCallback<string> OnComplete { get; set; }
+
+	/// <summary><c>inputmode</c> hint for on-screen keyboards. Default: <c>numeric</c>.</summary>
+	[Parameter] public string InputMode { get; set; } = "numeric";
+
+	private ElementReference InputRef;
+	private bool IsFocused;
+	private IJSObjectReference? Module;
+	private bool NeedsSync;
+
+	@* maxlength is deliberately NOT set on the element. It counts the RAW text, so a character
+	   rejected by Pattern would still consume the budget and typing would stop early. The limit
+	   is enforced in OnInput instead, and the raw text is pushed back into the element whenever
+	   it diverges from the filtered value. *@
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( !NeedsSync )
+			return;
+
+		NeedsSync = false;
+
+		try
+		{
+			Module ??= await Js.InvokeAsync<IJSObjectReference>( "import", "./_content/PINGWorks.SitecoreBlok.BlazorUI/Components/InputOtp/InputOtp.razor.js" );
+			await Module.InvokeVoidAsync( "syncValue", InputRef, Value ?? string.Empty );
+		}
+		catch ( Exception exception ) when ( exception is JSDisconnectedException or ObjectDisposedException or TaskCanceledException )
+		{
+		}
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await ( Module?.DisposeAsync() ?? ValueTask.CompletedTask );
+		}
+		catch ( JSDisconnectedException ) { }
+		finally
+		{
+			Module = null;
+		}
+	}
+
+	/// <summary>The character shown in a slot, or null when that slot is still empty.</summary>
+	internal char? CharAt( int index )
+		=> Value is not null && index < Value.Length ? Value[index] : null;
+
+	/// <summary>
+	/// The caret sits at the first empty slot, which is where typing lands. Once the value is
+	/// full the last slot stays active so the control still reads as focused.
+	/// </summary>
+	private int CaretIndex
+		=> Math.Min( Value?.Length ?? 0, Math.Max( MaxLength - 1, 0 ) );
+
+	internal bool IsActive( int index )
+		=> IsFocused && index == CaretIndex;
+
+	/// <summary>Only the slot awaiting input shows the blinking caret, so a full value shows none.</summary>
+	internal bool HasFakeCaret( int index )
+		=> IsActive( index ) && ( Value?.Length ?? 0 ) < MaxLength;
+
+	private string ContainerCssClass => CssClassBuilder.Start( "relative flex items-center gap-2 has-disabled:opacity-50" )
+										.With( ContainerClassName )
+										.Build();
+
+	@* The input is invisible but must stay focusable and cover the slots, so a click anywhere on
+	   the control puts the caret in it. Its own caret is hidden — the slots draw a fake one. *@
+	private string CssClass => CssClassBuilder.Start( "absolute inset-0 h-full w-full opacity-0 caret-transparent outline-none disabled:cursor-not-allowed" )
+										.With( ClassName )
+										.Build();
+
+	private void OnFocus()
+		=> IsFocused = true;
+
+	private void OnBlur()
+		=> IsFocused = false;
+
+	private async Task OnInput( ChangeEventArgs e )
+	{
+		var raw = e.Value?.ToString() ?? string.Empty;
+		var next = Filter( raw );
+
+		if ( next.Length > MaxLength )
+			next = next[..MaxLength];
+
+		// Whenever the element holds something other than the accepted value — a rejected
+		// character, or overflow past MaxLength — push the accepted value back into it.
+		if ( next != raw )
+			NeedsSync = true;
+
+		if ( next == Value )
+		{
+			StateHasChanged();
+			return;
+		}
+
+		Value = next;
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+
+		if ( Value.Length == MaxLength && OnComplete.HasDelegate )
+			await OnComplete.InvokeAsync( Value );
+	}
+
+	private string Filter( string raw )
+	{
+		if ( string.IsNullOrEmpty( Pattern ) )
+			return raw;
+
+		var regex = new Regex( Pattern );
+		return string.Concat( raw.Where( c => regex.IsMatch( c.ToString() ) ) );
+	}
+}

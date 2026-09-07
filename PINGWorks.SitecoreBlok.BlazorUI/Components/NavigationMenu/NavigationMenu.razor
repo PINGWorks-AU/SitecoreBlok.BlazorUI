@@ -2,7 +2,11 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
-<nav @ref="NavRef" data-slot="navigation-menu" class="@CssClass" @attributes="AdditionalAttributes">
+@* aria-label sits BEFORE @attributes so a consumer-supplied aria-label still wins (Blazor
+   lets a later splat override an earlier explicit attribute). That mirrors Blok's
+   `ariaLabel ?? default`. <nav> is a landmark, so two menus on one page need distinct
+   accessible names — this is the default half of that. *@
+<nav @ref="NavRef" data-slot="navigation-menu" class="@CssClass" aria-label="@DefaultAriaLabel" @attributes="AdditionalAttributes">
 	<CascadingValue Value="this" IsFixed="false">
 		@ChildContent
 	</CascadingValue>
@@ -32,6 +36,9 @@
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 	[Parameter] public string? ClassName { get; set; }
 	[Parameter] public bool Viewport { get; set; } = true;
+
+	private string DefaultAriaLabel
+		=> Viewport ? "Navigation menu" : "Inline navigation menu";
 	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
 	// Children (NavigationMenuIndicator) subscribe to re-render when active state changes.

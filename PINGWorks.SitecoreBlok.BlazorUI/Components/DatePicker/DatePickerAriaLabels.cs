@@ -6,6 +6,10 @@ namespace PINGWorks.SitecoreBlok.BlazorUI;
 /// </summary>
 public sealed record DatePickerAriaLabels
 {
-	/// <summary><c>aria-label</c> on the popover trigger button.</summary>
+	/// <summary>
+	/// <c>aria-label</c> on the popover trigger when <b>no date is selected</b> (empty state).
+	/// When a date is shown, <c>aria-label</c> is omitted so the visible formatted date is the
+	/// accessible name.
+	/// </summary>
 	public string? PopoverTrigger { get; init; }
 }

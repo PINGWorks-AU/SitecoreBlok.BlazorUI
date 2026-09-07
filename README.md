@@ -12,8 +12,8 @@ PINGWorks.SitecoreBlok.BlazorUI is a Blazor Razor Class Library that provides pr
 The library includes:
 
 - **Design Tokens** — Colors, typography, spacing, shadows, and border radius via Tailwind CSS custom properties
-- **Primitives** — 60+ primitive components (buttons, cards, dialogs, form fields, tables, and more), one-to-one with the upstream Blok library
-- **Chunks** — 85 opinionated compositions of Primitives across 7 families (Layouts, Headers, Navigation, Content, Forms, Data, Marketplace) — page envelopes, shells, headers, nav patterns, KPI tiles, full-page state views, form fields with Touched-tracking, data-table pages, and Sitecore Marketplace extension-point shells, all built on top of Primitives.
+- **Primitives** — all 61 Blok primitives (buttons, cards, dialogs, form fields, tables, and more), one-to-one with the upstream Blok library, plus Blazor-only additions
+- **Chunks** — 86 opinionated compositions of Primitives across 7 families (Layouts, Headers, Navigation, Content, Forms, Data, Marketplace) — page envelopes, shells, headers, nav patterns, KPI tiles, full-page state views, form fields with Touched-tracking, data-table pages, and Sitecore Marketplace extension-point shells, all built on top of Primitives.
 - **Theming** — Light and dark mode support via semantic CSS tokens
 - **Icons** — 300+ Material Design Icons available as static SVG path constants
 - **Catalogue** — A companion Blazor web app for browsing and previewing all components
@@ -131,6 +131,19 @@ builder.Services.AddSitecoreBlokUI();
 @using PINGWorks.SitecoreBlok.BlazorUI
 @using PINGWorks.SitecoreBlok.BlazorUI.Services
 ```
+
+**5. Add the root host components to `MainLayout.razor`**
+
+```razor
+<Popovers @rendermode="InteractiveServer" />
+<Toaster @rendermode="InteractiveServer" />
+```
+
+`<Popovers />` hosts every floating panel in the library. It is required by **Select**, **Combobox**, **Calendar**, **DatePicker**, **TimePicker** and the **SelectField** chunk. Omit it and those components still render their trigger, but the panel opens onto nothing — there is no build error and no exception, so the problem only appears when a user clicks. Place it once, at the root layout.
+
+`<Toaster />` is required by anything that raises notifications through `ToastService`.
+
+Both need `@rendermode="InteractiveServer"` (or another interactive render mode); they cannot function under static SSR.
 
 ### Running the Catalogue
 
@@ -261,7 +274,7 @@ Chunks are higher-level compositions of Primitives that absorb the Tailwind clas
                OpenChanged="@(v => confirmOpen = v)" OnConfirm="HandleDelete" />
 ```
 
-The full chunk roster (85 chunks across Layouts, Headers, Navigation, Content, Forms, Data, Marketplace) is browsable at `/chunks` in the Catalogue.
+The full chunk roster (86 chunks across Layouts, Headers, Navigation, Content, Forms, Data, Marketplace) is browsable at `/chunks` in the Catalogue.
 
 ## Prototyping UIs with Balsamiq
 

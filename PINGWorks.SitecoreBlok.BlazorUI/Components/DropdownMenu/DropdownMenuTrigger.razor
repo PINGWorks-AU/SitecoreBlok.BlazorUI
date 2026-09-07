@@ -1,7 +1,8 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
+@* aria-haspopup after the splat so it wins, matching Blok `82a49e` where it sits after {...props}. *@
 <button @ref="Ref" type="button" data-slot="dropdown-menu-trigger"
-		class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+		class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes" aria-haspopup="true">
 	@ChildContent
 </button>
 

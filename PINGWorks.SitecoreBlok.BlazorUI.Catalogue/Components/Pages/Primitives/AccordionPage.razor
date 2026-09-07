@@ -27,11 +27,25 @@
 			<Accordion Type="AccordionType.Multiple">
 				<AccordionItem>
 					<AccordionTrigger>Section One</AccordionTrigger>
-					<AccordionContent>Content for section one. You can open multiple sections at the same time.</AccordionContent>
+					<AccordionContent>Content for section one.</AccordionContent>
 				</AccordionItem>
 				<AccordionItem>
 					<AccordionTrigger>Section Two</AccordionTrigger>
-					<AccordionContent>Content for section two. This section can be open alongside section one.</AccordionContent>
+					<AccordionContent>Content for section two.</AccordionContent>
+				</AccordionItem>
+			</Accordion>
+		</ComponentExample>
+
+		<ComponentExample Title="Trigger actions" Code="@ActionsCode">
+			<Accordion>
+				<AccordionItem>
+					<AccordionTrigger>
+						<ChildContent>Deployment settings</ChildContent>
+						<Actions>
+							<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Sm">Edit</Button>
+						</Actions>
+					</AccordionTrigger>
+					<AccordionContent>Region, scaling and rollout strategy.</AccordionContent>
 				</AccordionItem>
 			</Accordion>
 		</ComponentExample>
@@ -41,6 +55,18 @@
 </ComponentPage>
 
 @code {
+	private const string ActionsCode = @"<Accordion>
+    <AccordionItem>
+        <AccordionTrigger>
+            <ChildContent>Deployment settings</ChildContent>
+            <Actions>
+                <Button Variant=""ButtonVariant.Ghost"" Size=""ButtonSize.Sm"">Edit</Button>
+            </Actions>
+        </AccordionTrigger>
+        <AccordionContent>Region, scaling and rollout strategy.</AccordionContent>
+    </AccordionItem>
+</Accordion>";
+
 	private static readonly ApiElement[] AccordionElements =
 	[
 		new ApiElement(
@@ -68,12 +94,13 @@
 		),
 		new ApiElement(
 			Name: "AccordionTrigger",
-			Description: "The clickable heading row that toggles its `AccordionItem`. Renders the chevron icon and handles the rotation animation when open.",
+			Description: "The clickable heading row that toggles its `AccordionItem`. Renders the chevron icon and handles the rotation animation when open. Optional `Actions` content sits beside the toggle button in the same hover row.",
 			Depth: 2,
 			Properties:
 			[
 				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the trigger button." ),
-				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Trigger label — typically a string or inline markup." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Trigger label — typically a string or inline markup. Wrap it in an explicit `<ChildContent>` element whenever `Actions` is also supplied." ),
+				new ApiProperty( "Actions",      "RenderFragment?",  false, "Optional controls rendered beside the toggle button, inside the same hover row. Clicks are stopped from reaching the toggle, so a button here acts without opening or closing the item." ),
 			]
 		),
 		new ApiElement(

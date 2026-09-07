@@ -10,9 +10,13 @@
 		@( Value.HasValue ? Value.Value.ToString( Format ) : RangeStart.HasValue && RangeEnd.HasValue ? $"{RangeStart.Value.ToString( Format )} — {RangeEnd.Value.ToString( Format )}" : RangeStart.HasValue ? $"{RangeStart.Value.ToString( Format )} — ..." : Placeholder )
 	</Button>
 
-	<Popover Id="@Id" OnClose="Close" ClassName="shadow-lg rounded-lg">
+	<Popover Id="@Id" OnClose="Close" Role="dialog" AriaLabel="Choose date" ClassName="shadow-lg rounded-lg">
+		@* Pass the resolved IsRange, not the raw Range parameter. Calendar falls back to
+		   "is RangeStartChanged bound?" when Range is null, and the handlers below are always
+		   wired — so a null Range would make every DatePicker a range picker, and @bind-Value
+		   would never set Value. DO NOT change this back to Range="@Range". *@
 		<Calendar Value="@Value" ValueChanged="OnDateSelected"
-				Range="@Range" RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
+				Range="@IsRange" RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
 				RangeEnd="@RangeEnd" RangeEndChanged="OnRangeEndSelected"
 				MinDate="@MinDate" MaxDate="@MaxDate"
 				NumberOfMonths="@NumberOfMonths"
@@ -44,7 +48,15 @@
 	[Parameter] public int NumberOfMonths { get; set; } = 1;
 	[Parameter] public DatePickerAriaLabels? AriaLabels { get; set; }
 
-	private string? TriggerAriaLabel => AriaLabels?.PopoverTrigger ?? Placeholder;
+	/// <summary>Whether the trigger is showing a formatted date rather than the placeholder.</summary>
+	private bool ShowsDate => Value.HasValue || RangeStart.HasValue;
+
+	/// <summary>
+	/// Null once a date is on the trigger, so the visible formatted date becomes the accessible
+	/// name instead of being overridden by the placeholder. Matches Blok `c4346e`.
+	/// </summary>
+	private string? TriggerAriaLabel
+		=> ShowsDate ? null : AriaLabels?.PopoverTrigger ?? Placeholder;
 
 	private bool IsRange => Range.HasValue ? Range.Value : ( RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate );
 

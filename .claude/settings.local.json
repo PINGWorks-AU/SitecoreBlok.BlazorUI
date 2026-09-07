@@ -11,5 +11,9 @@
       "PowerShell(dotnet build PINGWorks.SitecoreBlok.BlazorUI.Catalogue\\\\PINGWorks.SitecoreBlok.BlazorUI.Catalogue.csproj -nologo -clp:Summary 2>&1)",
       "mcp__da7be87c-de40-4bbd-8567-c618436b1346__list_balsamiq_projects"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "shadcn"
+  ],
+  "enableAllProjectMcpServers": true
 }

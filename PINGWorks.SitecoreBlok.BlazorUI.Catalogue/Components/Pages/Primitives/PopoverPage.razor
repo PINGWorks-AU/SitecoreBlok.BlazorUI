@@ -49,6 +49,8 @@
 				new ApiProperty( "CloseOnBackgroundClick", "bool",             false, "When true, clicking the overlay dismisses the popover. Default: `true`." ),
 				new ApiProperty( "OnClose",                "EventCallback",    false, "Invoked after the popover is hidden, regardless of whether it was closed via `PopoverService.Hide` or the overlay click." ),
 				new ApiProperty( "ClassName",              "string?",          false, "Extra CSS classes appended to the popover's outer wrapper when it is rendered inside `Popovers`." ),
+				new ApiProperty( "Role",                   "string?",          false, "ARIA role for the popup container. Default: `null`, which leaves it role-less — correct when the content brings its own role, as `SelectContent` does with `role=\"listbox\"`. Use `dialog` for popups that are a dialog in their own right, and pair it with `AriaLabel`." ),
+				new ApiProperty( "AriaLabel",              "string?",          false, "Accessible name for the popup container. Only meaningful alongside `Role` — `aria-label` on a role-less element is ignored by assistive technology. Default: `null`." ),
 				new ApiProperty( "ChildContent",           "RenderFragment?",  false, "Popover body content." ),
 			]
 		),

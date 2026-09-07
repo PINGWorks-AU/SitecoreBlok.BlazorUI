@@ -1,0 +1,60 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@* Wraps Button, as Blok does. Safe here because Button gates every one of its own size classes
+   on CssClassBuilder.ContainsAny( ClassName, ... ) — so the h-/px-/rounded-/size- utilities below
+   suppress Button's built-ins instead of colliding with them. CssClassBuilder does no
+   Tailwind conflict resolution (it is not twMerge), so that gate is what makes the override work.
+
+   CAUTION: do NOT pass a `title` attribute through to this component. Button's `Title` parameter
+   is the button's visible TEXT, not the HTML title attribute, so a splatted `title` binds to it
+   and renders as visible content. Use `AriaLabel` for an accessible name. *@
+<Button Variant="@Variant"
+		Size="@MappedSize"
+		ClassName="@CssClass"
+		OnClick="@OnClick"
+		Disabled="@Disabled"
+		data-size="@SizeAttr"
+		aria-label="@AriaLabel"
+		@attributes="AdditionalAttributes">
+	@ChildContent
+</Button>
+
+@code {
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public InputGroupButtonSize Size { get; set; } = InputGroupButtonSize.Xs;
+	[Parameter] public ButtonVariant Variant { get; set; } = ButtonVariant.Ghost;
+	[Parameter] public EventCallback OnClick { get; set; }
+	[Parameter] public bool Disabled { get; set; }
+
+	/// <summary>Accessible name for the control. Use this rather than a `title` attribute — see the note above.</summary>
+	[Parameter] public string? AriaLabel { get; set; }
+
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private ButtonSize MappedSize
+		=> Size switch
+		{
+			InputGroupButtonSize.Sm => ButtonSize.Sm,
+			InputGroupButtonSize.IconXs => ButtonSize.IconXs,
+			InputGroupButtonSize.IconSm => ButtonSize.IconSm,
+			_ => ButtonSize.Xs,
+		};
+
+	private string SizeAttr
+		=> Size switch
+		{
+			InputGroupButtonSize.Sm => "sm",
+			InputGroupButtonSize.IconXs => "icon-xs",
+			InputGroupButtonSize.IconSm => "icon-sm",
+			_ => "xs",
+		};
+
+	private string CssClass => CssClassBuilder.Start( "text-sm shadow-none flex gap-2 items-center" )
+										.With( "h-6 gap-1 px-2 rounded-full [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2", Size is InputGroupButtonSize.Xs )
+										.With( "h-8 px-2.5 gap-1.5 rounded-full has-[>svg]:px-2.5", Size is InputGroupButtonSize.Sm )
+										.With( "size-6 rounded-full p-0 has-[>svg]:p-0", Size is InputGroupButtonSize.IconXs )
+										.With( "size-8 rounded-full p-0 has-[>svg]:p-0", Size is InputGroupButtonSize.IconSm )
+										.With( ClassName )
+										.Build();
+}

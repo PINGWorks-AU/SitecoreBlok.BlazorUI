@@ -64,14 +64,14 @@ else
 
 	private string PaneClass
 		=> CssClassBuilder.Start( "flex-1 min-w-0 min-h-0 overflow-auto" )
-			.With( "bg-background", BgFilled )
+			.With( "bg-background text-foreground", BgFilled )
 			.With( "p-4", Gutters )
 			.Build();
 
 	// ResizablePanel is overflow-hidden and flex-sized; fill it and scroll the content inside.
 	private string ResizablePaneClass
 		=> CssClassBuilder.Start( "size-full overflow-auto" )
-			.With( "bg-background", BgFilled )
+			.With( "bg-background text-foreground", BgFilled )
 			.With( "p-4", Gutters )
 			.Build();
 }

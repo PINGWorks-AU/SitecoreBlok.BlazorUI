@@ -1,0 +1,61 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div class="@WidthCssClass" @attributes="AdditionalAttributes">
+	<SearchInput>
+		<SearchInputLeftElement>
+			<Icon Svg="@Icon" />
+		</SearchInputLeftElement>
+		<SearchInputField Value="@Value" ValueChanged="OnValueChanged"
+						  Placeholder="@Placeholder" Disabled="@Disabled"
+						  name="@Name" aria-label="@AriaLabel" aria-describedby="@DescribedBy" autocomplete="off" />
+		@if ( ShowClear && !string.IsNullOrEmpty( Value ) && !Disabled )
+		{
+			<SearchInputRightElement>
+				<SearchInputClearButton OnClear="Clear" AriaLabel="Clear search" />
+			</SearchInputRightElement>
+		}
+	</SearchInput>
+	@if ( HelperText is not null )
+	{
+		<p id="@HelperId" class="mt-1 text-xs text-muted-foreground">@HelperText</p>
+	}
+</div>
+
+@code {
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+	[Parameter] public string Placeholder { get; set; } = "Search...";
+	[Parameter] public string AriaLabel { get; set; } = "Search";
+	[Parameter] public string Icon { get; set; } = IconSvg.Magnify;
+	[Parameter] public bool ShowClear { get; set; } = true;
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string Width { get; set; } = "w-full max-w-sm";
+	[Parameter] public bool Disabled { get; set; }
+	[Parameter] public string? Name { get; set; }
+	[Parameter] public string? HelperText { get; set; }
+	[Parameter] public string? AriaDescribedBy { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private readonly string HelperId = $"filter-input-help-{Guid.NewGuid():N}";
+
+	/// <summary>Helper text is referenced first, then any consumer-supplied description, matching Blok.</summary>
+	private string? DescribedBy
+		=> HelperText is null
+			? AriaDescribedBy
+			: AriaDescribedBy is null ? HelperId : $"{HelperId} {AriaDescribedBy}";
+
+	private string WidthCssClass => CssClassBuilder.Start( Width )
+										.With( ClassName )
+										.Build();
+
+	private async Task OnValueChanged( string? value )
+	{
+		Value = value;
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+	}
+
+	private async Task Clear()
+		=> await OnValueChanged( string.Empty );
+}

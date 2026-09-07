@@ -43,11 +43,9 @@
 	}
 
 	private string CssClass => CssClassBuilder.Start(
-			"cursor-text rounded-md px-2 py-1 transition-colors",
-			"min-h-[2rem] flex items-center whitespace-pre-line break-words")
+			"cursor-text rounded-md px-2 py-1 transition-colors text-foreground",
+			"min-h-8 flex items-center whitespace-pre-line break-words")
 		.With("hover:bg-neutral-bg", Context?.IsPreviewFocusable != false && Context?.IsDisabled != true)
-		.With("text-muted-foreground italic", IsEmpty)
-		.With("text-foreground", !IsEmpty)
 		.With("cursor-not-allowed opacity-50", Context?.IsDisabled == true)
 		.With("cursor-default", Context?.IsPreviewFocusable == false)
 		.With(ClassName)

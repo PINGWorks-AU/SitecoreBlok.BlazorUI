@@ -1,0 +1,137 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div class="flex items-center gap-2">
+	<div class="flex flex-col gap-2">
+		<label for="@HourId" class="text-xs text-muted-foreground font-medium">@HourLabel</label>
+		<Select Value="@Hour" ValueChanged="OnHourChanged">
+			<SelectTrigger Id="@HourId" ClassName="w-[70px]" aria-label="@HourLabel">
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent ClassName="p-0 min-w-20">
+				@foreach ( var hour in Hours )
+				{
+					<SelectItem Value="@hour">@hour.TrimStart( '0' )</SelectItem>
+				}
+			</SelectContent>
+		</Select>
+	</div>
+
+	<span class="text-2xl font-bold mt-6">:</span>
+
+	<div class="flex flex-col gap-2">
+		<label for="@MinuteId" class="text-xs text-muted-foreground font-medium">@MinuteLabel</label>
+		<Select Value="@Minute" ValueChanged="OnMinuteChanged">
+			<SelectTrigger Id="@MinuteId" ClassName="w-[70px]" aria-label="@MinuteLabel">
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent ClassName="p-0 min-w-20 max-h-[400px]">
+				@foreach ( var minute in Minutes )
+				{
+					<SelectItem Value="@minute">@minute</SelectItem>
+				}
+			</SelectContent>
+		</Select>
+	</div>
+
+	<div class="flex flex-col gap-2">
+		<label for="@PeriodId" class="text-xs text-muted-foreground font-medium">@PeriodLabel</label>
+		<Select Value="@Period" ValueChanged="OnPeriodChanged">
+			<SelectTrigger Id="@PeriodId" ClassName="w-[75px]" aria-label="@PeriodLabel">
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent>
+				<SelectItem Value="AM">AM</SelectItem>
+				<SelectItem Value="PM">PM</SelectItem>
+			</SelectContent>
+		</Select>
+	</div>
+</div>
+
+<div class="flex gap-2 mt-4">
+	<Button Size="ButtonSize.Sm" Variant="ButtonVariant.Outline" ClassName="flex-1" OnClick="OnClearClicked">@ClearText</Button>
+	<Button Size="ButtonSize.Sm" ClassName="flex-1" OnClick="OnDone">@DoneText</Button>
+</div>
+
+@code {
+	[Parameter] public TimeSpan? Value { get; set; }
+	[Parameter] public EventCallback<TimeSpan?> ValueChanged { get; set; }
+	[Parameter] public EventCallback OnDone { get; set; }
+
+	[Parameter] public string HourLabel { get; set; } = "Hour";
+	[Parameter] public string MinuteLabel { get; set; } = "Minute";
+	[Parameter] public string PeriodLabel { get; set; } = "Period";
+	[Parameter] public string ClearText { get; set; } = "Clear";
+	[Parameter] public string DoneText { get; set; } = "Done";
+
+	private static readonly string[] Hours =
+		Enumerable.Range( 1, 12 ).Select( h => h.ToString( "D2" ) ).ToArray();
+
+	private static readonly string[] Minutes =
+		Enumerable.Range( 0, 60 ).Select( m => m.ToString( "D2" ) ).ToArray();
+
+	private readonly string HourId = $"time-picker-hour-{Guid.NewGuid():N}";
+	private readonly string MinuteId = $"time-picker-minute-{Guid.NewGuid():N}";
+	private readonly string PeriodId = $"time-picker-period-{Guid.NewGuid():N}";
+
+	private string Hour = "12";
+	private string Minute = "00";
+	private string Period = "AM";
+
+	protected override void OnParametersSet()
+	{
+		if ( Value is not TimeSpan time )
+			return;
+
+		var hour = time.Hours % 12;
+
+		Hour = ( hour == 0 ? 12 : hour ).ToString( "D2" );
+		Minute = time.Minutes.ToString( "D2" );
+		Period = time.Hours >= 12 ? "PM" : "AM";
+	}
+
+	private async Task OnHourChanged( string? value )
+	{
+		Hour = value ?? Hour;
+		await Commit();
+	}
+
+	private async Task OnMinuteChanged( string? value )
+	{
+		Minute = value ?? Minute;
+		await Commit();
+	}
+
+	private async Task OnPeriodChanged( string? value )
+	{
+		Period = value ?? Period;
+		await Commit();
+	}
+
+	/// <summary>Publishes a whole time built from the current hour, minute and period fields.</summary>
+	private async Task Commit()
+	{
+		var hour = int.Parse( Hour ) % 12;
+
+		if ( Period == "PM" )
+			hour += 12;
+
+		Value = new TimeSpan( hour, int.Parse( Minute ), 0 );
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+	}
+
+	private async Task OnClearClicked()
+	{
+		Value = null;
+		Hour = "12";
+		Minute = "00";
+		Period = "AM";
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+
+		if ( OnDone.HasDelegate )
+			await OnDone.InvokeAsync();
+	}
+}

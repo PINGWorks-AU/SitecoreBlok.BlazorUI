@@ -43,8 +43,8 @@ public enum SpinnerVariant { Default, Primary }
 public enum SwitchVariant { Primary, Danger, Success }
 
 // Toggle **************************************************************************************************
-public enum ToggleVariant { Default, Outline }
-public enum ToggleSize { Default, Sm, Lg }
+public enum ToggleVariant { Default, Outline, Square, Rounded }
+public enum ToggleSize { Default, Sm, Xs }
 public enum ToggleGroupType { Single, Multiple }
 
 // Field ****************************************************************************************************
@@ -53,6 +53,11 @@ public enum FieldOrientation { Vertical, Horizontal }
 
 // InputGroup **********************************************************************************************
 public enum InputGroupAlign { InlineStart, InlineEnd, BlockStart, BlockEnd }
+public enum InputGroupButtonSize { Xs, Sm, IconXs, IconSm }
+
+// Filter *************************************************************************************************
+public enum FilterDisplayMode { Text, Badge }
+public enum FilterBarDirection { Horizontal, Vertical }
 
 // Tabs ****************************************************************************************************
 public enum TabsVariant { Line, SoftRounded }
@@ -118,6 +123,7 @@ public enum TableSize { Sm, Md, Lg }
 
 // Stepper *************************************************************************************************
 public enum StepperOrientation { Horizontal, Vertical }
+public enum StepperSize { Default, Sm, Lg }
 public record StepperStep( string Label, string? Description = null );
 
 // Timeline ************************************************************************************************
