@@ -1,11 +1,5 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-@* Composition-based, unlike Blok. Blok's FilterBar takes a `filters` array of a discriminated
-   union plus a `values` bag keyed by string and an onChange(key, unknown) callback, because TS
-   can express that union and React can splat the props back out. C# has neither, and modelling
-   it would give up type-safe binding on every filter. Children are passed directly instead, so
-   each filter keeps its own @bind-Value. The wrapper's role, direction, gap and Clear all
-   behaviour are unchanged from Blok. *@
 <div role="region" aria-label="@AriaLabel" class="@CssClass" @attributes="AdditionalAttributes">
 	@ChildContent
 	@if ( ShowClearAll && OnClearAll.HasDelegate )

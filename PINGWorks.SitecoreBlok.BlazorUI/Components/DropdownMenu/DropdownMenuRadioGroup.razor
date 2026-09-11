@@ -1,8 +1,5 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-@* Blok's is a bare passthrough because Radix's RadioGroup owns the selected value. Blazor has no
-   equivalent, so this component holds the value and cascades itself to its items — the same
-   Register/read pattern used elsewhere in the library. *@
 <div data-slot="dropdown-menu-radio-group" role="group" class="@ClassName">
 	<CascadingValue Value="this">
 		@ChildContent

@@ -1,12 +1,5 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-@* Deliberately a plain <button>, NOT our <Button>. Blok `68c4af` routes its rail through the
-   Blok Button, but ours cannot: Button's `Title` parameter is the button's visible TEXT, so an
-   HTML `title="Toggle Sidebar"` attribute binds to that parameter instead of the DOM attribute
-   and renders "Toggle Sidebar" as visible content overflowing the 16px rail (verified in
-   browser: scrollWidth 55 vs clientWidth 16). The rail needs the native title tooltip, so it
-   stays a bare button. The leading h-full!/min-h-0!/min-w-0!/rounded-none/px-0/hover:bg-transparent
-   utilities are kept for class-string parity with Blok and are harmless no-ops here. *@
 <button data-sidebar="rail" data-slot="sidebar-rail"
 		aria-label="Toggle Sidebar" tabindex="-1"
 		title="Toggle Sidebar"

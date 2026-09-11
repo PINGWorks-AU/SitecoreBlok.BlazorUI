@@ -1,13 +1,5 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-@* Wraps Button, as Blok does. Safe here because Button gates every one of its own size classes
-   on CssClassBuilder.ContainsAny( ClassName, ... ) — so the h-/px-/rounded-/size- utilities below
-   suppress Button's built-ins instead of colliding with them. CssClassBuilder does no
-   Tailwind conflict resolution (it is not twMerge), so that gate is what makes the override work.
-
-   CAUTION: do NOT pass a `title` attribute through to this component. Button's `Title` parameter
-   is the button's visible TEXT, not the HTML title attribute, so a splatted `title` binds to it
-   and renders as visible content. Use `AriaLabel` for an accessible name. *@
 <Button Variant="@Variant"
 		Size="@MappedSize"
 		ClassName="@CssClass"
@@ -27,7 +19,7 @@
 	[Parameter] public EventCallback OnClick { get; set; }
 	[Parameter] public bool Disabled { get; set; }
 
-	/// <summary>Accessible name for the control. Use this rather than a `title` attribute — see the note above.</summary>
+	/// <summary>Accessible name for the control. Use this, not a <c>title</c> attribute: <c>title</c> binds to Button's visible text.</summary>
 	[Parameter] public string? AriaLabel { get; set; }
 
 	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }

@@ -38,7 +38,7 @@
 
 	private readonly string HelperId = $"filter-input-help-{Guid.NewGuid():N}";
 
-	/// <summary>Helper text is referenced first, then any consumer-supplied description, matching Blok.</summary>
+	/// <summary>The <c>aria-describedby</c> value: the helper text's id first, then any consumer-supplied ids.</summary>
 	private string? DescribedBy
 		=> HelperText is null
 			? AriaDescribedBy

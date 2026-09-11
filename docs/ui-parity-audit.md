@@ -82,7 +82,7 @@ For each component: render in Catalogue dark mode, compare side-by-side to `blok
 |-----------|---------|-------|--------|-------|----------|-------|
 | Tooltip | ✅ | — | — | — | ✅ | Uses `bg-gray-700` hardcoded — **intentional, matches Blok**. Tooltips stay dark in both modes (standard UX pattern). |
 | Popover | ✅ | — | — | — | ✅ | Uses `bg-popover text-popover-foreground` — theme-aware. |
-| Sheet | ✅ | — | — | — | ✅ | Uses `bg-background` with overlay `bg-black/50` — standard, matches Blok. |
+| Sheet | ✅ | — | — | — | ✅ | Uses `bg-background` with overlay `bg-black/50` — standard, matches Blok. 2026-09-11: closed state now unmounts like Radix `Presence` (no DOM while closed); open/close use Blok's own `animate-in` / `slide-*` keyframe classes. Addition beyond Blok: `data-[state=closed]:fill-mode-forwards`, because our unmount is timer-driven rather than `animationend`-driven. See "Sheet — a closed sheet leaves the DOM" below. |
 | AlertDialog | ✅ | — | — | — | ✅ | Same as Dialog. |
 | DropdownMenu | ✅ | ✅ | ✅ | ✅ | ✅ | Uses `bg-popover`, `hover:bg-accent`, `focus:bg-accent` — all theme-aware. |
 | ContextMenu | ✅ | ✅ | ✅ | ✅ | ✅ | Full 15-component split (2026-04-22). All `bg-popover text-popover-foreground` — theme-aware. Submenus hover-driven (not Radix focus). CheckboxItem keeps menu open. ContextMenuPortal is no-op passthrough. Harness clean. |
@@ -1337,3 +1337,67 @@ dot-radius tweak does not move it. SHA re-stamped so a future material rewrite s
 
 Harness re-run clean at both scopes after the Badge edit: `-Component Badge` and the full sweep both
 exit 0, with 25 accepted drift entries and none stale.
+
+## Sheet — a closed sheet leaves the DOM, 2026-09-11 (Blok `2d994e`)
+
+`sheet.tsx` is unchanged upstream. The defect was behavioural, and the harness was green before and
+after the fix: it compares class strings, and this was never a class-string problem.
+
+### The defect
+
+`Sheet` rendered its `sheet-overlay` and `sheet-content` whatever the value of `Open`, parking a closed
+panel one full width past its edge with `translate-x-full` / `-translate-y-full`. Blok's Sheet is a Radix
+`Dialog`, whose `Presence` unmounts the portal content once the exit animation ends. Ours never unmounted.
+
+A `position: fixed` box anchored to the viewport adds no scroll overflow, so the Catalogue never showed the
+problem. It shows up when an ancestor becomes the **containing block for fixed descendants** — any
+`transform`, `filter`, `backdrop-filter`, `contain: paint` or `will-change: transform`. `AppHeader` sets
+`backdrop-blur` by default (`BgFilled`), so a Sheet placed in its `Actions` slot was positioned against the
+header and its parked panel overflowed the page. Reproduced in an isolated document with the old closed-state
+geometry:
+
+| Host | Right | Left | Top | Bottom |
+|---|---|---|---|---|
+| Plain sticky header | 0 | 0 | 0 | 0 |
+| Sticky header with `backdrop-filter` | **384px** horizontal | 0 | 0 | 0 |
+
+Left and Top park in negative overflow, which cannot be scrolled to. Bottom parks below a short header,
+inside the document's height. They only look safe in this probe. With a different host geometry they overflow too.
+
+### The fix
+
+- **Unmount while closed.** The whole `data-slot="sheet"` subtree sits inside `@if ( Present )`. A closed
+  Sheet emits nothing, which matches Blok, where the closed Radix root renders no DOM.
+- **Blok's keyframe classes, verbatim.** Keyframe animations run when an element is inserted, so the open
+  animation needs no render-then-flip step. The overlay and content carry Blok's `data-[state=open]:animate-in
+  data-[state=closed]:animate-out`, `fade-in-0` / `fade-out-0`, `slide-in-from-*` / `slide-out-to-*`, and
+  `data-[state=closed]:duration-300 data-[state=open]:duration-500`. They replace the old
+  `translate-*` + `transition-transform duration-300` pair, and `tw-animate.css` already supplies them.
+- **Exit, then unmount.** On close, `data-state` flips to `closed` and a 300ms cancellable delay
+  (`ExitDurationMs`) then removes the subtree. Reopening during the exit cancels the delay.
+- **One addition beyond Blok: `data-[state=closed]:fill-mode-forwards`** on overlay and content. Radix
+  unmounts in the same frame as `animationend`. Our unmount crosses the circuit, so it can land a few
+  milliseconds after the animation ends. Without `forwards` the panel would snap back into view for those
+  frames.
+
+### Verified in browser (Catalogue, `/primitives/sheet`)
+
+- Closed page: 0 `sheet` / `sheet-overlay` / `sheet-content` nodes. Blok's live page, closed: 0.
+- All four sides: content and overlay mount with a running `enter` animation of 500ms. Blok's right-side
+  demo mounts with the same 500ms `enter` and a 384px panel.
+- All four sides: `data-state` flips to `closed` within 5–10ms of the click, with a running 300ms `exit`
+  (`fill: forwards`). The subtree is removed 290–309ms later, and the overlay-click dismiss path behaves the same.
+- Close followed immediately by reopen: `closed` → `open` 1ms apart, no removal, still mounted seconds later.
+- With a `backdrop-filter` forced onto the example's host, overflow after close equals overflow before open,
+  on all four sides.
+- Dark mode: panel `rgb(40,40,40)`, title white, description white at 68%.
+
+### Known remaining gap — open state inside a containing-block ancestor
+
+Blok portals `SheetContent` to `<body>`. We render in place. Unmounting fixes the closed state only. An
+**open** Sheet inside a `transform` / `filter` / `backdrop-filter` ancestor is still positioned against
+that ancestor. With `backdrop-filter` on the example host, the open Right panel measured 384×88, clipped
+to the host's height, instead of the full viewport height. `AppHeader`'s default `backdrop-blur` puts any
+Sheet in its `Actions` slot in this state. Closing this gap needs a body-level host for the Sheet: a
+portal-style render through a root component, as `<Popovers />` does for Popover. Unlike that host, it
+would have to re-render when the Sheet's content changes, because the `<Popovers />` host does not.

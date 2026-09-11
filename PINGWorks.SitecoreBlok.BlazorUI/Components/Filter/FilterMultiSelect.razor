@@ -81,8 +81,6 @@
 		<div class="fixed inset-0 z-40" @onclick="CloseDropdown"></div>
 	}
 
-	@* Anti-revert: see FilterSelectBase — this dropdown is rendered in place with `fixed`, not via
-	   PopoverService, because the search box must re-filter the list live. *@
 	<div data-slot="filter-multi-select-content" data-state="@( IsOpen ? "open" : "closed" )"
 		 class="@DropdownCssClass" style="@DropdownStyle">
 		@if ( Searchable && ShowSearch )
@@ -158,7 +156,7 @@
 	/// <summary>Controls the dropdown's open state. Leave unset to let the trigger own it; supports two-way binding via <c>@bind-Open</c>.</summary>
 	[Parameter] public bool? Open { get; set; }
 
-	/// <summary>Fires whenever the dropdown opens or closes. Nullable so it pairs with <c>Open</c> under <c>@bind-Open</c>; the value raised is never null.</summary>
+	/// <summary>Fires whenever the dropdown opens or closes. The value raised is never null.</summary>
 	[Parameter] public EventCallback<bool?> OpenChanged { get; set; }
 
 	private List<string> SelectedValues => Values ?? [];
@@ -298,7 +296,7 @@
 		await InvokeAsync( StateHasChanged );
 	}
 
-	/// <summary>Enter and Space remove the badge, matching the keyboard handler Blok puts on the same control.</summary>
+	/// <summary>Removes the badge on Enter or Space.</summary>
 	private async Task OnBadgeKeyDown( KeyboardEventArgs args, string value )
 	{
 		if ( args.Key is "Enter" or " " )

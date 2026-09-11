@@ -91,11 +91,7 @@ else
 
 	[Parameter] public string? Label { get; set; }
 
-	/// <summary>
-	/// Explicit <c>aria-label</c> for the control, independent of the visible <see cref="Label"/>.
-	/// Blok exposed this as its own prop in `589c0c`; falls back to <see cref="Label"/> so existing
-	/// usage is unchanged.
-	/// </summary>
+	/// <summary>Explicit <c>aria-label</c> for the control, independent of the visible <see cref="Label"/>. Falls back to <see cref="Label"/> when unset.</summary>
 	[Parameter] public string? AriaLabel { get; set; }
 	[Parameter] public string? Description { get; set; }
 

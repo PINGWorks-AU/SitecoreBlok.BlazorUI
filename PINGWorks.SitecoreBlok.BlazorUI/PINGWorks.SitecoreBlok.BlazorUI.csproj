@@ -51,6 +51,7 @@
 			🚨 **Breaking** - The Chunks FilterBar is renamed to FilterChipBar and moves from the Forms family to Data, freeing the name for the Blok Filter primitive
 			🚨 **Breaking** - TimePicker is rebuilt as Blok's composite picker (trigger plus Hour/Minute/Period panel); it is no longer a native input type=time, so native and mobile time entry are gone and a root Popovers component is now required
 			🚨 **Breaking** - Calendar month/year dropdowns now use the Select primitive, so Calendar and DatePicker also require a root Popovers component
+			🚨 **Breaking** - Toggle now shows a check mark while pressed, as Blok does; an icon-only Toggle that passes its icon as ChildContent is read as text and gains a check beside it, so pass the icon through the Icon parameter instead
 			🎉 Add the Filter primitive family - FilterInput, FilterSingleSelect, FilterMultiSelect and FilterBar - completing the port of all 61 Blok primitives
 			🎉 Add the InputOtp family - InputOtp, InputOtpGroup, InputOtpSlot and InputOtpSeparator
 			🎉 Complete DropdownMenu with the six missing Blok exports - DropdownMenuCheckboxItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItemText, DropdownMenuItemTitle and DropdownMenuItemDescription
@@ -62,9 +63,13 @@
 			🐛 Fix DatePicker ignoring range mode when Range was resolved rather than passed directly
 			🐛 Fix SearchInput being unable to shrink in narrow containers, which pushed the clear button outside its bounds
 			🐛 Fix Stepper step circles rendering transparent on non-page-coloured surfaces, and step labels wrapping instead of sitting on one line
+			🐛 Fix dark-mode text on 24 Chunk surfaces that set bg-background with no text colour, most visibly the layout roots AppShell, PageShell, SplitShell, ListDetailShell, ContextPanelShell, AppSidebar and NavRail
+			🐛 Fix ContextMenuItem having no visible highlight when focused from the keyboard
+			🐛 Fix Kbd inside a Tooltip rendering as a grey chip with grey text on the dark tooltip surface
 			✔️ ClassName override is added to NavListItem
 			✔️ Additional formatting options for LocalTime
 			✔️ Toggle gains Square and Rounded variants, and an Icon parameter that crossfades to a check mark while pressed
+			✔️ Toggle and ToggleGroupItem restyled to Blok - resting text colour, no dimming on hover, 14px text (was 13px), and the Outline variant's dark-mode fill
 			✔️ Stepper gains StepperSize, and the horizontal orientation now renders in Blok's muted panel
 			✔️ Editable gains EditableError; Calendar gains CalendarAriaLabels for nav and dropdown ARIA overrides
 			✔️ Input focus ring narrowed from 3px to 1px to match Blok, affecting every composed input including SearchInput, InputGroup, Combobox and Filter

@@ -15,9 +15,6 @@
 </div>
 
 @code {
-	@* Same ancestor set as DropdownMenuItem — a checkbox item can sit in a top-level menu, a
-	   ContextMenu, or a Sub, and selecting one dismisses the whole chain (Radix's default;
-	   Blok does not preventDefault). *@
 	[CascadingParameter] public DropdownMenu? ParentDropdownMenu { get; set; }
 	[CascadingParameter] public ContextMenu? ParentContextMenu { get; set; }
 	[CascadingParameter] public DropdownMenuSub? ParentSub { get; set; }

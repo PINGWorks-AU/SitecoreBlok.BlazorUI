@@ -2,10 +2,6 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
-@* aria-label sits BEFORE @attributes so a consumer-supplied aria-label still wins (Blazor
-   lets a later splat override an earlier explicit attribute). That mirrors Blok's
-   `ariaLabel ?? default`. <nav> is a landmark, so two menus on one page need distinct
-   accessible names — this is the default half of that. *@
 <nav @ref="NavRef" data-slot="navigation-menu" class="@CssClass" aria-label="@DefaultAriaLabel" @attributes="AdditionalAttributes">
 	<CascadingValue Value="this" IsFixed="false">
 		@ChildContent

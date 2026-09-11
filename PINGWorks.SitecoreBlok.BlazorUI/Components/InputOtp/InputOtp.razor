@@ -5,13 +5,6 @@
 @implements IAsyncDisposable
 @inject IJSRuntime Js
 
-@* Blok wraps the `input-otp` React library, which renders one real <input> stretched invisibly
-   over the slots and exposes a per-slot context. There is no Blazor equivalent, so the same
-   shape is built here: the wrapper positions a transparent, focusable <input> across the whole
-   control and the slots read their character and active state back off this component.
-
-   Keeping a real <input> (rather than per-slot inputs) is what makes typing, backspace, paste,
-   autofill and one-time-code autocomplete work natively instead of being reimplemented. *@
 <div class="@ContainerCssClass">
 	<CascadingValue Value="this">
 		@ChildContent
@@ -32,18 +25,12 @@
 	[Parameter] public string? Value { get; set; }
 	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
 
-	/// <summary>
-	/// Total number of slots, and the maximum accepted length. Enforced in code rather than via a
-	/// <c>maxlength</c> attribute — see the note on <c>OnAfterRenderAsync</c>.
-	/// </summary>
+	/// <summary>Total number of slots, and the maximum accepted length.</summary>
 	[Parameter] public int MaxLength { get; set; } = 6;
 
 	[Parameter] public bool Disabled { get; set; }
 
-	/// <summary>
-	/// Optional regular expression each typed character must match, mirroring the `pattern` prop
-	/// Blok passes through to the library. Characters that do not match are dropped.
-	/// </summary>
+	/// <summary>Optional regular expression each typed character must match. Characters that do not match are dropped.</summary>
 	[Parameter] public string? Pattern { get; set; }
 
 	/// <summary>Invoked once the value reaches <see cref="MaxLength"/>.</summary>
@@ -57,10 +44,6 @@
 	private IJSObjectReference? Module;
 	private bool NeedsSync;
 
-	@* maxlength is deliberately NOT set on the element. It counts the RAW text, so a character
-	   rejected by Pattern would still consume the budget and typing would stop early. The limit
-	   is enforced in OnInput instead, and the raw text is pushed back into the element whenever
-	   it diverges from the filtered value. *@
 	protected override async Task OnAfterRenderAsync( bool firstRender )
 	{
 		if ( !NeedsSync )
@@ -95,17 +78,14 @@
 	internal char? CharAt( int index )
 		=> Value is not null && index < Value.Length ? Value[index] : null;
 
-	/// <summary>
-	/// The caret sits at the first empty slot, which is where typing lands. Once the value is
-	/// full the last slot stays active so the control still reads as focused.
-	/// </summary>
+	/// <summary>Index of the slot awaiting input: the first empty slot, or the last slot once the value is full.</summary>
 	private int CaretIndex
 		=> Math.Min( Value?.Length ?? 0, Math.Max( MaxLength - 1, 0 ) );
 
 	internal bool IsActive( int index )
 		=> IsFocused && index == CaretIndex;
 
-	/// <summary>Only the slot awaiting input shows the blinking caret, so a full value shows none.</summary>
+	/// <summary>Whether the slot at <paramref name="index"/> shows the blinking caret. Only the slot awaiting input does.</summary>
 	internal bool HasFakeCaret( int index )
 		=> IsActive( index ) && ( Value?.Length ?? 0 ) < MaxLength;
 
@@ -113,8 +93,6 @@
 										.With( ContainerClassName )
 										.Build();
 
-	@* The input is invisible but must stay focusable and cover the slots, so a click anywhere on
-	   the control puts the caret in it. Its own caret is hidden — the slots draw a fake one. *@
 	private string CssClass => CssClassBuilder.Start( "absolute inset-0 h-full w-full opacity-0 caret-transparent outline-none disabled:cursor-not-allowed" )
 										.With( ClassName )
 										.Build();
@@ -133,8 +111,6 @@
 		if ( next.Length > MaxLength )
 			next = next[..MaxLength];
 
-		// Whenever the element holds something other than the accepted value — a rejected
-		// character, or overflow past MaxLength — push the accepted value back into it.
 		if ( next != raw )
 			NeedsSync = true;
 

@@ -3,7 +3,6 @@
 
 <div class="@RootCssClass" @onkeydown="OnKeyDown" @attributes="AdditionalAttributes">
 	<div class="relative inline-flex w-fit">
-		@* The trigger is the positioning anchor; FilterSelectBase measures it on open. *@
 		<button @ref="AnchorRef" type="button" data-slot="filter-single-select-trigger"
 				data-state="@( IsOpen ? "open" : "closed" )"
 				aria-haspopup="listbox" aria-expanded="@( IsOpen ? "true" : "false" )"
@@ -39,8 +38,6 @@
 		<div class="fixed inset-0 z-40" @onclick="CloseDropdown"></div>
 	}
 
-	@* Anti-revert: `fixed` must stay in the class string or the inline left/top are inert and the
-	   dropdown flows in document order. Same pattern as ComboboxContent and DropdownMenuContent. *@
 	<div data-slot="filter-single-select-content" data-state="@( IsOpen ? "open" : "closed" )"
 		 class="@DropdownCssClass" style="@DropdownStyle">
 		@if ( Searchable && ShowSearch )

@@ -24,9 +24,7 @@ public sealed record FilterSelectGroup
 	public required IReadOnlyList<FilterOption> Options { get; init; }
 }
 
-/// <summary>
-/// Accessible names for the interactive parts of a filter. Mirrors Blok's <c>FilterAriaLabels</c>.
-/// </summary>
+/// <summary>Accessible names for the interactive parts of a filter.</summary>
 public sealed record FilterAriaLabels
 {
 	/// <summary><c>aria-label</c> on the dropdown trigger. Falls back to the placeholder.</summary>

@@ -4,17 +4,7 @@ using Microsoft.JSInterop;
 
 namespace PINGWorks.SitecoreBlok.BlazorUI;
 
-/// <summary>
-/// Shared open-state, anchor measuring and search-query handling for <c>FilterSingleSelect</c> and
-/// <c>FilterMultiSelect</c>.
-///
-/// Both render their dropdown <b>in place</b> with <c>position: fixed</c> and measured coordinates,
-/// not through <c>PopoverService</c>. That is deliberate and load-bearing: the dropdown contains a
-/// search box, so its option list must re-render as the query changes, and the <c>Popovers</c> host
-/// renders the fragment it captured when the popup opened — it does not re-render when the
-/// originating component's state changes. Combobox hit exactly this and uses the same approach.
-/// DO NOT move these dropdowns onto <c>Popover</c>.
-/// </summary>
+/// <summary>Shared open state, anchor measuring and search-query handling for <c>FilterSingleSelect</c> and <c>FilterMultiSelect</c>.</summary>
 public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 {
 	[Inject] protected IJSRuntime Js { get; set; } = default!;
@@ -50,7 +40,7 @@ public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 
 	protected bool IsOpen { get; set; }
 
-	/// <summary>Guards the post-render measure so an open triggered by a parameter change positions the dropdown exactly once.</summary>
+	/// <summary>True once the dropdown has been positioned for the current open.</summary>
 	private bool MeasuredWhileOpen;
 	protected string SearchQuery { get; set; } = string.Empty;
 
@@ -60,7 +50,7 @@ public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 
 	protected readonly string HelperId = $"filter-select-help-{Guid.NewGuid():N}";
 
-	/// <summary>Helper text is referenced first, then any consumer-supplied description, matching Blok.</summary>
+	/// <summary>The <c>aria-describedby</c> value: the helper text's id first, then any consumer-supplied ids.</summary>
 	protected string? DescribedBy
 		=> HelperText is null
 			? AriaDescribedBy
@@ -105,7 +95,7 @@ public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 		await InvokeAsync( StateHasChanged );
 	}
 
-	/// <summary>Closing always clears the query, so reopening starts from the full list as in Blok.</summary>
+	/// <summary>Closes the dropdown and clears the search query.</summary>
 	protected virtual async Task CloseDropdown()
 	{
 		IsOpen = false;
@@ -118,7 +108,7 @@ public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 	protected virtual Task NotifyOpenChanged( bool open )
 		=> Task.CompletedTask;
 
-	/// <summary>Closes the dropdown on Escape and returns focus to the trigger, matching the Radix popover Blok builds on.</summary>
+	/// <summary>Closes the dropdown on Escape and returns focus to the trigger.</summary>
 	protected async Task OnKeyDown( KeyboardEventArgs args )
 	{
 		if ( args.Key is not "Escape" || !IsOpen )
@@ -158,7 +148,7 @@ public abstract class FilterSelectBase : ComponentBase, IAsyncDisposable
 		await InvokeAsync( StateHasChanged );
 	}
 
-	/// <summary>The trigger is <c>w-fit</c>, so it can resize as the selection changes — re-measure on open.</summary>
+	/// <summary>Measures the trigger and stores the dropdown's coordinates and width.</summary>
 	protected async Task UpdateAnchorPosition()
 	{
 		try

@@ -51,9 +51,6 @@
 										.With( "opacity-0 scale-[0.8]", !visible )
 										.Build();
 
-	@* Rounding lives on the variant arms, not the base string. CssClassBuilder concatenates
-	   without resolving Tailwind conflicts, so a base rounded-md alongside the Rounded variant's
-	   rounded-full would be settled by CSS rule order rather than by intent. *@
 	private string CssClass => CssClassBuilder.Start( "inline-flex items-center justify-center gap-2 font-medium whitespace-nowrap transition-[color,box-shadow] outline-none cursor-pointer",
 		"text-neutral-fg hover:bg-neutral-bg hover:text-neutral-fg",
 		"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",

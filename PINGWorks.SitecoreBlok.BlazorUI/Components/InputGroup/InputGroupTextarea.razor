@@ -1,13 +1,5 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-@* Renders a bare <textarea> rather than wrapping our Textarea, matching how the sibling
-   InputGroupInput renders a bare <input> instead of wrapping Input.
-
-   Blok wraps Textarea and strips its chrome with border-0 / rounded-none / bg-transparent,
-   which works there because cn() is twMerge and drops the conflicting base utilities.
-   CssClassBuilder only concatenates, so both `border` and `border-0` would survive onto the
-   element and the winner would come down to Tailwind's emitted rule order. Owning the full
-   class string keeps it deterministic. *@
 <textarea data-slot="input-group-control" placeholder="@Placeholder" disabled="@Disabled" rows="@Rows"
 		  class="@CssClass" @oninput="OnInput" @attributes="AdditionalAttributes">@Value</textarea>
 

@@ -2,8 +2,6 @@
 
 @inject NavigationManager Navigation
 
-@* Blok `99b9ef`: this was an <aside>, but <aside> is a landmark and the rail is routinely
-   placed inside another landmark, which is an accessibility violation. Plain <div> now. *@
 <div class="@AsideCssClass" @attributes="AdditionalAttributes">
 	@if ( !IsHorizontal && Header is not null )
 	{
@@ -17,9 +15,6 @@
 	   Horizontal orientation doesn't need the override (the `overflow-x-auto`
 	   scrollbar is the intended UX there). *@
 	<div class="@BodyCssClass" style="@BodyInlineStyle">
-		@* Blok `99b9ef` / `10eb7d`: only render the <nav> landmark when it has an accessible
-		   name, otherwise a plain <div>. An unnamed nav landmark — or several of them — is the
-		   thing the audit flags. *@
 		@if ( AriaLabel is not null )
 		{
 			<nav class="@NavCssClass" aria-label="@AriaLabel">
@@ -42,7 +37,6 @@
 	}
 </div>
 
-@* Shared by both landmark branches above so the item markup exists once. *@
 @code {
 	private RenderFragment RenderItems => @<text>
 		@for ( var i = 0; i < Items.Count; i++ )
@@ -72,15 +66,6 @@
 					}
 					else
 					{
-						@* Blok `82a49e`: an item that carries a click handler is an expandable control,
-						   not a link, so it renders as a <button> — Enter/Space then work natively and
-						   aria-expanded has something to sit on. This also removes the enhanced-navigation
-						   problem outright: a button has no browser default to prevent, so the old
-						   data-enhance-nav="false" opt-out is no longer needed. HandleItemClick still
-						   navigates via NavigationManager when the consumer leaves PreventDefault false.
-						   Trade-off accepted deliberately: an item with both a Path and an OnItemClick no
-						   longer supports middle/ctrl-click "open in new tab", because it is no longer an
-						   anchor. That follows Blok. *@
 						@if ( OnItemClick.HasDelegate )
 						{
 							<button type="button"
@@ -130,11 +115,7 @@
 	[Parameter] public string? ClassName { get; set; }
 	[Parameter] public string? NavClassName { get; set; }
 
-	/// <summary>
-	/// Accessible name for the navigation region. When set, the list container renders as a
-	/// <c>&lt;nav&gt;</c> landmark carrying this name; when null it renders as a plain
-	/// <c>&lt;div&gt;</c>, because an unnamed nav landmark is itself an accessibility finding.
-	/// </summary>
+	/// <summary>Accessible name for the navigation region. When set, the list container renders as a <c>&lt;nav&gt;</c> landmark carrying this name; when null, as a plain <c>&lt;div&gt;</c>.</summary>
 	[Parameter] public string? AriaLabel { get; set; }
 	[Parameter] public string Width { get; set; } = "w-[72px]";
 	[Parameter] public RenderFragment? Header { get; set; }

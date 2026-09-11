@@ -85,7 +85,7 @@
 			Depth: 0,
 			Properties:
 			[
-				new ApiProperty( "Open",         "bool",                  false, "Whether the sheet is currently open. Use `@bind-Open` for two-way binding. Default: `false`." ),
+				new ApiProperty( "Open",         "bool",                  false, "Whether the sheet is currently open. Use `@bind-Open` for two-way binding. While closed, the overlay, the panel and its `ChildContent` are unmounted once the 300 ms exit animation finishes. Default: `false`." ),
 				new ApiProperty( "OpenChanged",  "EventCallback<bool>",   false, "Fires when the sheet is dismissed (overlay click or built-in close). Part of the `@bind-Open` pair." ),
 				new ApiProperty( "Side",         "SheetSide",             false, "Edge to slide from. Default: `SheetSide.Right`. Other values: `Left`, `Top`, `Bottom`." ),
 				new ApiProperty( "ClassName",    "string?",               false, "Extra CSS classes appended to the sheet content container." ),
