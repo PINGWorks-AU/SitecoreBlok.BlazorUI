@@ -1,6 +1,7 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
 <div @ref="Ref" data-slot="dropdown-menu-sub-trigger" class="@CssClass"
+	 aria-haspopup="true"
 	 @onmouseenter="OnEnter" @onmouseleave="OnLeave">
 	@ChildContent
 	<Icon Svg="@IconSvg.ChevronRight" ClassName="ml-auto size-3.5 text-muted-foreground" />

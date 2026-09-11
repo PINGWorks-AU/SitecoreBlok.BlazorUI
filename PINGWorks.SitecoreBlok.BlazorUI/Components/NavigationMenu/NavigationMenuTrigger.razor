@@ -1,6 +1,6 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-<button data-slot="navigation-menu-trigger" type="button" data-state="@(IsOpen ? "open" : "closed")" class="@CssClass" @attributes="AdditionalAttributes">
+<button data-slot="navigation-menu-trigger" type="button" data-state="@(IsOpen ? "open" : "closed")" class="@CssClass" @attributes="AdditionalAttributes" aria-haspopup="true">
 	@ChildContent
 	<Icon Svg="@IconSvg.ChevronDown" ClassName="@ChevronClass" />
 </button>

@@ -33,6 +33,10 @@
 								{
 									<Badge ColorScheme="BadgeColor.Primary" Size="BadgeSize.Sm">Additional</Badge>
 								}
+								else if ( item.Status == ComponentStatus.Partial )
+								{
+									<Badge ColorScheme="BadgeColor.Warning" Size="BadgeSize.Sm">Partial</Badge>
+								}
 							</div>
 							<p class="text-xs text-muted-foreground mt-1 line-clamp-1">@item.Description</p>
 						</div>

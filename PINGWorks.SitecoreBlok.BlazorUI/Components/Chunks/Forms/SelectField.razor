@@ -12,7 +12,7 @@
 		<FormLabel For="@Id" Required="@Required" Error="@EffectiveError">@Label</FormLabel>
 	}
 	<div @onfocusout="MarkTouched">
-		<Select Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled">
+		<Select Value="@Value" ValueChanged="@( async v => await UpdateValue( v ) )" Disabled="@Disabled" DisplayLabel="@SelectedItemLabel">
 			<SelectTrigger>
 				<SelectValue Placeholder="@Placeholder" />
 			</SelectTrigger>
@@ -38,4 +38,7 @@
 
 	[Parameter] public string? Placeholder { get; set; }
 	[Parameter] public IList<SelectFieldItem>? Items { get; set; }
+
+	private string? SelectedItemLabel
+		=> Value is null ? null : Items?.FirstOrDefault( i => i.Value == Value )?.Label;
 }

@@ -111,12 +111,74 @@
 			</DropdownMenu>
 		</ComponentExample>
 
+		<ComponentExample Title="Checkbox items" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger><Button>View</Button></DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuLabel>Panels</DropdownMenuLabel>\n        <DropdownMenuCheckboxItem @bind-Checked=\"showSidebar\">Sidebar</DropdownMenuCheckboxItem>\n        <DropdownMenuCheckboxItem @bind-Checked=\"showToolbar\">Toolbar</DropdownMenuCheckboxItem>\n        <DropdownMenuCheckboxItem @bind-Checked=\"showStatusBar\" Disabled=\"true\">Status bar</DropdownMenuCheckboxItem>\n    </DropdownMenuContent>\n</DropdownMenu>")">
+			<div class="space-y-3">
+				<DropdownMenu>
+					<DropdownMenuTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">View</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent>
+						<DropdownMenuLabel>Panels</DropdownMenuLabel>
+						<DropdownMenuCheckboxItem @bind-Checked="ShowSidebar">Sidebar</DropdownMenuCheckboxItem>
+						<DropdownMenuCheckboxItem @bind-Checked="ShowToolbar">Toolbar</DropdownMenuCheckboxItem>
+						<DropdownMenuCheckboxItem @bind-Checked="ShowStatusBar" Disabled="true">Status bar</DropdownMenuCheckboxItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+				<p class="text-sm text-muted-foreground">Sidebar: <strong>@ShowSidebar</strong> · Toolbar: <strong>@ShowToolbar</strong></p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Radio group" Code="@("<DropdownMenu>\n    <DropdownMenuTrigger><Button>Sort</Button></DropdownMenuTrigger>\n    <DropdownMenuContent>\n        <DropdownMenuLabel>Sort by</DropdownMenuLabel>\n        <DropdownMenuRadioGroup @bind-Value=\"sortBy\">\n            <DropdownMenuRadioItem Value=\"name\">Name</DropdownMenuRadioItem>\n            <DropdownMenuRadioItem Value=\"date\">Date modified</DropdownMenuRadioItem>\n            <DropdownMenuRadioItem Value=\"size\">Size</DropdownMenuRadioItem>\n        </DropdownMenuRadioGroup>\n    </DropdownMenuContent>\n</DropdownMenu>")">
+			<div class="space-y-3">
+				<DropdownMenu>
+					<DropdownMenuTrigger>
+						<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Sort</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent>
+						<DropdownMenuLabel>Sort by</DropdownMenuLabel>
+						<DropdownMenuRadioGroup @bind-Value="SortBy">
+							<DropdownMenuRadioItem Value="name">Name</DropdownMenuRadioItem>
+							<DropdownMenuRadioItem Value="date">Date modified</DropdownMenuRadioItem>
+							<DropdownMenuRadioItem Value="size">Size</DropdownMenuRadioItem>
+						</DropdownMenuRadioGroup>
+					</DropdownMenuContent>
+				</DropdownMenu>
+				<p class="text-sm text-muted-foreground">Sorting by: <strong>@( SortBy ?? "(none)" )</strong></p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Two-line items" Code="@("<DropdownMenuItem>\n    <DropdownMenuItemText>\n        <DropdownMenuItemTitle>Personal</DropdownMenuItemTitle>\n        <DropdownMenuItemDescription>you@example.com</DropdownMenuItemDescription>\n    </DropdownMenuItemText>\n</DropdownMenuItem>")">
+			<DropdownMenu>
+				<DropdownMenuTrigger>
+					<Button Variant="ButtonVariant.Outline" ColorScheme="ButtonColor.Neutral">Switch account</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent>
+					<DropdownMenuItem>
+						<DropdownMenuItemText>
+							<DropdownMenuItemTitle>Personal</DropdownMenuItemTitle>
+							<DropdownMenuItemDescription>you@example.com</DropdownMenuItemDescription>
+						</DropdownMenuItemText>
+					</DropdownMenuItem>
+					<DropdownMenuItem>
+						<DropdownMenuItemText>
+							<DropdownMenuItemTitle>Work</DropdownMenuItemTitle>
+							<DropdownMenuItemDescription>you@ping-works.com.au</DropdownMenuItemDescription>
+						</DropdownMenuItemText>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</ComponentExample>
+
 	</ExamplesSection>
 
 </ComponentPage>
 
 @code {
 	private string? LastAction;
+	private bool ShowSidebar = true;
+	private bool ShowToolbar;
+	private bool ShowStatusBar;
+	private string? SortBy = "name";
 
 	private static readonly ApiElement[] DropdownMenuElements =
 	[
@@ -184,6 +246,73 @@
 				new ApiProperty( "OnClick",        "EventCallback",           false, "Invoked when the item is clicked, before the menu chain closes." ),
 				new ApiProperty( "ClassName",    "string?",                 false, "Extra CSS classes appended to the item `<div>`." ),
 				new ApiProperty( "ChildContent", "RenderFragment?",         false, "Item label and optional `Icon` / `DropdownMenuShortcut` children." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuCheckboxItem",
+			Description: "Menu item with a checkmark indicator. Two-way bind `Checked`. Selecting one dismisses the whole menu chain, matching Blok and Radix's default.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Checked",        "bool",                 false, "Whether the item is checked. Supports two-way binding via `@bind-Checked`. Default: `false`." ),
+				new ApiProperty( "CheckedChanged", "EventCallback<bool>",  false, "Fires with the new state when the item is toggled." ),
+				new ApiProperty( "Disabled",       "bool",                 false, "When true, the item is non-interactive and dimmed. Default: `false`." ),
+				new ApiProperty( "ChildContent",   "RenderFragment?",      false, "Item content — the label, and optionally a `DropdownMenuShortcut`." ),
+				new ApiProperty( "ClassName",      "string?",              false, "Extra CSS classes appended to the item." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuRadioGroup",
+			Description: "Groups `DropdownMenuRadioItem`s and owns the selected value. Blok's equivalent is a bare passthrough because Radix holds the value; this one holds it and cascades to its items.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string?",                  false, "Value of the selected item. Supports two-way binding via `@bind-Value`." ),
+				new ApiProperty( "ValueChanged", "EventCallback<string?>",   false, "Fires with the newly selected value." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",          false, "The `DropdownMenuRadioItem`s." ),
+				new ApiProperty( "ClassName",    "string?",                  false, "Extra CSS classes appended to the group wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuRadioItem",
+			Description: "A single option inside a `DropdownMenuRadioGroup`. Shows a dot when its `Value` matches the group's, and selects itself on click.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Value",        "string?",          true,  "Value this item represents. Compared against the parent `DropdownMenuRadioGroup`'s `Value` to decide the checked state." ),
+				new ApiProperty( "Disabled",     "bool",             false, "When true, the item is non-interactive and dimmed. Default: `false`." ),
+				new ApiProperty( "ChildContent", "RenderFragment?",  false, "Item label." ),
+				new ApiProperty( "ClassName",    "string?",          false, "Extra CSS classes appended to the item." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuItemText",
+			Description: "Stacks a `DropdownMenuItemTitle` and `DropdownMenuItemDescription` into a two-line item body. Use inside a `DropdownMenuItem`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Typically a `DropdownMenuItemTitle` followed by a `DropdownMenuItemDescription`." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuItemTitle",
+			Description: "The primary line of a two-line menu item.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Title text." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the title." ),
+			]
+		),
+		new ApiElement(
+			Name: "DropdownMenuItemDescription",
+			Description: "The muted secondary line of a two-line menu item.",
+			Depth: 3,
+			Properties:
+			[
+				new ApiProperty( "ChildContent", "RenderFragment?", false, "Description text." ),
+				new ApiProperty( "ClassName",    "string?",         false, "Extra CSS classes appended to the description." ),
 			]
 		),
 		new ApiElement(

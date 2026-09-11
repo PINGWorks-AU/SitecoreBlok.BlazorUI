@@ -1,0 +1,39 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@if ( HasContent )
+{
+	<div role="alert" aria-live="polite" data-slot="editable-error" class="@CssClass" @attributes="AdditionalAttributes">
+		@if ( ChildContent is not null )
+		{
+			@ChildContent
+		}
+		else if ( Messages.Count == 1 )
+		{
+			<span>@Messages[0]</span>
+		}
+		else
+		{
+			<ul class="list-disc list-inside space-y-1">
+				@foreach ( var message in Messages )
+				{
+					<li>@message</li>
+				}
+			</ul>
+		}
+	</div>
+}
+
+@code {
+	[Parameter] public IEnumerable<string>? Errors { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	private List<string> Messages => Errors?.Where( m => !string.IsNullOrWhiteSpace( m ) ).ToList() ?? [];
+
+	private bool HasContent => ChildContent is not null || Messages.Count > 0;
+
+	private string CssClass => CssClassBuilder.Start( "text-sm text-destructive absolute w-max bg-popover rounded-sm shadow-lg py-1 px-2 bottom-[calc(-100%+var(--spacing)*0.5)] cursor-default z-10" )
+										.With( ClassName )
+										.Build();
+}

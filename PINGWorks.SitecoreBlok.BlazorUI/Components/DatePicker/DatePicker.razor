@@ -10,9 +10,9 @@
 		@( Value.HasValue ? Value.Value.ToString( Format ) : RangeStart.HasValue && RangeEnd.HasValue ? $"{RangeStart.Value.ToString( Format )} — {RangeEnd.Value.ToString( Format )}" : RangeStart.HasValue ? $"{RangeStart.Value.ToString( Format )} — ..." : Placeholder )
 	</Button>
 
-	<Popover Id="@Id" OnClose="Close" ClassName="shadow-lg rounded-lg">
+	<Popover Id="@Id" OnClose="Close" Role="dialog" AriaLabel="Choose date" ClassName="shadow-lg rounded-lg">
 		<Calendar Value="@Value" ValueChanged="OnDateSelected"
-				Range="@Range" RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
+				Range="@IsRange" RangeStart="@RangeStart" RangeStartChanged="OnRangeStartSelected"
 				RangeEnd="@RangeEnd" RangeEndChanged="OnRangeEndSelected"
 				MinDate="@MinDate" MaxDate="@MaxDate"
 				NumberOfMonths="@NumberOfMonths"
@@ -44,7 +44,12 @@
 	[Parameter] public int NumberOfMonths { get; set; } = 1;
 	[Parameter] public DatePickerAriaLabels? AriaLabels { get; set; }
 
-	private string? TriggerAriaLabel => AriaLabels?.PopoverTrigger ?? Placeholder;
+	/// <summary>Whether the trigger shows a formatted date instead of the placeholder.</summary>
+	private bool ShowsDate => Value.HasValue || RangeStart.HasValue;
+
+	/// <summary>Accessible name for the trigger. Null while a formatted date is displayed on it.</summary>
+	private string? TriggerAriaLabel
+		=> ShowsDate ? null : AriaLabels?.PopoverTrigger ?? Placeholder;
 
 	private bool IsRange => Range.HasValue ? Range.Value : ( RangeStartChanged.HasDelegate || RangeEndChanged.HasDelegate );
 

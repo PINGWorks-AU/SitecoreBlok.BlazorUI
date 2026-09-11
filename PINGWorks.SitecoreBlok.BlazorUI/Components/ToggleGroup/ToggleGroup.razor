@@ -23,7 +23,9 @@
 	[Parameter] public List<string> Values { get; set; } = [];
 	[Parameter] public EventCallback<List<string>> ValuesChanged { get; set; }
 
-	private string CssClass => CssClassBuilder.Start( "group/toggle-group flex w-fit items-center rounded-md" )
+	private string CssClass => CssClassBuilder.Start( "group/toggle-group flex w-fit items-center" )
+										.With( "rounded-full", Variant is ToggleVariant.Rounded )
+										.With( "rounded-md", Variant is not ToggleVariant.Rounded )
 										.With( ClassName )
 										.Build();
 

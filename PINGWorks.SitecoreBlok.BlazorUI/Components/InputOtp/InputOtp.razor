@@ -1,0 +1,140 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+@using System.Text.RegularExpressions
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime Js
+
+<div class="@ContainerCssClass">
+	<CascadingValue Value="this">
+		@ChildContent
+	</CascadingValue>
+	<input @ref="InputRef" data-slot="input-otp" class="@CssClass"
+		   value="@Value" disabled="@Disabled"
+		   inputmode="@InputMode" autocomplete="one-time-code" autocorrect="off" spellcheck="false"
+		   @oninput="OnInput" @onfocus="OnFocus" @onblur="OnBlur"
+		   @attributes="AdditionalAttributes" />
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? ContainerClassName { get; set; }
+	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+	/// <summary>Total number of slots, and the maximum accepted length.</summary>
+	[Parameter] public int MaxLength { get; set; } = 6;
+
+	[Parameter] public bool Disabled { get; set; }
+
+	/// <summary>Optional regular expression each typed character must match. Characters that do not match are dropped.</summary>
+	[Parameter] public string? Pattern { get; set; }
+
+	/// <summary>Invoked once the value reaches <see cref="MaxLength"/>.</summary>
+	[Parameter] public EventCallback<string> OnComplete { get; set; }
+
+	/// <summary><c>inputmode</c> hint for on-screen keyboards. Default: <c>numeric</c>.</summary>
+	[Parameter] public string InputMode { get; set; } = "numeric";
+
+	private ElementReference InputRef;
+	private bool IsFocused;
+	private IJSObjectReference? Module;
+	private bool NeedsSync;
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
+	{
+		if ( !NeedsSync )
+			return;
+
+		NeedsSync = false;
+
+		try
+		{
+			Module ??= await Js.InvokeAsync<IJSObjectReference>( "import", "./_content/PINGWorks.SitecoreBlok.BlazorUI/Components/InputOtp/InputOtp.razor.js" );
+			await Module.InvokeVoidAsync( "syncValue", InputRef, Value ?? string.Empty );
+		}
+		catch ( Exception exception ) when ( exception is JSDisconnectedException or ObjectDisposedException or TaskCanceledException )
+		{
+		}
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await ( Module?.DisposeAsync() ?? ValueTask.CompletedTask );
+		}
+		catch ( JSDisconnectedException ) { }
+		finally
+		{
+			Module = null;
+		}
+	}
+
+	/// <summary>The character shown in a slot, or null when that slot is still empty.</summary>
+	internal char? CharAt( int index )
+		=> Value is not null && index < Value.Length ? Value[index] : null;
+
+	/// <summary>Index of the slot awaiting input: the first empty slot, or the last slot once the value is full.</summary>
+	private int CaretIndex
+		=> Math.Min( Value?.Length ?? 0, Math.Max( MaxLength - 1, 0 ) );
+
+	internal bool IsActive( int index )
+		=> IsFocused && index == CaretIndex;
+
+	/// <summary>Whether the slot at <paramref name="index"/> shows the blinking caret. Only the slot awaiting input does.</summary>
+	internal bool HasFakeCaret( int index )
+		=> IsActive( index ) && ( Value?.Length ?? 0 ) < MaxLength;
+
+	private string ContainerCssClass => CssClassBuilder.Start( "relative flex items-center gap-2 has-disabled:opacity-50" )
+										.With( ContainerClassName )
+										.Build();
+
+	private string CssClass => CssClassBuilder.Start( "absolute inset-0 h-full w-full opacity-0 caret-transparent outline-none disabled:cursor-not-allowed" )
+										.With( ClassName )
+										.Build();
+
+	private void OnFocus()
+		=> IsFocused = true;
+
+	private void OnBlur()
+		=> IsFocused = false;
+
+	private async Task OnInput( ChangeEventArgs e )
+	{
+		var raw = e.Value?.ToString() ?? string.Empty;
+		var next = Filter( raw );
+
+		if ( next.Length > MaxLength )
+			next = next[..MaxLength];
+
+		if ( next != raw )
+			NeedsSync = true;
+
+		if ( next == Value )
+		{
+			StateHasChanged();
+			return;
+		}
+
+		Value = next;
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+
+		if ( Value.Length == MaxLength && OnComplete.HasDelegate )
+			await OnComplete.InvokeAsync( Value );
+	}
+
+	private string Filter( string raw )
+	{
+		if ( string.IsNullOrEmpty( Pattern ) )
+			return raw;
+
+		var regex = new Regex( Pattern );
+		return string.Concat( raw.Where( c => regex.IsMatch( c.ToString() ) ) );
+	}
+}

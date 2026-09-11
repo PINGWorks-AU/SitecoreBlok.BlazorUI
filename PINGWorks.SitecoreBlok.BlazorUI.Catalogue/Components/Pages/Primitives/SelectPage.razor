@@ -103,6 +103,7 @@
 			[
 				new ApiProperty( "Value",        "string?",                false, "The currently-selected item value. Use `@bind-Value` for two-way binding." ),
 				new ApiProperty( "ValueChanged", "EventCallback<string?>", false, "Fires when the user picks a different item. Part of the `@bind-Value` pair." ),
+				new ApiProperty( "ValueLabel",   "string?",                false, "Label for the current `Value`, for a consumer that holds the options as data. Set it whenever `Value` may be populated before the user opens the dropdown: the trigger can otherwise only learn a label from a `SelectItem` the popover has rendered, and falls back to showing the raw value." ),
 				new ApiProperty( "Disabled",     "bool",                   false, "When true, the trigger is non-interactive and the dropdown will not open. Default: `false`." ),
 				new ApiProperty( "ChildContent", "RenderFragment?",        false, "Should contain a `SelectTrigger` and a `SelectContent`." ),
 			]

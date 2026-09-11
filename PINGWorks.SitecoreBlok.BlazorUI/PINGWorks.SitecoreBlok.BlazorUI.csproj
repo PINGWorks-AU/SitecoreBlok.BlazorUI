@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
 		<Version>2.0.0.0</Version>
-		<VersionTag>preview-1</VersionTag>
+		<VersionTag>preview-2</VersionTag>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -47,10 +47,33 @@
 			v2.0.0
 			🚨 **Breaking** - Update Click event to OnClick to better represent the Blazor idiom for Button, PaginationLink, PaginationNext, PaginationPrevious, AlertDialogAction, AlertDialogCancel, ContextMenuItem, DialogClose, DropdownMenuItem, MenuBarItem
 			🚨 **Breaking** - Update SplitShell IsResizable to Resizable for library consistency
+			🚨 **Breaking** - ToggleSize.Lg is removed; the Toggle and ToggleGroup size scale is realigned to Blok as Default, Sm, Xs
+			🚨 **Breaking** - The Chunks FilterBar is renamed to FilterChipBar and moves from the Forms family to Data, freeing the name for the Blok Filter primitive
+			🚨 **Breaking** - TimePicker is rebuilt as Blok's composite picker (trigger plus Hour/Minute/Period panel); it is no longer a native input type=time, so native and mobile time entry are gone and a root Popovers component is now required
+			🚨 **Breaking** - Calendar month/year dropdowns now use the Select primitive, so Calendar and DatePicker also require a root Popovers component
+			🚨 **Breaking** - Toggle now shows a check mark while pressed, as Blok does; an icon-only Toggle that passes its icon as ChildContent is read as text and gains a check beside it, so pass the icon through the Icon parameter instead
+			🎉 Add the Filter primitive family - FilterInput, FilterSingleSelect, FilterMultiSelect and FilterBar - completing the port of all 61 Blok primitives
+			🎉 Add the InputOtp family - InputOtp, InputOtpGroup, InputOtpSlot and InputOtpSeparator
+			🎉 Complete DropdownMenu with the six missing Blok exports - DropdownMenuCheckboxItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItemText, DropdownMenuItemTitle and DropdownMenuItemDescription
+			🎉 Complete InputGroup with InputGroupButton and InputGroupTextarea, plus Blok's four missing alignment variant groups
 			🐛 Fix SplitShell overflow behaviours when Resizable is enabled
 			🐛 Fix CodeViewer content reload
+			🐛 Fix PopoverItem tearing down the Blazor circuit when disposed, which left the page unresponsive to every click after using a dropdown - affected Select, SelectField, Combobox, DropdownMenu and Tooltip
+			🐛 Fix Select showing the raw value instead of the option label for a preselected value before the dropdown had been opened once - adds DisplayLabel and ValueLabel
+			🐛 Fix DatePicker ignoring range mode when Range was resolved rather than passed directly
+			🐛 Fix SearchInput being unable to shrink in narrow containers, which pushed the clear button outside its bounds
+			🐛 Fix Stepper step circles rendering transparent on non-page-coloured surfaces, and step labels wrapping instead of sitting on one line
+			🐛 Fix dark-mode text on 24 Chunk surfaces that set bg-background with no text colour, most visibly the layout roots AppShell, PageShell, SplitShell, ListDetailShell, ContextPanelShell, AppSidebar and NavRail
+			🐛 Fix ContextMenuItem having no visible highlight when focused from the keyboard
+			🐛 Fix Kbd inside a Tooltip rendering as a grey chip with grey text on the dark tooltip surface
 			✔️ ClassName override is added to NavListItem
 			✔️ Additional formatting options for LocalTime
+			✔️ Toggle gains Square and Rounded variants, and an Icon parameter that crossfades to a check mark while pressed
+			✔️ Toggle and ToggleGroupItem restyled to Blok - resting text colour, no dimming on hover, 14px text (was 13px), and the Outline variant's dark-mode fill
+			✔️ Stepper gains StepperSize, and the horizontal orientation now renders in Blok's muted panel
+			✔️ Editable gains EditableError; Calendar gains CalendarAriaLabels for nav and dropdown ARIA overrides
+			✔️ Input focus ring narrowed from 3px to 1px to match Blok, affecting every composed input including SearchInput, InputGroup, Combobox and Filter
+			✔️ StackNavigation, Accordion, Calendar, DatePicker, Popover, Tooltip, Checkbox, Combobox, NavigationMenu and Sidebar re-audited and realigned to current Blok source
 
 			v1.3.0
 			🎉 Add FileUpload chunk in the Forms family with drag-and-drop support and multi-file handling

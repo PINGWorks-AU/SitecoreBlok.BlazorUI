@@ -1,0 +1,140 @@
+{
+  "$comment": [
+    "Accepted Check 3 drift. Every entry is a decision already argued in docs/ui-parity-audit.md,",
+    "not a to-do. Findings listed here are reported under 'Known' and do not fail the run; anything",
+    "not listed does. Entries that stop matching are reported as stale and DO fail, so a divergence",
+    "that gets closed cannot rot here unnoticed.",
+    "",
+    "Adding an entry is a claim that the difference is deliberate. Write the reason, and put the",
+    "full argument in docs/ui-parity-audit.md — 'reason' is a summary, not the record.",
+    "",
+    "Baselined 2026-09-04 at 25 entries."
+  ],
+  "entries": [
+    {
+      "source": "button.tsx",
+      "token": "text-primary-foreground",
+      "reason": "Removed deliberately. Set in both the Default variant base and the Default+Primary compound, which raced on source order and lost in dark mode. Text colour is set once, in the compound."
+    },
+    {
+      "source": "calendar.tsx",
+      "token": "border-input",
+      "reason": "Composition artefact. Moved to SelectTrigger.razor with the InBuiltDropdown port, outside the harness's Calendar file scope."
+    },
+    {
+      "source": "calendar.tsx",
+      "token": "bg-popover",
+      "reason": "Composition artefact. Surface now comes from SelectContent, which sets it in its own file."
+    },
+    {
+      "source": "calendar.tsx",
+      "token": "border-collapse",
+      "reason": "Blok renders the day grid as a <table>; we render a flat div grid. Covered by the DivergenceNote on CalendarPage."
+    },
+    {
+      "source": "calendar.tsx",
+      "token": "hover:rounded-md",
+      "reason": "Our rounding is per-state (rounded-md / rounded-l-md / rounded-none). A base hover rounding would round range-middle cells and break the continuous range bar."
+    },
+    {
+      "source": "calendar.tsx",
+      "token": "text-inverse-text",
+      "reason": "Selected and range-endpoint cells use literal text-white. The surface is a fixed bg-primary-500 that does not flip, so the token would resolve dark-on-blue in dark mode. Enforced by Check 5."
+    },
+    {
+      "source": "editable.tsx",
+      "token": "hover:bg-transparent",
+      "reason": "Same visual result reached differently — hover:bg-neutral-bg is conditionally omitted when IsPreviewFocusable is false."
+    },
+    {
+      "source": "editable.tsx",
+      "token": "bg-white",
+      "reason": "We use bg-popover instead, deliberately. bg-white does not flip, so Blok's error tooltip is white-on-dark in dark mode with text-destructive on it."
+    },
+    {
+      "source": "kbd.tsx",
+      "token": "dark:[[data-slot=tooltip-content]_&]:bg-background/10",
+      "reason": "Our Tooltip surface is a fixed bg-gray-700 in both modes, so the nested Kbd uses bg-white/20 with literal text-white and needs no dark variant."
+    },
+    {
+      "source": "popover.tsx",
+      "token": "bg-popover",
+      "reason": "Ours is deliberately headless; consumers supply the surface via ClassName. Filter's dropdown is the worked example."
+    },
+    {
+      "source": "popover.tsx",
+      "token": "text-popover-foreground",
+      "reason": "Headless — see bg-popover above."
+    },
+    {
+      "source": "popover.tsx",
+      "token": "rounded-md",
+      "reason": "Headless — see bg-popover above."
+    },
+    {
+      "source": "popover.tsx",
+      "token": "shadow-md",
+      "reason": "Headless — see bg-popover above."
+    },
+    {
+      "source": "scroll-area.tsx",
+      "token": "border-l",
+      "reason": "Blok styles a Radix custom scrollbar with a bordered track. We use the library-wide native thin-scrollbar treatment."
+    },
+    {
+      "source": "scroll-area.tsx",
+      "token": "border-l-transparent",
+      "reason": "Radix scrollbar track — see border-l above."
+    },
+    {
+      "source": "scroll-area.tsx",
+      "token": "border-t",
+      "reason": "Radix scrollbar track — see border-l above."
+    },
+    {
+      "source": "scroll-area.tsx",
+      "token": "border-t-transparent",
+      "reason": "Radix scrollbar track — see border-l above."
+    },
+    {
+      "source": "scroll-area.tsx",
+      "token": "bg-border",
+      "reason": "Present, but as a ::-webkit-scrollbar-thumb variant rather than a bare token, so the comparison cannot see it."
+    },
+    {
+      "source": "search-input.tsx",
+      "token": "focus:border-0",
+      "reason": "Pre-existing. The wrapper draws the focus border via a has-[] selector, so the inner input having none is already the intent; left as-is pending a SearchInput pass."
+    },
+    {
+      "source": "tooltip.tsx",
+      "token": "text-inverse-text",
+      "reason": "Replaced by literal text-white. The surface is a fixed bg-gray-700 in both modes, so a flipping token renders invisible in dark. Enforced by Check 5."
+    },
+    {
+      "source": "time-picker.tsx",
+      "token": "border-input",
+      "reason": "Composition artefact. Our trigger is a Button with the Outline variant, so this token lives in Button.razor, outside the harness's TimePicker file scope. Blok inlines the whole trigger class string instead of composing a Button."
+    },
+    {
+      "source": "time-picker.tsx",
+      "token": "text-base",
+      "reason": "Composition artefact. Our trigger is a Button with the Outline variant, so this token lives in Button.razor, outside the harness's TimePicker file scope. Blok inlines the whole trigger class string instead of composing a Button."
+    },
+    {
+      "source": "time-picker.tsx",
+      "token": "dark:aria-invalid:ring-destructive/40",
+      "reason": "Composition artefact. Our trigger is a Button with the Outline variant, so this token lives in Button.razor, outside the harness's TimePicker file scope. Blok inlines the whole trigger class string instead of composing a Button."
+    },
+    {
+      "source": "time-picker.tsx",
+      "token": "dark:bg-input/30",
+      "reason": "Composition artefact. Our trigger is a Button with the Outline variant, so this token lives in Button.razor, outside the harness's TimePicker file scope. Blok inlines the whole trigger class string instead of composing a Button."
+    },
+    {
+      "source": "time-picker.tsx",
+      "token": "dark:hover:bg-input/50",
+      "reason": "Composition artefact. Our trigger is a Button with the Outline variant, so this token lives in Button.razor, outside the harness's TimePicker file scope. Blok inlines the whole trigger class string instead of composing a Button."
+    }
+  ]
+}

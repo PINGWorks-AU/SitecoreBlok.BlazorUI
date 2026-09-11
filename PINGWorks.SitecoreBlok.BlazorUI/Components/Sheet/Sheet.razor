@@ -1,18 +1,22 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IDisposable
 
-<div data-slot="sheet" data-state="@( Open ? "open" : "closed" )" class="@( Open ? "" : "pointer-events-none" )">
-	<div data-slot="sheet-overlay" @onclick="Close"
-		 class="@OverlayCssClass"></div>
-	<div data-slot="sheet-content" class="@ContentCssClass">
-		@ChildContent
-		<button type="button" data-slot="sheet-close"
-				class="absolute top-2.5 right-4 opacity-70 transition-opacity hover:opacity-100 inline-flex items-center justify-center size-8 rounded-full cursor-pointer hover:bg-neutral-bg"
-				@onclick="Close">
-			<Icon Svg="@IconSvg.Close" Scale="0.9" ResetClassName />
-			<span class="sr-only">Close</span>
-		</button>
+@if ( Present )
+{
+	<div data-slot="sheet" data-state="@State" class="@( Open ? "" : "pointer-events-none" )">
+		<div data-slot="sheet-overlay" data-state="@State" @onclick="Close"
+			 class="@OverlayCssClass"></div>
+		<div data-slot="sheet-content" data-state="@State" class="@ContentCssClass">
+			@ChildContent
+			<button type="button" data-slot="sheet-close"
+					class="absolute top-2.5 right-4 opacity-70 transition-opacity hover:opacity-100 inline-flex items-center justify-center size-8 rounded-full cursor-pointer hover:bg-neutral-bg"
+					@onclick="Close">
+				<Icon Svg="@IconSvg.Close" Scale="0.9" ResetClassName />
+				<span class="sr-only">Close</span>
+			</button>
+		</div>
 	</div>
-</div>
+}
 
 @code {
 	[Parameter] public RenderFragment? ChildContent { get; set; }
@@ -21,36 +25,79 @@
 	[Parameter] public EventCallback<bool> OpenChanged { get; set; }
 	[Parameter] public SheetSide Side { get; set; } = SheetSide.Right;
 
-	private string OverlayCssClass => CssClassBuilder.Start( "fixed inset-0 z-50 transition-opacity duration-300" )
-										.With( "bg-black/50 opacity-100", Open )
-										.With( "opacity-0", !Open )
+	private const int ExitDurationMs = 300;
+
+	private bool Present;
+	private CancellationTokenSource? ExitCts;
+
+	private string State => Open ? "open" : "closed";
+
+	private string OverlayCssClass => CssClassBuilder.Start( "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:fill-mode-forwards fixed inset-0 z-50 bg-black/50" )
 										.Build();
 
 	// `text-foreground` is explicit so the sheet text follows light/dark token
 	// flips. Blok's source omits it and relies on body-level inheritance, but
 	// the cascade does not reliably reach the fixed-positioned content in our
 	// Catalogue render path. Removing this regresses dark-mode text contrast.
-	private string ContentCssClass => CssClassBuilder.Start( "bg-background text-foreground fixed z-50 flex flex-col gap-4 shadow-lg transition-transform duration-300 ease-in-out" )
-										.With( "inset-y-0 right-0 h-full w-3/4 sm:max-w-sm", Side is SheetSide.Right )
-										.With( "translate-x-0", Open && Side is SheetSide.Right )
-										.With( "translate-x-full", !Open && Side is SheetSide.Right )
-										.With( "inset-y-0 left-0 h-full w-3/4 sm:max-w-sm", Side is SheetSide.Left )
-										.With( "-translate-x-0", Open && Side is SheetSide.Left )
-										.With( "-translate-x-full", !Open && Side is SheetSide.Left )
-										.With( "inset-x-0 top-0 h-auto", Side is SheetSide.Top )
-										.With( "translate-y-0", Open && Side is SheetSide.Top )
-										.With( "-translate-y-full", !Open && Side is SheetSide.Top )
-										.With( "inset-x-0 bottom-0 h-auto", Side is SheetSide.Bottom )
-										.With( "translate-y-0", Open && Side is SheetSide.Bottom )
-										.With( "translate-y-full", !Open && Side is SheetSide.Bottom )
+	private string ContentCssClass => CssClassBuilder.Start( "bg-background text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fill-mode-forwards fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500" )
+										.With( "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 sm:max-w-sm", Side is SheetSide.Right )
+										.With( "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 sm:max-w-sm", Side is SheetSide.Left )
+										.With( "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto", Side is SheetSide.Top )
+										.With( "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto", Side is SheetSide.Bottom )
 										.With( ClassName )
 										.Build();
+
+	protected override void OnParametersSet() => SyncPresence();
+
+	private void SyncPresence()
+	{
+		if ( Open )
+		{
+			CancelExit();
+			Present = true;
+		}
+		else if ( Present && ExitCts is null )
+		{
+			ExitCts = new CancellationTokenSource();
+			_ = UnmountAfterExit( ExitCts );
+		}
+	}
+
+	private async Task UnmountAfterExit( CancellationTokenSource cts )
+	{
+		try
+		{
+			await Task.Delay( ExitDurationMs, cts.Token );
+		}
+		catch ( TaskCanceledException )
+		{
+			return;
+		}
+
+		if ( !ReferenceEquals( ExitCts, cts ) )
+			return;
+
+		CancelExit();
+		Present = false;
+
+		await InvokeAsync( StateHasChanged );
+	}
+
+	private void CancelExit()
+	{
+		ExitCts?.Cancel();
+		ExitCts?.Dispose();
+		ExitCts = null;
+	}
 
 	private async Task Close()
 	{
 		Open = false;
+		SyncPresence();
 
 		if ( OpenChanged.HasDelegate )
 			await OpenChanged.InvokeAsync( false );
 	}
+
+	public void Dispose() => CancelExit();
 }

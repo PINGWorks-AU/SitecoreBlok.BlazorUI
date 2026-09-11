@@ -120,7 +120,7 @@ Signatures of every rendering in the "Blok UI Kit - Template" Balsamiq project. 
 | DataToolbar | Row: search-box + closed ComboBox filters + icon ButtonBar view switch + primary button |
 | DataPagination | "Showing X–Y of Z" + pager buttons |
 | EmptyTable | DataGrid header row + bordered empty rect with inbox icon + clear link |
-| FilterChip / FilterBar | `#EAE7FF` chip "Label: value ×"; bar = chips + dotted "+ Add filter" chip + "Clear all" link |
+| FilterChip / FilterChipBar | `#EAE7FF` chip "Label: value ×"; bar = chips + dotted "+ Add filter" chip + "Clear all" link |
 | KvList | Rows: fixed-width grey label + value, faint dividers |
 | ResultsList | Bordered list, `#EAE7FF` selected row (bold title + meta) |
 | SettingsPage | Title + left tab column (`#EAE7FF` active) + vline + form content |

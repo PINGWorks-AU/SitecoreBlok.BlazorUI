@@ -22,6 +22,13 @@
 .DESCRIPTION
     Run from the repo root. Exits non-zero if any issue is found.
 
+    Check 3 findings listed in tools/parity-known-drift.json are reported as accepted and do
+    NOT fail the run — they are divergences already argued in docs/ui-parity-audit.md. Anything
+    unlisted fails, which is what makes this usable as a CI gate. An entry that no longer matches
+    any finding is reported as stale and also fails, so the list cannot quietly accumulate dead
+    exceptions; staleness is only evaluated on a full run, since a scoped run legitimately never
+    reaches most entries.
+
     By default runs all six checks across all components. Use -Component
     to scope a single check (or -Components "Button,Card,Input" to scope a
     subset).
@@ -74,6 +81,21 @@ $repoRoot      = Split-Path $PSScriptRoot -Parent
 $componentsDir = Join-Path $repoRoot "PINGWorks.SitecoreBlok.BlazorUI/Components"
 $compiledCss   = Join-Path $repoRoot "PINGWorks.SitecoreBlok.BlazorUI/wwwroot/css/sitecore-blok.css"
 $fullReportPath = Join-Path $repoRoot $ReportPath
+$knownDriftPath = Join-Path $PSScriptRoot "parity-known-drift.json"
+
+# ---- Accepted Check 3 drift --------------------------------------------------
+# Each entry is a divergence already argued in docs/ui-parity-audit.md. Listing one here means
+# the run does not fail on it; anything unlisted still does, which is what makes the harness
+# usable as a build gate. Missing file is not fatal — the harness then behaves as it always did.
+
+$knownDrift = @()
+if (Test-Path $knownDriftPath) {
+    try {
+        $knownDrift = (Get-Content -Path $knownDriftPath -Raw | ConvertFrom-Json).entries
+    } catch {
+        throw "Could not parse $knownDriftPath : $($_.Exception.Message)"
+    }
+}
 
 if (-not (Test-Path $componentsDir)) { throw "Components folder not found: $componentsDir" }
 if (-not (Test-Path $compiledCss))   { throw "Compiled CSS not found: $compiledCss (has Tailwind CLI run?)" }
@@ -118,6 +140,22 @@ function Get-RazorClassStrings {
 
     $content = Get-Content -Path $Path -Raw
 
+    # Strip // line comments before parsing. The CssClassBuilder call pattern below cannot match
+    # a bare "(" inside the argument block, so a comment containing parentheses — e.g.
+    # "// addon (which is w-full) stays on the same row" — makes the whole Start(...) call fail to
+    # match, silently dropping EVERY class string in the file and reporting them all as drift.
+    # Only cut at a // that sits outside a string literal, so class strings are left intact.
+    $strippedLines = foreach ($line in ($content -split "`r?`n")) {
+        $idx = -1
+        $inString = $false
+        for ($c = 0; $c -lt $line.Length; $c++) {
+            if ($line[$c] -eq '"') { $inString = -not $inString }
+            elseif (-not $inString -and $c -lt $line.Length - 1 -and $line[$c] -eq '/' -and $line[$c + 1] -eq '/') { $idx = $c; break }
+        }
+        if ($idx -ge 0) { $line.Substring(0, $idx) } else { $line }
+    }
+    $content = $strippedLines -join "`n"
+
     $found = [System.Collections.Generic.List[string]]::new()
 
     # 1) CssClassBuilder chain — every "literal" passed to .Start/.With/.Reset
@@ -126,9 +164,24 @@ function Get-RazorClassStrings {
     $chainPattern = '(?:CssClassBuilder\.Start|\bCssClassBuilder\b\.With|(?<=Start\s*\([^)]*)\s*,\s*"[^"]*")|(\.With|\.Reset)\s*\(\s*(?:[^"]*?"([^"]*)")'
     # Simpler: match every `.Start(...)` / `.With(...)` / `.Reset(...)` block
     # and pull strings from inside the parens (scoped to that call).
-    $callPattern = '\b(?:Start|With|Reset)\s*\(((?:[^()"]|"[^"]*")*)\)'
+    # Balanced-paren match so a NESTED CALL inside the argument block doesn't kill the match.
+    # The earlier flat pattern could not contain a bare "(", so a guard like
+    # .With( "rounded-xl", Rounded && !CssClassBuilder.ContainsAny( ClassName, "rounded-" ) )
+    # failed to match and silently dropped that class — the same class of silent, retroactive
+    # blindness as the comment defect above, and it affected 21 primitive files (Alert, Button,
+    # Card, Dialog, Table ...). .NET balancing groups let the block span nested parens.
+    $callPattern = '\b(?:Start|With|Reset)\s*\((?<body>(?:[^()"]|"[^"]*"|\((?<Depth>)|\)(?<-Depth>))*(?(Depth)(?!)))\)'
     [regex]::Matches($content, $callPattern) | ForEach-Object {
-        $argBlock = $_.Groups[1].Value
+        $argBlock = $_.Groups['body'].Value
+
+        # Drop nested call expressions before harvesting literals. Their arguments are guard
+        # probes, not class names — ContainsAny( ClassName, "rounded-" ) passes the PREFIX
+        # "rounded-", which is not a utility and would report as missing from the compiled CSS.
+        # Strip innermost calls repeatedly so only the .With/.Start literals remain.
+        while ($argBlock -match '[A-Za-z_][\w.]*\s*\([^()]*\)') {
+            $argBlock = [regex]::Replace($argBlock, '[A-Za-z_][\w.]*\s*\([^()]*\)', '')
+        }
+
         [regex]::Matches($argBlock, '"([^"]*)"') | ForEach-Object { $found.Add($_.Groups[1].Value) }
     }
 
@@ -149,8 +202,26 @@ function Get-RazorClassStrings {
 
     # 5) Switch-expression arms — `=> "literal class string"` in @code blocks.
     #    Captures class strings returned from switch expressions (e.g. TileClass, ColorSchemeClass).
-    #    Get-TailwindTokens will filter out any non-Tailwind strings naturally.
-    [regex]::Matches($content, '=>\s*"([^"]*)"') | ForEach-Object { $found.Add($_.Groups[1].Value) }
+    #
+    #    Scoped to members whose NAME contains "Class", which is what this rule always meant but
+    #    did not enforce. Unscoped, it harvested every `=> "literal"` in the file, including
+    #    enum-to-attribute-value maps that never touch a class attribute —
+    #    `InputGroupAlign.InlineStart => "inline-start"` feeds data-align, and
+    #    `InputGroupButtonSize.IconXs => "icon-xs"` feeds data-size. Check 1 then reported both
+    #    as utilities missing from the compiled CSS, which they were, because they are not
+    #    utilities. The claim in the old comment that Get-TailwindTokens filters non-Tailwind
+    #    strings "naturally" was wrong: it cannot tell a class name from any other hyphenated word.
+    $memberStarts = [regex]::Matches($content, '(?m)^\s*(?:\[[^\]]*\]\s*)*(?:private|public|protected|internal)\b[^\n]*')
+    for ($m = 0; $m -lt $memberStarts.Count; $m++) {
+        $decl = $memberStarts[$m].Value
+        if ($decl -notmatch '\b\w*Class\w*\b') { continue }
+
+        $start = $memberStarts[$m].Index
+        $end   = if ($m + 1 -lt $memberStarts.Count) { $memberStarts[$m + 1].Index } else { $content.Length }
+        $body  = $content.Substring($start, $end - $start)
+
+        [regex]::Matches($body, '=>\s*"([^"]*)"') | ForEach-Object { $found.Add($_.Groups[1].Value) }
+    }
 
     $found
 }
@@ -202,6 +273,10 @@ foreach ($file in $razorFiles) {
         # `parity-*` is the harness's own marker namespace (e.g. `parity-no-text-pair`).
         # These are not real Tailwind utilities — they're suppression hints for Check 4.
         if ($token -match '^parity-') { continue }
+
+        # `language-*` is Prism's grammar namespace, applied by CodeViewer to the <code> element
+        # so Prism can pick a highlighter. Never a Tailwind utility, and there are 35 of them.
+        if ($token -match '^language-') { continue }
 
         # Tailwind compiles class selectors with CSS escapes for special chars:
         #   gap-1.5                → `.gap-1\.5`          (dot escaped)
@@ -290,11 +365,21 @@ if (-not $SkipDrift) {
     $equivGroups = @(
         @('bg-background', 'bg-body-bg'),
         @('border-border', 'border-border-color'),
-        @('text-foreground', 'text-body-text'),
         @('focus-visible:border-primary', 'focus:border-primary'),
         @('focus-visible:ring-primary/50', 'focus:ring-primary'),
+        @('focus-visible:ring-1', 'focus:ring-1'),
         @('text-muted-foreground', 'text-subtle-text'),
-        @('text-accent-foreground', 'text-body-text'),
+        # `--foreground` and `--accent-foreground` both resolve to blackAlpha-900 in light and
+        # white in dark, so these three are one colour. Previously two separate groups both
+        # claimed `text-body-text`, so whichever ran last silently won.
+        @('text-foreground', 'text-body-text', 'text-accent-foreground'),
+        # Chakra-era alias: typography.css defines --text-md and --text-base as the same
+        # 0.875rem, so `text-md` and `text-base` compile to an identical font-size. Note this
+        # does NOT extend to `text-sm` (0.8125rem), which is genuinely one step smaller.
+        @('text-base', 'text-md'),
+        # `border` and `border-1` both compile to border-width:1px in Tailwind v4. Blok mixes
+        # the two spellings across files (timeline.tsx uses border-1, most others use border).
+        @('border', 'border-1'),
         # Semantic hover/active aliases — `--primary-hover` resolves to `--color-primary-600`
         # in globals.css, so `bg-primary-hover` and `bg-primary-600` paint the same colour.
         # Same for active/700 and the success/danger families.
@@ -311,7 +396,12 @@ if (-not $SkipDrift) {
         @('dark:[&>svg]:text-danger-200', 'dark:[&_svg]:text-danger-200'),
         @('dark:[&>svg]:text-warning-200', 'dark:[&_svg]:text-warning-200'),
         @('dark:[&>svg]:text-success-200', 'dark:[&_svg]:text-success-200'),
-        @('dark:[&>svg]:text-info-200', 'dark:[&_svg]:text-info-200')
+        @('dark:[&>svg]:text-info-200', 'dark:[&_svg]:text-info-200'),
+        # `bg-backgrounds` (plural) is a typo in Blok's own source — button.tsx and toggle.tsx
+        # Outline variants. No such token exists, so Tailwind emits nothing for it and Blok's
+        # Outline buttons fall through to transparent in light mode. Ours spell it correctly.
+        # Mapped so the correct spelling doesn't report as drift against Blok's mistake.
+        @('bg-background', 'bg-backgrounds')
     )
     $canonicalMap = @{}
     foreach ($group in $equivGroups) {
@@ -321,6 +411,13 @@ if (-not $SkipDrift) {
 
     # Track which components we've already audited (aggregated with sub-components)
     $auditedBlokNames = @{}
+
+    # Chunks are PINGWorks compositions with no Blok source (MIGRATION_STATUS tracks them as
+    # Extras with no rows). Comparing them to Blok primitives is meaningless, and the prefix
+    # match below pools them into the wrong component: FormActions strips to `form` and diffs
+    # against Blok's form.tsx — a Won't Do row — while FilterChip and SkeletonCard pollute the
+    # Filter and Skeleton token sets. Check 3 only.
+    $razorFiles = $razorFiles | Where-Object { $_.Replace('\', '/') -notmatch '/Chunks/' }
 
     foreach ($file in $razorFiles) {
         $fileName = Split-Path $file -Leaf
@@ -332,14 +429,30 @@ if (-not $SkipDrift) {
         # until we hit a Blok source file.
         $baseName = $compName
         $blokSrc = $null
-        $candidate = $baseName
-        for ($i = 0; $i -lt 4; $i++) {
+
+        # Blok file names are kebab-case (input-otp.tsx, stack-navigation.tsx), so try the
+        # kebab form of the FULL component name before falling back to word-stripping.
+        # Without this, InputOtp lowercases to "inputotp" (404), strips "Otp", and resolves to
+        # input.tsx — silently diffing a component against the wrong Blok source. InputGroup hit
+        # the same trap. Word-stripping still runs afterwards for genuine sub-components
+        # (AccordionItem -> accordion).
+        $kebab = [regex]::Replace([IO.Path]::GetFileNameWithoutExtension($fileName), '(?<!^)([A-Z])', '-$1').ToLowerInvariant()
+        $candidate = if ($kebab -ne $compName) { $kebab } else { $baseName }
+        $triedKebab = $false
+        for ($i = 0; $i -lt 5; $i++) {
             $blokUrl = "https://raw.githubusercontent.com/Sitecore/blok/main/src/components/ui/$candidate.tsx"
             try {
                 $blokSrc = Invoke-WebRequest -Uri $blokUrl -UseBasicParsing -ErrorAction Stop -TimeoutSec 10
                 $baseName = $candidate
                 break
             } catch {
+                # The kebab attempt is the extra first pass; fall back to the plain lowercase
+                # name before word-stripping begins.
+                if (-not $triedKebab -and $candidate -eq $kebab) {
+                    $triedKebab = $true
+                    $candidate = $compName
+                    continue
+                }
                 # Strip trailing PascalCase word from original name
                 $candidate = [IO.Path]::GetFileNameWithoutExtension($fileName)
                 $m = [regex]::Match($candidate, '^(.+?)[A-Z][a-z]+$')
@@ -357,9 +470,13 @@ if (-not $SkipDrift) {
         # We search the full Components tree here (not just $razorFiles) because sub-components
         # may be outside the scope explicitly passed via -Component / -Components.
         $relatedFiles = Get-ChildItem -Path $componentsDir -Filter *.razor -File -Recurse |
+                        Where-Object { $_.FullName.Replace('\', '/') -notmatch '/Chunks/' } |
                         Where-Object {
                             $n = [IO.Path]::GetFileNameWithoutExtension($_.Name).ToLowerInvariant()
-                            $n -eq $baseName -or $n -like "$baseName*"
+                            # $baseName may be kebab-case (input-otp) while our file names are not
+                            # (InputOtpSlot -> inputotpslot), so match on both forms.
+                            $flat = $baseName -replace '-', ''
+                            $n -eq $baseName -or $n -like "$baseName*" -or $n -eq $flat -or $n -like "$flat*"
                         } | ForEach-Object { $_.FullName }
 
         $ourTokens = $relatedFiles |
@@ -368,7 +485,15 @@ if (-not $SkipDrift) {
                      Select-Object -Unique
 
         # Pull Blok class strings from the source (strings containing Tailwind-like content)
-        $blokTokens = [regex]::Matches($blokSrc.Content, '"([^"]*(?:bg-|text-|border-|ring-|hover:|active:|focus:|focus-visible:|aria-|data-|dark:|\[&|rounded-|shadow-|h-|w-|size-|px-|py-|gap-|flex|inline-|relative|absolute|fixed|transition)[^"]*)"') |
+        # Blok tests caller-supplied classNames at runtime, e.g.
+        #   const hasShadowNone = className?.includes("shadow-none")
+        # in stack-navigation.tsx. That string is a predicate, not a class Blok applies, but it
+        # looks identical to a class string to the matcher below and reported as drift we could
+        # never satisfy. Strip these comparison forms before extracting.
+        $blokSource = [regex]::Replace($blokSrc.Content, '\.(?:includes|startsWith|endsWith|indexOf|match|split|replace(?:All)?)\s*\(\s*"[^"]*"', '')
+        $blokSource = [regex]::Replace($blokSource, '(?:===|!==|==|!=)\s*"[^"]*"', '')
+
+        $blokTokens = [regex]::Matches($blokSource, '"([^"]*(?:bg-|text-|border-|ring-|hover:|active:|focus:|focus-visible:|aria-|data-|dark:|\[&|rounded-|shadow-|h-|w-|size-|px-|py-|gap-|flex|inline-|relative|absolute|fixed|transition)[^"]*)"') |
                        ForEach-Object { $_.Groups[1].Value } |
                        ForEach-Object { Get-TailwindTokens $_ } |
                        Select-Object -Unique
@@ -377,6 +502,20 @@ if (-not $SkipDrift) {
         $normalize = {
             param($t)
             if ($canonicalMap.ContainsKey($t)) { return $canonicalMap[$t] }
+
+            # The map holds bare utilities, so a variant-prefixed token never matched it and
+            # every equivalence had to be restated per prefix. Canonicalise the utility after
+            # the last ':' and re-attach the prefix, so `focus:text-accent-foreground` compares
+            # equal to `focus:text-foreground`. Arbitrary values are unaffected — the segment
+            # after the final ':' (e.g. `w-1.5` in `[&::-webkit-scrollbar]:w-1.5`) is simply
+            # absent from the map and falls through unchanged.
+            $idx = $t.LastIndexOf(':')
+            if ($idx -gt 0 -and $idx -lt $t.Length - 1) {
+                $prefix = $t.Substring(0, $idx + 1)
+                $base   = $t.Substring($idx + 1)
+                if ($canonicalMap.ContainsKey($base)) { return $prefix + $canonicalMap[$base] }
+            }
+
             return $t
         }
 
@@ -407,12 +546,41 @@ if (-not $SkipDrift) {
         if ($missingInOurs) {
             foreach ($mm in $missingInOurs | Select-Object -First 5) {
                 $driftFindings.Add([pscustomobject]@{
+                    Source    = "$baseName.tsx"
                     Component = "$baseName.tsx (Blok) ↔ $($relatedFiles.Count) Razor file(s)"
                     InBlok    = $mm
                     InOurs    = "(missing)"
                 })
             }
         }
+    }
+}
+
+# ---- Partition Check 3 against the accepted-drift list -----------------------
+# A stale entry is one that no longer matches any finding: the divergence was closed, or a token
+# was renamed upstream. Those fail too. Without that, the list quietly accumulates dead exceptions
+# and stops describing the codebase — which is how a baseline turns into a place to hide things.
+
+$knownDriftFindings = @()
+$newDriftFindings   = @()
+$staleKnownDrift    = @()
+
+if (-not $SkipDrift) {
+    $matchedKeys = @{}
+
+    foreach ($d in $driftFindings) {
+        $hit = $knownDrift | Where-Object { $_.source -eq $d.Source -and $_.token -eq $d.InBlok } | Select-Object -First 1
+        if ($hit) {
+            $matchedKeys["$($hit.source)|$($hit.token)"] = $true
+            $knownDriftFindings += [pscustomobject]@{ Component = $d.Component; InBlok = $d.InBlok; Reason = $hit.reason }
+        } else {
+            $newDriftFindings += $d
+        }
+    }
+
+    # Only meaningful on a full run — a scoped run legitimately never reaches most entries.
+    if (-not $Component -and -not $Components) {
+        $staleKnownDrift = $knownDrift | Where-Object { -not $matchedKeys.ContainsKey("$($_.source)|$($_.token)") }
     }
 }
 
@@ -650,9 +818,37 @@ if ($SkipDrift) {
 } elseif ($driftFindings.Count -eq 0) {
     [void]$sb.AppendLine("No drift detected.")
 } else {
-    [void]$sb.AppendLine("| Component | In Blok | In ours |")
-    [void]$sb.AppendLine("|-----------|---------|---------|")
-    foreach ($d in $driftFindings) { [void]$sb.AppendLine("| $($d.Component) | ``$($d.InBlok)`` | $($d.InOurs) |") }
+    if ($newDriftFindings.Count -eq 0) {
+        [void]$sb.AppendLine("No unexpected drift.")
+    } else {
+        [void]$sb.AppendLine("### Unexpected — these fail the run")
+        [void]$sb.AppendLine("")
+        [void]$sb.AppendLine("| Component | In Blok | In ours |")
+        [void]$sb.AppendLine("|-----------|---------|---------|")
+        foreach ($d in $newDriftFindings) { [void]$sb.AppendLine("| $($d.Component) | ``$($d.InBlok)`` | $($d.InOurs) |") }
+    }
+
+    if ($knownDriftFindings.Count -gt 0) {
+        [void]$sb.AppendLine("")
+        [void]$sb.AppendLine("### Accepted — $($knownDriftFindings.Count) documented divergence(s)")
+        [void]$sb.AppendLine("")
+        [void]$sb.AppendLine("Listed in ``tools/parity-known-drift.json`` and argued in [docs/ui-parity-audit.md](ui-parity-audit.md). These do not fail the run.")
+        [void]$sb.AppendLine("")
+        [void]$sb.AppendLine("| Component | In Blok | Why |")
+        [void]$sb.AppendLine("|-----------|---------|-----|")
+        foreach ($d in $knownDriftFindings) { [void]$sb.AppendLine("| $($d.Component) | ``$($d.InBlok)`` | $($d.Reason) |") }
+    }
+}
+
+if ($staleKnownDrift.Count -gt 0) {
+    [void]$sb.AppendLine("")
+    [void]$sb.AppendLine("### Stale accepted-drift entries — these fail the run")
+    [void]$sb.AppendLine("")
+    [void]$sb.AppendLine("No longer reported by the harness. The divergence was closed, or the token was renamed upstream. Remove them from ``tools/parity-known-drift.json``.")
+    [void]$sb.AppendLine("")
+    [void]$sb.AppendLine("| Source | Token |")
+    [void]$sb.AppendLine("|--------|-------|")
+    foreach ($s in $staleKnownDrift) { [void]$sb.AppendLine("| $($s.source) | ``$($s.token)`` |") }
 }
 [void]$sb.AppendLine("")
 [void]$sb.AppendLine("## Check 4 — Surface background without paired text token")
@@ -698,14 +894,17 @@ Write-Host ""
 Write-Host "=== Summary ===" -ForegroundColor Yellow
 Write-Host "Missing utilities         : $($missingUtilities.Count)"
 Write-Host "Composed class hits       : $($composedFindings.Count)"
-Write-Host "Drift findings            : $(if ($SkipDrift) { 'skipped' } else { $driftFindings.Count })"
+Write-Host "Drift findings            : $(if ($SkipDrift) { 'skipped' } else { "$($newDriftFindings.Count) unexpected, $($knownDriftFindings.Count) accepted" })"
+if ($staleKnownDrift.Count -gt 0) {
+    Write-Host "Stale accepted-drift      : $($staleKnownDrift.Count)" -ForegroundColor Yellow
+}
 Write-Host "Unpaired surface bg/text  : $($bgTextFindings.Count)"
 Write-Host "Fixed-bg + flipping-text  : $($fixedBgFindings.Count)"
 Write-Host "Token light/dark asymmetry: $($tokenSymmetryFindings.Count)"
 Write-Host ""
 Write-Host "Full report: $fullReportPath"
 
-$totalIssues = $missingUtilities.Count + $composedFindings.Count + $bgTextFindings.Count + $fixedBgFindings.Count + $tokenSymmetryFindings.Count + $(if ($SkipDrift) { 0 } else { $driftFindings.Count })
+$totalIssues = $missingUtilities.Count + $composedFindings.Count + $bgTextFindings.Count + $fixedBgFindings.Count + $tokenSymmetryFindings.Count + $(if ($SkipDrift) { 0 } else { $newDriftFindings.Count + $staleKnownDrift.Count })
 
 if ($totalIssues -gt 0) {
     Write-Host ""

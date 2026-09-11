@@ -1,9 +1,13 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
 @*
-	FilterBar — horizontal filter-chip row.
+	FilterChipBar — horizontal row of FilterChips representing filters that are ALREADY APPLIED.
 	Filters slot accepts chip / badge / button elements representing active filters.
 	ClearAction slot (trailing) is typically a ghost "Clear filters" button.
+
+	Not to be confused with the FilterBar primitive, which holds the live filter CONTROLS.
+	Renamed from FilterBar on 2026-09-04 to free that name for Blok's export and to pair with
+	the FilterChip chunk this one exists to hold.
 *@
 
 <div class="flex items-center gap-2 flex-wrap">

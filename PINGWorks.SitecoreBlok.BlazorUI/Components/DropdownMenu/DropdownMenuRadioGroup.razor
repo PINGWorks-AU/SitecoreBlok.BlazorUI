@@ -1,0 +1,30 @@
+@namespace PINGWorks.SitecoreBlok.BlazorUI
+
+<div data-slot="dropdown-menu-radio-group" role="group" class="@ClassName">
+	<CascadingValue Value="this">
+		@ChildContent
+	</CascadingValue>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? ClassName { get; set; }
+	[Parameter] public string? Value { get; set; }
+	[Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+	internal bool IsSelected( string? value )
+		=> value is not null && value == Value;
+
+	internal async Task SetValue( string? value )
+	{
+		if ( Value == value )
+			return;
+
+		Value = value;
+
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
+
+		await InvokeAsync( StateHasChanged );
+	}
+}

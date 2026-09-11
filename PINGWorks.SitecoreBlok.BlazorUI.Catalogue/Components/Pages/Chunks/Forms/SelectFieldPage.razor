@@ -22,6 +22,14 @@
 			</div>
 		</ComponentExample>
 
+		<ComponentExample Title="Select field with a value already set"
+			Code="@("<SelectField Label=\"Country\" Placeholder=\"Pick a country\" Items=\"@Countries\" @bind-Value=\"PresetCountry\" />")"
+			Primitives="@("<div class=\"space-y-1.5\">\n    <label class=\"text-sm font-medium text-foreground ...\">Country</label>\n    <Select Value=\"au\" ValueLabel=\"Australia\">\n        <SelectTrigger><SelectValue Placeholder=\"Pick a country\" /></SelectTrigger>\n        <SelectContent>\n            <SelectItem Value=\"au\" Label=\"Australia\" />\n            ...\n        </SelectContent>\n    </Select>\n</div>")">
+			<div class="max-w-sm">
+				<SelectField Label="Country" Placeholder="Pick a country" Items="@Countries" @bind-Value="PresetCountry" />
+			</div>
+		</ComponentExample>
+
 	</ExamplesSection>
 
 </ComponentPage>
@@ -29,6 +37,9 @@
 @code {
 	private string? Country;
 	private string? Priority;
+
+	/// <summary>A value set before the field is first opened, for the preset-value example.</summary>
+	private string? PresetCountry = "au";
 
 	private static readonly List<SelectField.SelectFieldItem> Countries =
 	[

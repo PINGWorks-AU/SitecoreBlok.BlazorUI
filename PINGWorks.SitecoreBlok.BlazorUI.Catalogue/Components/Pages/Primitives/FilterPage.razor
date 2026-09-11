@@ -1,0 +1,326 @@
+@page "/primitives/filter"
+@using PINGWorks.SitecoreBlok.BlazorUI.Catalogue.Services
+@rendermode InteractiveServer
+
+<ComponentPage Title="Filter"
+			   Description="Search, single-select and multi-select filter controls, and the bar that lays them out"
+			   Interactivity="ComponentInteractivity.Interactive"
+			   ApiElements="@FilterElements">
+
+	<DivergenceNote>
+		<p><strong><code>FilterBar</code> takes children, not a filter array.</strong> Blok's <code>FilterBar</code> accepts a <code>filters</code> array of a discriminated union (<code>{ type: "input" | "single-select" | "multi-select", key, props }</code>), a <code>values</code> bag keyed by string, and an <code>onChange(key, unknown)</code> callback, because TypeScript can express that union and React can splat the props back out. C# has neither. Modelling it would mean giving up type-safe binding on every filter, so the filters are passed as child content instead and each one keeps its own <code>@@bind-Value</code>. The wrapper's <code>role</code>, direction, gap and clear-all behaviour are unchanged.</p>
+		<p><strong>No <code>defaultValue</code> parameters.</strong> Blok pairs each <code>value</code> with a <code>defaultValue</code> for its uncontrolled mode — a React distinction. In Blazor a filter left unbound keeps whatever you set <code>Value</code> to, so the second parameter has no job.</p>
+	</DivergenceNote>
+
+	<ExamplesSection>
+
+		<ComponentExample Title="Filter bar" Code="@("<FilterBar OnClearAll=\"ClearAll\">\n    <FilterInput @bind-Value=\"query\" Placeholder=\"Search products...\" />\n    <FilterSingleSelect @bind-Value=\"status\" Options=\"@StatusOptions\" Placeholder=\"Status\" />\n    <FilterMultiSelect @bind-Values=\"tags\" Options=\"@TagOptions\" Placeholder=\"Tags\" />\n</FilterBar>")">
+			<div class="space-y-3">
+				<FilterBar OnClearAll="ClearAll">
+					<FilterInput @bind-Value="BarQuery" Placeholder="Search products..." />
+					<FilterSingleSelect @bind-Value="BarStatus" Options="@StatusOptions" Placeholder="Status" />
+					<FilterMultiSelect @bind-Values="BarTags" Options="@TagOptions" Placeholder="Tags" />
+				</FilterBar>
+				<p class="text-sm text-muted-foreground">Applied: <strong>@AppliedSummary</strong></p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Search" Code="@("<FilterInput @bind-Value=\"query\"\n             Placeholder=\"Search products...\"\n             HelperText=\"Matches name and SKU\" />")">
+			<div class="space-y-3">
+				<FilterInput @bind-Value="Query"
+							 Placeholder="Search products..."
+							 HelperText="Matches name and SKU" />
+				<p class="text-sm text-muted-foreground">Query: <strong>@( string.IsNullOrEmpty( Query ) ? "(empty)" : Query )</strong></p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Single select" Code="@("<FilterSingleSelect @bind-Value=\"status\"\n                    Options=\"@StatusOptions\"\n                    Placeholder=\"Status\"\n                    Searchable=\"true\" />")">
+			<div class="space-y-3">
+				<FilterSingleSelect @bind-Value="Status"
+									Options="@StatusOptions"
+									Placeholder="Status"
+									Searchable="true" />
+				<p class="text-sm text-muted-foreground">Value: <strong>@( Status ?? "(none)" )</strong></p>
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Grouped options" Code="@("<FilterSingleSelect @bind-Value=\"region\"\n                    Groups=\"@RegionGroups\"\n                    Placeholder=\"Region\"\n                    Searchable=\"true\"\n                    HelperText=\"Single-select flattens the groups\" />\n\n<FilterMultiSelect @bind-Values=\"regions\"\n                   Groups=\"@RegionGroups\"\n                   Placeholder=\"Regions\"\n                   Searchable=\"true\"\n                   HelperText=\"Multi-select renders the headings\" />")">
+			<div class="flex flex-wrap items-start gap-3">
+				<FilterSingleSelect @bind-Value="Region"
+									Groups="@RegionGroups"
+									Placeholder="Region"
+									Searchable="true"
+									HelperText="Single-select flattens the groups" />
+
+				<FilterMultiSelect @bind-Values="Regions"
+								   Groups="@RegionGroups"
+								   Placeholder="Regions"
+								   Searchable="true"
+								   HelperText="Multi-select renders the headings" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Multi-select display modes" Code="@("<FilterMultiSelect @bind-Values=\"tags\" Options=\"@TagOptions\" Placeholder=\"Tags\" />\n\n<FilterMultiSelect @bind-Values=\"badgeTags\" Options=\"@TagOptions\" Placeholder=\"Tags\"\n                   DisplayMode=\"FilterDisplayMode.Badge\" />\n\n<FilterMultiSelect @bind-Values=\"countTags\" Options=\"@TagOptions\" Placeholder=\"Tags\"\n                   ShowSelectedCount=\"true\" />")">
+			<div class="flex flex-wrap items-start gap-3">
+				<FilterMultiSelect @bind-Values="Tags" Options="@TagOptions" Placeholder="Tags" />
+
+				<FilterMultiSelect @bind-Values="BadgeTags" Options="@TagOptions" Placeholder="Tags"
+								   DisplayMode="FilterDisplayMode.Badge" />
+
+				<FilterMultiSelect @bind-Values="CountTags" Options="@TagOptions" Placeholder="Tags"
+								   ShowSelectedCount="true" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Searchable multi-select with overflow" Code="@("<FilterMultiSelect @bind-Values=\"owners\"\n                   Options=\"@OwnerOptions\"\n                   Placeholder=\"Owners\"\n                   Searchable=\"true\"\n                   MaxDisplayItems=\"1\"\n                   MaxButtonWidth=\"260\" />")">
+			<FilterMultiSelect @bind-Values="Owners"
+							   Options="@OwnerOptions"
+							   Placeholder="Owners"
+							   Searchable="true"
+							   MaxDisplayItems="1"
+							   MaxButtonWidth="260" />
+		</ComponentExample>
+
+		<ComponentExample Title="Controlled open state" Code="@("<Button Variant=\"ButtonVariant.Outline\" OnClick=\"@(() => open = !( open ?? false ))\">\n    @( open == true ? \"Close\" : \"Open\" ) the filter\n</Button>\n\n<FilterMultiSelect @bind-Open=\"open\" @bind-Values=\"controlledTags\"\n                   Options=\"@TagOptions\" Placeholder=\"Tags\" />")">
+			<div class="flex flex-wrap items-center gap-3">
+				<Button Variant="ButtonVariant.Outline" OnClick="@(() => DropdownOpen = !( DropdownOpen ?? false ))">
+					@( DropdownOpen == true ? "Close" : "Open" ) the filter
+				</Button>
+
+				<FilterMultiSelect @bind-Open="DropdownOpen" @bind-Values="ControlledTags"
+								   Options="@TagOptions" Placeholder="Tags" />
+			</div>
+		</ComponentExample>
+
+		<ComponentExample Title="Vertical bar" Code="@("<FilterBar Direction=\"FilterBarDirection.Vertical\" ShowClearAll=\"false\">\n    <FilterInput @bind-Value=\"sideQuery\" Placeholder=\"Search...\" />\n    <FilterSingleSelect @bind-Value=\"sideStatus\" Options=\"@StatusOptions\" Placeholder=\"Status\" />\n</FilterBar>")">
+			<FilterBar Direction="FilterBarDirection.Vertical" ShowClearAll="false">
+				<FilterInput @bind-Value="SideQuery" Placeholder="Search..." />
+				<FilterSingleSelect @bind-Value="SideStatus" Options="@StatusOptions" Placeholder="Status" />
+			</FilterBar>
+		</ComponentExample>
+
+		<ComponentExample Title="Disabled" Code="@("<FilterBar ShowClearAll=\"false\">\n    <FilterInput Value=\"widget\" Disabled=\"true\" />\n    <FilterSingleSelect Value=\"active\" Options=\"@StatusOptions\" Placeholder=\"Status\" Disabled=\"true\" />\n    <FilterMultiSelect Values=\"@DisabledTags\" Options=\"@TagOptions\" Placeholder=\"Tags\" Disabled=\"true\" />\n</FilterBar>")">
+			<FilterBar ShowClearAll="false">
+				<FilterInput Value="widget" Disabled="true" />
+				<FilterSingleSelect Value="active" Options="@StatusOptions" Placeholder="Status" Disabled="true" />
+				<FilterMultiSelect Values="@DisabledTags" Options="@TagOptions" Placeholder="Tags" Disabled="true" />
+			</FilterBar>
+		</ComponentExample>
+
+	</ExamplesSection>
+
+</ComponentPage>
+
+@code {
+	private string? Query;
+	private string? Status;
+	private string? Region;
+	private List<string> Regions = [];
+	private List<string> Tags = [];
+	private List<string> BadgeTags = [];
+	private List<string> CountTags = [];
+	private List<string> Owners = [];
+	private List<string> ControlledTags = [];
+	private bool? DropdownOpen;
+
+	private string? BarQuery;
+	private string? BarStatus;
+	private List<string> BarTags = [];
+
+	private string? SideQuery;
+	private string? SideStatus;
+
+	private readonly List<string> DisabledTags = [ "new", "sale" ];
+
+	private string AppliedSummary
+	{
+		get
+		{
+			var parts = new List<string>();
+
+			if ( !string.IsNullOrEmpty( BarQuery ) )
+				parts.Add( $"\"{BarQuery}\"" );
+
+			if ( BarStatus is not null )
+				parts.Add( BarStatus );
+
+			parts.AddRange( BarTags );
+
+			return parts.Count == 0 ? "(nothing)" : string.Join( ", ", parts );
+		}
+	}
+
+	private void ClearAll()
+	{
+		BarQuery = null;
+		BarStatus = null;
+		BarTags = [];
+	}
+
+	private static readonly FilterOption[] StatusOptions =
+	[
+		new FilterOption { Value = "active", Label = "Active" },
+		new FilterOption { Value = "draft", Label = "Draft", Description = "Not visible to customers" },
+		new FilterOption { Value = "archived", Label = "Archived" },
+		new FilterOption { Value = "deleted", Label = "Deleted", Disabled = true },
+	];
+
+	private static readonly FilterOption[] TagOptions =
+	[
+		new FilterOption { Value = "new", Label = "New" },
+		new FilterOption { Value = "sale", Label = "Sale" },
+		new FilterOption { Value = "clearance", Label = "Clearance" },
+		new FilterOption { Value = "seasonal", Label = "Seasonal" },
+	];
+
+	private static readonly FilterOption[] OwnerOptions =
+	[
+		new FilterOption { Value = "ada", Label = "Ada Lovelace" },
+		new FilterOption { Value = "grace", Label = "Grace Hopper" },
+		new FilterOption { Value = "katherine", Label = "Katherine Johnson" },
+		new FilterOption { Value = "alan", Label = "Alan Turing" },
+		new FilterOption { Value = "edsger", Label = "Edsger Dijkstra" },
+	];
+
+	private static readonly FilterSelectGroup[] RegionGroups =
+	[
+		new FilterSelectGroup
+		{
+			Label = "Europe",
+			Options =
+			[
+				new FilterOption { Value = "uk", Label = "United Kingdom" },
+				new FilterOption { Value = "de", Label = "Germany" },
+			]
+		},
+		new FilterSelectGroup
+		{
+			Label = "Asia Pacific",
+			Options =
+			[
+				new FilterOption { Value = "au", Label = "Australia" },
+				new FilterOption { Value = "jp", Label = "Japan" },
+			]
+		},
+	];
+
+	private static readonly ApiElement[] FilterElements =
+	[
+		new ApiElement(
+			Name: "FilterBar",
+			Description: "Lays a set of filters out in a labelled region and optionally renders a clear-all action. Pass `FilterInput`, `FilterSingleSelect` and `FilterMultiSelect` as children.",
+			Depth: 0,
+			Properties:
+			[
+				new ApiProperty( "ChildContent",         "RenderFragment?",             false, "The filters to lay out." ),
+				new ApiProperty( "OnClearAll",           "EventCallback",               false, "Invoked by the clear-all button. The button only renders when this is bound." ),
+				new ApiProperty( "ShowClearAll",         "bool",                        false, "Whether the clear-all button may render. Default: `true`." ),
+				new ApiProperty( "ClearAllText",         "string",                      false, "Label on the clear-all button. Default: `\"Clear all\"`." ),
+				new ApiProperty( "Direction",            "FilterBarDirection",          false, "Layout axis. Default: `FilterBarDirection.Horizontal`. Other value: `Vertical`." ),
+				new ApiProperty( "Gap",                  "string",                      false, "Gap utility applied between filters. Default: `\"gap-3\"`." ),
+				new ApiProperty( "AriaLabel",            "string",                      false, "Accessible name for the region. Default: `\"Filters\"`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the region." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes, forwarded to the region." ),
+			]
+		),
+		new ApiElement(
+			Name: "FilterInput",
+			Description: "Free-text filter built on `SearchInput`, with a leading icon and an optional clear button.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                     false, "The current text. Supports two-way binding via `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",      false, "Fires on every keystroke and when the field is cleared." ),
+				new ApiProperty( "Placeholder",          "string",                      false, "Placeholder text. Default: `\"Search...\"`." ),
+				new ApiProperty( "AriaLabel",            "string",                      false, "Accessible name for the field. Default: `\"Search\"`." ),
+				new ApiProperty( "Icon",                 "string",                      false, "SVG path for the leading icon. Default: `IconSvg.Magnify`." ),
+				new ApiProperty( "ShowClear",            "bool",                        false, "Whether the clear button appears once text is entered. Default: `true`." ),
+				new ApiProperty( "Width",                "string",                      false, "Width utilities for the wrapper. Default: `\"w-full max-w-sm\"`." ),
+				new ApiProperty( "Disabled",             "bool",                        false, "Disables the field and hides the clear button. Default: `false`." ),
+				new ApiProperty( "Name",                 "string?",                     false, "`name` attribute on the underlying input." ),
+				new ApiProperty( "HelperText",           "string?",                     false, "Hint rendered beneath the field and referenced by `aria-describedby`." ),
+				new ApiProperty( "AriaDescribedBy",      "string?",                     false, "Additional element ids to append to `aria-describedby`." ),
+				new ApiProperty( "ClassName",            "string?",                     false, "Extra CSS classes appended to the wrapper." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?", false, "Captured unmatched attributes, forwarded to the wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "FilterSingleSelect",
+			Description: "Dropdown filter that holds one value at a time, with an optional in-dropdown search box.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Value",                "string?",                           false, "The selected option's value. Supports two-way binding via `@bind-Value`." ),
+				new ApiProperty( "ValueChanged",         "EventCallback<string?>",            false, "Fires when the selection changes or is cleared." ),
+				new ApiProperty( "Options",              "IReadOnlyList<FilterOption>",       false, "The selectable options. Ignored when `Groups` is set." ),
+				new ApiProperty( "Groups",               "IReadOnlyList<FilterSelectGroup>?", false, "Sectioned options. When set, these replace `Options`. `FilterSingleSelect` flattens them into one list, as Blok does; only `FilterMultiSelect` renders the group headings." ),
+				new ApiProperty( "Placeholder",          "string",                            false, "Label shown on the trigger ahead of the selection. Default: `\"Select an option\"`." ),
+				new ApiProperty( "GroupLabel",           "string?",                           false, "Fallback accessible name for the option list." ),
+				new ApiProperty( "Searchable",           "bool",                              false, "Enables the in-dropdown search box. Default: `false`." ),
+				new ApiProperty( "ShowSearch",           "bool",                              false, "Whether the search box renders when `Searchable` is on. Default: `true`." ),
+				new ApiProperty( "SearchPlaceholder",    "string",                            false, "Placeholder for the search box. Default: `\"Search\"`." ),
+				new ApiProperty( "NoResultsText",        "string",                            false, "Shown when the query matches nothing. Default: `\"No results found\"`." ),
+				new ApiProperty( "ShowClear",            "bool",                              false, "Whether the trigger offers a clear button once a value is set. Default: `true`." ),
+				new ApiProperty( "Disabled",             "bool",                              false, "Disables the trigger. Default: `false`." ),
+				new ApiProperty( "Name",                 "string?",                           false, "Emits a hidden input under this name carrying the selected value." ),
+				new ApiProperty( "HelperText",           "string?",                           false, "Hint rendered beneath the trigger and referenced by `aria-describedby`." ),
+				new ApiProperty( "AriaDescribedBy",      "string?",                           false, "Additional element ids to append to `aria-describedby`." ),
+				new ApiProperty( "AriaLabels",           "FilterAriaLabels?",                 false, "Overrides the accessible names of the trigger, search box, list and clear button." ),
+				new ApiProperty( "RenderOption",         "RenderFragment<FilterOption>?",     false, "Replaces the default label and description rendering for each option." ),
+				new ApiProperty( "ClassName",            "string?",                           false, "Extra CSS classes appended to the wrapper." ),
+				new ApiProperty( "DropdownClassName",    "string?",                           false, "Extra CSS classes appended to the dropdown surface." ),
+				new ApiProperty( "AdditionalAttributes", "Dictionary<string, object>?",       false, "Captured unmatched attributes, forwarded to the wrapper." ),
+			]
+		),
+		new ApiElement(
+			Name: "FilterMultiSelect",
+			Description: "Dropdown filter that holds any number of values, shown on the trigger as text, badges or a count. Takes every parameter `FilterSingleSelect` does, plus those below.",
+			Depth: 1,
+			Properties:
+			[
+				new ApiProperty( "Values",            "List<string>",                false, "The selected values. Supports two-way binding via `@bind-Values`." ),
+				new ApiProperty( "ValuesChanged",     "EventCallback<List<string>>", false, "Fires whenever an option is toggled or the selection is cleared." ),
+				new ApiProperty( "DisplayMode",       "FilterDisplayMode",           false, "How the selection appears on the trigger. Default: `FilterDisplayMode.Text`. Other value: `Badge`." ),
+				new ApiProperty( "MaxDisplayItems",   "int",                         false, "How many labels or badges appear before an overflow `+N`. Default: `2`." ),
+				new ApiProperty( "ShowSelectedCount", "bool",                        false, "Shows a count badge instead of the selected labels. Default: `false`." ),
+				new ApiProperty( "MaxButtonWidth",    "int?",                        false, "Pixel cap on the trigger width; selected labels truncate within it." ),
+				new ApiProperty( "Open",              "bool?",                       false, "Controls the dropdown's open state. Leave unset to let the trigger own it; supports two-way binding via `@bind-Open`." ),
+				new ApiProperty( "OpenChanged",       "EventCallback<bool?>",        false, "Fires whenever the dropdown opens or closes. Nullable so it pairs with `Open` under `@bind-Open`; the value raised is never null." ),
+			]
+		),
+		new ApiElement(
+			Name: "FilterOption",
+			Description: "One selectable option in a `FilterSingleSelect` or `FilterMultiSelect`.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Value",       "string",  true,  "The value stored when the option is selected." ),
+				new ApiProperty( "Label",       "string",  true,  "The text shown for the option, and what the in-dropdown search matches against." ),
+				new ApiProperty( "Description", "string?", false, "Secondary line rendered beneath the label." ),
+				new ApiProperty( "Disabled",    "bool",    false, "Renders the option dimmed and unselectable. Default: `false`." ),
+			]
+		),
+		new ApiElement(
+			Name: "FilterSelectGroup",
+			Description: "A titled section of options, passed to a filter's `Groups` parameter.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "Label",   "string",                      true, "Heading rendered above the group's options." ),
+				new ApiProperty( "Options", "IReadOnlyList<FilterOption>", true, "The options in this group." ),
+			]
+		),
+		new ApiElement(
+			Name: "FilterAriaLabels",
+			Description: "Accessible-name overrides for the interactive parts of a filter, passed to the `AriaLabels` parameter.",
+			Depth: 2,
+			Properties:
+			[
+				new ApiProperty( "PopoverTrigger", "string?", false, "Names the dropdown trigger. Falls back to the placeholder." ),
+				new ApiProperty( "SearchInput",    "string?", false, "Names the in-dropdown search box. Falls back to its placeholder." ),
+				new ApiProperty( "Listbox",        "string?", false, "Names the option list. Falls back to the group label, then the placeholder." ),
+				new ApiProperty( "ClearSelection", "string?", false, "Names the clear button." ),
+			]
+		),
+	];
+}

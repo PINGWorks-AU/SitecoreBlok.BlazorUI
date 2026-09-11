@@ -118,7 +118,7 @@ else
 		=> CssClassBuilder.Start( "relative flex flex-col items-center justify-center gap-2 text-center transition-colors rounded-lg" )
 			.With( "p-6", Gutters )
 			.With( "border-2 border-dashed", Borders )
-			.With( "border-input bg-background", Borders && !DragOver && !Disabled )
+			.With( "border-input bg-background text-foreground", Borders && !DragOver && !Disabled )
 			.With( "hover:bg-neutral-bg", !DragOver && !Disabled )
 			.With( "border-primary bg-primary-bg", Borders && DragOver && !Disabled )
 			.With( "opacity-50", Disabled )
@@ -137,7 +137,7 @@ else
 				// Focus
 				"outline-none focus-within:border-primary focus-within:ring-primary/50 focus-within:ring-[3px]" )
 			.With( "h-10 min-w-10 px-4 rounded-4xl", Gutters )
-			.With( "bg-background hover:bg-neutral-bg active:bg-neutral-bg-active dark:bg-input/30 dark:hover:bg-input/50", !Disabled )
+			.With( "bg-background text-foreground hover:bg-neutral-bg active:bg-neutral-bg-active dark:bg-input/30 dark:hover:bg-input/50", !Disabled )
 			.With( "opacity-50 pointer-events-none", Disabled )
 			.With( ClassName )
 			.Build();

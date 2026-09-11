@@ -1,7 +1,7 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
 <button @ref="Ref" type="button" data-slot="dropdown-menu-trigger"
-		class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+		class="@CssClass" @onclick="OnClick" @attributes="AdditionalAttributes" aria-haspopup="true">
 	@ChildContent
 </button>
 
