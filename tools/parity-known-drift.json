@@ -135,6 +135,11 @@
       "source": "time-picker.tsx",
       "token": "dark:hover:bg-input/50",
       "reason": "Composition artefact. Our trigger is a Button with the Outline variant, so this token lives in Button.razor, outside the harness's TimePicker file scope. Blok inlines the whole trigger class string instead of composing a Button."
+    },
+    {
+      "source": "menubar.tsx",
+      "token": "focus:bg-accent",
+      "reason": "Replaced deliberately. Blok's dark --accent equals the menubar background, so hover, focus and open fills were invisible. Triggers and items use the flipping neutral-200 / neutral-300 scale instead."
     }
   ]
 }

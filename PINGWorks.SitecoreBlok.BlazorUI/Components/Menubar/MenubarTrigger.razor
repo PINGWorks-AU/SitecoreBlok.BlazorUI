@@ -1,6 +1,10 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-<button @ref="Ref" type="button" data-slot="menubar-trigger"
+<button @ref="Ref" type="button" role="menuitem" data-slot="menubar-trigger"
+		id="@ParentMenu.TriggerId"
+		aria-haspopup="menu"
+		aria-expanded="@( ParentMenu.IsOpen ? "true" : "false" )"
+		aria-controls="@( ParentMenu.IsOpen ? ParentMenu.ContentId : null )"
 		data-state="@( ParentMenu.IsOpen ? "open" : "closed" )"
 		class="@CssClass" @onclick="OnClick" @onmouseenter="OnMouseEnter"
 		@attributes="AdditionalAttributes">
@@ -20,8 +24,9 @@
 	// different trigger while a menu is open is a single click — not two (backdrop close, then open).
 	private string CssClass => CssClassBuilder.Start(
 		"relative z-50 flex select-none items-center rounded-sm px-2 py-1 font-medium text-sm outline-hidden",
-		"hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-		"data-[state=open]:bg-accent data-[state=open]:text-accent-foreground" )
+		// Blok's --accent equals the dark bar background, so fills use the flipping neutral scale for contrast in both themes.
+		"hover:bg-neutral-200 hover:text-accent-foreground focus:bg-neutral-200 focus:text-accent-foreground",
+		"data-[state=open]:bg-neutral-300 data-[state=open]:text-accent-foreground" )
 											.With( ClassName )
 											.Build();
 
@@ -31,11 +36,10 @@
 			ParentMenu.RegisterTriggerRef( Ref );
 	}
 
-	private async Task OnClick() => await ParentMenu.Toggle();
+	// A click with no pointer detail came from Enter or Space, so the first item takes focus.
+	private Task OnClick( MouseEventArgs args )
+		=> ParentMenu.Toggle( focusFirstItem: args.Detail == 0 );
 
-	private async Task OnMouseEnter()
-	{
-		if ( ParentMenubar.HasAnyOpen && !ParentMenu.IsOpen )
-			await ParentMenu.Open();
-	}
+	private Task OnMouseEnter()
+		=> ParentMenubar.HasAnyOpen && !ParentMenu.IsOpen ? ParentMenu.Open() : Task.CompletedTask;
 }

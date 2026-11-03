@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
 		<Version>2.0.0.0</Version>
-		<VersionTag>preview-3</VersionTag>
+		<VersionTag>preview-4</VersionTag>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -74,6 +74,7 @@
 			✔️ Editable gains EditableError; Calendar gains CalendarAriaLabels for nav and dropdown ARIA overrides
 			✔️ Input focus ring narrowed from 3px to 1px to match Blok, affecting every composed input including SearchInput, InputGroup, Combobox and Filter
 			✔️ StackNavigation, Accordion, Calendar, DatePicker, Popover, Tooltip, Checkbox, Combobox, NavigationMenu and Sidebar re-audited and realigned to current Blok source
+			✔️ Menubar updates with performance enhancements, keyboard support and improved contrast in dark mode
 
 			v1.3.0
 			🎉 Add FileUpload chunk in the Forms family with drag-and-drop support and multi-file handling

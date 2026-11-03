@@ -1,6 +1,5 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
-@inject IJSRuntime JS
-@implements IAsyncDisposable
+@implements IDisposable
 
 <CascadingValue Value="this">
 	@ChildContent
@@ -11,76 +10,38 @@
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 
 	internal bool IsOpen { get; private set; }
-	internal bool IsPositioned { get; private set; }
-	internal double X { get; private set; }
-	internal double Y { get; private set; }
-	internal double TriggerLeft { get; private set; }
-	internal double TriggerTop { get; private set; }
-	internal double TriggerRight { get; private set; }
-	internal double TriggerBottom { get; private set; }
-
-	private ElementReference TriggerRef;
-	private bool HasTriggerRef;
-	private IJSObjectReference? Module;
+	internal bool FocusFirstItemOnOpen { get; private set; }
+	internal ElementReference TriggerRef { get; private set; }
+	internal string TriggerId { get; } = $"menubar-{Guid.NewGuid():N}"[..17] + "-trigger";
+	internal string ContentId
+		=> TriggerId.Replace( "-trigger", "-content" );
 
 	protected override void OnInitialized() => ParentMenubar.Register( this );
 
 	internal void RegisterTriggerRef( ElementReference triggerRef )
+		=> TriggerRef = triggerRef;
+
+	internal Task Toggle( bool focusFirstItem = false )
+		=> IsOpen ? Close() : Open( focusFirstItem );
+
+	// State changes before anything is awaited: hover and click events are handled in order, so the last one always wins.
+	internal Task Open( bool focusFirstItem = false )
 	{
-		TriggerRef = triggerRef;
-		HasTriggerRef = true;
-	}
+		var closing = ParentMenubar.NotifyOpening( this );
 
-	internal async Task Toggle()
-	{
-		if ( IsOpen )
-			await Close();
-		else
-			await Open();
-	}
-
-	internal async Task Open()
-	{
-		if ( !HasTriggerRef ) return;
-		await ParentMenubar.NotifyOpening( this );
-
-		Module ??= await JS.InvokeAsync<IJSObjectReference>( "import", "/_content/PINGWorks.SitecoreBlok.BlazorUI/js/sitecoreUI.js" );
-		var rect = await Module.InvokeAsync<ElementRect>( "SitecoreUI.getElementBounds", TriggerRef );
-
-		TriggerLeft = rect.Left;
-		TriggerTop = rect.Top;
-		TriggerRight = rect.Left + rect.Width;
-		TriggerBottom = rect.Top + rect.Height;
-		X = TriggerLeft;
-		Y = TriggerBottom + 8;
-		IsPositioned = false;
+		FocusFirstItemOnOpen = focusFirstItem;
 		IsOpen = true;
 
-		await InvokeAsync( StateHasChanged );
+		return Task.WhenAll( closing, InvokeAsync( StateHasChanged ) );
 	}
 
-	internal async Task UpdatePosition( double x, double y )
-	{
-		X = x;
-		Y = y;
-		IsPositioned = true;
-		await InvokeAsync( StateHasChanged );
-	}
-
-	internal async Task Close()
+	internal Task Close()
 	{
 		IsOpen = false;
-		IsPositioned = false;
-		await InvokeAsync( StateHasChanged );
+
+		return InvokeAsync( StateHasChanged );
 	}
 
-	public async ValueTask DisposeAsync()
-	{
-		try
-		{
-			ParentMenubar.Unregister( this );
-			await (Module?.DisposeAsync() ?? ValueTask.CompletedTask);
-		}
-		catch ( JSDisconnectedException ) { }
-	}
+	public void Dispose()
+		=> ParentMenubar.Unregister( this );
 }

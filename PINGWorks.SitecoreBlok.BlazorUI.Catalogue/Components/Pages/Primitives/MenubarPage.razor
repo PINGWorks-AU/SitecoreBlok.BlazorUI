@@ -8,9 +8,10 @@
 			   ApiElements="@MenubarElements">
 
 	<DivergenceNote>
-		<p><strong>No keyboard navigation.</strong> Blok's Menubar uses Radix UI which provides full keyboard support (arrow keys, <kbd>Enter</kbd>, <kbd>Esc</kbd>, roving focus). This Blazor port does not implement keyboard navigation — use mouse interaction. This is a known gap with no simple CSS-only workaround.</p>
+		<p><strong>Keyboard support covers top-level menus only.</strong> <kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>↓</kbd> opens a menu and focuses its first item; <kbd>↑</kbd>/<kbd>↓</kbd>, <kbd>Home</kbd> and <kbd>End</kbd> move between items; <kbd>←</kbd>/<kbd>→</kbd> move between menus; <kbd>Esc</kbd> closes and returns focus to the trigger. Submenus open on hover only, and triggers are all in the tab order rather than Radix's single roving tab stop.</p>
 		<p><strong><code>MenubarPortal</code> is a no-op.</strong> In Blok, <code>MenubarPortal</code> portals content to <code>document.body</code> for z-index stacking. In Blazor, <code>MenubarContent</code> uses <code>position:fixed</code> directly, so <code>MenubarPortal</code> exists only for API parity and is a transparent pass-through wrapper.</p>
-		<p><strong>Hover-to-switch is supported.</strong> When any menu is open and the user hovers over another trigger, the new menu opens automatically — matching standard menubar behaviour.</p>
+		<p><strong>Stronger hover, focus and open fills.</strong> Blok fills these with <code>--accent</code>, which in dark mode is the same colour as the menubar background, so the highlight barely shows. Triggers and items here use the flipping neutral scale instead: <code>bg-neutral-200</code> for hover and focus, <code>bg-neutral-300</code> for an open trigger or submenu trigger.</p>
+		<p><strong>Hover-to-switch is supported.</strong> When any menu is open and the user hovers over another trigger, the new menu opens automatically — matching standard menubar behaviour. A click outside the menu closes it.</p>
 	</DivergenceNote>
 
 	<ExamplesSection>

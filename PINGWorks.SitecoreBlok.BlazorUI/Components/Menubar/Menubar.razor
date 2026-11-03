@@ -1,6 +1,8 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
-<div data-slot="menubar" class="@CssClass" @attributes="AdditionalAttributes">
+<div @ref="Ref" role="menubar" data-slot="menubar" class="@CssClass" @attributes="AdditionalAttributes">
 	<CascadingValue Value="this">
 		@ChildContent
 	</CascadingValue>
@@ -11,7 +13,11 @@
 	[Parameter] public string? ClassName { get; set; }
 	[Parameter( CaptureUnmatchedValues = true )] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+	private const string ModulePath = "./_content/PINGWorks.SitecoreBlok.BlazorUI/Components/Menubar/Menubar.razor.js";
+
 	private List<MenubarMenu> RegisteredMenus = [];
+	private ElementReference Ref;
+	private Task<IJSObjectReference>? ModuleTask;
 
 	private string CssClass => CssClassBuilder.Start( "flex h-9 items-center gap-1 rounded-md border bg-background text-foreground p-1 shadow-xs" )
 											.With( ClassName )
@@ -22,9 +28,38 @@
 	internal void Register( MenubarMenu menu ) => RegisteredMenus.Add( menu );
 	internal void Unregister( MenubarMenu menu ) => RegisteredMenus.Remove( menu );
 
-	internal async Task NotifyOpening( MenubarMenu opening )
+	// Closes the other menus before returning, so a hover that switches menus never leaves two open.
+	internal Task NotifyOpening( MenubarMenu opening )
+		=> Task.WhenAll( RegisteredMenus.Where( m => m != opening && m.IsOpen ).Select( m => m.Close() ) );
+
+	internal Task<IJSObjectReference> Module()
+		=> ModuleTask ??= JS.InvokeAsync<IJSObjectReference>( "import", ModulePath ).AsTask();
+
+	protected override async Task OnAfterRenderAsync( bool firstRender )
 	{
-		foreach ( var menu in RegisteredMenus.Where( m => m != opening && m.IsOpen ) )
-			await menu.Close();
+		if ( !firstRender )
+			return;
+
+		try
+		{
+			var module = await Module();
+			await module.InvokeVoidAsync( "attach", Ref );
+		}
+		catch ( JSDisconnectedException ) { }
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if ( ModuleTask is null )
+			return;
+
+		try
+		{
+			var module = await ModuleTask;
+			await module.InvokeVoidAsync( "detach", Ref );
+			await module.DisposeAsync();
+		}
+		catch ( JSDisconnectedException ) { }
+		catch ( JSException ) { }
 	}
 }

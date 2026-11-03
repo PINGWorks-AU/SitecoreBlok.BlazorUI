@@ -1,6 +1,6 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
-<div data-slot="menubar-item"
+<div role="menuitem" tabindex="-1" data-slot="menubar-item"
 	 data-inset="@( Inset ? "" : null )"
 	 data-variant="@Variant.ToString().ToLowerInvariant()"
 	 data-disabled="@( Disabled ? "" : null )"
@@ -21,7 +21,7 @@
 
 	private string CssClass => CssClassBuilder.Start(
 		"relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden",
-		"hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+		"hover:bg-neutral-200 hover:text-accent-foreground focus:bg-neutral-200 focus:text-accent-foreground",
 		"data-[disabled]:pointer-events-none data-[inset]:pl-8 data-[disabled]:opacity-50",
 		"data-[variant=destructive]:text-destructive",
 		"data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive",
