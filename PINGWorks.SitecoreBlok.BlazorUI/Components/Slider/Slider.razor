@@ -1,13 +1,14 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
+@using System.Globalization
 
 <div data-slot="slider" class="@CssClass">
 	@* `parity-no-text-pair`: slider track and range are decorative — no text content. *@
 	<div data-slot="slider-track" class="relative grow overflow-hidden rounded-full h-1.5 bg-muted parity-no-text-pair">
 		<div data-slot="slider-range" class="absolute h-full bg-primary rounded-full parity-no-text-pair" style="width:@(Percentage)%"></div>
 	</div>
-	<input type="range" min="@Min" max="@Max" step="@Step" value="@Value" disabled="@Disabled"
+	<input type="range" min="@Min" max="@Max" step="@Step" disabled="@Disabled"
 		   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-		   @oninput="OnInput" @attributes="AdditionalAttributes" />
+		   @bind:get="Value" @bind:set="OnInput" @bind:event="oninput" @bind:culture="CultureInfo.InvariantCulture" @attributes="AdditionalAttributes" />
 	<div data-slot="slider-thumb" class="@ThumbCssClass" style="left:@(Percentage)%"></div>
 </div>
 
@@ -30,14 +31,11 @@
 
 	private string ThumbCssClass => "absolute block size-4 -translate-x-1/2 rounded-full border border-primary bg-background parity-no-text-pair shadow-sm transition-[color,box-shadow] hover:ring-2 hover:ring-primary pointer-events-none";
 
-	private async Task OnInput( ChangeEventArgs e )
+	private async Task OnInput( double value )
 	{
-		if ( double.TryParse( e.Value?.ToString(), out var val ) )
-		{
-			Value = val;
+		Value = value;
 
-			if ( ValueChanged.HasDelegate )
-				await ValueChanged.InvokeAsync( Value );
-		}
+		if ( ValueChanged.HasDelegate )
+			await ValueChanged.InvokeAsync( Value );
 	}
 }

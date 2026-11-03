@@ -8,13 +8,12 @@
 	     including while the dropdown is open.
 	   - If neither applies, render empty so the `placeholder` attribute kicks in. *@
 	<input data-slot="input-group-control" type="text" class="@InputCssClass"
-		   value="@DisplayedInputValue"
 		   placeholder="@Placeholder"
 		   disabled="@IsDisabled"
 		   name="@Name"
 		   aria-expanded="@( Parent.IsOpen ? "true" : "false" )"
 		   data-placeholder="@( string.IsNullOrEmpty( DisplayedInputValue ) )"
-		   @oninput="OnInput"
+		   @bind:get="DisplayedInputValue" @bind:set="OnInput" @bind:event="oninput"
 		   @onfocus="OnFocus"
 		   @onkeydown="Parent.HandleKeyDown"
 		   @attributes="AdditionalAttributes" />
@@ -110,11 +109,8 @@
 			Parent.RegisterAnchor( Group.ElementRef );
 	}
 
-	private async Task OnInput( ChangeEventArgs e )
-	{
-		var text = e.Value?.ToString();
-		await Parent.SetInputValue( text );
-	}
+	private Task OnInput( string? text )
+		=> Parent.SetInputValue( text );
 
 	private async Task OnFocus()
 	{

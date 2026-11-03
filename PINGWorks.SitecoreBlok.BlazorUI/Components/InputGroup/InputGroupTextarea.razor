@@ -1,7 +1,7 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
 <textarea data-slot="input-group-control" placeholder="@Placeholder" disabled="@Disabled" rows="@Rows"
-		  class="@CssClass" @oninput="OnInput" @attributes="AdditionalAttributes">@Value</textarea>
+		  class="@CssClass" @bind:get="Value" @bind:set="OnInput" @bind:event="oninput" @attributes="AdditionalAttributes"></textarea>
 
 @code {
 	[Parameter] public string? ClassName { get; set; }
@@ -17,9 +17,9 @@
 										.With( ClassName )
 										.Build();
 
-	private async Task OnInput( ChangeEventArgs e )
+	private async Task OnInput( string? value )
 	{
-		Value = e.Value?.ToString();
+		Value = value;
 
 		if ( ValueChanged.HasDelegate )
 			await ValueChanged.InvokeAsync( Value );

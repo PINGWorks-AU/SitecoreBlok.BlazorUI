@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
 		<Version>2.0.0.0</Version>
-		<VersionTag>preview-2</VersionTag>
+		<VersionTag>preview-3</VersionTag>
 	</PropertyGroup>
 
 	<ItemGroup>

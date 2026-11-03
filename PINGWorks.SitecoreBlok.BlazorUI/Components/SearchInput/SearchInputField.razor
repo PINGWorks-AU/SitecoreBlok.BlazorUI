@@ -2,8 +2,8 @@
 
 @implements IDisposable
 
-<input data-slot="search-input-control" type="@Type" value="@Value" placeholder="@Placeholder" disabled="@Disabled"
-	   class="@CssClass" @oninput="OnInput" @attributes="AdditionalAttributes" />
+<input data-slot="search-input-control" type="@Type" placeholder="@Placeholder" disabled="@Disabled"
+	   class="@CssClass" @bind:get="Value" @bind:set="OnInput" @bind:event="oninput" @attributes="AdditionalAttributes" />
 
 @code {
 	[Parameter] public string? ClassName { get; set; }
@@ -21,9 +21,9 @@
 										.With(ClassName)
 										.Build();
 
-	private async Task OnInput(ChangeEventArgs e)
+	private async Task OnInput(string? value)
 	{
-		Value = e.Value?.ToString();
+		Value = value;
 
 		if ( !ValueChanged.HasDelegate )
 			return;

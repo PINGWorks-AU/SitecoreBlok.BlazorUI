@@ -1,8 +1,8 @@
 ﻿{
   "schema": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI/blob/main/docs/components-schema.json",
   "package": "PINGWorks.SitecoreBlok.BlazorUI",
-  "version": "2.0.0.0-preview-2",
-  "generatedAt": "2026-09-11T06:10:29Z",
+  "version": "2.0.0.0-preview-3",
+  "generatedAt": "2026-11-03T03:13:05Z",
   "repository": "https://github.com/PINGWorks-AU/SitecoreBlok.BlazorUI",
   "documentation": {
     "theme": "/theme.md",

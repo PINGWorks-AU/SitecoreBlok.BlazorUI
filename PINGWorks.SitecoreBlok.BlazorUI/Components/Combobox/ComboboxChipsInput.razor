@@ -1,11 +1,10 @@
 @namespace PINGWorks.SitecoreBlok.BlazorUI
 
 <input data-slot="combobox-chip-input" type="text" class="@CssClass"
-	   value="@Parent.InputValue"
 	   placeholder="@Placeholder"
 	   disabled="@Disabled"
 	   name="@Name"
-	   @oninput="OnInput"
+	   @bind:get="Parent.InputValue" @bind:set="OnInput" @bind:event="oninput"
 	   @onfocus="OnFocus"
 	   @onkeydown="Parent.HandleKeyDown"
 	   @attributes="AdditionalAttributes" />
@@ -22,11 +21,8 @@
 											.With( ClassName )
 											.Build();
 
-	private async Task OnInput( ChangeEventArgs e )
-	{
-		var text = e.Value?.ToString();
-		await Parent.SetInputValue( text );
-	}
+	private Task OnInput( string? text )
+		=> Parent.SetInputValue( text );
 
 	private async Task OnFocus()
 	{

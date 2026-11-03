@@ -7,11 +7,10 @@
 	<input @ref="InputRef"
 		   data-slot="editable-input"
 		   type="text"
-		   value="@Context.Value"
 		   placeholder="@Context.Placeholder"
 		   disabled="@Context.IsDisabled"
 		   class="@CssClass"
-		   @oninput="HandleInput"
+		   @bind:get="Context.Value" @bind:set="HandleInput" @bind:event="oninput"
 		   @onblur="HandleBlur"
 		   @onkeydown="HandleKeyDown"
 		   @attributes="AdditionalAttributes" />
@@ -56,10 +55,10 @@
 		}
 	}
 
-	private async Task HandleInput(ChangeEventArgs e)
+	private async Task HandleInput(string? value)
 	{
 		if (Context is null) return;
-		await Context.HandleChange(e.Value?.ToString() ?? "");
+		await Context.HandleChange(value ?? "");
 	}
 
 	private async Task HandleBlur()

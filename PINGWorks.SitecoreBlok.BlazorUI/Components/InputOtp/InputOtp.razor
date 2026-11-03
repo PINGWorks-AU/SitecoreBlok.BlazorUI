@@ -10,9 +10,9 @@
 		@ChildContent
 	</CascadingValue>
 	<input @ref="InputRef" data-slot="input-otp" class="@CssClass"
-		   value="@Value" disabled="@Disabled"
+		   disabled="@Disabled"
 		   inputmode="@InputMode" autocomplete="one-time-code" autocorrect="off" spellcheck="false"
-		   @oninput="OnInput" @onfocus="OnFocus" @onblur="OnBlur"
+		   @bind:get="Value" @bind:set="OnInput" @bind:event="oninput" @onfocus="OnFocus" @onblur="OnBlur"
 		   @attributes="AdditionalAttributes" />
 </div>
 
@@ -103,9 +103,9 @@
 	private void OnBlur()
 		=> IsFocused = false;
 
-	private async Task OnInput( ChangeEventArgs e )
+	private async Task OnInput( string? value )
 	{
-		var raw = e.Value?.ToString() ?? string.Empty;
+		var raw = value ?? string.Empty;
 		var next = Filter( raw );
 
 		if ( next.Length > MaxLength )
